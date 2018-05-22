@@ -37,9 +37,10 @@ if __name__ == '__main__':
     print("Getting Data for Project id %s - %s" %
           (args['project_id'], my_project.display_name))
 
-    # get classifications
+    # generate new export and wait until it is ready
     if args['new_export']:
-        my_project.generate_export(args['export_type'])
+        print("Generating new export and wait until it is ready")
+        my_project.wait_export(args['export_type'])
 
     # get info about export
     export_description = my_project.describe_export(args['export_type'])
@@ -53,6 +54,8 @@ if __name__ == '__main__':
         writer = csv.writer(csvfile, delimiter=',')
         for i, row in enumerate(export.csv_reader()):
             writer.writerow(row)
+            if (i % 10000) == 0:
+                print("Wrote %s records" % i)
 
     print("Finished Writing File %s - Wrote %s records" %
           (args['output_file'], i))
