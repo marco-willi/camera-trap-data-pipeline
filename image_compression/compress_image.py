@@ -34,9 +34,10 @@ def compress_image (img_entry):
 if __name__ == '__main__':
     example_images_path = '/home/packerc/shared/machine_learning/will5448/data/example_images/compression_issue/'
     image_files = os.listdir(example_images_path)
-    output_prefix = 'compressed_'
+    output_postfix = '_compressed'
     image_input_paths = [''.join([example_images_path, file]) for file in image_files]
-    image_output_paths = [''.join([example_images_path, output_prefix + file]) for file in image_files]
+    image_output_paths = [''.join([example_images_path, file[0] + output_postfix + file[1]]) for
+                          file.split('.') in image_files]
     image_data = list()
 
     for image_input_path, image_output_path in zip(image_input_paths, image_output_paths):
