@@ -53,3 +53,6 @@ if __name__ == '__main__':
         writer = csv.writer(csvfile, delimiter=',')
         for i, row in enumerate(export.csv_reader()):
             writer.writerow(row)
+
+    print("Finished Writing File %s - Wrote %s records" %
+          (args['output_file'], i))
