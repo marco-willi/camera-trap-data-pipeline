@@ -41,18 +41,16 @@ if __name__ == '__main__':
                           file.split('.')[0] + output_postfix + '.' +
                           file.split('.')[1]]) for
                           file in image_files]
-    image_data = list()
+
 
     for image_input_path, image_output_path in zip(image_input_paths, image_output_paths):
         image_entry = {'imnum': 0, 'totim': 100, 't0': 100, 'invalid': 0,
                         'absimpath': image_input_path,
                         'comprimgpath': image_output_path,
                         'quality': 17}
-        image_data.append(image_entry)
+        compress_image(image_entry)
 
-    compress_image(image_data)
-
-
+    
     # TEST
     # img = Image.open(image_input_paths[0])
     # img.thumbnail(img.size)
