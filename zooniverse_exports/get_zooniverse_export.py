@@ -39,7 +39,7 @@ if __name__ == '__main__':
 
     # get classifications
     if args['new_export']:
-        my_project.generate_export('classifications')
+        my_project.generate_export(args['export_type'])
 
     # get info about export
     export_description = my_project.describe_export(args['export_type'])
