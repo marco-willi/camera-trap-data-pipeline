@@ -115,12 +115,12 @@ if __name__ == '__main__':
     image_input_paths = [''.join([example_images_path, file])
                          for file in image_files]
 
-
-     max_pixel_of_largest_side=[None, 2048, 2048, 2048, 2048],
-     resize_type=[Image.BILINEAR, Image.BILINEAR, PIL.Image.BICUBIC,  Image.BILINEAR]
-     check_disk_size_below_KB=[None, None, None, 600]
-     output_postfixes = ['_compressed', '_max2048_bilinear',
-                         '_max2048_bicubic', '_max2048_bilinear_ignore600KB']
+    max_pixel_of_largest_side = [None, 2048, 2048, 2048, 2048],
+    resize_type = [Image.BILINEAR, Image.BILINEAR, PIL.Image.BICUBIC,
+                   Image.BILINEAR]
+    check_disk_size_below_KB = [None, None, None, 600]
+    output_postfixes = ['_compressed', '_max2048_bilinear',
+                        '_max2048_bicubic', '_max2048_bilinear_ignore600KB']
 
     for i in range(0, len(output_postfixes)):
         ma = max_pixel_of_largest_side[i]
@@ -128,18 +128,18 @@ if __name__ == '__main__':
         ck = check_disk_size_below_KB[i]
         op = output_postfixes[i]
 
-
     output_postfix = op
     image_output_paths = [''.join([example_images_path,
                           file.split('.')[0] + output_postfix + '.' +
                           file.split('.')[1]]) for
                           file in image_files]
 
-    for image_input_path, image_output_path in zip(image_input_paths, image_output_paths):
+    for image_input_path, image_output_path in \
+     zip(image_input_paths, image_output_paths):
         image_entry = {'imnum': 0, 'totim': 100, 't0': 100, 'invalid': 0,
-                        'absimpath': image_input_path,
-                        'comprimgpath': image_output_path,
-                        'quality': 17}
+                       'absimpath': image_input_path,
+                       'comprimgpath': image_output_path,
+                       'quality': 17}
         compress_image(image_entry, max_pixel_of_largest_side=ma,
                        resize_type=re,
                        check_disk_size_below_KB=ck)
