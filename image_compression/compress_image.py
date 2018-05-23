@@ -116,12 +116,12 @@ if __name__ == '__main__':
     image_input_paths = [''.join([example_images_path, file])
                          for file in image_files]
 
-    max_pixel_of_largest_side = [None, 2048, 2048, 2048]
-    resize_type = [Image.BILINEAR, Image.BILINEAR,
-                   Image.BILINEAR]
-    check_disk_size_below_KB = [None, None, None, 600]
-    output_postfixes = ['_compressed', '_max2048_bilinear',
-                        '_max2048_bilinear_ignore600KB']
+    max_pixel_of_largest_side = [None, 2048, 2048, 1920, 1600]
+    # resize_type = [Image.BILINEAR, Image.BILINEAR,
+    #                Image.BILINEAR]
+    check_disk_size_below_KB = [None, None, 600, None, None]
+    output_postfixes = ['_compressed', '_max2048',
+                        '_max2048_ignoreBelow600KB', '_max1920', '_max1600']
 
     for i in range(0, len(output_postfixes)):
         ma = max_pixel_of_largest_side[i]
@@ -142,7 +142,6 @@ if __name__ == '__main__':
                            'comprimgpath': image_output_path,
                            'quality': 17}
             compress_image(image_entry, max_pixel_of_largest_side=ma,
-                           resize_type=re,
                            check_disk_size_below_KB=ck)
 
 
