@@ -71,8 +71,8 @@ def compress_image(img_entry, max_pixel_of_largest_side=None,
 
                 # check if any size (width, height) is above max
                 # if so, resize it to the max
-                elif (not image_is_processed) and \
-                     (max_pixel_of_largest_side is not None):
+                if (not image_is_processed) and \
+                   (max_pixel_of_largest_side is not None):
                     img = Image.open(img_entry['absimpath'])
                     if any([x > max_pixel_of_largest_side for x in img.size]):
                         img.thumbnail(size=[max_pixel_of_largest_side,
@@ -82,7 +82,7 @@ def compress_image(img_entry, max_pixel_of_largest_side=None,
                     image_is_processed = True
 
                 # Compress image by reducing quality
-                else:
+                if not image_is_processed:
                     img = Image.open(img_entry['absimpath'])
                     img.thumbnail(img.size)
                     img.save(img_entry['comprimgpath'],
