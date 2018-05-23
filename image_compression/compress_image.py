@@ -46,7 +46,7 @@ def compress_image(img_entry,
             omits any processing if image is below that size
     """
 
-	if img_entry['imnum'] % 2000 == 500:
+    if img_entry['imnum'] % 2000 == 500:
         approxtrem = (img_entry['totim'] - img_entry['imnum'] - 1) * \
                      (time.time()-img_entry['t0']) / (img_entry['imnum']+1)
 
