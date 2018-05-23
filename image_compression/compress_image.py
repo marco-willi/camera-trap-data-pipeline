@@ -32,7 +32,7 @@ def compress_image_old(img_entry):
 
 
 def compress_image(img_entry, max_pixel_of_largest_side=None,
-                   resize_type=Image.BILINEAR,
+                   resize_type=1,
                    check_disk_size_below_KB=None):
     """ Compress image by resizing
         Arguments:
@@ -117,11 +117,11 @@ if __name__ == '__main__':
                          for file in image_files]
 
     max_pixel_of_largest_side = [None, 2048, 2048, 2048]
-    resize_type = [Image.BILINEAR, Image.BILINEAR, Image.BICUBIC,
+    resize_type = [Image.BILINEAR, Image.BILINEAR,
                    Image.BILINEAR]
     check_disk_size_below_KB = [None, None, None, 600]
     output_postfixes = ['_compressed', '_max2048_bilinear',
-                        '_max2048_bicubic', '_max2048_bilinear_ignore600KB']
+                        '_max2048_bilinear_ignore600KB']
 
     for i in range(0, len(output_postfixes)):
         ma = max_pixel_of_largest_side[i]
