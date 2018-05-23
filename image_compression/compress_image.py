@@ -76,7 +76,8 @@ def compress_image(img_entry, max_pixel_of_largest_side=None,
                     img = Image.open(img_entry['absimpath'])
                     if any([x > max_pixel_of_largest_side for x in img.size]):
                         img.thumbnail(size=[max_pixel_of_largest_side,
-                                            max_pixel_of_largest_side])
+                                            max_pixel_of_largest_side],
+                                      resample=resize_type)
                     img.save(img_entry['comprimgpath'])
                     img.close()
                     image_is_processed = True
