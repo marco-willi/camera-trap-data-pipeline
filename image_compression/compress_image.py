@@ -31,8 +31,7 @@ def compress_image_old(img_entry):
 		return "IN" #invalid
 
 
-def compress_image(img_entry,
-                   max_pixel_of_largest_side=None,
+def compress_image(img_entry, max_pixel_of_largest_side=None,
                    resize_type=Image.BILINEAR,
                    check_disk_size_below_KB=None):
     """ Compress image by resizing
@@ -50,16 +49,16 @@ def compress_image(img_entry,
         approxtrem = (img_entry['totim'] - img_entry['imnum'] - 1) * \
                      (time.time()-img_entry['t0']) / (img_entry['imnum']+1)
 
-	    print("\nEstimated time remaining: " +
+        print("\nEstimated time remaining: " +
               time.strftime("%H:%M:%S", time.gmtime(approxtrem)))
 
-		print("(Approx. " + str(img_entry['imnum']) +
+        print("(Approx. " + str(img_entry['imnum']) +
               " out of " + str(img_entry['totim']) + " images compressed...)")
 
-	if img_entry['invalid'] in [0, 3]:
+    if img_entry['invalid'] in [0, 3]:
 
-		if img_entry['absimpath'] != "NF":
-			try:
+        if img_entry['absimpath'] != "NF":
+            try:
                 image_is_processed = False
 
                 # Check image size on disk
@@ -73,7 +72,7 @@ def compress_image(img_entry,
                 # check if any size (width, height) is above max
                 # if so, resize it to the max
                 elif (not image_is_processed) and \
-                      max_pixel_of_largest_side is not None:
+                     (max_pixel_of_largest_side is not None):
                     img = Image.open(img_entry['absimpath'])
                     if any([x > max_pixel_of_largest_side for x in img.size]):
                         img.thumbnail(size=[max_pixel_of_largest_side,
@@ -84,24 +83,29 @@ def compress_image(img_entry,
 
                 # Compress image by reducing quality
                 else:
-    				img = Image.open(img_entry['absimpath'])
-    				img.thumbnail(img.size)
-    				img.save(img_entry['comprimgpath'],
+                    img = Image.open(img_entry['absimpath'])
+                    img.thumbnail(img.size)
+                    img.save(img_entry['comprimgpath'],
                              "JPEG", quality=img_entry['quality'])
-    				img.close()
+                    img.close()
                     image_is_processed = True
 
-			except Exception, e:
-				print e
+            except Exception, e:
+                print e
 
-			if os.path.isfile(img_entry['comprimgpath']):
-				return "SC" #Successful compression
-			else:
-				return "CR" #not compressed
-		else:
-			return "NF" #not found
-	else:
-		return "IN" #invalid
+            # Successful compression
+            if os.path.isfile(img_entry['comprimgpath']):
+                return "SC"
+            # not compressed
+            else:
+                return "CR"
+        # not found
+        else:
+            return "NF"
+    # invalid
+    else:
+        return "IN"
+
 
 # TESTING
 if __name__ == '__main__':
