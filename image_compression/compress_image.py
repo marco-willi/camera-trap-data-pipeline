@@ -50,7 +50,7 @@ def compress_image(img_entry,
         approxtrem = (img_entry['totim'] - img_entry['imnum'] - 1) * \
                      (time.time()-img_entry['t0']) / (img_entry['imnum']+1)
 
-		print("\nEstimated time remaining: " +
+	    print("\nEstimated time remaining: " +
               time.strftime("%H:%M:%S", time.gmtime(approxtrem)))
 
 		print("(Approx. " + str(img_entry['imnum']) +
