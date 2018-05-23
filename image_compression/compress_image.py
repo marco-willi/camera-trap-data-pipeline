@@ -125,7 +125,7 @@ if __name__ == '__main__':
 
     for i in range(0, len(output_postfixes)):
         ma = max_pixel_of_largest_side[i]
-        re = resize_type[i]
+        #re = resize_type[i]
         ck = check_disk_size_below_KB[i]
         op = output_postfixes[i]
 
