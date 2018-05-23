@@ -115,7 +115,7 @@ if __name__ == '__main__':
     image_input_paths = [''.join([example_images_path, file])
                          for file in image_files]
 
-    max_pixel_of_largest_side = [None, 2048, 2048, 2048],
+    max_pixel_of_largest_side = [None, 2048, 2048, 2048]
     resize_type = [Image.BILINEAR, Image.BILINEAR, Image.BICUBIC,
                    Image.BILINEAR]
     check_disk_size_below_KB = [None, None, None, 600]
