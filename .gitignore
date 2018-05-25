@@ -1,2 +1,3 @@
 config/passwords.ini
 tests
+.spy*
