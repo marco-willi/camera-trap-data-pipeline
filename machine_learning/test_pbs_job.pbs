@@ -1,0 +1,33 @@
+#!/bin/bash -l
+#PBS -l walltime=00:00:30,nodes=1:ppn=1:pmem=150mb -q small
+#PBS -j oe
+#PBS -m abe -M will5448@umn.edu
+
+# Parameters
+ID=season9_test
+SEASON=S9
+ROOT=/home/packerc/shared/machine_learning/
+CODE=${ROOT}will5448/code/snapshot_safari_misc/machine_learning/
+LOG_DIR=${ROOT}data/models/SER/empty_or_not/phase1/
+PREDICTIONS=${ROOT}/data/runs/SER/empty_or_not/predictions_${ID}.txt
+IMAGES_ROOT=/home/packerc/shared/albums/SER/
+DATA_INFO=${ROOT}data/info_files/SER/season9_new.csv
+
+# Log Parameters
+echo "ID: $ID"
+echo "SEASON: $SEASON"
+echo "ROOT: $ROOT"
+echo "CODE: $CODE"
+echo "LOG_DIR: $LOG_DIR"
+echo "PREDICTIONS: $PREDICTIONS"
+echo "IMAGES_ROOT: $IMAGES_ROOT"
+echo "DATA_INFO: $DATA_INFO"
+
+# Execute code
+cd $CODE
+
+python print_args.py --log_dir $LOG_DIR \
+--save_predictions $PREDICTIONS \
+--architecture vgg \
+--data_info $DATA_INFO \
+--path_prefix $IMAGES_ROOT
