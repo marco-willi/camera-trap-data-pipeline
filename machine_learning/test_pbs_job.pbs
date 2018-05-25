@@ -1,7 +1,8 @@
 #!/bin/bash -l
-#PBS -l walltime=00:00:30,nodes=1:ppn=1:pmem=150mb -q small
+#PBS -l walltime=00:00:30,nodes=1:ppn=1:pmem=150mb
 #PBS -j oe
 #PBS -m abe -M will5448@umn.edu
+#PBS -q small
 
 # Parameters
 ID=season9_test
