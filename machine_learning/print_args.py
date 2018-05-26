@@ -16,7 +16,7 @@ def main():
   parser.add_argument('--architecture', default= 'resnet', help='The DNN architecture')
   parser.add_argument('--depth', default= 50, type= int, help= 'The depth of ResNet architecture')
   parser.add_argument('--log_dir', default= None, action= 'store', help='Path for saving Tensorboard info and checkpoints')
-  parser.add_argument('save_predictions', default= None, action= 'store', help= 'Save top-5 predictions of the networks along with their confidence in the specified file')
+  parser.add_argument('--save_predictions', default= None, action= 'store', help= 'Save top-5 predictions of the networks along with their confidence in the specified file')
 
   args = parser.parse_args()
   print(args)
