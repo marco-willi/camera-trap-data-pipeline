@@ -46,7 +46,7 @@ if __name__ == '__main__':
             allfiles.append(os.path.join(path,f))
             if len(allfiles)%10000==0:
               print(len(allfiles))"""
-      with open("season7.csv") as f:
+      with open("/panfs/roc/groups/5/packerc/shared/machine_learning/anorouzz/season7.csv") as f:
         for line in f.readlines():
           fields= line.split(",")
           allfiles.append(fields[0])
