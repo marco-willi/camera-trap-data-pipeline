@@ -1,10 +1,10 @@
 #!/bin/bash -l
-#PBS -l walltime=00:00:30,nodes=1:ppn=1,pmem=500mb
+#PBS -l walltime=24:00:00,nodes=1:ppn=8:gpus=1
 #PBS -j oe
 #PBS -m abe
 #PBS -M will5448@umn.edu
-#PBS -q lab
-#PBS -N test_arguments
+#PBS -q k40
+#PBS -N eval
 #PBS -o ${HOME}/job_ml_output.log
 #PBS -e ${HOME}/job_ml_error.log
 
@@ -13,7 +13,7 @@ ID=test_run
 SITE=SER
 SEASON=S9
 ROOT=/home/packerc/shared/machine_learning/
-CODE=${ROOT}will5448/code/snapshot_safari_misc/machine_learning/
+CODE=${ROOT}code/deep_learning_for_camera_trap_images/phase1
 LOG_DIR=${ROOT}data/models/${SITE}/empty_or_not/phase1/
 PREDICTIONS=${ROOT}data/predictions/empty_or_not/${SITE}/${SEASON}/predictions_${ID}.txt
 IMAGES_ROOT=/home/packerc/shared/albums/
@@ -30,14 +30,13 @@ echo "PREDICTIONS: $PREDICTIONS"
 echo "IMAGES_ROOT: $IMAGES_ROOT"
 echo "DATA_INFO: $DATA_INFO"
 
-
-# Load Python
-module load python3
+# Load Tensroflow
+module load tensorflow/1.4_gpu
 
 # Execute code
 cd $CODE
 
-python print_args.py --log_dir $LOG_DIR \
+python eval.py --log_dir $LOG_DIR \
 --save_predictions $PREDICTIONS \
 --architecture vgg \
 --data_info $DATA_INFO \
