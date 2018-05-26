@@ -9,15 +9,15 @@
 #PBS -e ${HOME}/job_ml_error.log
 
 # Parameters
-ID=test_run
+ID=test_run2
 SITE=SER
-SEASON=S9
+SEASON=S7
 ROOT=/home/packerc/shared/machine_learning/
-CODE=${ROOT}code/deep_learning_for_camera_trap_images/phase1
-LOG_DIR=${ROOT}data/models/${SITE}/empty_or_not/phase1/
-PREDICTIONS=${ROOT}data/predictions/empty_or_not/${SITE}/${SEASON}/predictions_${ID}.txt
-IMAGES_ROOT=/home/packerc/shared/albums/
-DATA_INFO=${ROOT}data/info_files/${SITE}/${SEASON}.csv
+CODE=${ROOT}code/deep_learning_for_camera_trap_images/phase2
+LOG_DIR=${ROOT}data/models/${SITE}/species/resnet152/
+PREDICTIONS=${ROOT}data/predictions/species/${SITE}/${SEASON}/predictions_${ID}.txt
+IMAGES_ROOT=/home/packerc/shared/albums/${SITE}/
+DATA_INFO=${ROOT}data/info_files/${SITE}/${SEASON}_species.csv
 
 # Log Parameters
 echo "ID: $ID"
@@ -36,8 +36,9 @@ module load tensorflow/1.4_gpu
 # Execute code
 cd $CODE
 
-python eval.py --log_dir $LOG_DIR \
+python2 eval.py --log_dir $LOG_DIR \
 --save_predictions $PREDICTIONS \
---architecture vgg \
+--architecture resnet \
+--depth 152 \
 --data_info $DATA_INFO \
 --path_prefix $IMAGES_ROOT
