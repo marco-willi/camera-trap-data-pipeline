@@ -5,6 +5,8 @@
 #PBS -M will5448@umn.edu
 #PBS -q lab
 #PBS -N test_arguments
+#PBS -o ${HOME}/job_output
+#PBS -e ${HOME}/job_error
 
 # Parameters
 ID=season9_test
