@@ -1,5 +1,5 @@
 #!/bin/bash -l
-#PBS -l walltime=00:00:30,nodes=1:ppn=1:pmem=500mb
+#PBS -l walltime=00:00:30,nodes=1:ppn=1,pmem=500mb
 #PBS -j oe
 #PBS -m abe
 #PBS -M will5448@umn.edu
@@ -12,7 +12,7 @@ SEASON=S9
 ROOT=/home/packerc/shared/machine_learning/
 CODE=${ROOT}will5448/code/snapshot_safari_misc/machine_learning/
 LOG_DIR=${ROOT}data/models/SER/empty_or_not/phase1/
-PREDICTIONS=${ROOT}/data/runs/SER/empty_or_not/predictions_${ID}.txt
+PREDICTIONS=${ROOT}data/runs/SER/empty_or_not/predictions_${ID}.txt
 IMAGES_ROOT=/home/packerc/shared/albums/SER/
 DATA_INFO=${ROOT}data/info_files/SER/season9_new.csv
 
