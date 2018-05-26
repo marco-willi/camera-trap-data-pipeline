@@ -1,8 +1,10 @@
 #!/bin/bash -l
-#PBS -l walltime=00:00:30,nodes=1:ppn=1:pmem=150mb
+#PBS -l walltime=00:00:30,nodes=1:ppn=1:pmem=500mb
 #PBS -j oe
-#PBS -m abe -M will5448@umn.edu
+#PBS -m abe
+#PBS -M will5448@umn.edu
 #PBS -q lab
+#PBS -N test_arguments
 
 # Parameters
 ID=season9_test
@@ -23,6 +25,10 @@ echo "LOG_DIR: $LOG_DIR"
 echo "PREDICTIONS: $PREDICTIONS"
 echo "IMAGES_ROOT: $IMAGES_ROOT"
 echo "DATA_INFO: $DATA_INFO"
+
+
+# Load Python
+module load python3
 
 # Execute code
 cd $CODE
