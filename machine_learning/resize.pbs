@@ -8,7 +8,6 @@
 #PBS -o ${HOME}/job_resize_output.log
 #PBS -e ${HOME}/job_resize_error.log
 
-
 cd $PBS_O_WORKDIR
 
 #module load anaconda/1.7.0

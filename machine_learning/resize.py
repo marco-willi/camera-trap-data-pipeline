@@ -10,7 +10,7 @@ from multiprocessing import Process
 import multiprocessing
 
 src_dir= "/home/packerc/shared/albums/SER/"
-dst_dir= "/home/packerc/shared/machine_learning/data/images/"
+dst_dir= "/home/packerc/shared/machine_learning/data/images/SER/"
 
 def divide(t,n,i):
     length=t/(n+0.0)

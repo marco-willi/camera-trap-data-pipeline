@@ -122,27 +122,33 @@ if __name__ == '__main__':
 
 	# original (some): 2560x1920
 
-    max_pixel_of_largest_side = [None, None, None,
-	 							 2048, 1920, 1600, 1440, 1280, 1024,
-								 2048, 1920, 1600, 1440, 1280, 1024]
-    # resize_type = [Image.BILINEAR, Image.BILINEAR,
-    #                Image.BILINEAR]
-    #check_disk_size_below_KB = [None, None, 300, None, None]
-    output_postfixes = ['_compressed17CURRENT',
-                        '_original',
-                        '_compressed75',
-                        #'_max2048_ignoreBelow600KB',
-                        '_max2048compr75',
-                        '_max1920compr75', '_max1600compr75', '_max1440compr75',
-                        '_max1280compr75', '_max1024compr75',
-                        '_max2048compr50',
-                        '_max1920compr50', '_max1600compr50', '_max1440compr50',
-                        '_max1280compr50', '_max1024compr50'
-                        ]
+#    max_pixel_of_largest_side = [None, None, None,
+#	 							 2048, 1920, 1600, 1440, 1280, 1024,
+#								 2048, 1920, 1600, 1440, 1280, 1024]
+#    # resize_type = [Image.BILINEAR, Image.BILINEAR,
+#    #                Image.BILINEAR]
+#    #check_disk_size_below_KB = [None, None, 300, None, None]
+#    output_postfixes = ['_compressed17CURRENT',
+#                        '_original',
+#                        '_compressed75',
+#                        #'_max2048_ignoreBelow600KB',
+#                        '_max2048compr75',
+#                        '_max1920compr75', '_max1600compr75', '_max1440compr75',
+#                        '_max1280compr75', '_max1024compr75',
+#                        '_max2048compr50',
+#                        '_max1920compr50', '_max1600compr50', '_max1440compr50',
+#                        '_max1280compr50', '_max1024compr50'
+#                        ]
+#
+#    save_quality = [17, None, 75,
+#	 				75, 75, 75, 75, 75, 75,
+#					50, 50, 50, 50, 50, 50]
 
-    save_quality = [17, None, 75,
-	 				75, 75, 75, 75, 75, 75,
-					50, 50, 50, 50, 50, 50]
+
+    max_pixel_of_largest_side = [1600, 1440]
+    output_postfixes = ['_max1600compr50', '_max1440compr50']
+
+    save_quality = [50, 50]
 
     for i in range(0, len(output_postfixes)):
         ma = max_pixel_of_largest_side[i]

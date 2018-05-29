@@ -1,5 +1,5 @@
 #!/bin/bash -l
-#PBS -l walltime=24:00:00,nodes=1:ppn=8:gpus=1
+#PBS -l walltime=03:00:00,nodes=1:ppn=8:gpus=1
 #PBS -j oe
 #PBS -m abe
 #PBS -M will5448@umn.edu
@@ -9,7 +9,7 @@
 #PBS -e ${HOME}/job_ml_error.log
 
 # Parameters
-ID=test_run2
+ID=test_run_MSImodel_MSIcode_originalImages
 SITE=SER
 SEASON=S7
 ROOT=/home/packerc/shared/machine_learning/
