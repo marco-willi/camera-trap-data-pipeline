@@ -1,3 +1,4 @@
+
 import sys, os, glob, random, getpass, time, re
 from PIL import Image
 from shutil import move, copytree, ignore_patterns, rmtree
@@ -18,25 +19,25 @@ def set_output_vars(compvars):
 	else:
 		compvars['loc_code'] = raw_input("\n -> Enter location code (ex. SER, NIA, DEB): ")
 		compvars['s_num'] = raw_input("\n -> Enter season number (ex. S1): ")
-	
+
 	if os.path.basename(compvars['output_loc']) != compvars['loc_code']:
 		compvars['output_loc'] = os.path.join(compvars['output_loc'],compvars['loc_code'])
 		compvars['zooid_loc'] = os.path.join(compvars['zooid_loc'],compvars['loc_code'])
 		compvars['manifest_loc'] = os.path.join(compvars['manifest_loc'],compvars['loc_code'])
-	
+
 	if compvars['label'] == "":
 		compvars['prefix'] = compvars['loc_code']+"_"+compvars['s_num']
 	else:
 		compvars['prefix'] = compvars['prefix']+"_"+compvars['label']
-	
+
 	compvars['out_dir_name'] = compvars['prefix']+"_"+"Compressed"
 	compvars['out_dir_path'] = os.path.join(compvars['output_loc'],compvars['out_dir_name'])
 
-	
+
 	compvars['zooid_csv'] = compvars['prefix']+"_ZOOID.csv"
 	compvars['zooid_path'] = os.path.join(compvars['zooid_loc'],compvars['zooid_csv'])
 
-	
+
 	compvars['manifest_csv'] = compr_vars['prefix']+"_manifest_v0.csv"
 	compvars['manifest_path'] = os.path.join(compvars['manifest_loc'],compvars['manifest_csv'])
 
@@ -57,7 +58,7 @@ def test_output_paths(compvars):
 	return error
 
 def find_full_res_img_path (img_entry):
-	
+
 	img_key = img_entry['imname'].split('_')  #0:LOC 1:S# 2:Site 3:Roll 4:ImageName
 	keyed_path = "/"+img_key[2]+"/"+img_key[2]+"_"+img_key[3]+"/"+img_entry['imname']
 	fr_img_path = img_entry['inputdir']+keyed_path #don't know why, but os.path.join refuses to incorporate img_entry['inputdir']
@@ -70,52 +71,110 @@ def find_full_res_img_path (img_entry):
 
 	return fr_img_path
 
+
 #####COMPRESS IMAGE FILE#####
+def compress_image(img_entry, max_pixel_of_largest_side=None,
+                   resize_type=1,
+                   check_disk_size_below_KB=None,
+                   save_quality=75):
+    """ Compress image by resizing
+        Arguments:
+        ----------
+        max_pixel_of_largest_side (int) - default None:
+		 	checks width and height of an image
+            and resizes the largest side to this size if either is larger,
+            keeps aspect ratio
+        resize_type (int) - default 1:
+		 	PIL method to resize images
+        check_disk_size_below_KB (int) - default None:
+		 	checks image size on disk in KB and
+            omits any processing if image is below that size
+		save_quality (int) - default 75:
+		 	specify quality of image compression
+    """
 
-def compress_image (img_entry):
+    if img_entry['imnum'] % 2000 == 500:
+        approxtrem = (img_entry['totim'] - img_entry['imnum'] - 1) * \
+                     (time.time()-img_entry['t0']) / (img_entry['imnum']+1)
 
-	if img_entry['imnum']%2000 == 500:
-		approxtrem = (img_entry['totim'] - img_entry['imnum'] - 1) * (time.time()-img_entry['t0'])/(img_entry['imnum']+1)
-		print("\nEstimated time remaining: " + time.strftime("%H:%M:%S",time.gmtime(approxtrem)))
-		print("(Approx. "+str(img_entry['imnum'])+" out of "+str(img_entry['totim'])+" images compressed...)")
+        print("\nEstimated time remaining: " +
+              time.strftime("%H:%M:%S", time.gmtime(approxtrem)))
 
-	if img_entry['invalid'] in [0,3]: 
-		if img_entry['absimpath'] != "NF":
-			try:
-				img = Image.open(img_entry['absimpath'])
-				img.thumbnail(img.size)
-				img.save(img_entry['comprimgpath'],"JPEG",quality=img_entry['quality'])
-				img.close()
-			except Exception, e:
-				print e
+        print("(Approx. " + str(img_entry['imnum']) +
+              " out of " + str(img_entry['totim']) + " images compressed...)")
 
-			if os.path.isfile(img_entry['comprimgpath']):
-				return "SC" #Successful compression
-			else:
-				return "CR" #not compressed
-		else:
-			return "NF" #not found
-	else:
-		return "IN" #invalid
+    if img_entry['invalid'] in [0, 3]:
+
+        if img_entry['absimpath'] != "NF":
+            try:
+                image_is_processed = False
+
+                # Check image size on disk
+                if check_disk_size_below_KB is not None:
+                    file_size_KB = os.path.getsize(img_entry['absimpath']) / 1024
+                    if file_size_KB <= check_disk_size_below_KB:
+                        copyfile(img_entry['absimpath'],
+                                 img_entry['comprimgpath'])
+                        image_is_processed = True
+
+                # check if any size (width, height) is above max
+                # if so, resize it to the max
+                if not image_is_processed:
+                    img = Image.open(img_entry['absimpath'])
+                    if max_pixel_of_largest_side is not None:
+                        if any([x > max_pixel_of_largest_side for x in img.size]):
+                            img.thumbnail(size=[max_pixel_of_largest_side,
+                                                max_pixel_of_largest_side],
+                                          resample=resize_type)
+                    if save_quality is not None:
+                        img.save(img_entry['comprimgpath'], "JPEG",
+                                 quality=save_quality)
+                        image_is_processed = True
+                    else:
+
+                        img.save(img_entry['comprimgpath'])
+                        image_is_processed = True
+                    img.close()
+
+                # return error code if no processing has been applied
+                if not image_is_processed:
+                    return "CR"
+
+            except Exception, e:
+                print e
+
+            # Successful compression
+            if os.path.isfile(img_entry['comprimgpath']):
+                return "SC"
+            # not compressed
+            else:
+                return "CR"
+        # not found
+        else:
+            return "NF"
+    # invalid
+    else:
+        return "IN"
 
 
-#______GLOBAL VARS _______#
+# ______GLOBAL VARS _______#
+compr_vars = dict.fromkeys([
+    'home_dir', 'input_dir', 'input_dir_path',
+    'input_csv_path', 'input_csv', 'label', 'output_loc', 'out_dir_name',
+    'zooid_loc', 'zooid_path', 'zooid_csv', 'manifest_loc', 'manifest_path',
+    'manifest_csv', 'quality', 'loc_code', 's_num', 'prefix', 'set_label',
+    'temp_dir_path', 'out_dir_path'])
 
-compr_vars = dict.fromkeys(['home_dir','input_dir','input_dir_path','input_csv_path','input_csv','label','output_loc','out_dir_name','zooid_loc','zooid_path','zooid_csv','manifest_loc','manifest_path','manifest_csv','quality','loc_code','s_num','prefix','set_label','temp_dir_path','out_dir_path'])
-compr_stat = {'SC':"Successfully Compressed", 'NF':"Not Found", 'CR':"Compression Error",'IN':"Invalid"}
+compr_stat = {'SC': "Successfully Compressed", 'NF': "Not Found",
+              'CR': "Compression Error", 'IN': "Invalid"}
 
 compr_vars['output_loc'] = "/home/packerc/shared/zooniverse/ToUpload/"
 compr_vars['zooid_loc'] = "/home/packerc/shared/zooniverse/ZOOIDs/"
 compr_vars['manifest_loc'] = "/home/packerc/shared/zooniverse/Manifests"
 compr_vars['home_dir'] = "packerc"
 
-
-#compr_vars['output_loc'] = "/Users/befort/Desktop/zooniverse/ToUpload/"
-#compr_vars['zooid_loc'] = "/Users/befort/Desktop/zooniverse/ZOOIDs/"
-#compr_vars['manifest_loc'] = "/Users/befort/Desktop/zooniverse/Manifests/"
-#compr_vars['home_dir'] = "befort"
-
-compr_vars['quality'] = 17
+compr_vars['quality'] = 50
+compr_vars['max_image_pixel_side'] = 1440
 
 compr_vars['label'] = ""
 
@@ -128,7 +187,7 @@ if len(sys.argv) < 3:
     exit(1)
 
 
-try: 
+try:
 	img_df = pd.read_csv(sys.argv[1])
 except Exception, e:
 	print e
@@ -136,7 +195,7 @@ except Exception, e:
 
 if os.path.isdir(sys.argv[2])==False:
 	print ("\nSpecified input directory does not exist.\n")
-	exit(1)	
+	exit(1)
 
 #####SET AND CHECK INPUT/OUTPUT VARIABLES#####
 
@@ -169,7 +228,7 @@ if compr_vars['label'] !="":
 	print("\tManifest csv will be saved to: "+compr_vars['manifest_path'])
 
 error = test_output_paths(compr_vars)
-if len(error) != 0: 
+if len(error) != 0:
 	print("\n")
 	for e in error:
 		print(e)
@@ -219,10 +278,13 @@ print("Chkpt 12")
 #####COMPRESS AND ANONYMIZE IMAGE FILES#####
 
 print ("\n\tCOMPRESSING FILES...\n")
-		
-img_df['comprstat'] = img_df.apply(compress_image, axis=1)  
 
-	#Print compression stats
+img_df['comprstat'] = img_df.apply(
+	compress_image, axis=1,
+ 	max_pixel_of_largest_side=compr_vars['max_image_pixel_side'],
+	save_quality=compr_vars['quality'])
+
+#Print compression stats
 for cs,text in compr_stat.iteritems():
 	if cs != 'SC':
 		img_df.loc[img_df['comprstat']==cs,'anonimname'] = cs #set error code for image files that were not compressed
