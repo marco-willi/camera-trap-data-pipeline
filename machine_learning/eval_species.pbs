@@ -9,12 +9,12 @@
 #PBS -e ${HOME}/job_ml_error.log
 
 # Parameters
-ID=test_run_MSImodel_MSIcode_originalImages
+ID=test_run_GHmodel_MSIcode_originalImages
 SITE=SER
 SEASON=S7
 ROOT=/home/packerc/shared/machine_learning/
 CODE=${ROOT}code/deep_learning_for_camera_trap_images/phase2
-LOG_DIR=${ROOT}data/models/${SITE}/species/resnet152/
+LOG_DIR=${ROOT}data/models/${SITE}/species/phase2/
 PREDICTIONS=${ROOT}data/predictions/species/${SITE}/${SEASON}/predictions_${ID}.txt
 IMAGES_ROOT=/home/packerc/shared/albums/${SITE}/
 DATA_INFO=${ROOT}data/info_files/${SITE}/${SEASON}_species.csv
