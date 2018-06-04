@@ -10,7 +10,7 @@
         Workflow id of the classifications to extract
     - workflow version (int):
         Worfklow version of the classifications to extract
-        
+
     Example Usage:
     --------------
     python3 extract_classifications.py \
@@ -25,6 +25,10 @@ import copy
 import argparse
 from collections import OrderedDict
 from collections import Counter
+import traceback
+import sys
+
+from utils import print_progress
 
 
 if __name__ == '__main__':
@@ -195,6 +199,8 @@ if __name__ == '__main__':
     with open(input_file, "r") as ins:
         csv_reader = csv.reader(ins, delimiter=',', quotechar='"')
         for _id, line in enumerate(csv_reader):
+            if (_id % 10000) == 0:
+                print("Processing Classification %" % _id)
             # extract header
             if _id == 0:
                 row_name_to_id_mapper = {x: i for i, x in enumerate(line)}
@@ -205,26 +211,31 @@ if __name__ == '__main__':
                                          row_name_to_id_mapper):
                     continue
 
-                # Extract data
-                meta_dict = extract_meta_data(line, row_name_to_id_mapper)
-                annos = extract_annos(line, row_name_to_id_mapper)
-                tasks = extract_tasks(annos)
-                task_values = extract_task_values(tasks)
+                try:
+                    # Extract data
+                    meta_dict = extract_meta_data(line, row_name_to_id_mapper)
+                    annos = extract_annos(line, row_name_to_id_mapper)
+                    tasks = extract_tasks(annos)
+                    task_values = extract_task_values(tasks)
 
-                # Build annotation records
-                n_tasks = find_n_tasks(task_values)
+                    # Build annotation records
+                    n_tasks = find_n_tasks(task_values)
 
-                for j in range(0, n_tasks):
-                    user_id = line[row_name_to_id_mapper['user_name']]
-                    created_at = line[row_name_to_id_mapper['created_at']]
-                    subject_id = line[row_name_to_id_mapper['subject_ids']]
-                    task_annos = get_task_x(task_values, j)
+                    for j in range(0, n_tasks):
+                        user_id = line[row_name_to_id_mapper['user_name']]
+                        created_at = line[row_name_to_id_mapper['created_at']]
+                        subject_id = line[row_name_to_id_mapper['subject_ids']]
+                        task_annos = get_task_x(task_values, j)
 
-                    anno_record = [subject_id, user_id, created_at] + \
-                                  [task_annos[x] for x in
-                                   snapshot_safari_default_record.keys()]
-                    anno_record = post_process_anno(anno_record)
-                    annos_extracted.append(anno_record)
+                        anno_record = [subject_id, user_id, created_at] + \
+                                      [task_annos[x] for x in
+                                       snapshot_safari_default_record.keys()]
+                        anno_record = post_process_anno(anno_record)
+                        annos_extracted.append(anno_record)
+
+                except Exception:
+                    print("Error - Skipping Record %s" % _id)
+                    print(traceback.format_exc())
 
     # Calc statistics
     stats = {k: [] for k in record_names}
@@ -240,7 +251,9 @@ if __name__ == '__main__':
 
     with open(output_file, "w", newline='') as outs:
         csv_writer = csv.writer(outs, delimiter=',')
+        print("Writing file to %s" % output_file)
         csv_writer.writerow(annotation_record)
         tot = len(annos_extracted)
         for i, line in enumerate(annos_extracted):
+            print_progress(i, tot)
             csv_writer.writerow(line)
