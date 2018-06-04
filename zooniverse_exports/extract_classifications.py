@@ -200,7 +200,7 @@ if __name__ == '__main__':
         csv_reader = csv.reader(ins, delimiter=',', quotechar='"')
         for _id, line in enumerate(csv_reader):
             if (_id % 10000) == 0:
-                print("Processing Classification %" % _id)
+                print("Processing Classification %s" % _id)
             # extract header
             if _id == 0:
                 row_name_to_id_mapper = {x: i for i, x in enumerate(line)}
