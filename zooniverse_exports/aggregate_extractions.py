@@ -347,6 +347,8 @@ if __name__ == '__main__':
         reader = csv.reader(csvfile, delimiter=',')
         subject_set = dict()
         for row_id, row in enumerate(reader):
+            if (row_id % 10000) == 0:
+                print("Processing Classification %s" % row_id)
             if row_id == 0:
                 header = row
                 column_to_row_mapping = {x: i for i, x in enumerate(header)}
