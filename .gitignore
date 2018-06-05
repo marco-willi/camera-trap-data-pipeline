@@ -2,3 +2,4 @@ config/passwords.ini
 tests
 .spy*
 .Rproj.user
+old/*
