@@ -5,11 +5,11 @@
 #PBS -M will5448@umn.edu
 #PBS -q k40
 #PBS -N eval
-#PBS -o ${HOME}/job_ml_output_s11_e.log
-#PBS -e ${HOME}/job_ml_error_s11_e.log
+#PBS -o ${HOME}/job_ml_output_s11_e2.log
+#PBS -e ${HOME}/job_ml_error_s11_e2.log
 
 # Parameters
-ID=test_run_GHmodel_MSIcode_originalImages
+ID=test_run_GHmodel_MSIcode_originalImages_newInput
 SITE=SER
 SEASON=SER_S11
 ROOT=/home/packerc/shared/machine_learning/
