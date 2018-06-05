@@ -134,7 +134,7 @@ label_order = ['count', 'standing', 'resting', 'moving', 'eating',
 map_label_to_row_id={'count': 3, 'standing': 4, 'resting': 5, 'moving': 6,
                      'eating': 7, 'interacting': 8, 'young_present': 9}
 
-counts_mapping = {1150: 11}
+counts_mapping = {1150: 11, 0: 1}
 
 species_not_ml = ['Fire', 'VULTURE', 'HYENABROWN', 'DUIKER', 'BAT']
 
@@ -143,6 +143,7 @@ ml_data = list()
 for zoo_id, subject_id in image_id_to_sub.items():
     image_path = zooid_to_img_path[zoo_id]
     label_data = subs[subject_id]
+    behav_attrs = [int(label_data[x]) for x in label_order]
 
     # Create ML record
     if label_data['species'] == 'NOTHINGHERE':
@@ -155,12 +156,10 @@ for zoo_id, subject_id in image_id_to_sub.items():
         else:
             species = map_zoo_to_names[label_data['species']]
             species_num = map_names_to_id[species]
-
-    behav_attrs = [int(label_data[x]) for x in label_order]
-    count_val = behav_attrs[label_order.index('count')]
-    if count_val in counts_mapping:
-        behav_attrs[label_order.index('count')] = counts_mapping[count_val]
-
+        # Map counts to eligible values
+        count_val = behav_attrs[label_order.index('count')]
+        if count_val in counts_mapping:
+            behav_attrs[label_order.index('count')] = counts_mapping[count_val]
     row_ml = [image_path, empty, species_num] + behav_attrs
     ml_data.append(row_ml)
 
