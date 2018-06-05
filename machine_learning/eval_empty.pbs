@@ -40,4 +40,5 @@ python eval.py --log_dir $LOG_DIR \
 --save_predictions $PREDICTIONS \
 --architecture vgg \
 --data_info $DATA_INFO \
---path_prefix $IMAGES_ROOT
+--path_prefix $IMAGES_ROOT \
+--batch_size 128
