@@ -16,7 +16,7 @@ ROOT=/home/packerc/shared/machine_learning/
 CODE=${ROOT}code/deep_learning_for_camera_trap_images/phase1
 LOG_DIR=${ROOT}data/models/${SITE}/empty_or_not/phase1/
 PREDICTIONS=${ROOT}data/predictions/empty_or_not/${SITE}/${SEASON}/predictions_${ID}.json
-IMAGES_ROOT=/home/packerc/shared/albums//${SITE}/
+IMAGES_ROOT=/home/packerc/shared/albums/${SITE}/
 DATA_INFO=${ROOT}data/info_files/${SITE}/${SEASON}_empty.csv
 
 # Log Parameters
