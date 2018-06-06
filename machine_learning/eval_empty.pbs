@@ -9,7 +9,7 @@
 #PBS -e ${HOME}/job_ml_error_s11_e.log
 
 # Parameters
-ID=run_20180605_json
+ID=run_20180605
 SITE=SER
 SEASON=SER_S11
 ROOT=/home/packerc/shared/machine_learning/
