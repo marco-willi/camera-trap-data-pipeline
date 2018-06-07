@@ -5,21 +5,25 @@
 #PBS -M will5448@umn.edu
 #PBS -q lab
 #PBS -N test_arguments
-#PBS -o ${HOME}/job_ml_output.log
-#PBS -e ${HOME}/job_ml_error.log
+#PBS -o ${HOME}/job_ml_output_`date +%Y%m%d%H%M`.log
+#PBS -e ${HOME}/job_ml_error_`date +%Y%m%d%H%M`.log
 
 # Parameters
-ID=test_run
+TIMESTAMP=`date +%Y%m%d%H%M`
+DATE=`date +%Y%m%d`
+ID=run_${DATE}
 SITE=SER
-SEASON=S9
+SEASON=SER_S11
 ROOT=/home/packerc/shared/machine_learning/
-CODE=${ROOT}will5448/code/snapshot_safari_misc/machine_learning/
+CODE=${ROOT}code/deep_learning_for_camera_trap_images/phase1
 LOG_DIR=${ROOT}data/models/${SITE}/empty_or_not/phase1/
-PREDICTIONS=${ROOT}data/predictions/empty_or_not/${SITE}/${SEASON}/predictions_${ID}.txt
-IMAGES_ROOT=/home/packerc/shared/albums/
-DATA_INFO=${ROOT}data/info_files/${SITE}/${SEASON}.csv
+PREDICTIONS=${ROOT}data/predictions/empty_or_not/${SITE}/${SEASON}/predictions_${ID}.json
+IMAGES_ROOT=/home/packerc/shared/albums/${SITE}/
+DATA_INFO=${ROOT}data/info_files/${SITE}/${SEASON}_empty.csv
 
 # Log Parameters
+echo "TIMESTAMP: $TIMESTAMP"
+echo "DATE: $DATE"
 echo "ID: $ID"
 echo "SITE: $SITE"
 echo "SEASON: $SEASON"
@@ -29,7 +33,6 @@ echo "LOG_DIR: $LOG_DIR"
 echo "PREDICTIONS: $PREDICTIONS"
 echo "IMAGES_ROOT: $IMAGES_ROOT"
 echo "DATA_INFO: $DATA_INFO"
-
 
 # Load Python
 module load python3
