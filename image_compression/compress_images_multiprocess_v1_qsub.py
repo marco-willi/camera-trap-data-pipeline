@@ -198,28 +198,6 @@ def process_images_multiprocess(
     return status_messages
 
 
-# ______GLOBAL VARS _______#
-compr_vars = dict.fromkeys([
-    'home_dir', 'input_dir', 'input_dir_path',
-    'input_csv_path', 'input_csv', 'label', 'output_loc', 'out_dir_name',
-    'zooid_loc', 'zooid_path', 'zooid_csv', 'manifest_loc', 'manifest_path',
-    'manifest_csv', 'quality', 'loc_code', 's_num', 'prefix', 'set_label',
-    'temp_dir_path', 'out_dir_path'])
-
-compr_stat = {'SC': "Successfully Compressed", 'NF': "Not Found",
-              'CR': "Compression Error", 'IN': "Invalid"}
-
-compr_vars['output_loc'] = "/home/packerc/shared/zooniverse/ToUpload/"
-compr_vars['zooid_loc'] = "/home/packerc/shared/zooniverse/ZOOIDs/"
-compr_vars['manifest_loc'] = "/home/packerc/shared/zooniverse/Manifests"
-compr_vars['home_dir'] = "packerc"
-
-compr_vars['quality'] = 50
-compr_vars['max_image_pixel_side'] = 1440
-
-compr_vars['label'] = ""
-
-
 #______MAIN PROGRAM_______#
 
 # For testing
@@ -228,6 +206,28 @@ compr_vars['label'] = ""
 
 
 if __name__ == "__main__":
+
+    # ______GLOBAL VARS _______#
+    compr_vars = dict.fromkeys([
+        'home_dir', 'input_dir', 'input_dir_path',
+        'input_csv_path', 'input_csv', 'label', 'output_loc', 'out_dir_name',
+        'zooid_loc', 'zooid_path', 'zooid_csv', 'manifest_loc', 'manifest_path',
+        'manifest_csv', 'quality', 'loc_code', 's_num', 'prefix', 'set_label',
+        'temp_dir_path', 'out_dir_path'])
+
+    compr_stat = {'SC': "Successfully Compressed", 'NF': "Not Found",
+                  'CR': "Compression Error", 'IN': "Invalid"}
+
+    compr_vars['output_loc'] = "/home/packerc/shared/zooniverse/ToUpload/"
+    compr_vars['zooid_loc'] = "/home/packerc/shared/zooniverse/ZOOIDs/"
+    compr_vars['manifest_loc'] = "/home/packerc/shared/zooniverse/Manifests"
+    compr_vars['home_dir'] = "packerc"
+
+    compr_vars['quality'] = 50
+    compr_vars['max_image_pixel_side'] = 1440
+
+    compr_vars['label'] = ""
+
     # Parse command line arguments
     parser = argparse.ArgumentParser()
     parser.add_argument("-cleaned_captures_csv", type=str, required=True)
