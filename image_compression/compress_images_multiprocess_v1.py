@@ -272,7 +272,7 @@ error = test_output_paths(compr_vars)
 if len(error) != 0:
     print("\n")
     for e in error:
-    print(e)
+        print(e)
     exit(1)
 
 #####CONFIRM PROCESS#####
