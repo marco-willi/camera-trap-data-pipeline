@@ -1,6 +1,6 @@
 """ Process images by copying the originals to a Zooniverse upload
     folder while compressing and anonymizing them
-    - uses multiprocessing (default 24 processes)
+    - uses multiprocessing (default 16 processes)
 """
 import sys, os, glob, random, getpass, time, re
 from PIL import Image
@@ -181,7 +181,11 @@ def process_images_multiprocess(
     # Shared dictionary to store status messages for each record
     manager = Manager()
     status_messages = manager.dict()
+    # initialize with empty messages
+    for f in image_source_list:
+        status_messages[f] = ''
     try:
+        processes_list = list()
         for i in range(1, n_processes+1):
             start_i, end_i = assign_records_to_block(n_records,
                                                      n_processes, i)
@@ -191,8 +195,10 @@ def process_images_multiprocess(
                                status_messages),
                          kwargs=kwargs)
             p1.start()
+        for p in processes_list:
+            p.join()
     except Exception, e:
-        print(e)
+        print e
         raise
     return status_messages
 
@@ -335,7 +341,7 @@ status_results = process_images_multiprocess(
     image_source_path_list,
     image_dest_path_list,
     compress_images,
-    n_processes=24,
+    n_processes=16,
     save_quality=compr_vars['quality'],
     max_pixel_of_largest_side=compr_vars['max_image_pixel_side']
 )

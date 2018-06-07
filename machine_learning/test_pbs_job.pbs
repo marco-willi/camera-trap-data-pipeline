@@ -5,8 +5,8 @@
 #PBS -M will5448@umn.edu
 #PBS -q lab
 #PBS -N test_arguments
-#PBS -o ${HOME}/job_ml_output_$(date +"%Y%m%d%H%M").log
-#PBS -e ${HOME}/job_ml_error_`$(date +"%Y%m%d%H%M").log
+#PBS -o ${HOME}/job_ml_output_TEST_${PBS_JOBID}.log
+#PBS -e ${HOME}/job_ml_output_TEST_error_${PBS_JOBID}.log
 
 # Parameters
 TIMESTAMP=`date +%Y%m%d%H%M`
@@ -37,8 +37,8 @@ echo "DATA_INFO: $DATA_INFO"
 # Load Python
 module load python3
 
-# Execute code
-cd $CODE
+
+cd /home/packerc/shared/machine_learning/will5448/code/snapshot_safari_misc/machine_learning/
 
 python print_args.py --log_dir $LOG_DIR \
 --save_predictions $PREDICTIONS \

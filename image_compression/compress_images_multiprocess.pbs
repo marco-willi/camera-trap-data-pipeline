@@ -3,8 +3,8 @@
 #PBS -j oe
 #PBS -q small
 #PBS -N compressing_images
-#PBS -o ${HOME}/compress_images.log
-#PBS -e ${HOME}/compress_images_error.log
+#PBS -o ${HOME}/compress_images_${PBS_JOBID}.log
+#PBS -e ${HOME}/compress_images_error_${PBS_JOBID}.log
 
 cd /home/packerc/shared/scripts
 

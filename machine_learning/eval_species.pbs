@@ -9,7 +9,9 @@
 #PBS -e ${HOME}/job_ml_error_s11_s.log
 
 # Parameters
-ID=run_20180605
+TIMESTAMP=`date +%Y%m%d%H%M`
+DATE=`date +%Y%m%d`
+ID=run_${DATE}
 SITE=SER
 #SEASON=S7
 SEASON=SER_S11
@@ -21,6 +23,8 @@ IMAGES_ROOT=/home/packerc/shared/albums/${SITE}/
 DATA_INFO=${ROOT}data/info_files/${SITE}/${SEASON}_species.csv
 
 # Log Parameters
+echo "TIMESTAMP: $TIMESTAMP"
+echo "DATE: $DATE"
 echo "ID: $ID"
 echo "SITE: $SITE"
 echo "SEASON: $SEASON"
