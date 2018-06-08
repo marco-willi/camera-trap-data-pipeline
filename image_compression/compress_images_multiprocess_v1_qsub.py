@@ -190,12 +190,13 @@ def process_images_multiprocess(
         for i in range(1, n_processes+1):
             start_i, end_i = assign_records_to_block(n_records,
                                                      n_processes, i)
-            p1 = Process(target=compress_images,
+            pr = Process(target=compress_images,
                          args=(i, image_source_list[start_i:end_i],
                                image_dest_list[start_i:end_i],
                                status_messages),
                          kwargs=kwargs)
-            p1.start()
+            pr.start()
+            processes_list.append(pr)
         for p in processes_list:
             p.join()
     except Exception, e:
