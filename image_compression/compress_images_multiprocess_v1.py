@@ -1,5 +1,5 @@
-""" Process images by copying the originals to a Zooniverse upload
-    folder while compressing and anonymizing them
+""" Process images by copying source images to a specific upload
+    folder (for Zooniverse) while compressing and anonymizing them
     - uses multiprocessing (default 16 processes)
 """
 import sys, os, glob, random, getpass, time, re
@@ -68,19 +68,16 @@ def find_full_res_img_path (img_entry):
 
 ###############################
 # Image Compression and
-# multiprocessing Functinos
+# multiprocessing Functions
 ###############################
 
-
-def assign_records_to_block(total_records, n_blocks, block_id):
-    """ Assign a list of N records to a block with id block_id
-        block_id (int): must be an integer denoting the block number
-            between 1 and n_blocks
+def slice_generator(sequence_length, n_blocks):
+    """ Creates a generator to get start/end indexes for dividing a
+        sequence_length into n blocks
     """
-    length = total_records / (n_blocks + 0.0)
-    start_i_for_block_id = int(round((block_id-1)*length))
-    end_i_for_block_id = int(round(block_id*length))
-    return start_i_for_block_id, end_i_for_block_id
+    return ((int(round((b - 1) * sequence_length/n_blocks)),
+             int(round(b * sequence_length/n_blocks)))
+            for b in range(1, n_blocks+1))
 
 
 def estimate_remaining_time(start_time, n_total, n_current):
@@ -97,6 +94,7 @@ def compress_images(pid, image_source_list, image_dest_list,
                     save_quality=None,
                     max_pixel_of_largest_side=None):
     """ Compresses images for use with multiprocessing
+
         Arguments:
         -----------
         pid (int):
@@ -110,8 +108,9 @@ def compress_images(pid, image_source_list, image_dest_list,
         save_quality (int):
             compression quality of images
         max_pixel_of_largest_side (int):
-            max allowed size in pixels of larges side of an image,
-            if an image exceeds this it is resized
+            max allowed size in pixels of largest side of an image,
+            if an image exceeds this, its largest side is resized to this
+            while preserving the aspect ratio
     """
     # Check Input
     assert any([save_quality, max_pixel_of_largest_side]) is not None,\
@@ -186,9 +185,8 @@ def process_images_multiprocess(
         status_messages[f] = ''
     try:
         processes_list = list()
-        for i in range(1, n_processes+1):
-            start_i, end_i = assign_records_to_block(n_records,
-                                                     n_processes, i)
+        slices = slice_generator(n_records, n_processes)
+        for i, (start_i, end_i) in enumerate(slices):
             pr = Process(target=compress_images,
                          args=(i, image_source_list[start_i:end_i],
                                image_dest_list[start_i:end_i],
@@ -378,14 +376,16 @@ img_df.loc[img_df['comprstat'] == "SC"].to_csv(compr_vars['zooid_path'],columns=
 
 #####CREATE AND SAVE UPLOAD INPUT MANIFEST FILE#####
 #Reshape table... split images by capture
-capture_df = img_df[['site','roll','capture','image','anonimname']].set_index(['site','roll','capture','image']).unstack(fill_value="NA") #unstacks the anonimname column into manifest form
-capture_df.columns = capture_df.columns.get_level_values(1)
-capture_df = capture_df.reset_index()
+# img_df_copy = img_df.copy()
+# img_df = img_df[img_df['image'] < 4]
 
-#A fancy way of renaming image column headers... flexible, in case there are less/more than 3 image columns
-int_col_names = [col for col in list(capture_df) if col in list(img_df['image'].unique())]
-str_col_names = ["Image "+str(col) for col in int_col_names]
-capture_df = capture_df.rename(columns = dict(zip(int_col_names,str_col_names)))
+capture_df = img_df[['site','roll','capture','image','anonimname', 'path']].set_index(['site','roll','capture','image']).unstack(fill_value="NA") #unstacks the anonimname column into manifest form
+transposed_names = capture_df.columns.get_level_values(0)
+transposed_values = capture_df.columns.get_level_values(1)
+cols = [k + " " + str(v) for k, v in zip(transposed_names, transposed_values)]
+cols = [n.replace('anonimname', 'Image') for n in nams]
+capture_df.columns = cols
+capture_df = capture_df.reset_index()
 
 #Sets the metadata capture id key...
 #capture_df['captureidkey'] = pd.Series(capture_df.index.values)
@@ -394,6 +394,3 @@ capture_df['zoosubjsetid'] = "N0"
 capture_df['zoosubjid'] = "N0"
 capture_df['uploadstatus'] = "N0"
 capture_df.to_csv(compr_vars['manifest_path'],index=False)
-
-#####CLEANUP#####
-rmtree(compr_vars['temp_dir_path'],ignore_errors=True)
