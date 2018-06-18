@@ -379,14 +379,16 @@ if __name__ == '__main__':
                 species_distribution[species] = 0
             species_distribution[species] += 1
 
-    print("N Subjects: %s" % len(subject_set.keys()))
+    n_subjects = len(subject_set.keys())
+    print("N Subjects: %s" % n_subjects)
     Counter(species_counts)
     species_distribution = order_dict_by_values(species_distribution)
 
     for k, v in species_distribution.items():
-        print("Class %s - # %s" % (k, v))
+        print("Class %s - # %s (%s %%)" % (k, v, round(100 * v/n_subjects, 2)))
 
     # subject = subject_set['19237945']
+    print("Example Subject")
     for annot in subject.aggregated_annotations:
         for k, v in annot.labels.items():
             print("Label %s: %s" % (k, v.value))

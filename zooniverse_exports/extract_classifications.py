@@ -238,8 +238,9 @@ if __name__ == '__main__':
 
                 except Exception:
                     print("Error - Skipping Record %s" % _id)
+                    print("Full line:\n %s" % line)
                     print(traceback.format_exc())
-                    break
+                    continue
 
     # Calc statistics
     stats = {k: [] for k in record_names}
