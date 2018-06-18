@@ -182,11 +182,13 @@ if __name__ == '__main__':
 
     def find_n_tasks(task_values):
         """ Determine the number of tasks made in a classification """
-
-        if isinstance(task_values[0], list):
-            return len(task_values[0])
+        if len(task_values) > 0:
+            if isinstance(task_values[0], list):
+                return len(task_values[0])
+            else:
+                return len(task_values)
         else:
-            return len(task_values)
+            return 0
 
     def get_task_x(task_values, x):
         """ Get Task X from list of Tasks """
@@ -198,6 +200,7 @@ if __name__ == '__main__':
             return task_values[x]
 
     annos_extracted = list()
+
 
     with open(input_file, "r") as ins:
         csv_reader = csv.reader(ins, delimiter=',', quotechar='"')
