@@ -26,7 +26,6 @@ import argparse
 from collections import OrderedDict
 from collections import Counter
 import traceback
-import sys
 
 from utils import print_progress
 
@@ -47,20 +46,19 @@ if __name__ == '__main__':
     workflow_id = args['workflow_id']
     workflow_version_major = args['workflow_version'].split('.')[0]
 
-    # input_file = "D:\\Studium_GD\\Zooniverse\\SnapshotSafari\\data\\zooniverse_exports\\classifications_sampled.csv"
-    # output_file = "D:\\Studium_GD\\Zooniverse\\SnapshotSafari\\data\\zooniverse_exports\\classifications_extracted_sampled.csv"
-    # workflow_id = '4655'
-    # workflow_version_major = '304'
+    # input_file = "D:\\Studium_GD\\Zooniverse\\SnapshotSafari\\data\\zooniverse_exports\\GRU\\classifications_sampled.csv"
+    # output_file = "D:\\Studium_GD\\Zooniverse\\SnapshotSafari\\data\\zooniverse_exports\\GRU\\classifications_extracted_sampled.csv"
+    # workflow_id = '4979'
+    # workflow_version_major = '275'
 
     ############################
     # Parameters Fixed
     ############################
 
     # Define the fields of a Snapshot Safari Record
-    record_names = [
-            'species', 'count', 'moving',
-            'eating', 'standing', 'resting', 'interacting',
-            'young_present']
+    record_names = ['species', 'count', 'moving',
+                    'eating', 'standing', 'resting', 'interacting',
+                    'young_present']
 
     # Define the default values of a Snapshot Safari Record
     record_defaults = ['default', '0', '0', '0', '0', '0', '0', '0']
@@ -169,6 +167,11 @@ if __name__ == '__main__':
                 if task_is_completed(task_value):
                     extracted = extract_t0_task(task_value)
                     extractions.append(extracted)
+            elif task_name == 'T4':
+                if task_is_completed(task_value):
+                    extracted = extract_t1_task(task_value)
+                    extractions.append(extracted)
+
         return extractions
 
     def check_eligibility(line, w_id, w_v, mapper):
@@ -236,6 +239,7 @@ if __name__ == '__main__':
                 except Exception:
                     print("Error - Skipping Record %s" % _id)
                     print(traceback.format_exc())
+                    break
 
     # Calc statistics
     stats = {k: [] for k in record_names}

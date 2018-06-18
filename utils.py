@@ -23,7 +23,6 @@ def write_first_nrows_of_csv_to_csv(input_file, output_file, n_rows):
             if _id > n_rows:
                 break
             parsed_lines.append(line)
-
     with open(output_file, 'w') as outs:
         for line in parsed_lines:
             outs.write(line)

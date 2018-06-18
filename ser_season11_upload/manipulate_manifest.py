@@ -5,7 +5,13 @@
     Additionally, some information of subjects merged from the old manifest
     has to be merged into the new one. Yes it is complicated.
 """
+import os
 import pandas as pd
+
+##############################
+# Local Parameters
+##############################
+
 
 old_path = 'D:\\Studium_GD\\Zooniverse\\SnapshotSafari\\data\\ser_s11_upload\\previous_uploads\\'
 new_path = 'D:\\Studium_GD\\Zooniverse\\SnapshotSafari\\data\\ser_s11_upload\\'
@@ -19,12 +25,21 @@ new_zooid_path = new_path + 'SER_S11_ZOOID.csv'
 old_zooid1_path = old_path + 'SER_S11_1_ZOOID.csv'
 old_zooid2_path = old_path + 'SER_S11_2_ZOOID.csv'
 
+##############################
+# MSI Parameters
+##############################
+
+old_zooid_path = '/home/packerc/shared/zooniverse/ZOOIDs/SER/backup_will5448/'
+new_zooid_path = '/home/packerc/shared/zooniverse/ZOOIDs/SER/'
+
+new_zooid_path = new_zooid_path + 'SER_S11_ZOOID.csv'
+old_zooid1_path = old_zooid_path + 'SER_S11_1_ZOOID.csv'
+old_zooid2_path = old_zooid_path + 'SER_S11_2_ZOOID.csv'
 
 
 ################################
 # SPLIT ZOOID FILES
 ################################
-
 
 # read files
 new_zooid = pd.DataFrame.from_csv(new_zooid_path)
@@ -51,7 +66,7 @@ n_in_old_merged = sum(~merged.anonimname_old.isnull())
 n_in_old_merged / n_in_old
 
 
-# take old manifest information for old rows and new manifest information for
+# take old zooid information for old rows and new zooid information for
 # new rows and combine in one data frame
 
 only_new_ones = new_zooid[~new_zooid.index.isin(old_zooid.index)]
@@ -64,20 +79,17 @@ merged_stack = pd.concat([old_zooid, only_new_ones])
 
 # copy used anonymized and uploaded old images to a specific folder
 from shutil import copyfile, move
-old_image_source_path = '/home/packerc/shared/zooniverse/ToUpload/SER_backup_will5448/backup_will5448/SER_S11_2_Compressed/'
+old_image_source_path = '/home/packerc/shared/zooniverse/ToUpload/SER_backup_will5448/SER_S11_2_Compressed/'
 old_image_move_to_path = '/home/packerc/shared/zooniverse/ToUpload/SER/SER_S11_ALREADY_UPLOADED_OLD/'
 for i, (index, old_image_name) in enumerate(old_zooid.anonimname.iteritems()):
     src = old_image_source_path + old_image_name
     dst = old_image_move_to_path + old_image_name
-    print("copy from %s to %s" % (src, dst))
+    #print("copy from %s to %s" % (src, dst))
     try:
-        # copyfile(src, dst)
+        copyfile(src, dst)
     except:
         print("Failed to copy from %s to %s" % (src, dst))
-
-    print(old_image_name)
-    if i > 10:
-        break
+    #print(old_image_name)
 
 
 # move unused new anonymized images to a specific folder
@@ -89,14 +101,26 @@ new_image_move_to_path = '/home/packerc/shared/zooniverse/ToUpload/SER/SER_S11_N
 for i, (index, new_image_name) in enumerate(new_ones_already_in_old.anonimname.iteritems()):
     src = new_image_source_path + new_image_name
     dst = new_image_move_to_path + new_image_name
-    print("move from %s to %s" % (src, dst))
+    #print("move from %s to %s" % (src, dst))
     try:
-        # move(src, dst)
+        move(src, dst)
     except:
         print("Failed to move from %s to %s" % (src, dst))
-    print(old_image_name)
-    if i > 10:
-        break
+    # print(old_image_name)
+    # if i > 10:
+    #     break
+
+# Move Already uploaded (from old processing) to new processed folder
+to_move = '/home/packerc/shared/zooniverse/ToUpload/SER/SER_S11_ALREADY_UPLOADED_OLD/'
+target_dir = '/home/packerc/shared/zooniverse/ToUpload/SER/SER_S11_Compressed/'
+files_to_move = os.listdir(to_move)
+for f in files_to_move:
+    from_path = to_move + f
+    to_path = target_dir + f
+    try:
+        move(from_path, to_path)
+    except:
+        print("Failed to move %s" % (to_move + f))
 
 
 # Split ZOOid files into batch 1 and 2 and rest
@@ -178,8 +202,18 @@ def slice_generator(sequence_length, n_blocks):
 
 def split_file_equally_into_files(input_file, output_files,
                                   input_has_header=True):
-    """ Split input file into list of output_files distributing the rows
+    """ Split input file into output_files by distributing the rows
         as equally as possible
+
+        Arguments:
+        -----------
+        input_file (str):
+            path to the input file
+        output_files (list):
+            list with paths to the output files
+        inpnut_has_header (bool):
+            wether the input file has a header that needs to be written to
+            each of the output files
     """
 
     # Read input files and store lines in memory
@@ -212,8 +246,3 @@ def split_file_equally_into_files(input_file, output_files,
 
 
 split_file_equally_into_files(source_file, output_files)
-
-
-
-
-

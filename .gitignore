@@ -3,3 +3,7 @@ tests
 .spy*
 .Rproj.user
 old/*
+__pycache*
+*.Rhistory
+*.Rproj
+*.R
