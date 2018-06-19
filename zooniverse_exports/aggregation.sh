@@ -82,6 +82,15 @@ python3 -m zooniverse_exports.extract_choices_from_workflow \
   -workflow_csv /home/packerc/shared/machine_learning/data/zooniverse_exports/SER/SER_S11/workflows.csv \
   -output /home/packerc/shared/machine_learning/data/zooniverse_exports/SER/SER_S11/label_mapping.json
 
+python3 -m zooniverse_exports.create_image_to_label \
+-zooid_path /home/packerc/shared/zooniverse/ZOOIDs/SER/ \
+-manifest_path /home/packerc/shared/zooniverse/Manifests/SER/ \
+-zoo_exports_path /home/packerc/shared/machine_learning/will5448/data/zooniverse_exports/SER/ \
+-ml_info_path /home/packerc/shared/machine_learning/data/info_files/SER/ \
+-manifest_files SER_S11_1_manifest_v1 SER_S11_2_manifest_v1 \
+-zooid_files SER_S11_1_ZOOID.csv SER_S11_2_ZOOID.csv \
+-season_id SER_S11
+
 
 ###################################
 # Ruaha
@@ -108,6 +117,15 @@ python3 -m zooniverse_exports.extract_choices_from_workflow \
 
 cd /home/packerc/shared/machine_learning/will5448/code/snapshot_safari_misc
 
+python3 -m zooniverse_exports.create_image_to_label \
+-zooid_path /home/packerc/shared/zooniverse/ZOOIDs/RUA/ \
+-manifest_path /home/packerc/shared/zooniverse/Manifests/RUA/ \
+-zoo_exports_path /home/packerc/shared/machine_learning/data/zooniverse_exports/RUA/RUA_S1/ \
+-ml_info_path /home/packerc/shared/machine_learning/data/info_files/RUA/RUA_S1/ \
+-manifest_files RUA_S1_A1_manifest_v1 \
+-zooid_files RUA_S1_A1_ZOOID.csv \
+-season_id RUA_S1
+
 
 ###################################
 # Grumeti
@@ -128,6 +146,16 @@ python3 -m zooniverse_exports.aggregate_extractions \
 python3 -m zooniverse_exports.extract_choices_from_workflow \
   -workflow_csv /home/packerc/shared/machine_learning/data/zooniverse_exports/GRU/GRU_S1/workflows.csv \
   -output /home/packerc/shared/machine_learning/data/zooniverse_exports/GRU/GRU_S1/label_mapping.json
+
+
+python3 -m zooniverse_exports.create_image_to_label \
+-zooid_path /home/packerc/shared/zooniverse/ZOOIDs/GRU/ \
+-manifest_path /home/packerc/shared/zooniverse/Manifests/GRU/ \
+-zoo_exports_path /home/packerc/shared/machine_learning/data/zooniverse_exports/GRU/GRU_S1/ \
+-ml_info_path /home/packerc/shared/machine_learning/data/info_files/GRU/GRU_S1/ \
+-manifest_files GRU_S1_manifest_v1 \
+-zooid_files GRU_S1_ZOOID.csv \
+-season_id GRU_S1
 
 
 

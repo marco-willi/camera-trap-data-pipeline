@@ -8,35 +8,6 @@ import os
 import random
 import argparse
 
-# python3 -m zooniverse_exports.create_image_to_label \
-# -zooid_path /home/packerc/shared/zooniverse/ZOOIDs/SER/ \
-# -manifest_path /home/packerc/shared/zooniverse/Manifests/SER/ \
-# -zoo_exports_path /home/packerc/shared/machine_learning/will5448/data/zooniverse_exports/SER/ \
-# -ml_info_path /home/packerc/shared/machine_learning/data/info_files/SER/ \
-# -manifest_files SER_S11_1_manifest_v1 SER_S11_2_manifest_v1 \
-# -zooid_files SER_S11_1_ZOOID.csv SER_S11_2_ZOOID.csv \
-# -season_id SER_S11
-#
-# python3 -m zooniverse_exports.create_image_to_label \
-# -zooid_path /home/packerc/shared/zooniverse/ZOOIDs/RUA/ \
-# -manifest_path /home/packerc/shared/zooniverse/Manifests/RUA/ \
-# -zoo_exports_path /home/packerc/shared/machine_learning/data/zooniverse_exports/RUA/RUA_S1/ \
-# -ml_info_path /home/packerc/shared/machine_learning/data/info_files/RUA/RUA_S1/ \
-# -manifest_files RUA_S1_A1_manifest_v1 \
-# -zooid_files RUA_S1_A1_ZOOID.csv \
-# -season_id RUA_S1
-#
-#
-# python3 -m zooniverse_exports.create_image_to_label \
-# -zooid_path /home/packerc/shared/zooniverse/ZOOIDs/GRU/ \
-# -manifest_path /home/packerc/shared/zooniverse/Manifests/GRU/ \
-# -zoo_exports_path /home/packerc/shared/machine_learning/data/zooniverse_exports/GRU/GRU_S1/ \
-# -ml_info_path /home/packerc/shared/machine_learning/data/info_files/GRU/GRU_S1/ \
-# -manifest_files GRU_S1_manifest_v1 \
-# -zooid_files GRU_S1_ZOOID.csv \
-# -season_id GRU_S1
-
-
 if __name__ == '__main__':
 
     # Parse command line arguments
@@ -301,7 +272,7 @@ if __name__ == '__main__':
         # Export Species OLD
         with open(output_file_old_species, "w", newline='') as outs:
             csv_writer = csv.writer(outs, delimiter=',')
-            print("Writing file to %s" % output_file_empty)
+            print("Writing file to %s" % output_file_old_species)
             for ml_data in ml_data_d.values():
                 if ml_data['ml_old_species'] is not None:
                     csv_writer.writerow(ml_data['ml_old_species'])
@@ -309,7 +280,7 @@ if __name__ == '__main__':
         # Export Species
         with open(output_file_species, "w", newline='') as outs:
             csv_writer = csv.writer(outs, delimiter=',')
-            print("Writing file to %s" % output_file_empty)
+            print("Writing file to %s" % output_file_species)
             for ml_data in ml_data_d.values():
                 if ml_data['ml_species'] is not None:
                     csv_writer.writerow(ml_data['ml_species'])
@@ -330,7 +301,7 @@ if __name__ == '__main__':
         # Export Train Species
         with open(output_file_species_train, "w", newline='') as outs:
             csv_writer = csv.writer(outs, delimiter=',')
-            print("Writing file to %s" % output_file_empty)
+            print("Writing file to %s" % output_file_species_train)
             for ml_data in ml_data_d.values():
                 if ml_data['ml_species'] is not None:
                     if ml_data['subject_id'] in train_ids:
@@ -339,7 +310,7 @@ if __name__ == '__main__':
         # Export Val Species
         with open(output_file_species_val, "w", newline='') as outs:
             csv_writer = csv.writer(outs, delimiter=',')
-            print("Writing file to %s" % output_file_empty)
+            print("Writing file to %s" % output_file_species_val)
             for ml_data in ml_data_d.values():
                 if ml_data['ml_species'] is not None:
                     if ml_data['subject_id'] not in train_ids:
