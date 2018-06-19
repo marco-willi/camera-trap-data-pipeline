@@ -18,7 +18,7 @@ MODEL=SER
 ROOT=/home/packerc/shared/machine_learning/
 CODE=${ROOT}code/deep_learning_for_camera_trap_images/phase1
 LOG_DIR=${ROOT}data/models/${MODEL}/empty_or_not/phase1/
-PREDICTIONS=${ROOT}data/predictions/empty_or_not/${SITE}/${SEASON}/predictions_${ID}.json
+PREDICTIONS=${ROOT}data/predictions/empty_or_not/${SITE}/${SEASON}/evals_${ID}.json
 IMAGES_ROOT=/home/packerc/shared/albums/${SITE}/
 DATA_INFO=${ROOT}data/info_files/${SITE}/${SEASON}/${SEASON}_empty.csv
 

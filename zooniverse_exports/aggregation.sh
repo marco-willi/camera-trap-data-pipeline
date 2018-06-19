@@ -92,6 +92,14 @@ python3 -m zooniverse_exports.create_image_to_label \
 -season_id SER_S11
 
 
+# Generate Info Files from ZOOID files for prediction
+python3 -m zooniverse_exports.generate_predict_file_from_zooids \
+-root_path /home/packerc/shared/zooniverse/ZOOIDs/SER/ \
+-output_file /home/packerc/shared/machine_learning/data/info_files/SER/SER_S11/SER_S11_all.csv \
+-files SER_S11_1_ZOOID_v0.csv SER_S11_2_ZOOID_v0.csv \
+-path_field path
+
+
 ###################################
 # Ruaha
 ####################################
@@ -127,6 +135,15 @@ python3 -m zooniverse_exports.create_image_to_label \
 -season_id RUA_S1
 
 
+# Generate Info Files from ZOOID files for prediction
+python3 -m zooniverse_exports.generate_predict_file_from_zooids \
+-root_path /home/packerc/shared/zooniverse/ZOOIDs/RUA/ \
+-output_file /home/packerc/shared/machine_learning/data/info_files/RUA/RUA_S1/RUA_S1_all.csv \
+-files RUA_S1_A1_ZOOID.csv RUA_S1_A2_ZOOID.csv \
+-path_field path
+
+
+
 ###################################
 # Grumeti
 ####################################
@@ -156,6 +173,14 @@ python3 -m zooniverse_exports.create_image_to_label \
 -manifest_files GRU_S1_manifest_v1 \
 -zooid_files GRU_S1_ZOOID.csv \
 -season_id GRU_S1
+
+
+# Generate Info Files from ZOOID files for prediction
+python3 -m zooniverse_exports.generate_predict_file_from_zooids \
+-root_path /home/packerc/shared/zooniverse/ZOOIDs/GRU/ \
+-output_file /home/packerc/shared/machine_learning/data/info_files/GRU/GRU_S1/GRU_S1_all.csv \
+-files GRU_S1_ZOOID.csv \
+-path_field path
 
 
 

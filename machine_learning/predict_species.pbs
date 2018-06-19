@@ -12,9 +12,8 @@
 TIMESTAMP=`date +%Y%m%d%H%M`
 DATE=`date +%Y%m%d`
 ID=run_${DATE}
-SITE=GRU
-#SEASON=S7
-SEASON=GRU_S1
+SITE=SER
+SEASON=SER_S11
 MODEL=SER
 NUMCLASS=48
 ROOT=/home/packerc/shared/machine_learning/
@@ -45,7 +44,7 @@ module load tensorflow/1.4_gpu
 # Execute code
 cd $CODE
 
-python2 eval.py --log_dir $LOG_DIR \
+python2 predict.py --log_dir $LOG_DIR \
 --save_predictions $PREDICTIONS \
 --architecture resnet \
 --depth 152 \

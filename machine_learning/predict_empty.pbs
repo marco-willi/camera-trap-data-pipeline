@@ -4,16 +4,16 @@
 #PBS -m abe
 #PBS -M will5448@umn.edu
 #PBS -q k40
-#PBS -N eval
-#PBS -o ${HOME}/job_ml_output_gru_s1_empty.log
-#PBS -e ${HOME}/job_ml_error_gru_s1_empty.log
+#PBS -N predict
+#PBS -o ${HOME}/job_ml_output_gru_s1_pred_empty.log
+#PBS -e ${HOME}/job_ml_error_gru_s1_pred_empty.log
 
 # Parameters
 TIMESTAMP=`date +%Y%m%d%H%M`
 DATE=`date +%Y%m%d`
 ID=run_${DATE}
-SITE=GRU
-SEASON=GRU_S1
+SITE=SER
+SEASON=SER_S11
 MODEL=SER
 ROOT=/home/packerc/shared/machine_learning/
 CODE=${ROOT}code/deep_learning_for_camera_trap_images/phase1
@@ -42,7 +42,7 @@ module load tensorflow/1.4_gpu
 # Execute code
 cd $CODE
 
-python eval.py --log_dir $LOG_DIR \
+python predict.py --log_dir $LOG_DIR \
 --save_predictions $PREDICTIONS \
 --architecture vgg \
 --data_info $DATA_INFO \
