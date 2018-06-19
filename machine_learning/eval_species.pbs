@@ -15,9 +15,10 @@ ID=run_${DATE}
 SITE=GRU
 #SEASON=S7
 SEASON=GRU_S1
+MODEL=SER
 ROOT=/home/packerc/shared/machine_learning/
 CODE=${ROOT}code/deep_learning_for_camera_trap_images/phase2
-LOG_DIR=${ROOT}data/models/${SITE}/species/phase2/
+LOG_DIR=${ROOT}data/models/${MODEL}/species/phase2/
 PREDICTIONS=${ROOT}data/predictions/species/${SITE}/${SEASON}/predictions_${ID}.json
 IMAGES_ROOT=/home/packerc/shared/albums/${SITE}/
 DATA_INFO=${ROOT}data/info_files/${SITE}/${SEASON}/${SEASON}_old_species.csv
@@ -28,6 +29,7 @@ echo "DATE: $DATE"
 echo "ID: $ID"
 echo "SITE: $SITE"
 echo "SEASON: $SEASON"
+echo "MODEL: $MODEL"
 echo "ROOT: $ROOT"
 echo "CODE: $CODE"
 echo "LOG_DIR: $LOG_DIR"
