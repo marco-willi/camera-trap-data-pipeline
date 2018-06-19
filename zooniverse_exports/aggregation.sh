@@ -85,10 +85,10 @@ python3 -m zooniverse_exports.extract_choices_from_workflow \
 python3 -m zooniverse_exports.create_image_to_label \
 -zooid_path /home/packerc/shared/zooniverse/ZOOIDs/SER/ \
 -manifest_path /home/packerc/shared/zooniverse/Manifests/SER/ \
--zoo_exports_path /home/packerc/shared/machine_learning/will5448/data/zooniverse_exports/SER/ \
--ml_info_path /home/packerc/shared/machine_learning/data/info_files/SER/ \
+-zoo_exports_path /home/packerc/shared/machine_learning/data/zooniverse_exports/SER/SER_S11/ \
+-ml_info_path /home/packerc/shared/machine_learning/data/info_files/SER/SER_S11/ \
 -manifest_files SER_S11_1_manifest_v1 SER_S11_2_manifest_v1 \
--zooid_files SER_S11_1_ZOOID.csv SER_S11_2_ZOOID.csv \
+-zooid_files SER_S11_1_ZOOID_v0.csv SER_S11_2_ZOOID_v0.csv \
 -season_id SER_S11
 
 

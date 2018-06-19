@@ -5,22 +5,22 @@
 #PBS -M will5448@umn.edu
 #PBS -q k40
 #PBS -N eval
-#PBS -o ${HOME}/job_ml_output_s11_s.log
-#PBS -e ${HOME}/job_ml_error_s11_s.log
+#PBS -o ${HOME}/job_ml_output_gru_s1_species.log
+#PBS -e ${HOME}/job_ml_error_gru_s1_species.log
 
 # Parameters
 TIMESTAMP=`date +%Y%m%d%H%M`
 DATE=`date +%Y%m%d`
 ID=run_${DATE}
-SITE=SER
+SITE=GRU
 #SEASON=S7
-SEASON=SER_S11
+SEASON=GRU_S1
 ROOT=/home/packerc/shared/machine_learning/
 CODE=${ROOT}code/deep_learning_for_camera_trap_images/phase2
 LOG_DIR=${ROOT}data/models/${SITE}/species/phase2/
 PREDICTIONS=${ROOT}data/predictions/species/${SITE}/${SEASON}/predictions_${ID}.json
 IMAGES_ROOT=/home/packerc/shared/albums/${SITE}/
-DATA_INFO=${ROOT}data/info_files/${SITE}/${SEASON}_species.csv
+DATA_INFO=${ROOT}data/info_files/${SITE}/${SEASON}/${SEASON}_species.csv
 
 # Log Parameters
 echo "TIMESTAMP: $TIMESTAMP"
