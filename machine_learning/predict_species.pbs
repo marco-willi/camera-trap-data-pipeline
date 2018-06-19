@@ -4,9 +4,9 @@
 #PBS -m abe
 #PBS -M will5448@umn.edu
 #PBS -q k40
-#PBS -N eval
-#PBS -o ${HOME}/job_ml_output_gru_s1_pred_species.log
-#PBS -e ${HOME}/job_ml_error_gru_s1_pred_species.log
+#PBS -N predict
+#PBS -o ${HOME}/job_ml_output_pred_species.log
+#PBS -e ${HOME}/job_ml_error_pred_species.log
 
 # Parameters
 TIMESTAMP=`date +%Y%m%d%H%M`
