@@ -442,6 +442,20 @@ if __name__ == '__main__':
                             else:
                                 self.aggregated_annotations.append(human_aggs)
 
+            if 'empty_first_two_90conf' in rules:
+                if species_pred == 'NOTHINGHERE' and species_conf >= 0.90:
+                    human_aggs = self.aggregateSpeciesLabels(max_annos=2, ret=True)
+                    n_human_aggs = len(human_aggs)
+                    if n_human_aggs == 1:
+                        human_species_pred = human_aggs[0].labels['species'].value
+                        if human_species_pred == 'NOTHINGHERE':
+                            rule_match = True
+                            self.n_annos_aggregated = 2
+                            if ret:
+                                return human_aggs
+                            else:
+                                self.aggregated_annotations.append(human_aggs)
+
             elif 'empty_first_95conf' in rules:
                 if species_pred == 'NOTHINGHERE' and species_conf >= 0.95:
                     human_aggs = self.aggregateSpeciesLabels(max_annos=1, ret=True)
@@ -675,6 +689,31 @@ if __name__ == '__main__':
         tot_classifications = 0
         for j, subject in enumerate(subject_set.values()):
             aggs = subject.aggregateSpeciesLabelsML(ret=True, rules=['empty_first_two_95conf'])
+            tot_classifications += subject.n_annos_aggregated
+            subject.aggregated_annotations = aggs
+            n_labels = len(subject.aggregated_annotations)
+            print_progress(j, tot)
+            # Create a seprate record for each label
+            for i in range(0, n_labels):
+                anno = subject.aggregated_annotations[i].labels
+                row = [subject.id, i+1]
+                for label in labels_to_export:
+                    row.append(anno[label].value)
+                row.append(subject.n_annos_aggregated)
+                csv_writer.writerow(row)
+
+        print("Used %s annotations" % tot_classifications)
+
+    # Write to Disk
+    fnam = output_file + "empty_first2_90.csv"
+    with open(fnam, "w", newline='') as outs:
+        csv_writer = csv.writer(outs, delimiter=',')
+        print("Writing file to %s" % fnam)
+        csv_writer.writerow(output_header)
+        tot = len(subject_set)
+        tot_classifications = 0
+        for j, subject in enumerate(subject_set.values()):
+            aggs = subject.aggregateSpeciesLabelsML(ret=True, rules=['empty_first_two_90conf'])
             tot_classifications += subject.n_annos_aggregated
             subject.aggregated_annotations = aggs
             n_labels = len(subject.aggregated_annotations)
