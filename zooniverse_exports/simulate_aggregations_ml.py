@@ -10,8 +10,6 @@
         Path to a file that contains aggregated machine predictions
     - output_csv (str):
         Path to new aggregated csv file (will be overwritten)
-        Must not contain the '.csv' ending as it will be automatically
-        generated
 
     Example Usage:
     --------------
@@ -311,10 +309,9 @@ if __name__ == '__main__':
     rules = ['all', 'max_2', 'max_5', 'empty_first_two_95conf',
              'empty_first_two_90conf', 'empty_first_95conf',
              'species_first_two_95conf']
-    fnam = output_file + "full.csv"
-    with open(fnam, "w", newline='') as outs:
+    with open(output_file, "w", newline='') as outs:
         csv_writer = csv.writer(outs, delimiter=',')
-        print("Writing file to %s" % fnam)
+        print("Writing file to %s" % output_file)
         csv_writer.writerow(output_header + ['n_annos', 'rule'])
         # calculate different rules
         for rule in rules:

@@ -116,7 +116,7 @@ python3 -m zooniverse_exports.aggregate_preds_on_subject \
 # Simulate Different Aggregations
 python3 -m zooniverse_exports.simulate_aggregations_ml \
 -classifications_extracted /home/packerc/shared/machine_learning/data/zooniverse_exports/SER/SER_S11/classifications_extracted.csv \
--output_csv /home/packerc/shared/machine_learning/data/zooniverse_exports/SER/SER_S11/classifications_aggregated_ml_ \
+-output_csv /home/packerc/shared/machine_learning/data/zooniverse_exports/SER/SER_S11/classifications_aggregated_ml.csv \
 -aggregated_predictions /home/packerc/shared/machine_learning/data/zooniverse_exports/SER/SER_S11/SER_S11_predictions.json
 
 
