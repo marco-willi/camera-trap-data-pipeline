@@ -425,6 +425,7 @@ if __name__ == '__main__':
                 species_pred = subject.ml_annotation[0].labels['species'].value
                 species_conf = subject.ml_annotation[0].labels['species'].confidence
             except:
+                print("Subject prediction not found for id %s" % subject.id)
                 return self.aggregateSpeciesLabels(max_annos=max_annos, ret=ret)
 
             if 'empty_first_two_95conf' in rules:
@@ -646,7 +647,7 @@ if __name__ == '__main__':
         tot = len(subject_set)
         tot_classifications = 0
         for j, subject in enumerate(subject_set.values()):
-            aggs = subject.aggregateSpeciesLabels(2, ret=True)
+            aggs = subject.aggregateSpeciesLabels(5, ret=True)
             tot_classifications += subject.n_annos_aggregated
             subject.aggregated_annotations = aggs
             n_labels = len(subject.aggregated_annotations)
