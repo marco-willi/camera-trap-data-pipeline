@@ -107,9 +107,9 @@ if __name__ == '__main__':
             if rule == 'all':
                 res = self.aggregateSpeciesLabels(max_annos=None, ret=True)
             elif rule == 'max_2':
-                res = self.subject.aggregateSpeciesLabels(2, ret=True)
+                res = self.aggregateSpeciesLabels(2, ret=True)
             elif rule == 'max_5':
-                res = self.subject.aggregateSpeciesLabels(5, ret=True)
+                res = self.aggregateSpeciesLabels(5, ret=True)
             elif rule in ['empty_first_two_95conf', 'empty_first_two_90conf',
                           'empty_first_95conf', 'species_first_two_95conf']:
                 res = self.aggregateSpeciesLabelsML(ret=True, rules=[rule])
