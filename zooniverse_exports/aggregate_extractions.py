@@ -276,14 +276,14 @@ if __name__ == '__main__':
                 'young_present': 'young_present'}
 
             self.create_annotation(
-                species=row[column_to_row_mapping[col_names['species']]],
-                count=row[column_to_row_mapping[col_names['count']]],
-                moving=row[column_to_row_mapping[col_names['moving']]],
-                eating=row[column_to_row_mapping[col_names['eating']]],
-                standing=row[column_to_row_mapping[col_names['standing']]],
-                resting=row[column_to_row_mapping[col_names['resting']]],
-                interacting=row[column_to_row_mapping[col_names['interacting']]],
-                young_present=row[column_to_row_mapping[col_names['young_present']]]
+                species=row[column_mapping[col_names['species']]],
+                count=row[column_mapping[col_names['count']]],
+                moving=row[column_mapping[col_names['moving']]],
+                eating=row[column_mapping[col_names['eating']]],
+                standing=row[column_mapping[col_names['standing']]],
+                resting=row[column_mapping[col_names['resting']]],
+                interacting=row[column_mapping[col_names['interacting']]],
+                young_present=row[column_mapping[col_names['young_present']]]
                 )
 
     class Subject(object):

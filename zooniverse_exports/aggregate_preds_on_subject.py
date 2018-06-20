@@ -8,15 +8,15 @@ from collections import Counter
 from statistics import mean
 
 
-# subjects_path = 'D:\\Studium_GD\\Zooniverse\\SnapshotSafari\\data\\zooniverse_exports\\SER\\subjects.csv'
-manifest_root_path = 'D:\\Studium_GD\\Zooniverse\\SnapshotSafari\\data\\zooniverse\\Manifests\\SER\\'
-mainfest_files = ['SER_S11_1_manifest_v1', 'SER_S11_2_manifest_v1']
-zooid_root_path = 'D:\\Studium_GD\\Zooniverse\\SnapshotSafari\\data\\zooniverse\\ZOOIDs\\SER\\'
-zooid_files = ['SER_S11_1_ZOOID_v0.csv', 'SER_S11_2_ZOOID_v0.csv']
-predictions_empty_path = 'D:\\Studium_GD\\Zooniverse\\SnapshotSafari\\data\\predictions\\empty_or_not\\SER\\SER_S11\\predictions_run_20180619.json'
-predictions_species_path = 'D:\\Studium_GD\\Zooniverse\\SnapshotSafari\\data\\predictions\\species\\SER\\SER_S11\\predictions_run_20180619.json'
-output_file = 'D:\\Studium_GD\\Zooniverse\\SnapshotSafari\\data\\zooniverse_exports\\SER\\SER_S11_predictions.json'
-label_mapping_path = 'D:\\Studium_GD\\Zooniverse\\SnapshotSafari\\data\\zooniverse_exports\\SER\\label_mapping.json'
+# # subjects_path = 'D:\\Studium_GD\\Zooniverse\\SnapshotSafari\\data\\zooniverse_exports\\SER\\subjects.csv'
+# manifest_root_path = 'D:\\Studium_GD\\Zooniverse\\SnapshotSafari\\data\\zooniverse\\Manifests\\SER\\'
+# manifest_files = ['SER_S11_1_manifest_v1', 'SER_S11_2_manifest_v1']
+# zooid_root_path = 'D:\\Studium_GD\\Zooniverse\\SnapshotSafari\\data\\zooniverse\\ZOOIDs\\SER\\'
+# zooid_files = ['SER_S11_1_ZOOID_v0.csv', 'SER_S11_2_ZOOID_v0.csv']
+# predictions_empty_path = 'D:\\Studium_GD\\Zooniverse\\SnapshotSafari\\data\\predictions\\empty_or_not\\SER\\SER_S11\\predictions_run_20180619.json'
+# predictions_species_path = 'D:\\Studium_GD\\Zooniverse\\SnapshotSafari\\data\\predictions\\species\\SER\\SER_S11\\predictions_run_20180619.json'
+# output_file = 'D:\\Studium_GD\\Zooniverse\\SnapshotSafari\\data\\zooniverse_exports\\SER\\SER_S11_predictions.json'
+# label_mapping_path = 'D:\\Studium_GD\\Zooniverse\\SnapshotSafari\\data\\zooniverse_exports\\SER\\label_mapping.json'
 
 
 
@@ -95,7 +95,7 @@ if __name__ == '__main__':
 
     # Read Manifest file
     anonym_to_subj = dict()
-    for file in mainfest_files:
+    for file in manifest_files:
         full_path = os.path.join(manifest_root_path, file)
         with open(full_path, newline='') as csvfile:
             reader = csv.reader(csvfile, delimiter=',')
