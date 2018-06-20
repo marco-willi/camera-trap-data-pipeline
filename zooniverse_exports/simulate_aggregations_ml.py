@@ -635,7 +635,7 @@ if __name__ == '__main__':
                 row = [subject.id, i+1]
                 for label in labels_to_export:
                     row.append(anno[label].value)
-                    row.append(subject.n_annos_aggregated)
+                row.append(subject.n_annos_aggregated)
                 csv_writer.writerow(row)
 
         print("Used %s annotations" % tot_classifications)
@@ -660,7 +660,7 @@ if __name__ == '__main__':
                 row = [subject.id, i+1]
                 for label in labels_to_export:
                     row.append(anno[label].value)
-                    row.append(subject.n_annos_aggregated)
+                row.append(subject.n_annos_aggregated)
                 csv_writer.writerow(row)
 
         print("Used %s annotations" % tot_classifications)
@@ -685,7 +685,7 @@ if __name__ == '__main__':
                 row = [subject.id, i+1]
                 for label in labels_to_export:
                     row.append(anno[label].value)
-                    row.append(subject.n_annos_aggregated)
+                row.append(subject.n_annos_aggregated)
                 csv_writer.writerow(row)
 
         print("Used %s annotations" % tot_classifications)
@@ -710,7 +710,7 @@ if __name__ == '__main__':
                 row = [subject.id, i+1]
                 for label in labels_to_export:
                     row.append(anno[label].value)
-                    row.append(subject.n_annos_aggregated)
+                row.append(subject.n_annos_aggregated)
                 csv_writer.writerow(row)
 
         print("Used %s annotations" % tot_classifications)
@@ -735,7 +735,7 @@ if __name__ == '__main__':
                 row = [subject.id, i+1]
                 for label in labels_to_export:
                     row.append(anno[label].value)
-                    row.append(subject.n_annos_aggregated)
+                row.append(subject.n_annos_aggregated)
                 csv_writer.writerow(row)
 
         print("Used %s annotations" % tot_classifications)
