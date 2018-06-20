@@ -418,8 +418,12 @@ if __name__ == '__main__':
         def aggregateSpeciesLabelsML(self, ret=False, rules=[], max_annos=None):
             """ Aggregate Labels per Species Using Rules """
 
-            species_pred = subject.ml_annotation[0].labels['species'].value
-            species_conf = subject.ml_annotation[0].labels['species'].confidence
+            try:
+                species_pred = subject.ml_annotation[0].labels['species'].value
+                species_conf = subject.ml_annotation[0].labels['species'].confidence
+            except:
+                return self.aggregateSpeciesLabels(max_annos=max_annos, ret=ret)
+
             rule_match = False
             self.n_annos_aggregated = 0
 
