@@ -418,14 +418,14 @@ if __name__ == '__main__':
         def aggregateSpeciesLabelsML(self, ret=False, rules=[], max_annos=None):
             """ Aggregate Labels per Species Using Rules """
 
+            rule_match = False
+            self.n_annos_aggregated = 0
+
             try:
                 species_pred = subject.ml_annotation[0].labels['species'].value
                 species_conf = subject.ml_annotation[0].labels['species'].confidence
             except:
                 return self.aggregateSpeciesLabels(max_annos=max_annos, ret=ret)
-
-            rule_match = False
-            self.n_annos_aggregated = 0
 
             if 'empty_first_two_95conf' in rules:
                 if species_pred == 'NOTHINGHERE' and species_conf >= 0.95:
@@ -463,7 +463,7 @@ if __name__ == '__main__':
                         human_species_pred = human_aggs[0].labels['species'].value
                         if human_species_pred == species_pred:
                             rule_match = True
-                            self.n_annos_aggregated = 1
+                            self.n_annos_aggregated = 2
                             if ret:
                                 return human_aggs
                             else:
