@@ -232,7 +232,7 @@ if __name__ == '__main__':
         pred_aggregated[subject_id] = default_dict
 
     with open(output_file, 'w') as fp:
-        json.dump(pred_aggregated, fp, indent=2)
+        json.dump(pred_aggregated, fp, indent=1)
 
 
     # # Define a final consensus
