@@ -100,6 +100,32 @@ python3 -m zooniverse_exports.generate_predict_file_from_zooids \
 -path_field path
 
 
+# Generate Predictions to Subject Mapping
+python3 -m zooniverse_exports.aggregate_preds_on_subject \
+-manifest_root_path  /home/packerc/shared/zooniverse/Manifests/SER/ \
+-mainfest_files  SER_S11_1_manifest_v1 SER_S11_2_manifest_v1 \
+-zooid_root_path  /home/packerc/shared/zooniverse/ZOOIDs/SER/
+-zooid_files SER_S11_1_ZOOID_v0.csv SER_S11_2_ZOOID_v0.csv \
+-predictions_empty_path /home/packerc/shared/machine_learning/data/predictions/empty_or_not/SER/SER_S11/predictions_run_20180619.json \
+-predictions_species_path /home/packerc/shared/machine_learning/data/predictions/species/SER/SER_S11/predictions_run_20180619.json \
+-output_file  /home/packerc/shared/machine_learning/data/zooniverse_exports/SER/SER_S11/SER_S11_predictions.json \
+-label_mapping_path /home/packerc/shared/machine_learning/data/zooniverse_exports/SER/SER_S11/label_mapping.json
+
+
+
+# Simulate Different Aggregations
+python3 -m zooniverse_exports.simulate_aggregations_ml \
+-classifications_extracted /home/packerc/shared/machine_learning/will5448/data/zooniverse_exports/SER/classifications_extracted.csv \
+-output_csv /home/packerc/shared/machine_learning/will5448/data/zooniverse_exports/SER/classifications_aggregated_ml_ \
+-aggregated_predictions
+
+
+-root_path /home/packerc/shared/zooniverse/ZOOIDs/SER/ \
+-output_file /home/packerc/shared/machine_learning/data/info_files/SER/SER_S11/SER_S11_all.csv \
+-files SER_S11_1_ZOOID_v0.csv SER_S11_2_ZOOID_v0.csv \
+-path_field path
+
+
 ###################################
 # Ruaha
 ####################################
