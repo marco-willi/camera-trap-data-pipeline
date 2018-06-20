@@ -43,7 +43,7 @@ if __name__ == '__main__':
     predictions_species_path = args['predictions_species_path']
     output_file = args['output_file']
     label_mapping_path = args['label_mapping_path']
-    
+
     # Read ZooID files
     anonym_to_im = dict()
     for file in zooid_files:
@@ -232,7 +232,7 @@ if __name__ == '__main__':
         pred_aggregated[subject_id] = default_dict
 
     with open(output_file, 'w') as fp:
-        json.dump(pred_aggregated, fp)
+        json.dump(pred_aggregated, fp, indent=2)
 
 
     # # Define a final consensus
