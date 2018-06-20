@@ -110,8 +110,7 @@ if __name__ == '__main__':
                 res = self.aggregateSpeciesLabels(2, ret=True)
             elif rule == 'max_5':
                 res = self.aggregateSpeciesLabels(5, ret=True)
-            elif rule in ['empty_first_two_95conf', 'empty_first_two_90conf',
-                          'empty_first_95conf', 'species_first_two_95conf']:
+            else:
                 res = self.aggregateSpeciesLabelsML(ret=True, rules=[rule])
             return res
 
@@ -121,11 +120,11 @@ if __name__ == '__main__':
             rule_match = False
             self.n_annos_aggregated = 0
 
+            # Catch case when no machine prediction is available
             try:
                 species_pred = subject.ml_annotation[0].labels['species'].value
                 species_conf = subject.ml_annotation[0].labels['species'].confidence
             except:
-                print("Subject prediction not found for id %s" % subject.id)
                 return self.aggregateSpeciesLabels(max_annos=max_annos, ret=ret)
 
             if 'empty_first_two_95conf' in rules:
@@ -183,6 +182,32 @@ if __name__ == '__main__':
                                 return human_aggs
                             else:
                                 self.aggregated_annotations.append(human_aggs)
+
+            elif 'empty_first_2_humans' in rules:
+                human_aggs = self.aggregateSpeciesLabels(max_annos=2, ret=True)
+                n_human_aggs = len(human_aggs)
+                if n_human_aggs == 1:
+                    human_species_pred = human_aggs[0].labels['species'].value
+                    if human_species_pred == 'NOTHINGHERE':
+                        rule_match = True
+                        self.n_annos_aggregated = 2
+                        if ret:
+                            return human_aggs
+                        else:
+                            self.aggregated_annotations.append(human_aggs)
+
+            elif 'empty_first_5_humans' in rules:
+                human_aggs = self.aggregateSpeciesLabels(max_annos=5, ret=True)
+                n_human_aggs = len(human_aggs)
+                if n_human_aggs == 1:
+                    human_species_pred = human_aggs[0].labels['species'].value
+                    if human_species_pred == 'NOTHINGHERE':
+                        rule_match = True
+                        self.n_annos_aggregated = 5
+                        if ret:
+                            return human_aggs
+                        else:
+                            self.aggregated_annotations.append(human_aggs)
 
             # If Rules do not match
             if not rule_match:
@@ -308,7 +333,8 @@ if __name__ == '__main__':
     # Write to Disk
     rules = ['all', 'max_2', 'max_5', 'empty_first_two_95conf',
              'empty_first_two_90conf', 'empty_first_95conf',
-             'species_first_two_95conf']
+             'species_first_two_95conf', 'empty_first_2_humans',
+             'empty_first_5_humans']
     with open(output_file, "w", newline='') as outs:
         csv_writer = csv.writer(outs, delimiter=',')
         print("Writing file to %s" % output_file)
