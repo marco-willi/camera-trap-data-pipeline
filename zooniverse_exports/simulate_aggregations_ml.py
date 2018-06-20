@@ -587,9 +587,10 @@ if __name__ == '__main__':
             subject_set[subject_id].add_ml_annotation(annotation)
 
     # Write to Disk
-    with open(output_file + "full.csv", "w", newline='') as outs:
+    fnam = output_file + "full.csv"
+    with open(fnam, "w", newline='') as outs:
         csv_writer = csv.writer(outs, delimiter=',')
-        print("Writing file to %s" % output_file)
+        print("Writing file to %s" % fnam)
         csv_writer.writerow(output_header)
         tot = len(subject_set)
         tot_classifications = 0
@@ -609,9 +610,10 @@ if __name__ == '__main__':
         print("Used %s annotations" % tot_classifications)
 
     # Write to Disk
-    with open(output_file + "only_2.csv", "w", newline='') as outs:
+    fnam = output_file + "only_2.csv"
+    with open(fnam, "w", newline='') as outs:
         csv_writer = csv.writer(outs, delimiter=',')
-        print("Writing file to %s" % output_file)
+        print("Writing file to %s" % fnam)
         csv_writer.writerow(output_header)
         tot = len(subject_set)
         tot_classifications = 0
@@ -632,9 +634,10 @@ if __name__ == '__main__':
         print("Used %s annotations" % tot_classifications)
 
     # Write to Disk
-    with open(output_file + "only_5.csv", "w", newline='') as outs:
+    fnam = output_file + "only_5.csv"
+    with open(fnam, "w", newline='') as outs:
         csv_writer = csv.writer(outs, delimiter=',')
-        print("Writing file to %s" % output_file)
+        print("Writing file to %s" % fnam)
         csv_writer.writerow(output_header)
         tot = len(subject_set)
         tot_classifications = 0
@@ -655,9 +658,10 @@ if __name__ == '__main__':
         print("Used %s annotations" % tot_classifications)
 
     # Write to Disk
-    with open(output_file + "empty_first2_95.csv", "w", newline='') as outs:
+    fnam = output_file + "empty_first2_95.csv"
+    with open(fnam, "w", newline='') as outs:
         csv_writer = csv.writer(outs, delimiter=',')
-        print("Writing file to %s" % output_file)
+        print("Writing file to %s" % fnam)
         csv_writer.writerow(output_header)
         tot = len(subject_set)
         tot_classifications = 0
@@ -678,9 +682,10 @@ if __name__ == '__main__':
         print("Used %s annotations" % tot_classifications)
 
     # Write to Disk
-    with open(output_file + "empty_first1_95.csv", "w", newline='') as outs:
+    fnam = output_file + "empty_first1_95.csv"
+    with open(fnam, "w", newline='') as outs:
         csv_writer = csv.writer(outs, delimiter=',')
-        print("Writing file to %s" % output_file)
+        print("Writing file to %s" % fnam)
         csv_writer.writerow(output_header)
         tot = len(subject_set)
         tot_classifications = 0
@@ -701,9 +706,10 @@ if __name__ == '__main__':
         print("Used %s annotations" % tot_classifications)
 
     # Write to Disk
-    with open(output_file + "species_first2_95.csv", "w", newline='') as outs:
+    fnam = output_file + "species_first2_95.csv"
+    with open(fnam, "w", newline='') as outs:
         csv_writer = csv.writer(outs, delimiter=',')
-        print("Writing file to %s" % output_file)
+        print("Writing file to %s" % fnam)
         csv_writer.writerow(output_header)
         tot = len(subject_set)
         tot_classifications = 0
