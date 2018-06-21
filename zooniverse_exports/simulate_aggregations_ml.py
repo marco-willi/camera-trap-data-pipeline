@@ -159,7 +159,7 @@ if __name__ == '__main__':
                             else:
                                 self.aggregated_annotations.append(human_aggs)
 
-            elif 'empty_first_95conf' in rules:
+            if 'empty_first_95conf' in rules:
                 if species_pred == 'NOTHINGHERE' and species_conf >= 0.95:
                     human_aggs = self.aggregateSpeciesLabels(max_annos=1, ret=True)
                     n_human_aggs = len(human_aggs)
@@ -173,7 +173,7 @@ if __name__ == '__main__':
                             else:
                                 self.aggregated_annotations.append(human_aggs)
 
-            elif 'species_first_two_95conf' in rules:
+            if 'species_first_two_95conf' in rules:
                 if not species_pred == 'NOTHINGHERE' and species_conf >= 0.95:
                     human_aggs = self.aggregateSpeciesLabels(max_annos=2, ret=True)
                     n_human_aggs = len(human_aggs)
@@ -187,7 +187,7 @@ if __name__ == '__main__':
                             else:
                                 self.aggregated_annotations.append(human_aggs)
 
-            elif 'empty_first_2_humans' in rules:
+            if 'empty_first_2_humans' in rules:
                 human_aggs = self.aggregateSpeciesLabels(max_annos=2, ret=True)
                 n_human_aggs = len(human_aggs)
                 if n_human_aggs == 1:
@@ -200,7 +200,7 @@ if __name__ == '__main__':
                         else:
                             self.aggregated_annotations.append(human_aggs)
 
-            elif 'empty_first_5_humans' in rules:
+            if 'empty_first_5_humans' in rules:
                 human_aggs = self.aggregateSpeciesLabels(max_annos=5, ret=True)
                 n_human_aggs = len(human_aggs)
                 if n_human_aggs == 1:
@@ -214,7 +214,7 @@ if __name__ == '__main__':
                             self.aggregated_annotations.append(human_aggs)
 
 
-            elif 'empty_first_two_95conf_max5empty' in rules:
+            if 'empty_first_two_95conf_max5empty' in rules:
                 if species_pred == 'NOTHINGHERE' and species_conf >= 0.95:
                     human_aggs = self.aggregateSpeciesLabels(max_annos=2, ret=True)
                     n_human_aggs = len(human_aggs)
