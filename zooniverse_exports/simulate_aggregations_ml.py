@@ -110,8 +110,12 @@ if __name__ == '__main__':
                 res = self.aggregateSpeciesLabels(2, ret=True)
             elif rule == 'max_5':
                 res = self.aggregateSpeciesLabels(5, ret=True)
+            elif rule == 'max_10':
+                res = self.aggregateSpeciesLabels(10, ret=True)
             else:
-                res = self.aggregateSpeciesLabelsML(ret=True, rules=[rule])
+                if not isinstance(rule, list):
+                    rule = [rule]
+                res = self.aggregateSpeciesLabelsML(ret=True, rules=rule)
             return res
 
         def aggregateSpeciesLabelsML(self, ret=False, rules=[], max_annos=None):
@@ -208,6 +212,21 @@ if __name__ == '__main__':
                             return human_aggs
                         else:
                             self.aggregated_annotations.append(human_aggs)
+
+
+            elif 'empty_first_two_95conf_max5empty' in rules:
+                if species_pred == 'NOTHINGHERE' and species_conf >= 0.95:
+                    human_aggs = self.aggregateSpeciesLabels(max_annos=2, ret=True)
+                    n_human_aggs = len(human_aggs)
+                    if n_human_aggs == 1:
+                        human_species_pred = human_aggs[0].labels['species'].value
+                        if human_species_pred == species_pred:
+                            rule_match = True
+                            self.n_annos_aggregated = 2
+                            if ret:
+                                return human_aggs
+                            else:
+                                self.aggregated_annotations.append(human_aggs)
 
             # If Rules do not match
             if not rule_match:
@@ -331,10 +350,13 @@ if __name__ == '__main__':
             subject_set[subject_id].add_ml_annotation(annotation)
 
     # Write to Disk
-    rules = ['all', 'max_2', 'max_5', 'empty_first_two_95conf',
+    rules = ['all', 'max_2', 'max_5', 'max_10', 'empty_first_two_95conf',
              'empty_first_two_90conf', 'empty_first_95conf',
              'species_first_two_95conf', 'empty_first_2_humans',
-             'empty_first_5_humans']
+             'empty_first_5_humans',
+             ['empty_first_5_humans', 'empty_first_95conf'],
+             ['empty_first_5_humans', 'empty_first_95conf', 'species_first_two_95conf']
+             ]
     with open(output_file, "w", newline='') as outs:
         csv_writer = csv.writer(outs, delimiter=',')
         print("Writing file to %s" % output_file)
@@ -354,9 +376,28 @@ if __name__ == '__main__':
                     for label in labels_to_export:
                         row.append(anno[label].value)
                     row.append(subject.n_annos_aggregated)
-                    row.append(rule)
+                    rule_string = '#'.join(rule)
+                    row.append(rule_string)
                     csv_writer.writerow(row)
             print("Rule %s: %s annotations" % (rule, tot_classifications))
+
+    species_distribution = dict()
+    species_counts = list()
+    for subject in subject_set.values():
+        species_counts.append(len(subject.species))
+        for species in subject.species:
+            if species not in species_distribution:
+                species_distribution[species] = 0
+            species_distribution[species] += 1
+
+    n_subjects = len(subject_set.keys())
+    print("N Subjects: %s" % n_subjects)
+    Counter(species_counts)
+    species_distribution = order_dict_by_values(species_distribution)
+
+    for k, v in species_distribution.items():
+        print("Class %s - # %s (%s %%)" % (k, v, round(100 * v/n_subjects, 2)))
+
 
     # # Write to Disk
     # fnam = output_file + "full.csv"
@@ -533,22 +574,6 @@ if __name__ == '__main__':
     #     print("Used %s annotations" % tot_classifications)
 
 
-    species_distribution = dict()
-    species_counts = list()
-    for subject in subject_set.values():
-        species_counts.append(len(subject.species))
-        for species in subject.species:
-            if species not in species_distribution:
-                species_distribution[species] = 0
-            species_distribution[species] += 1
-
-    n_subjects = len(subject_set.keys())
-    print("N Subjects: %s" % n_subjects)
-    Counter(species_counts)
-    species_distribution = order_dict_by_values(species_distribution)
-
-    for k, v in species_distribution.items():
-        print("Class %s - # %s (%s %%)" % (k, v, round(100 * v/n_subjects, 2)))
 
 
     # # Create Aggregations
