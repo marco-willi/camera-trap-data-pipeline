@@ -376,7 +376,10 @@ if __name__ == '__main__':
                     for label in labels_to_export:
                         row.append(anno[label].value)
                     row.append(subject.n_annos_aggregated)
-                    rule_string = '#'.join(rule)
+                    if isinstance(rule, list):
+                        rule_string = '#'.join(rule)
+                    else:
+                        rule_string = rule
                     row.append(rule_string)
                     csv_writer.writerow(row)
             print("Rule %s: %s annotations" % (rule, tot_classifications))
