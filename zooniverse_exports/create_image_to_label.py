@@ -353,6 +353,10 @@ if __name__ == '__main__':
         # sample into train / val
         balanced_sample_size = min([len(empty_subject_ids),
                                     len(species_subject_ids)])
+
+        train_size_fraction = 0.8
+        balanced_sample_size = int(balanced_sample_size * train_size_fraction)
+
         random.seed(123)
         train_ids_empty = random.sample(empty_subject_ids,
                                         balanced_sample_size)
