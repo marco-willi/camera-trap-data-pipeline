@@ -1,12 +1,12 @@
 #!/bin/bash -l
-#PBS -l walltime=10:00:00,nodes=1:ppn=8:gpus=1
+#PBS -l walltime=2:00:00,nodes=1:ppn=8:gpus=2
 #PBS -j oe
 #PBS -m abe
 #PBS -M will5448@umn.edu
 #PBS -q k40
 #PBS -N tl
-#PBS -o ${HOME}/job_ml_output_rua_s1_ft_empty.log
-#PBS -e ${HOME}/job_ml_error_rua_s1_ft_empty.log
+#PBS -o ${HOME}/job_ml_output_rua_s1_ft2_empty.log
+#PBS -e ${HOME}/job_ml_error_rua_s1_ft2_empty.log
 
 # Parameters
 TIMESTAMP=`date +%Y%m%d%H%M`
