@@ -165,7 +165,7 @@ python3 -m zooniverse_exports.create_image_to_label \
 python3 -m zooniverse_exports.generate_predict_file_from_zooids \
 -root_path /home/packerc/shared/zooniverse/ZOOIDs/RUA/ \
 -output_file /home/packerc/shared/machine_learning/data/info_files/RUA/RUA_S1/RUA_S1_all.csv \
--files RUA_S1_A1_ZOOID.csv RUA_S1_A2_ZOOID.csv \
+-files RUA_S1_A1_ZOOID.csv \
 -path_field path
 
 

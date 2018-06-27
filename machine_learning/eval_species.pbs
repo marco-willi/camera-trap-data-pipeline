@@ -12,9 +12,9 @@
 TIMESTAMP=`date +%Y%m%d%H%M`
 DATE=`date +%Y%m%d`
 ID=run_${DATE}
-SITE=GRU
+SITE=RUA
 #SEASON=S7
-SEASON=GRU_S1
+SEASON=RUA_S1
 MODEL=SER
 ROOT=/home/packerc/shared/machine_learning/
 CODE=${ROOT}code/deep_learning_for_camera_trap_images/phase2
