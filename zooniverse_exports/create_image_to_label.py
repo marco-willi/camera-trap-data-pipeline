@@ -70,6 +70,8 @@ if __name__ == '__main__':
     output_file_species_val = add_postfix_to_path(output_file_species, 'val')
     output_file_empty_train = add_postfix_to_path(output_file_empty, 'train')
     output_file_empty_val = add_postfix_to_path(output_file_empty, 'val')
+    output_file_old_species_train = add_postfix_to_path(output_file_old_species, 'train')
+    output_file_old_species_val = add_postfix_to_path(output_file_old_species, 'val')
 
     # Read manifests and create Image ID to Subject ID mapping
     image_id_to_sub = dict()
@@ -191,17 +193,19 @@ if __name__ == '__main__':
      'RHINOCEROS': 36, 'RODENTS': 37, 'SECRETARYBIRD': 38, 'SERVAL': 39,
      'TOPI': 40, 'MONKEYVERVET': 41, 'WARTHOG': 42, 'WATERBUCK': 43,
      'WILDCAT': 44, 'WILDEBEEST': 45, 'ZEBRA': 46, 'ZORILLA': 47}
-    map_id_to_species_zoonames_old = {v: k for k, v in map_species_zoonames_to_id_old.items()}
+
+    map_id_to_species_zoonames_old = {
+        v: k for k, v in map_species_zoonames_to_id_old.items()}
 
     map_empty_zoonames_to_id_old = {'NOTHINGHERE': 0}
     map_id_to_empty_zoonames_old = {0: 'NOTHINGHERE'}
 
     # NEW Snapshot Safari Mapping
-    map_empty_species_old = {k: 1 for k in map_species_zoonames_to_id_old.keys()}
+    map_empty_species_old = {
+        k: 1 for k in map_species_zoonames_to_id_old.keys()}
     map_empty_species = {k: 1 for k in label_mapping.keys()}
     map_empty_species_all = {**map_empty_species, **map_empty_species_old}
     map_empty_to_id = {'NOTHINGHERE': 0, **map_empty_species_all}
-
 
     def _create_ml_record(image_path, label_data, behav_attrs,
                           label_mapping, label_order, counts_mapping):
@@ -210,12 +214,12 @@ if __name__ == '__main__':
             species_num = label_mapping[label_data['species']]
             count_val = behav_attrs[label_order.index('count')]
             if count_val in counts_mapping:
-                behav_attrs[label_order.index('count')] = counts_mapping[count_val]
+                behav_attrs[label_order.index('count')] = \
+                    counts_mapping[count_val]
             ml_row = [image_path, species_num] + behav_attrs
             return ml_row
         else:
             return None
-
 
     # Merge all files
     ml_data_d = dict()
@@ -316,6 +320,24 @@ if __name__ == '__main__':
                     if ml_data['subject_id'] not in train_ids:
                         csv_writer.writerow(ml_data['ml_species'])
 
+        # Export Train Species OLD
+        with open(output_file_old_species_train, "w", newline='') as outs:
+            csv_writer = csv.writer(outs, delimiter=',')
+            print("Writing file to %s" % output_file_old_species_train)
+            for ml_data in ml_data_d.values():
+                if ml_data['ml_old_species'] is not None:
+                    if ml_data['subject_id'] in train_ids:
+                        csv_writer.writerow(ml_data['ml_old_species'])
+
+        # Export Val Species OLD
+        with open(output_file_old_species_val, "w", newline='') as outs:
+            csv_writer = csv.writer(outs, delimiter=',')
+            print("Writing file to %s" % output_file_old_species_val)
+            for ml_data in ml_data_d.values():
+                if ml_data['ml_old_species'] is not None:
+                    if ml_data['subject_id'] not in train_ids:
+                        csv_writer.writerow(ml_data['ml_old_species'])
+
         # Export Splitted Empty
         all_subject_ids = set()
         empty_subject_ids = set()
@@ -329,14 +351,17 @@ if __name__ == '__main__':
                 all_subject_ids.add(ml_data['subject_id'])
 
         # sample into train / val
-        balanced_sample_size = min([len(empty_subject_ids), len(species_subject_ids)])
+        balanced_sample_size = min([len(empty_subject_ids),
+                                    len(species_subject_ids)])
         random.seed(123)
-        train_ids_empty = random.sample(empty_subject_ids, balanced_sample_size)
+        train_ids_empty = random.sample(empty_subject_ids,
+                                        balanced_sample_size)
         random.seed(123)
-        train_ids_species = random.sample(species_subject_ids, balanced_sample_size)
+        train_ids_species = random.sample(species_subject_ids,
+                                          balanced_sample_size)
         train_ids = set(train_ids_empty + train_ids_species)
 
-        # Export Train Species
+        # Export Train EMPTY
         with open(output_file_empty_train, "w", newline='') as outs:
             csv_writer = csv.writer(outs, delimiter=',')
             print("Writing file to %s" % output_file_empty_train)
@@ -345,7 +370,7 @@ if __name__ == '__main__':
                     if ml_data['subject_id'] in train_ids:
                         csv_writer.writerow(ml_data['ml_empty'][0:2])
 
-        # Export Val Species
+        # Export Val EMPTY
         with open(output_file_empty_val, "w", newline='') as outs:
             csv_writer = csv.writer(outs, delimiter=',')
             print("Writing file to %s" % output_file_empty_val)
