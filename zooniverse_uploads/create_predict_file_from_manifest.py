@@ -46,6 +46,6 @@ if __name__ == "__main__":
     with open(args['prediction_file'], "w", newline='') as outs:
         csv_writer = csv.writer(outs, delimiter=',')
         print("Writing file to %s" % args['prediction_file'])
-        for capture_id, mani_data in manifest.values():
+        for capture_id, mani_data in manifest.items():
             for image in mani_data['images']['original_images']:
                 csv_writer.writerow(image)
