@@ -5,23 +5,24 @@
 #PBS -M will5448@umn.edu
 #PBS -q k40
 #PBS -N predict
-#PBS -o ${HOME}/job_ml_output_pred_species.log
-#PBS -e ${HOME}/job_ml_error_pred_species.log
+#PBS -o ${HOME}/job_ml_output_pred_species_${PBS_JOBID}.log
+#PBS -e ${HOME}/job_ml_error_pred_species_${PBS_JOBID}.log
 
 # Parameters
 TIMESTAMP=`date +%Y%m%d%H%M`
 DATE=`date +%Y%m%d`
 ID=run_${DATE}
-SITE=SER
-SEASON=SER_S11
+SITE=RUA
+SEASON=RUA_S1
 MODEL=SER
+MODEL_NAME=phase2
 NUMCLASS=48
 ROOT=/home/packerc/shared/machine_learning/
-CODE=${ROOT}code/deep_learning_for_camera_trap_images/phase2
+CODE=${ROOT}code/deep_learning_for_camera_trap_images/${MODEL_NAME}
 LOG_DIR=${ROOT}data/models/${MODEL}/species/phase2/
 PREDICTIONS=${ROOT}data/predictions/species/${SITE}/${SEASON}/predictions_${ID}.json
 IMAGES_ROOT=/home/packerc/shared/albums/${SITE}/
-DATA_INFO=${ROOT}data/info_files/${SITE}/${SEASON}/${SEASON}_all.csv
+DATA_INFO=${ROOT}data/info_files/${SITE}/${SEASON}/${SEASON}_all_val_old.csv
 
 # Log Parameters
 echo "TIMESTAMP: $TIMESTAMP"
@@ -30,6 +31,7 @@ echo "ID: $ID"
 echo "SITE: $SITE"
 echo "SEASON: $SEASON"
 echo "MODEL: $MODEL"
+echo "MODEL_NAME: ${MODEL_NAME}"
 echo "NUMCLASS: $NUMCLASS"
 echo "ROOT: $ROOT"
 echo "CODE: $CODE"

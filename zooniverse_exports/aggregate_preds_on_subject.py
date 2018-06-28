@@ -18,6 +18,15 @@ from statistics import mean
 # output_file = 'D:\\Studium_GD\\Zooniverse\\SnapshotSafari\\data\\zooniverse_exports\\SER\\SER_S11_predictions.json'
 # label_mapping_path = 'D:\\Studium_GD\\Zooniverse\\SnapshotSafari\\data\\zooniverse_exports\\SER\\label_mapping.json'
 
+# subjects_path = 'D:\\Studium_GD\\Zooniverse\\SnapshotSafari\\data\\zooniverse_exports\\SER\\subjects.csv'
+# manifest_root_path = 'D:\\Studium_GD\\Zooniverse\\SnapshotSafari\\data\\zooniverse\\Manifests\\RUA\\'
+# manifest_files = ['RUA_S1_A1_manifest_v1']
+# zooid_root_path = 'D:\\Studium_GD\\Zooniverse\\SnapshotSafari\\data\\zooniverse\\ZOOIDs\\RUA\\'
+# zooid_files = ['RUA_S1_A1_ZOOID.csv']
+# predictions_empty_path = 'D:\\Studium_GD\\Zooniverse\\SnapshotSafari\\data\\predictions\\empty_or_not\\RUA\\RUA_S1\\evals_run_SER_fine_tune_20180627.json'
+# predictions_species_path = 'D:\\Studium_GD\\Zooniverse\\SnapshotSafari\\data\\predictions\\species\\RUA\\RUA_S1\\evals_run_originalSERmodel_20180626.json'
+# output_file = 'D:\\Studium_GD\\Zooniverse\\SnapshotSafari\\data\\zooniverse_exports\\RUA\\RUA_S1_predictions.json'
+# label_mapping_path = 'D:\\Studium_GD\\Zooniverse\\SnapshotSafari\\data\\zooniverse_exports\\RUA\\label_mapping.json'
 
 
 if __name__ == '__main__':

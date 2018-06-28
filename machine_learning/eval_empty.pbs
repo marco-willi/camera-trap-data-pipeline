@@ -5,8 +5,8 @@
 #PBS -M will5448@umn.edu
 #PBS -q k40
 #PBS -N eval
-#PBS -o ${HOME}/job_ml_output_rua_s1_empty_val.log
-#PBS -e ${HOME}/job_ml_error_rua_s1_empty_val.log
+#PBS -o ${HOME}/job_ml_output_empty_val_${PBS_JOBID}.log
+#PBS -e ${HOME}/job_ml_error_empty_val_${PBS_JOBID}.log
 
 # Parameters
 TIMESTAMP=`date +%Y%m%d%H%M`
