@@ -394,10 +394,10 @@ if __name__ == '__main__':
             for line in f:
                 val_records.append(line)
 
-        with open(output_file_val, "w", newline='') as outs:
+        with open(output_file_val, "w", newline='') as f:
             print("Writing file to %s" % output_file_val)
             for val_record in val_records:
-                csv_writer.write(val_record)
+                f.write(val_record)
 
         # Export consolidated Val Data for Simulations (old species)
         val_records = list()
@@ -408,9 +408,9 @@ if __name__ == '__main__':
             for line in f:
                 val_records.append(line)
 
-        with open(output_file_val_old, "w", newline='') as outs:
+        with open(output_file_val_old, "w", newline='') as f:
             print("Writing file to %s" % output_file_val_old)
             for val_record in val_records:
-                csv_writer.write(val_record)
+                f.write(val_record)
 
     export_ml_files(ml_data_d)
