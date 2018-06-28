@@ -47,4 +47,4 @@ if __name__ == "__main__":
         print("Writing file to %s" % args['prediction_file'])
         for capture_id, mani_data in manifest.items():
             for image in mani_data['images']['original_images']:
-                f.write(image)
+                f.write(image + '\n')
