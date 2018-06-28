@@ -43,9 +43,8 @@ if __name__ == "__main__":
           (len(manifest.keys()), args['manifest']))
 
     # Extract all image paths and store them to disk
-    with open(args['prediction_file'], "w", newline='') as outs:
-        csv_writer = csv.writer(outs, delimiter=',')
+    with open(args['prediction_file'], "w", newline='') as f:
         print("Writing file to %s" % args['prediction_file'])
         for capture_id, mani_data in manifest.items():
             for image in mani_data['images']['original_images']:
-                csv_writer.writerow(image)
+                f.write(image)
