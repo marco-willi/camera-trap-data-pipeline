@@ -112,6 +112,13 @@ if __name__ == '__main__':
                 res = self.aggregateSpeciesLabels(5, ret=True)
             elif rule == 'max_10':
                 res = self.aggregateSpeciesLabels(10, ret=True)
+            elif rule == 'ml_only':
+                try:
+                    _ = self.ml_annotation[0].labels['species'].value
+                    self.n_annos_aggregated = 0
+                    res = self.ml_annotation
+                except:
+                    res = self.aggregateSpeciesLabels(max_annos=None, ret=True)
             else:
                 if not isinstance(rule, list):
                     rule = [rule]
@@ -126,8 +133,8 @@ if __name__ == '__main__':
 
             # Catch case when no machine prediction is available
             try:
-                species_pred = subject.ml_annotation[0].labels['species'].value
-                species_conf = subject.ml_annotation[0].labels['species'].confidence
+                species_pred = self.ml_annotation[0].labels['species'].value
+                species_conf = self.ml_annotation[0].labels['species'].confidence
             except:
                 return self.aggregateSpeciesLabels(max_annos=max_annos, ret=ret)
 
@@ -350,7 +357,7 @@ if __name__ == '__main__':
             subject_set[subject_id].add_ml_annotation(annotation)
 
     # Write to Disk
-    rules = ['all', 'max_2', 'max_5', 'max_10', 'empty_first_two_95conf',
+    rules = ['all', 'max_2', 'max_5', 'max_10', 'ml_only', 'empty_first_two_95conf',
              'empty_first_two_90conf', 'empty_first_95conf',
              'species_first_two_95conf', 'empty_first_2_humans',
              'empty_first_5_humans',
