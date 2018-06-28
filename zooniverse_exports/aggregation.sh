@@ -130,6 +130,7 @@ python3 -m zooniverse_exports.simulate_aggregations_ml \
 # Ruaha
 ####################################
 
+# Extract Zooniverse Classifications
 cd /home/packerc/shared/machine_learning/will5448/code/snapshot_safari_misc
 python3 -m zooniverse_exports.extract_classifications \
         -classification_csv /home/packerc/shared/machine_learning/data/zooniverse_exports/RUA/RUA_S1/classifications.csv \
@@ -137,11 +138,12 @@ python3 -m zooniverse_exports.extract_classifications \
         -workflow_id 4889 \
         -workflow_version 797
 
+# Aggregate Zooniverse Classifications
 python3 -m zooniverse_exports.aggregate_extractions \
           -classifications_extracted /home/packerc/shared/machine_learning/data/zooniverse_exports/RUA/RUA_S1/classifications_extracted.csv \
           -output_csv /home/packerc/shared/machine_learning/data/zooniverse_exports/RUA/RUA_S1/classifications_aggregated.csv
 
-
+# Create Label Mapping from workflow file
 python3 -m zooniverse_exports.extract_choices_from_workflow \
   -workflow_csv /home/packerc/shared/machine_learning/data/zooniverse_exports/RUA/RUA_S1/workflows.csv \
   -output /home/packerc/shared/machine_learning/data/zooniverse_exports/RUA/RUA_S1/label_mapping.json
@@ -149,6 +151,7 @@ python3 -m zooniverse_exports.extract_choices_from_workflow \
 
 # write_first_nrows_of_csv_to_csv('/home/packerc/shared/machine_learning/data/zooniverse_exports/RUA/RUA_S1/classifications.csv', '/home/packerc/shared/machine_learning/data/zooniverse_exports/RUA/RUA_S1/classifications_sampled.csv', 50000)
 
+# Create Mapping Files: Image Path to Label (for training and evaluating models)
 cd /home/packerc/shared/machine_learning/will5448/code/snapshot_safari_misc
 
 python3 -m zooniverse_exports.create_image_to_label \
@@ -168,14 +171,15 @@ python3 -m zooniverse_exports.generate_predict_file_from_zooids \
 -files RUA_S1_A1_ZOOID.csv \
 -path_field path
 
+
 python3 -m zooniverse_exports.aggregate_preds_on_subject \
 -manifest_root_path  /home/packerc/shared/zooniverse/Manifests/RUA/ \
 -manifest_files  RUA_S1_A1_manifest_v1 \
 -zooid_root_path  /home/packerc/shared/zooniverse/ZOOIDs/RUA/ \
 -zooid_files RUA_S1_A1_ZOOID.csv \
--predictions_empty_path /home/packerc/shared/machine_learning/data/predictions/empty_or_not/RUA/RUA_S1/evals_run_SER_fine_tune_20180627.json \
--predictions_species_path /home/packerc/shared/machine_learning/data/predictions/species/RUA/RUA_S1/evals_run_20180626.json \
--output_file  /home/packerc/shared/machine_learning/data/zooniverse_exports/RUA/RUA_S1/RUA_S1_predictions.json \
+-predictions_empty_path /home/packerc/shared/machine_learning/data/predictions/empty_or_not/RUA/RUA_S1/predictions_run_SER_fine_tune_20180627.json \
+-predictions_species_path /home/packerc/shared/machine_learning/data/predictions/species/RUA/RUA_S1/predictions_run_SER_fine_tune_20180627.json \
+-output_file  /home/packerc/shared/machine_learning/data/zooniverse_exports/RUA/RUA_S1/RUA_S1_predictions_SER_fine_tuning.json \
 -label_mapping_path /home/packerc/shared/machine_learning/data/zooniverse_exports/RUA/RUA_S1/label_mapping.json
 
 
@@ -184,7 +188,7 @@ python3 -m zooniverse_exports.aggregate_preds_on_subject \
 python3 -m zooniverse_exports.simulate_aggregations_ml \
 -classifications_extracted /home/packerc/shared/machine_learning/data/zooniverse_exports/RUA/RUA_S1/classifications_extracted.csv \
 -output_csv /home/packerc/shared/machine_learning/data/zooniverse_exports/RUA/RUA_S1/classifications_aggregated_ml.csv \
--aggregated_predictions /home/packerc/shared/machine_learning/data/zooniverse_exports/RUA/RUA_S1/RUA_S1_predictions.json
+-aggregated_predictions /home/packerc/shared/machine_learning/data/zooniverse_exports/RUA/RUA_S1/RUA_S1_predictions_SER_fine_tuning.json
 
 
 ###################################

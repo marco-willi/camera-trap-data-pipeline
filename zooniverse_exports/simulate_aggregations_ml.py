@@ -346,16 +346,21 @@ if __name__ == '__main__':
         pred_data = json.load(f)
 
     # Add ML Annotation
+    ml_subject_set = set()
     for subject_id, preds in pred_data.items():
-
+        ml_subject_set.add(subject_id)
         annotation = SnapshotSafariAnnotation(
             user_id='ml_agent',
             time='now')
         annotation.create_annotation_from_ml(preds)
         user_id = 'ml_agent'
+        # Remove Subjects for which no prediction is available
         if subject_id in subject_set:
             subject_set[subject_id].add_ml_annotation(annotation)
 
+    # remove subjects for which no ML predictions are available
+    subject_set = {k: subject_set[k] for k in ml_subject_set}
+    
     # Write to Disk
     rules = ['all', 'max_2', 'max_5', 'max_10', 'ml_only', 'empty_first_two_95conf',
              'empty_first_two_90conf', 'empty_first_95conf',
