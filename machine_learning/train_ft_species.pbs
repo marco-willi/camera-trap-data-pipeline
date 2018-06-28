@@ -1,10 +1,10 @@
 #!/bin/bash -l
-#PBS -l walltime=01:00:00,nodes=1:ppn=8:gpus=2
+#PBS -l walltime=02:00:00,nodes=1:ppn=8:gpus=2
 #PBS -j oe
 #PBS -m abe
 #PBS -M will5448@umn.edu
 #PBS -q k40
-#PBS -N tl
+#PBS -N ft
 #PBS -o ${HOME}/job_ml_output_ft_species_${PBS_JOBID}.log
 #PBS -e ${HOME}/job_ml_error_ft_species_${PBS_JOBID}.log
 
