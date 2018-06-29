@@ -52,7 +52,10 @@ if __name__ == '__main__':
                 for line in csv_reader:
                     path = line[6]
                     cid = line[0]
-                    zooid = cid_to_zooid_mapper[cid]
+                    if cid in cid_to_zooid_mapper:
+                        zooid = cid_to_zooid_mapper[cid]
+                    else:
+                        continue
                     # Map zooids to images
                     if zooid not in zooid_to_img_mapper:
                         zooid_to_img_mapper[zooid] = []
