@@ -3,6 +3,20 @@ import os
 import csv
 import random
 
+
+def correct_image_name(name):
+    """ chaange image name
+    OLD: S1/G12/G12_R1/PICT3981.JPG
+    NEW: S1/G12/G12_R1/S1_G12_R1_PICT3981.JPG
+    """
+    if '/' not in name:
+        return name
+    name_splits = name.split('/')
+    path = '/'.join(name_splits[0:-1])
+    file_name_new = '_'.join([name_splits[0], name_splits[2], name_splits[3]])
+    return path + '/' + file_name_new
+
+
 if __name__ == '__main__':
 
     # Parameters
@@ -86,6 +100,8 @@ if __name__ == '__main__':
                 continue
             # randomly sample one image
             blank_image = random.choice(blank_images)
+            # correct image name
+            blank_image = correct_image_name(blank_image)
             final_sample.append(blank_image)
 
     # Write to disk
