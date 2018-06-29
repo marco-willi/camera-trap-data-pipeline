@@ -7,8 +7,8 @@ import random
 if __name__ == '__main__':
 
     # Parameters
-    output_file = '/home/packerc/shared/machine_learning/data/info_files/SER/blank_species_prev.csv'
-    blank_file = '/home/packerc/shared/machine_learning/data/info_files/SER/blank_prev.csv'
+    output_file = '/home/packerc/shared/machine_learning/data/info_files/SER/blanks_species_prev.csv'
+    blank_file = '/home/packerc/shared/machine_learning/data/info_files/SER/blanks_prev.csv'
     species_file = '/home/packerc/shared/machine_learning/data/info_files/SER/species_prev.csv'
     files = [blank_file, species_file]
 
