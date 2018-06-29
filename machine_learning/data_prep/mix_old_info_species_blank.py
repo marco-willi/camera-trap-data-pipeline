@@ -13,7 +13,7 @@ if __name__ == '__main__':
     files = [blank_file, species_file]
 
     # 35'000 empty in S11 training set
-    sampling_size = 17500
+    sampling_size = 13500
 
     all_records = list()
     for file_path in files:
