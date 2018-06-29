@@ -28,7 +28,7 @@ if __name__ == '__main__':
                     class_flag = 0
                 else:
                     class_flag = 1
-                class_records.append(path, class_flag)
+                class_records.append([path, class_flag])
         class_sample = random.sample(class_records, sampling_size)
         all_records.append(class_sample)
 
@@ -38,5 +38,4 @@ if __name__ == '__main__':
     # Write to disk
     with open(output_file, 'w') as f:
         csv_writer = csv.writer(f, delimiter=',')
-        for line in all_records:
-            csv_writer.writerow(line)
+        csv_writer.writerows(all_records)
