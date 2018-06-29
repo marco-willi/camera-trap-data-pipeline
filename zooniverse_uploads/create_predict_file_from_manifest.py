@@ -1,7 +1,12 @@
 """ Create a Prediction File from a Manifest for a Model to
     Generate Predictions
+
+    Arguments:
+    ----------
+    manifest: Path to a manifest (.json)
+    prediction_file: Path to the new file that is generated for calculating
+        predictions(.csv)
 """
-import csv
 import json
 import os
 import argparse
@@ -16,8 +21,12 @@ if __name__ == "__main__":
 
     # Parse command line arguments
     parser = argparse.ArgumentParser()
-    parser.add_argument("-manifest", type=str, required=True)
-    parser.add_argument("-prediction_file", type=str, required=True)
+    parser.add_argument(
+        "-manifest", type=str, required=True,
+        help="Path to manifest file (.json)")
+    parser.add_argument(
+        "-prediction_file", type=str, required=True,
+        help="Output file for the model to create predictions for (.csv)")
 
     args = vars(parser.parse_args())
 

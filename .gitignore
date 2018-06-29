@@ -7,3 +7,4 @@ __pycache*
 *.Rhistory
 *.Rproj
 *.R
+*/old/*
