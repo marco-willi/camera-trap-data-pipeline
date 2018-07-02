@@ -5,16 +5,16 @@
 #PBS -M will5448@umn.edu
 #PBS -q k40
 #PBS -N eval
-#PBS -o ${HOME}/job_ml_output_gru_s1_species.log
-#PBS -e ${HOME}/job_ml_error_gru_s1_species.log
+#PBS -o ${HOME}/job_ml_output_species_val_${PBS_JOBID}.log
+#PBS -e ${HOME}/job_ml_error_species_val_${PBS_JOBID}.log
 
 # Parameters
 TIMESTAMP=`date +%Y%m%d%H%M`
 DATE=`date +%Y%m%d`
-ID=run_${DATE}
-SITE=RUA
+ID=run_SER_old_${DATE}
+SITE=SER
 #SEASON=S7
-SEASON=RUA_S1
+SEASON=SER_S11
 MODEL=SER
 ROOT=/home/packerc/shared/machine_learning/
 CODE=${ROOT}code/deep_learning_for_camera_trap_images/phase2
