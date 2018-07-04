@@ -11,17 +11,17 @@
 # Parameters
 TIMESTAMP=`date +%Y%m%d%H%M`
 DATE=`date +%Y%m%d`
-ID=run_manifest_${DATE}
-SITE=RUA
-SEASON=RUA_S1
-MODEL=RUA
+ID=run_SER_fine_tune_empty_val_${DATE}
+SITE=SER
+SEASON=SER_S11
+MODEL=SER
 MODEL_NAME=SER_fine_tune
 ROOT=/home/packerc/shared/machine_learning/
 CODE=${ROOT}code/deep_learning_for_camera_trap_images/phase1
 LOG_DIR=${ROOT}data/models/${MODEL}/empty_or_not/${MODEL_NAME}/
 PREDICTIONS=${ROOT}data/predictions/empty_or_not/${SITE}/${SEASON}/predictions_${ID}.json
 IMAGES_ROOT=/home/packerc/shared/albums/${SITE}/
-DATA_INFO=${ROOT}data/info_files/${SITE}/${SEASON}/${SEASON}_manifest.csv
+DATA_INFO=${ROOT}data/info_files/${SITE}/${SEASON}/${SEASON}_empty_val.csv
 
 # Log Parameters
 echo "TIMESTAMP: $TIMESTAMP"
