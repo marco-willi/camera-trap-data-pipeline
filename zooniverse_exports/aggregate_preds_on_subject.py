@@ -97,9 +97,9 @@ if __name__ == '__main__':
     label_mapping_empty = {'NOTHINGHERE': 0}
 
     # count mapping
-    counts_map_to_numeric = {"0": 0, "1": 1, "2": 2, "3": 3, "4": 4,
-                             "5": 5, "6": 6, "7": 7, "8": 8, "9": 9,
-                              "10": 10, "1150": 11, "51": 12}
+    counts_map_to_numeric = {"1": 0, "2": 1, "3": 2, "4": 3,
+                             "5": 4, "6": 5, "7": 6, "8": 7, "9": 8,
+                              "10": 9, "1150": 10, "51": 11}
     count_num_to_label = {v: k for k, v in counts_map_to_numeric.items()}
 
     # Read Manifest file
