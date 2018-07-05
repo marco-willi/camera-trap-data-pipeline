@@ -6,11 +6,11 @@ import json
 import argparse
 import os
 
-# For Testing
-args = dict()
-args['manifest'] = "/home/packerc/shared/zooniverse/Manifests/RUA/RUA_S1_manifest.json"
-args['old_manifest_to_remove'] = '/home/packerc/shared/zooniverse/Manifests/RUA/RUA_S1_A1_manifest_v1'
-args['season'] = 'RUA_S1'
+# # For Testing
+# args = dict()
+# args['manifest'] = "/home/packerc/shared/zooniverse/Manifests/RUA/RUA_S1_manifest.json"
+# args['old_manifest_to_remove'] = '/home/packerc/shared/zooniverse/Manifests/RUA/RUA_S1_A1_manifest_v1'
+# args['season'] = 'RUA_S1'
 
 if __name__ == "__main__":
 
@@ -19,14 +19,11 @@ if __name__ == "__main__":
     parser.add_argument(
         "-manifest", type=str, required=True,
         help="Path to manifest file (.json), will be overwritten")
+
     parser.add_argument(
         "-old_manifest_to_remove", type=str, required=True,
         help="Old manifest (must contain 'site', 'roll', 'capture') in file \
              (*v1 file)")
-
-    parser.add_argument(
-        "-species_predictions", type=str, required=True,
-        help="Predictions from the species model (.json)")
 
     parser.add_argument(
         "-season", type=str, required=True,

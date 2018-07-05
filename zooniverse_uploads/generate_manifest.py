@@ -13,7 +13,7 @@ from collections import OrderedDict
 # args['manifest_prefix'] = 'RUA_S1'
 # args['csv_quotechar'] = '"'
 # args['attribution'] = 'University of Minnesota Lion Center + SnapshotSafari + Ruaha Carnivore Project + Tanzania + Ruaha National Park'
-# args['license'] =  'SnapshotSafar + Ruaha Carnivore Project'
+# args['license'] =  'SnapshotSafari + Ruaha Carnivore Project'
 
 
 if __name__ == "__main__":
