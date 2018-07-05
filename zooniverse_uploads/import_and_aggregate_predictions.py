@@ -99,6 +99,9 @@ if __name__ == "__main__":
     preds_all = dict()
     for pred in predictions_empty.values():
         image_name = os.path.split(pred['path'])[-1]
+        # Skip if predicted image is not in Manifest
+        if image_name not in img_to_capture_id_map:
+            continue
         capture_id = img_to_capture_id_map[image_name]
         if capture_id not in preds_all:
             preds_all[capture_id] = {'empty': [], 'species': []}
@@ -106,6 +109,9 @@ if __name__ == "__main__":
 
     for pred in predictions_species.values():
         image_name = os.path.split(pred['path'])[-1]
+        # Skip if predicted image is not in Manifest
+        if image_name not in img_to_capture_id_map:
+            continue
         capture_id = img_to_capture_id_map[image_name]
         if capture_id not in preds_all:
             preds_all[capture_id] = {'empty': [], 'species': []}
