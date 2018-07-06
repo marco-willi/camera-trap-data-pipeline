@@ -2,6 +2,12 @@
 # Ruaha
 ####################################
 
+# Create Zooniverse password file in home directory
+# Example: zooniverse.ini
+# chmod 600 zooniverse.ini
+# username: XYZ
+# password: 1234
+
 # Generate Manifest
 cd /home/packerc/shared/machine_learning/will5448/code/snapshot_safari_misc
 python3 -m zooniverse_uploads.generate_manifest \
@@ -58,5 +64,4 @@ python3 -m zooniverse_uploads.upload_manifest \
 -output_file /home/packerc/shared/zooniverse/Manifests/RUA/RUA_S1_manifest2.json \
 -project_id 5155 \
 -subject_set_name RUA_S1_machine_learning_v1 \
--zooniverse_username \
--zooniverse_password
+-password_file ~/keys/passwords.ini

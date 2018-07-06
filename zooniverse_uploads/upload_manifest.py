@@ -5,10 +5,10 @@ import argparse
 import time
 import datetime
 import hashlib
+import configparser
 
 from panoptes_client import Project, Panoptes, SubjectSet, Subject
 
-from utils import print_progress
 
 # # For Testing
 # args = dict()
@@ -17,8 +17,7 @@ from utils import print_progress
 # args['project_id'] = 5155
 # args['subject_set_id'] = ''
 # args['subject_set_name'] = 'RUA_S1_machine_learning_v1'
-# args['zooniverse_username'] = ''
-# args['zooniverse_password'] = ''
+# args['password_file'] = '~/keys/passwords.ini'
 
 
 if __name__ == "__main__":
@@ -46,25 +45,38 @@ if __name__ == "__main__":
         help="Output file for updated manifest (.json)")
 
     parser.add_argument(
-        "-zooniverse_username", type=str, required=True,
-        help="Zooniverse user name")
-
-    parser.add_argument(
-        "-zooniverse_password", type=str, required=True,
-        help="Zooniverse password")
+        "-password_file", type=str, required=True,
+        help="File that contains the Zooniverse password (.ini),\
+              Example File:\
+              [zooniverse]\
+              username: dummy\
+              password: 1234")
 
     args = vars(parser.parse_args())
 
     for k, v in args.items():
         print("Argument %s: %s" % (k, v))
 
+    # Check Inputs
+    if not os.path.exists(args['manifest']):
+        raise FileNotFoundError("manifest: %s not found" %
+                                args['manifest'])
+
+    if not os.path.exists(args['password_file']):
+        raise FileNotFoundError("password_file: %s not found" %
+                                args['password_file'])
+
     # import manifest
     with open(args['manifest'], 'r') as f:
         mani = json.load(f)
 
+    # read Zooniverse credentials
+    config = configparser.ConfigParser()
+    config.read(args['password_file'])
+
     # connect to panoptes
-    Panoptes.connect(username=args['zooniverse_username'],
-                     password=args['zooniverse_password'])
+    Panoptes.connect(username=config['zooniverse']['username'],
+                     password=config['zooniverse']['password'])
 
     # Get Project
     my_project = Project(args['project_id'])
@@ -118,10 +130,14 @@ if __name__ == "__main__":
             st = datetime.datetime.fromtimestamp(ts).strftime('%Y%m%d%H%M%S')
             data['info']['upload_time'] = st
             data['info']['subject_id'] = subject.id
+            data['info']['anonymized_capture_id'] = anonymized_capture_id
         except:
             print("Failed to upload subject %s" % capture_id)
         counter += 1
-        print_progress(counter, n_tot)
+        if (counter % 1000) == 0:
+            ts = time.time()
+            st = datetime.datetime.fromtimestamp(ts).strftime('%H%M%S')
+            print("Completed %s/%s - Time:" % (counter, n_tot, st))
         if counter > 50:
             break
 
