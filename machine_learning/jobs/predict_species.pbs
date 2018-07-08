@@ -12,9 +12,9 @@
 TIMESTAMP=`date +%Y%m%d%H%M`
 DATE=`date +%Y%m%d`
 ID=run_SER_fine_tune_old_species_val_${DATE}
-SITE=SER
-SEASON=SER_S11
-MODEL=SER
+SITE=RUA
+SEASON=RUA_S1
+MODEL=RUA
 MODEL_NAME=SER_fine_tune
 NUMCLASS=48
 ROOT=/home/packerc/shared/machine_learning/

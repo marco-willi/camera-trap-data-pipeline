@@ -23,6 +23,7 @@ LOG_DIR_RETRAIN_FROM=${ROOT}data/models/${MODEL_RETRAIN_FROM}/empty_or_not/phase
 IMAGES_ROOT=/home/packerc/shared/albums/${SITE}/
 DATA_INFO=${ROOT}data/info_files/${SITE}/${SEASON}/${SEASON}_empty_train.csv
 
+
 # Log Parameters
 echo "TIMESTAMP: $TIMESTAMP"
 echo "DATE: $DATE"
@@ -37,6 +38,8 @@ echo "LOG_DIR: $LOG_DIR"
 echo "LOG_DIR_RETRAIN_FROM: $LOG_DIR_RETRAIN_FROM"
 echo "IMAGES_ROOT: $IMAGES_ROOT"
 echo "DATA_INFO: $DATA_INFO"
+
+
 
 # Load Tensroflow
 module load tensorflow/1.4_gpu
