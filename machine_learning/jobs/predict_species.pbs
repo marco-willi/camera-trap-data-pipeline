@@ -11,7 +11,7 @@
 # Parameters
 TIMESTAMP=`date +%Y%m%d%H%M`
 DATE=`date +%Y%m%d`
-ID=run_SER_fine_tune_old_species_val_${DATE}
+ID=run_SER_fine_tune_all_val_old_${DATE}
 SITE=RUA
 SEASON=RUA_S1
 MODEL=RUA
@@ -22,7 +22,7 @@ CODE=${ROOT}code/deep_learning_for_camera_trap_images/phase2
 LOG_DIR=${ROOT}data/models/${MODEL}/species/${MODEL_NAME}/
 PREDICTIONS=${ROOT}data/predictions/species/${SITE}/${SEASON}/predictions_${ID}.json
 IMAGES_ROOT=/home/packerc/shared/albums/${SITE}/
-DATA_INFO=${ROOT}data/info_files/${SITE}/${SEASON}/${SEASON}_old_species_val.csv
+DATA_INFO=${ROOT}data/info_files/${SITE}/${SEASON}/${SEASON}_all_val_old.csv
 
 # Log Parameters
 echo "TIMESTAMP: $TIMESTAMP"
