@@ -28,6 +28,17 @@ from statistics import mean
 # output_file = 'D:\\Studium_GD\\Zooniverse\\SnapshotSafari\\data\\zooniverse_exports\\RUA\\RUA_S1_predictions.json'
 # label_mapping_path = 'D:\\Studium_GD\\Zooniverse\\SnapshotSafari\\data\\zooniverse_exports\\RUA\\label_mapping.json'
 
+# subjects_path = 'D:\\Studium_GD\\Zooniverse\\SnapshotSafari\\data\\zooniverse_exports\\SER\\subjects.csv'
+# manifest_root_path = '/home/packerc/shared/zooniverse/Manifests/RUA/'
+# manifest_files = ['RUA_S1_A1_manifest_v1']
+# zooid_root_path = '/home/packerc/shared/zooniverse/ZOOIDs/RUA/'
+# zooid_files = ['RUA_S1_A1_ZOOID.csv']
+# predictions_empty_path = '/home/packerc/shared/machine_learning/data/predictions/empty_or_not/RUA/RUA_S1/predictions_run_SER_fine_tune_empty_val_20180708.json'
+# predictions_species_path = '/home/packerc/shared/machine_learning/data/predictions/species/RUA/RUA_S1/predictions_run_SER_fine_tune_old_species_val_20180708.json'
+# output_file = '/home/packerc/shared/machine_learning/data/zooniverse_exports/RUA/RUA_S1/RUA_S1_predictions_SER_fine_tuning_val.json'
+# label_mapping_path = '/home/packerc/shared/machine_learning/data/zooniverse_exports/RUA/RUA_S1/label_mapping.json'
+#
+
 
 if __name__ == '__main__':
 
@@ -162,7 +173,6 @@ if __name__ == '__main__':
                      'resting', 'young_present']
         behav_preds = {k: [] for k in behaviors}
         behav_confs = {k: [] for k in behaviors}
-
         for pred in preds:
             for behav in behaviors:
                 behav_preds[behav].append(pred['top_pred_' + behav])
@@ -194,7 +204,6 @@ if __name__ == '__main__':
             - if default is zero, evidence of 1 in an of the predictions is
               enough to override default predictions
         """
-
         non_default = [c for p, c in zip(preds, confs) if p is not 0]
         if len(non_default) > 0:
             max_conf_non_default = max(non_default)
@@ -212,7 +221,6 @@ if __name__ == '__main__':
         behaviors = ['standing',  'moving', 'eating', 'interacting',
                      'resting', 'young_present']
         labels = ['empty', 'species'] + behaviors
-
         default_dict = {**{x: 0 for x in labels},
                         **{x + '_conf': 0 for x in labels}}
         # Empty
@@ -237,61 +245,7 @@ if __name__ == '__main__':
             pred, conf = aggregate_majority(pr, cf)
             default_dict['count'] = count_num_to_label[pred]
             default_dict['count_conf'] = conf
-
         pred_aggregated[subject_id] = default_dict
 
     with open(output_file, 'w') as fp:
         json.dump(pred_aggregated, fp, indent=0)
-
-
-    # # Define a final consensus
-    # pred_final = dict()
-    # labels_to_export = ['empty', 'species', 'count', 'moving', 'eating',
-    #                     'standing', 'resting',
-    #                     'interacting', 'young_present']
-    # label_dict = {k: i for i, k in enumerate(labels_to_export)}
-    # for subject_id, pred in pred_aggregated.items():
-    #     default_values = [None, None, 0, 0, 0, 0, 0, 0, 0]
-    #     default_confs = [0 for x in range(0, len(default_values))]
-    #     # if overall prediction is empty
-    #     if pred['empty'] == 0:
-    #         default_values[label_dict['empty']] = 0
-    #         default_confs[label_dict['empty']] = pred['empty_conf']
-    #     else:
-    #         for label in labels_to_export:
-    #             default_values[label_dict[label]] = pred[label]
-    #             default_confs[label_dict[label]] = pred[label + '_conf']
-    #     pred_final[subject_id] = {'preds': default_values, 'confs': default_confs}
-
-
-
-    # if __name__ == '__main__':
-    #
-    #     # Parse command line arguments
-    #     parser = argparse.ArgumentParser()
-    #     parser.add_argument("-root_path", type=str, required=True)
-    #     parser.add_argument("-files", nargs='+', type=str, required=True)
-    #     parser.add_argument("-path_field", type=str, default="path")
-    #     parser.add_argument("-output_file", type=str, required=True)
-    #
-    #     args = vars(parser.parse_args())
-    #
-    #     file_rows = list()
-    #     for file in args['files']:
-    #         full_path = os.path.join([args['root_path'], file])
-    #         with open(full_path, newline='') as csvfile:
-    #             reader = csv.reader(csvfile, delimiter=',')
-    #             for row_id, row in enumerate(reader):
-    #                 if row_id == 0:
-    #                     header = row
-    #                     name_to_id_mapping = {x: i for i, x in enumerate(header)}
-    #                     continue
-    #                 else:
-    #                     path = row[name_to_id_mapping[args['path_field']]]
-    #                     file_rows.append([path])
-    #
-    #     with open(args['output_file'], "w", newline='') as outs:
-    #         csv_writer = csv.writer(outs, delimiter=',')
-    #         print("Writing file to %s" % args['output_file'])
-    #         for i, line in enumerate(file_rows):
-    #             csv_writer.writerow(line)
