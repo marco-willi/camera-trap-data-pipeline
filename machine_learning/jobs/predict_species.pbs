@@ -11,11 +11,11 @@
 # Parameters
 TIMESTAMP=`date +%Y%m%d%H%M`
 DATE=`date +%Y%m%d`
-ID=run_SER_fine_tune_all_val_old_${DATE}
+ID=run_SER_old_all_val_old_${DATE}
 SITE=RUA
 SEASON=RUA_S1
-MODEL=RUA
-MODEL_NAME=SER_fine_tune
+MODEL=SER
+MODEL_NAME=phase2
 NUMCLASS=48
 ROOT=/home/packerc/shared/machine_learning/
 CODE=${ROOT}code/deep_learning_for_camera_trap_images/phase2
