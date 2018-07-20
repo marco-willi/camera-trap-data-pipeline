@@ -32,7 +32,7 @@ python3 -m zooniverse_uploads.create_predict_file_from_manifest \
 -prediction_file /home/packerc/shared/machine_learning/data/info_files/RUA/RUA_S1/RUA_S1_manifest.csv
 
 # Generate new Predictions
-cd /home/packerc/shared/machine_learning/will5448/code/snapshot_safari_misc/machine_learning
+cd /home/packerc/shared/machine_learning/will5448/code/snapshot_safari_misc/machine_learning/jobs
 # ADAPT predict_species.pbs
 # ADAPT predict_empty.pbs
 
@@ -44,8 +44,8 @@ qsub predict_empty.pbs
 cd /home/packerc/shared/machine_learning/will5448/code/snapshot_safari_misc
 python3 -m zooniverse_uploads.import_and_aggregate_predictions \
 -manifest /home/packerc/shared/zooniverse/Manifests/RUA/RUA_S1_manifest.json \
--empty_predictions /home/packerc/shared/machine_learning/data/predictions/empty_or_not/RUA/RUA_S1/predictions_run_manifest_20180628.json \
--species_predictions /home/packerc/shared/machine_learning/data/predictions/species/RUA/RUA_S1/predictions_run_manifest_20180628.json \
+-empty_predictions /home/packerc/shared/machine_learning/data/predictions/empty_or_not/RUA/RUA_S1/predictions_run_SER_old_manifest_20180719.json \
+-species_predictions /home/packerc/shared/machine_learning/data/predictions/species/RUA/RUA_S1/predictions_run_SER_old_manifest_20180719.json \
 -output_file /home/packerc/shared/zooniverse/Manifests/RUA/RUA_S1_preds_aggregated.json
 
 

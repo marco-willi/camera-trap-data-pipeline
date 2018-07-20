@@ -106,9 +106,9 @@ python3 -m zooniverse_exports.aggregate_preds_on_subject \
 -manifest_files  SER_S11_1_manifest_v1 SER_S11_2_manifest_v1 \
 -zooid_root_path  /home/packerc/shared/zooniverse/ZOOIDs/SER/ \
 -zooid_files SER_S11_1_ZOOID_v0.csv SER_S11_2_ZOOID_v0.csv \
--predictions_empty_path /home/packerc/shared/machine_learning/data/predictions/empty_or_not/SER/SER_S11/predictions_run_SER_fine_tune_empty_val_20180703.json \
--predictions_species_path /home/packerc/shared/machine_learning/data/predictions/species/SER/SER_S11/predictions_run_SER_fine_tune_old_species_val_20180703.json \
--output_file  /home/packerc/shared/machine_learning/data/zooniverse_exports/SER/SER_S11/SER_S11_predictions_fine_tune.json \
+-predictions_empty_path /home/packerc/shared/machine_learning/data/predictions/empty_or_not/SER/SER_S11/predictions_run_20180619.json \
+-predictions_species_path /home/packerc/shared/machine_learning/data/predictions/species/SER/SER_S11/predictions_run_20180619.json \
+-output_file  /home/packerc/shared/machine_learning/data/zooniverse_exports/SER/SER_S11/SER_S11_predictions_SER_old.json \
 -label_mapping_path /home/packerc/shared/machine_learning/data/zooniverse_exports/SER/SER_S11/label_mapping.json
 
 
@@ -116,8 +116,8 @@ python3 -m zooniverse_exports.aggregate_preds_on_subject \
 # Simulate Different Aggregations
 python3 -m zooniverse_exports.simulate_aggregations_ml \
 -classifications_extracted /home/packerc/shared/machine_learning/data/zooniverse_exports/SER/SER_S11/classifications_extracted.csv \
--output_csv /home/packerc/shared/machine_learning/data/zooniverse_exports/SER/SER_S11/classifications_aggregated_ml.csv \
--aggregated_predictions /home/packerc/shared/machine_learning/data/zooniverse_exports/SER/SER_S11/SER_S11_predictions.json
+-output_csv /home/packerc/shared/machine_learning/data/zooniverse_exports/SER/SER_S11/classifications_aggregated_ml_SER_old.csv \
+-aggregated_predictions /home/packerc/shared/machine_learning/data/zooniverse_exports/SER/SER_S11/SER_S11_predictions_SER_old.json
 
 
 # Simulate Different Aggregations after fine tuning
@@ -185,18 +185,17 @@ python3 -m zooniverse_exports.aggregate_preds_on_subject \
 -manifest_files  RUA_S1_A1_manifest_v1 \
 -zooid_root_path  /home/packerc/shared/zooniverse/ZOOIDs/RUA/ \
 -zooid_files RUA_S1_A1_ZOOID.csv \
--predictions_empty_path /home/packerc/shared/machine_learning/data/predictions/empty_or_not/RUA/RUA_S1/predictions_run_SER_fine_tune_20180627.json \
--predictions_species_path /home/packerc/shared/machine_learning/data/predictions/species/RUA/RUA_S1/predictions_run_SER_fine_tune_20180627.json \
--output_file  /home/packerc/shared/machine_learning/data/zooniverse_exports/RUA/RUA_S1/RUA_S1_predictions_SER_fine_tuning.json \
+-predictions_empty_path /home/packerc/shared/machine_learning/data/predictions/empty_or_not/RUA/RUA_S1/predictions_run_SER_old_all_val_old_20180716.json \
+-predictions_species_path /home/packerc/shared/machine_learning/data/predictions/species/RUA/RUA_S1/predictions_run_SER_old_all_val_old_20180716.json \
+-output_file  /home/packerc/shared/machine_learning/data/zooniverse_exports/RUA/RUA_S1/RUA_S1_predictions_SER_old_all_val_old.json \
 -label_mapping_path /home/packerc/shared/machine_learning/data/zooniverse_exports/RUA/RUA_S1/label_mapping.json
-
 
 
 # Simulate Different Aggregations
 python3 -m zooniverse_exports.simulate_aggregations_ml \
 -classifications_extracted /home/packerc/shared/machine_learning/data/zooniverse_exports/RUA/RUA_S1/classifications_extracted.csv \
--output_csv /home/packerc/shared/machine_learning/data/zooniverse_exports/RUA/RUA_S1/classifications_aggregated_ml.csv \
--aggregated_predictions /home/packerc/shared/machine_learning/data/zooniverse_exports/RUA/RUA_S1/RUA_S1_predictions_SER_fine_tuning.json
+-output_csv /home/packerc/shared/machine_learning/data/zooniverse_exports/RUA/RUA_S1/classifications_aggregated_ml_SER_old_20180716.csv \
+-aggregated_predictions /home/packerc/shared/machine_learning/data/zooniverse_exports/RUA/RUA_S1/RUA_S1_predictions_SER_old_all_val_old.json
 
 
 ###################################
