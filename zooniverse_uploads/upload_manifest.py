@@ -138,8 +138,6 @@ if __name__ == "__main__":
             ts = time.time()
             st = datetime.datetime.fromtimestamp(ts).strftime('%H%M%S')
             print("Completed %s/%s - Time:" % (counter, n_tot, st))
-        if counter > 50:
-            break
 
     # Export Manifest
     with open(args['output_file'], 'w') as outfile:

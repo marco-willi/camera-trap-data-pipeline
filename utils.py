@@ -1,6 +1,5 @@
 """ Util Functions """
 import sys
-import csv
 
 
 def print_progress(count, total):
