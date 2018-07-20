@@ -136,8 +136,8 @@ if __name__ == "__main__":
         counter += 1
         if (counter % 1000) == 0:
             ts = time.time()
-            st = datetime.datetime.fromtimestamp(ts).strftime('%H%M%S')
-            print("Completed %s/%s - Time: %s" % (counter, n_tot, st), flush=True)
+            st = datetime.datetime.fromtimestamp(ts).strftime('%H:%M:%S')
+            print("Completed %s/%s - Current Time: %s" % (counter, n_tot, st), flush=True)
 
     # Export Manifest
     with open(args['output_file'], 'w') as outfile:
