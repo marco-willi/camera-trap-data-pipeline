@@ -23,7 +23,7 @@ and creates a csv with one line per annotation. All classifications have to
 be from the same workflow with the same workflow version.
 
 ```
-python3 extract_classifications.py \
+python3 -m zooniverse_exports.extract_classifications.py \
         -classification_csv classifications.csv \
         -output_csv classifications_extracted.csv \
         -workflow_id 4655 \
