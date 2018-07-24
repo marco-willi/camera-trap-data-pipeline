@@ -9,6 +9,7 @@
 #PBS -e ${HOME}/job_create_tfr_${PBS_JOBID}.log
 
 cd /home/packerc/shared/machine_learning/will5448/code/camera-trap-classifier
+module load python3
 source activate ctc
 
 python create_dataset.py -inventory /home/packerc/will5448/dataset_inventory_s1.json \

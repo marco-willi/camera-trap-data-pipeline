@@ -1,4 +1,5 @@
 cd /home/packerc/shared/machine_learning/will5448/code/camera-trap-classifier
+module load python3
 source activate ctc
 
 python create_dataset_inventory.py csv -path /home/packerc/will5448/test_export_season_1_cleaned.csv \
