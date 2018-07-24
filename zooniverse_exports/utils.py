@@ -1,3 +1,4 @@
+""" Helper Functions and Classes for Zooniverse Exports """
 from collections import OrderedDict, Counter
 from statistics import median
 

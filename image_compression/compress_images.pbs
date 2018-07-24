@@ -6,11 +6,11 @@
 #PBS -o ${HOME}/compress_images_${PBS_JOBID}.log
 #PBS -e ${HOME}/compress_images_error_${PBS_JOBID}.log
 
-cd /home/packerc/shared/scripts
+cd /home/packerc/shared/scripts/snapshot_safari_misc
 
 module load python3
 
-python3 compress_images_multiprocess_v2_qsub.py \
+python3 -m image_compression.compress_images \
 -cleaned_captures_csv /home/packerc/shared/season_captures/RUA/cleaned/RUA_S1_cleaned.csv \
 -output_image_dir  /home/packerc/shared/zooniverse/ToUpload/RUA_will5448/RUA_S1_Compressed \
 -root_image_path /home/packerc/shared/albums/RUA/

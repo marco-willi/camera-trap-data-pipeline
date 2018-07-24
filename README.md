@@ -13,6 +13,11 @@ username: my_username
 password: my_password
 ```
 
+Set permissions of that file by using this command:
+```
+chmod 600 ~/keys/passwords.ini
+```
+
 Before executing (most of) the code, you need to execute the follwing:
 ```
 ssh lab
@@ -20,6 +25,7 @@ module load python3
 cd /home/packerc/shared/scripts/snapshot_safari_misc
 git pull
 ```
+
 ## Get and Extract Zooniverse Exports
 
 ### Get Zooniverse Exports
@@ -73,14 +79,14 @@ The following steps are required to upload new data to Zooniverse including mach
 
 ### Compress Images
 
-The code 'compress_images_multiprocess_v2.pbs' compresses images and has to be ADAPTED in the following way (NOT EXECUTED):
+The code 'compress_images.pbs' compresses images and has to be ADAPTED in the following way (NOT EXECUTED):
 
 ```
 module load python3
 
 cd /home/packerc/shared/scripts/snapshot_safari_misc
 
-python3 -m image_compression.compress_images_multiprocess_v2_qsub \
+python3 -m image_compression.compress_images \
 -cleaned_captures_csv /home/packerc/shared/season_captures/RUA/cleaned/RUA_S1_cleaned.csv \
 -output_image_dir  /home/packerc/shared/zooniverse/ToUpload/RUA_will5448/RUA_S1_Compressed \
 -root_image_path /home/packerc/shared/albums/RUA/
@@ -90,7 +96,7 @@ After that we create the folders and submit the job:
 ```
 mkdir /home/packerc/shared/zooniverse/ToUpload/RUA_will5448/RUA_S1_Compressed
 cd /home/packerc/shared/scripts/snapshot_safari_misc/image_compression
-qsub compress_images_multiprocess_v2.pbs
+qsub compress_images.pbs
 ```
 
 

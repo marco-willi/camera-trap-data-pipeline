@@ -12,6 +12,8 @@ import traceback
 import time
 from multiprocessing import Process, Manager
 
+from utils import estimate_remaining_time, slice_generator
+
 
 ###############################
 # Image Compression and
@@ -19,25 +21,8 @@ from multiprocessing import Process, Manager
 ###############################
 
 
-def slice_generator(sequence_length, n_blocks):
-    """ Creates a generator to get start/end indexes for dividing a
-        sequence_length into n blocks
-    """
-    return ((int(round((b - 1) * sequence_length/n_blocks)),
-             int(round(b * sequence_length/n_blocks)))
-            for b in range(1, n_blocks+1))
-
-
-def estimate_remaining_time(start_time, n_total, n_current):
-    """ Estimate remaining time """
-    time_elapsed = time.time() - start_time
-    n_remaining = n_total - (n_current - 1)
-    avg_time_per_record = time_elapsed / (n_current + 1)
-    estimated_time = n_remaining * avg_time_per_record
-    return time.strftime("%H:%M:%S", time.gmtime(estimated_time))
-
-
-def compress_images(pid, image_source_list, image_dest_list,
+def compress_images(pid, image_source_list,
+                    image_dest_list,
                     result_dict,
                     save_quality=None,
                     max_pixel_of_largest_side=None):
