@@ -3,7 +3,7 @@
 #PBS -j oe
 #PBS -m abe
 #PBS -M will5448@umn.edu
-#PBS -q small
+#PBS -q lab
 #PBS -N create_tfr
 #PBS -o ${HOME}/job_create_tfr_${PBS_JOBID}.log
 #PBS -e ${HOME}/job_create_tfr_${PBS_JOBID}.log
