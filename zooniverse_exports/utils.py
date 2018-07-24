@@ -1,4 +1,4 @@
-from collections import OrderedDict
+from collections import OrderedDict, Counter
 from statistics import median
 
 
@@ -315,12 +315,69 @@ class SnapshotSafariAnnotation(object):
                 default_confs[label_dict[label]] = pred[label + '_conf']
 
         self.create_annotation_with_conf(
-            species=(default_values[label_dict['species']],default_confs[label_dict['species']]),
-            count=(default_values[label_dict['count']],default_confs[label_dict['count']]),
-            moving=(default_values[label_dict['moving']],default_confs[label_dict['moving']]),
-            eating=(default_values[label_dict['eating']],default_confs[label_dict['eating']]),
-            standing=(default_values[label_dict['standing']],default_confs[label_dict['standing']]),
-            resting=(default_values[label_dict['resting']],default_confs[label_dict['resting']]),
-            interacting=(default_values[label_dict['interacting']],default_confs[label_dict['interacting']]),
-            young_present=(default_values[label_dict['young_present']],default_confs[label_dict['young_present']])
+            species=(default_values[label_dict['species']], default_confs[label_dict['species']]),
+            count=(default_values[label_dict['count']], default_confs[label_dict['count']]),
+            moving=(default_values[label_dict['moving']], default_confs[label_dict['moving']]),
+            eating=(default_values[label_dict['eating']], default_confs[label_dict['eating']]),
+            standing=(default_values[label_dict['standing']], default_confs[label_dict['standing']]),
+            resting=(default_values[label_dict['resting']], default_confs[label_dict['resting']]),
+            interacting=(default_values[label_dict['interacting']], default_confs[label_dict['interacting']]),
+            young_present=(default_values[label_dict['young_present']], default_confs[label_dict['young_present']])
             )
+
+
+class Subject(object):
+    """ a subject """
+    def __init__(self, id):
+        self.id = id
+        self.annotations = list()
+        self.aggregated_annotations = list()
+
+    def add_annotation(self, annotation):
+        self.annotations.append(annotation)
+
+    def _get_species(self):
+        species = list()
+        n_species = self._calc_number_of_annotations()
+
+        for annotation in self.annotations:
+            species.append(annotation.labels['species'].value)
+
+        species_counts = Counter(species)
+        ordered_species = order_dict_by_values(species_counts)
+        self.ordered_species = ordered_species
+        self.species = list(self.ordered_species.keys())[0: n_species]
+
+    def _calc_number_of_annotations(self):
+        """ Calculate median number of annotations """
+        user_ids = list()
+        for annotation in self.annotations:
+            user_ids.append(annotation.user_id)
+        user_counts = Counter(user_ids)
+        median_annotations = int(median(list(user_counts.values())))
+        return median_annotations
+
+    def aggregateSpeciesLabels(self):
+        """ Aggregate Labels per Species """
+
+        # extract species labels
+        self._get_species()
+
+        # Collect all aggregations for the species
+        species_annotations = {s: list() for s in self.species}
+        for annotation in self.annotations:
+            species_label = annotation.labels['species'].value
+            if species_label in species_annotations.keys():
+                species_annotations[species_label].append(annotation)
+
+        # create new aggregated annotations for each species
+        for species in self.species:
+            aggregated_annotation = SnapshotSafariAnnotation(
+                user_id="aggregated",
+                time="aggregated")
+
+            aggregated_annotation.create_from_annotations(
+                species,
+                species_annotations[species])
+
+            self.aggregated_annotations.append(aggregated_annotation)

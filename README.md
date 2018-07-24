@@ -20,8 +20,9 @@ module load python3
 cd /home/packerc/shared/scripts/snapshot_safari_misc
 git pull
 ```
+## Get and Extract Zooniverse Exports
 
-## Get Zooniverse Exports
+### Get Zooniverse Exports
 
 Download Zooniverse exports. Requires Zooniverse account credentials and
 collaborator status with the project. The project_id can be found in the project builder
@@ -37,7 +38,7 @@ python3 -m zooniverse_exports.get_zooniverse_export \
 ```
 
 
-## Extract Zooniverse Classifications
+### Extract Zooniverse Classifications
 
 This extracts the relevant fields of a Zooniverse classification file
 and creates a csv with one line per annotation. All classifications have to
@@ -54,7 +55,7 @@ python3 -m zooniverse_exports.extract_classifications \
 ```
 
 
-## Aggregate Extracted Zooniverse Classifications
+### Aggregate Extracted Zooniverse Classifications
 
 This aggregates the extracted Zooniverse classifications using the
 plurality algorithm to get one single label per species detection for each
