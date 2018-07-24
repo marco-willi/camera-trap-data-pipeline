@@ -8,3 +8,4 @@ __pycache*
 *.Rproj
 *.R
 */old/*
+serengeti_db/*

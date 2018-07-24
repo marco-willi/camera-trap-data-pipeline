@@ -2,7 +2,7 @@
 
     Example Usage:
     --------------
-    python3 get_zooniverse_export.py -username user -password 1234 \
+    python3 get_zooniverse_export.py -password_file ~/keys/passwords.ini \
             -project_id 4715 \
             -output_file classifications.csv \
             -export_type classifications \
@@ -13,13 +13,20 @@ import csv
 
 from panoptes_client import Project, Panoptes
 
+from utils import read_config_file
+
 
 if __name__ == '__main__':
 
     # Parse command line arguments
     parser = argparse.ArgumentParser()
-    parser.add_argument("-username", type=str, required=True)
-    parser.add_argument("-password", type=str, required=True)
+    parser.add_argument(
+        "-password_file", type=str, required=True,
+        help="File that contains the Zooniverse password (.ini),\
+              Example File:\
+              [zooniverse]\
+              username: dummy\
+              password: 1234")
     parser.add_argument("-project_id", type=int, required=True)
     parser.add_argument("-output_file", type=str, required=True)
     parser.add_argument("-export_type", default='classifications',
@@ -28,8 +35,12 @@ if __name__ == '__main__':
 
     args = vars(parser.parse_args())
 
+    # get Zooniverse passowrd
+    config = read_config_file(args['password_file'])
+
     # connect to panoptes
-    Panoptes.connect(username=args['username'], password=args['password'])
+    Panoptes.connect(username=config['zooniverse']['username'],
+                     password=config['zooniverse']['password'])
 
     # Get Project
     my_project = Project(args['project_id'])

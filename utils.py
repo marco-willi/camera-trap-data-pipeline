@@ -1,5 +1,7 @@
 """ Util Functions """
 import sys
+import os
+import configparser
 
 
 def print_progress(count, total):
@@ -25,3 +27,20 @@ def write_first_nrows_of_csv_to_csv(input_file, output_file, n_rows):
     with open(output_file, 'w') as outs:
         for line in parsed_lines:
             outs.write(line)
+
+
+def read_config_file(cfg_file_path):
+    """ Reads a cfg (.ini) file """
+    # replace ~ in path
+    if '~' in cfg_file_path:
+        user_path = os.path.expanduser('~')
+        cfg_file_path = cfg_file_path.replace('~', user_path)
+
+    if not os.path.exists(cfg_file_path):
+        raise FileNotFoundError("config file: %s not found" %
+                                cfg_file_path)
+
+    # read config file and return
+    config = configparser.ConfigParser()
+    config.read(cfg_file_path)
+    return config

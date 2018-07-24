@@ -1,16 +1,37 @@
 # snapshot_safari_misc
 Misc Code for Snapshot Safari
 
+## Pre-Requisites
+
+For code that accesses Zooniverse via Panoptes (e.g. requires a password),
+a file with Zooniverse credentials should be stored (e.g. in ~/keys/passwords.ini).
+It should have the following content:
+
+```
+[zooniverse]
+username: my_username
+password: my_password
+```
+
+Before executing (most of) the code, you need to execute the follwing:
+```
+ssh lab
+module load python3
+cd /home/packerc/shared/scripts/snapshot_safari_misc
+git pull
+```
+
 ## Get Zooniverse Exports
 
 Download Zooniverse exports. Requires Zooniverse account credentials and
-collaborator status with the project.
+collaborator status with the project. The project_id can be found in the project builder
+in the top left corner.
 
 ```
-python3 zooniverse_exports/get_zooniverse_export.py -username user \
-        -password 1234 \
-        -project_id 4715 \
-        -output_file classifications.csv \
+python3 -m zooniverse_exports.get_zooniverse_export \
+        -password_file ~/keys/passwords.ini \
+        -project_id 5155 \
+        -output_file /home/packerc/shared/zooniverse/Exports/RUA/RUA_S1_classifications.csv \
         -export_type classifications \
         -new_export 0
 ```
@@ -20,14 +41,16 @@ python3 zooniverse_exports/get_zooniverse_export.py -username user \
 
 This extracts the relevant fields of a Zooniverse classification file
 and creates a csv with one line per annotation. All classifications have to
-be from the same workflow with the same workflow version.
+be from the same workflow with the same workflow version. The workflow_id
+can be found in the project builder when clicking on the workflow. The workflow_version
+is at the same place slightly further down (e.g. something like 745.34 - use only 745).
 
 ```
-python3 -m zooniverse_exports.extract_classifications.py \
-        -classification_csv classifications.csv \
-        -output_csv classifications_extracted.csv \
-        -workflow_id 4655 \
-        -workflow_version 304
+python3 -m zooniverse_exports.extract_classifications \
+        -classification_csv /home/packerc/shared/zooniverse/Exports/RUA/RUA_S1_classifications.csv \
+        -output_csv /home/packerc/shared/zooniverse/Exports/RUA/RUA_S1_classifications_extracted.csv \
+        -workflow_id 4889 \
+        -workflow_version 797
 ```
 
 
@@ -38,9 +61,9 @@ plurality algorithm to get one single label per species detection for each
 subject.
 
 ```
-python3 aggregate_extractions.py \
-        -classifications_extracted classifications_extracted.csv \
-        -output_csv classifications_aggregated.csv
+python3 -m zooniverse_exports.aggregate_extractions \
+        -classifications_extracted /home/packerc/shared/zooniverse/Exports/RUA/RUA_S1_classifications_extracted.csv \
+        -output_csv /home/packerc/shared/zooniverse/Exports/RUA/RUA_S1_classifications_aggregated.csv
 ```
 
 ## Upload new Data to Zooniverse
@@ -49,14 +72,14 @@ The following steps are required to upload new data to Zooniverse including mach
 
 ### Compress Images
 
-The code 'compress_images_multiprocess_v2.pbs' compresses images and has to be adapted in the following way:
+The code 'compress_images_multiprocess_v2.pbs' compresses images and has to be ADAPTED in the following way (NOT EXECUTED):
 
 ```
-cd /home/packerc/shared/scripts
-
 module load python3
 
-python3 compress_images_multiprocess_v2_qsub.py \
+cd /home/packerc/shared/scripts/snapshot_safari_misc
+
+python3 -m image_compression.compress_images_multiprocess_v2_qsub \
 -cleaned_captures_csv /home/packerc/shared/season_captures/RUA/cleaned/RUA_S1_cleaned.csv \
 -output_image_dir  /home/packerc/shared/zooniverse/ToUpload/RUA_will5448/RUA_S1_Compressed \
 -root_image_path /home/packerc/shared/albums/RUA/
@@ -65,7 +88,7 @@ python3 compress_images_multiprocess_v2_qsub.py \
 After that we create the folders and submit the job:
 ```
 mkdir /home/packerc/shared/zooniverse/ToUpload/RUA_will5448/RUA_S1_Compressed
-cd /home/packerc/shared/scripts
+cd /home/packerc/shared/scripts/snapshot_safari_misc/image_compression
 qsub compress_images_multiprocess_v2.pbs
 ```
 
@@ -75,7 +98,6 @@ qsub compress_images_multiprocess_v2.pbs
 This generates a manifest from the cleaned season captures csv.
 
 ```
-cd /home/packerc/shared/machine_learning/will5448/code/snapshot_safari_misc
 python3 -m zooniverse_uploads.generate_manifest \
 -cleaned_captures_csv /home/packerc/shared/season_captures/RUA/cleaned/RUA_S1_cleaned.csv \
 -compressed_image_dir /home/packerc/shared/zooniverse/ToUpload/RUA/RUA_S1_Compressed/ \
@@ -91,7 +113,6 @@ python3 -m zooniverse_uploads.generate_manifest \
 This code is only required if data has already been uploaded using the old process in order to remove already uploaded capture events.
 
 ```
-cd /home/packerc/shared/machine_learning/will5448/code/snapshot_safari_misc
 python3 -m zooniverse_uploads.remove_records_from_manifest \
 -manifest /home/packerc/shared/zooniverse/Manifests/RUA/RUA_S1_manifest.json \
 -old_manifest_to_remove /home/packerc/shared/zooniverse/Manifests/RUA/RUA_S1_A1_manifest_v1 \
@@ -103,7 +124,6 @@ python3 -m zooniverse_uploads.remove_records_from_manifest \
 This code creates a 'prediction file' that is the input to the model for classifying the images.
 
 ```
-cd /home/packerc/shared/machine_learning/will5448/code/snapshot_safari_misc
 python3 -m zooniverse_uploads.create_predict_file_from_manifest \
 -manifest /home/packerc/shared/zooniverse/Manifests/RUA/RUA_S1_manifest.json \
 -prediction_file /home/packerc/shared/machine_learning/data/info_files/RUA/RUA_S1/RUA_S1_manifest.csv
@@ -114,7 +134,7 @@ python3 -m zooniverse_uploads.create_predict_file_from_manifest \
 The following steps describe how to run the machine learning models. Note that the files 'predict_species.pbs' and 'predict_empty.pbs' have to be adapted.
 
 ```
-cd /home/packerc/shared/machine_learning/will5448/code/snapshot_safari_misc/machine_learning
+cd /home/packerc/shared/scripts/snapshot_safari_misc/machine_learning
 # ADAPT predict_species.pbs
 # ADAPT predict_empty.pbs
 
@@ -128,7 +148,6 @@ qsub predict_empty.pbs
 This code aggregates the individual image classifications on capture event level.
 
 ```
-cd /home/packerc/shared/machine_learning/will5448/code/snapshot_safari_misc
 python3 -m zooniverse_uploads.import_and_aggregate_predictions \
 -manifest /home/packerc/shared/zooniverse/Manifests/RUA/RUA_S1_manifest.json \
 -empty_predictions /home/packerc/shared/machine_learning/data/predictions/empty_or_not/RUA/RUA_S1/predictions_run_manifest_20180628.json \
@@ -141,7 +160,6 @@ python3 -m zooniverse_uploads.import_and_aggregate_predictions \
 This code merges the aggregated predictions into the manifest.
 
 ```
-cd /home/packerc/shared/machine_learning/will5448/code/snapshot_safari_misc
 python3 -m zooniverse_uploads.merge_predictions_with_manifest \
 -manifest /home/packerc/shared/zooniverse/Manifests/RUA/RUA_S1_manifest.json \
 -predictions /home/packerc/shared/zooniverse/Manifests/RUA/RUA_S1_preds_aggregated.json \

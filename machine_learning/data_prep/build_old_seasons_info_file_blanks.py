@@ -5,7 +5,7 @@ import random
 
 
 def correct_image_name(name):
-    """ chaange image name
+    """ change image name
     OLD: S1/G12/G12_R1/PICT3981.JPG
     NEW: S1/G12/G12_R1/S1_G12_R1_PICT3981.JPG
 

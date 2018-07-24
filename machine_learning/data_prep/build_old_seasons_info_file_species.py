@@ -7,6 +7,7 @@ if __name__ == '__main__':
 
     # Parameters
     output_file = '/home/packerc/shared/machine_learning/data/info_files/SER/species_prev.csv'
+    output_file_all = '/home/packerc/shared/machine_learning/data/info_files/SER/species_S1_9.csv'
     class_paths = '/home/packerc/shared/machine_learning/data/info_files/SER/'
     file_names = ['S1_6.csv', 'S9_species.csv', 'S8.csv', 'S7_species.csv']
     # 14292 in species train for S11
@@ -19,8 +20,15 @@ if __name__ == '__main__':
             csv_reader = csv.reader(f, delimiter=',')
             for line in csv_reader:
                 # remove capture id
-                line.pop(1)
+                _ = line.pop(1)
                 all_records.append(line)
+
+    # Write to disk
+    with open(output_file_all, 'w') as f:
+        csv_writer = csv.writer(f, delimiter=',')
+        for line in all_records:
+            _ = csv_writer.writerow(line)
+
     # sample
     final_sample = random.sample(all_records, sampling_size)
 

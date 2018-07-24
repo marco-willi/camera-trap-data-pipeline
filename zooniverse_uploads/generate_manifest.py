@@ -103,6 +103,7 @@ if __name__ == "__main__":
             upload_metadata = {
                 '#site': site,
                 '#roll': roll,
+                '#season': season,
                 '#capture': capture,
                 'attribution': args['attribution'],
                 'license': args['license']
