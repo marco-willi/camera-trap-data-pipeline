@@ -6,6 +6,10 @@ import datetime
 from collections import Counter, OrderedDict
 import argparse
 
+from utils import (
+    correct_image_name, assign_hash_to_zero_one,
+    assign_zero_one_to_split)
+
 
 def binarize(x):
     """ convert values between 0 and 1 to 1 (if 0.5 or larger), else to 0 """
@@ -15,24 +19,6 @@ def binarize(x):
         return 0
 
 
-def correct_image_name(name):
-    """ change image name
-    OLD: S1/G12/G12_R1/PICT3981.JPG
-    NEW: S1/G12/G12_R1/S1_G12_R1_PICT3981.JPG
-
-    OLD: S8/O09/O09_R3/S8_O09_R3_S8_O09_R3_IMAG9279.JPG
-    NEW: S8/O09/O09_R3/S8_O09_R3_S8_O09_R3_IMAG9279.JPG
-    """
-    if '/' not in name:
-        return name
-    name_splits = name.split('/')
-    if '_' in name_splits[-1]:
-        return name
-    path = '/'.join(name_splits[0:-1])
-    file_name_new = '_'.join([name_splits[0], name_splits[2], name_splits[3]])
-    return path + '/' + file_name_new
-
-
 if __name__ == '__main__':
 
     # Parse command line arguments
@@ -40,6 +26,20 @@ if __name__ == '__main__':
     parser.add_argument(
         "-season", type=str, required=True,
         help="season (1-9) or all")
+    parser.add_argument(
+        "-season_prefix", type=str, required=True, default='',
+        help="prefix for the season identifier (e.g. SER_S)")
+    parser.add_argument("-split_names", nargs='+', type=str,
+                        help='split dataset into these named splits',
+                        default=['train', 'val', 'test'],
+                        required=False)
+    parser.add_argument("-split_percent", nargs='+', type=float,
+                        help='split dataset into these proportions',
+                        default=[0.9, 0.05, 0.05],
+                        required=False)
+    parser.add_argument(
+        "-max_n_images", type=int, required=True, default=3,
+        help="maximum number of images per capture")
 
     args = vars(parser.parse_args())
 
@@ -47,9 +47,10 @@ if __name__ == '__main__':
         print("Argument %s: %s" % (k, v))
 
     season = args['season']
-    input_db_export = '/home/packerc/will5448/data/season_exports/db_export_season_%s.csv' % season
-    output_cleaned = '/home/packerc/will5448/data/season_exports/db_export_season_%s_cleaned.csv' % season
-    max_images = 3
+    data_path = '/home/packerc/will5448/data/season_exports'
+    input_db_export = '%s/db_export_season_%s.csv' % (data_path, season)
+    output_cleaned = '%s/db_export_season_%s_cleaned.csv' % (data_path, season)
+    max_images = args['max_n_images']
 
     behaviors = ["Standing", "Resting", "Moving",
                  "Eating", "Interacting", "Babies"]
@@ -64,9 +65,12 @@ if __name__ == '__main__':
         header[header.index("idCaptureEvent")] = 'capture_id'
         header[header.index("CountMedian")] = 'Count'
         header[header.index("PathFilename")] = 'image'
+        header.append('split_name')
+        header.append('location')
         header_to_id = {h: i for i, h in enumerate(header)}
         for row in csv_reader:
-            row.append('')
+            for _ in range(len(row), len(header)):
+                row.append('')
             try:
                 ts = datetime.datetime.strptime(
                         row[header_to_id["CaptureTimestamp"]],
@@ -93,12 +97,22 @@ if __name__ == '__main__':
             counts.append(row[header_to_id["Count"]])
             # lower case for species
             row[header_to_id["Species"]] = row[header_to_id["Species"]].lower()
+            # add location
+            row[header_to_id["location"]] = row[header_to_id["GridCell"]]
+            # Season with prefix
+            row[header_to_id["Season"]] = args['season_prefix'] + row[header_to_id["Season"]]
             # create capture id
             capture_id = '#'.join([row[header_to_id["Season"]],
                                    row[header_to_id["GridCell"]],
                                    row[header_to_id["RollNumber"]],
                                    row[header_to_id["CaptureEventNum"]]])
             row[header_to_id['capture_id']] = capture_id
+            # randomly assign to test / train / val
+            zero_one_hash = assign_hash_to_zero_one(capture_id)
+            split_name = assign_zero_one_to_split(
+                zero_one_hash,
+                args['split_percent'], args['split_names'])
+            row[header_to_id["split_name"]] = '_'.join([split_name, row[header_to_id["Season"]].lower()])
             all_records.append(row)
 
     # check counts

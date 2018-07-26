@@ -9,6 +9,8 @@ import configparser
 
 from panoptes_client import Project, Panoptes, SubjectSet, Subject
 
+from utils.estimate_remaining_time
+
 # # For Testing
 # args = dict()
 # args['manifest'] = "/home/packerc/shared/zooniverse/Manifests/RUA/RUA_S1_manifest1.json"
@@ -18,15 +20,6 @@ from panoptes_client import Project, Panoptes, SubjectSet, Subject
 # args['subject_set_name'] = 'RUA_S1_machine_learning_TEST'
 # args['password_file'] = '~/keys/passwords.ini'
 # # 40557
-
-
-def estimate_remaining_time(start_time, n_total, n_current):
-    """ Estimate remaining time """
-    time_elapsed = time.time() - start_time
-    n_remaining = n_total - (n_current - 1)
-    avg_time_per_record = time_elapsed / (n_current + 1)
-    estimated_time = n_remaining * avg_time_per_record
-    return time.strftime("%H:%M:%S", time.gmtime(estimated_time))
 
 
 def add_subject_data_to_manifest(data, subject_set):

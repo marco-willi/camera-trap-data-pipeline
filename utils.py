@@ -2,6 +2,7 @@
 import sys
 import os
 import time
+from hashlib import md5
 import configparser
 
 
@@ -39,6 +40,24 @@ def write_first_nrows_of_csv_to_csv(input_file, output_file, n_rows):
             outs.write(line)
 
 
+def correct_image_name(name):
+    """ change image name
+    OLD: S1/G12/G12_R1/PICT3981.JPG
+    NEW: S1/G12/G12_R1/S1_G12_R1_PICT3981.JPG
+
+    OLD: S8/O09/O09_R3/S8_O09_R3_S8_O09_R3_IMAG9279.JPG
+    NEW: S8/O09/O09_R3/S8_O09_R3_S8_O09_R3_IMAG9279.JPG
+    """
+    if '/' not in name:
+        return name
+    name_splits = name.split('/')
+    if '_' in name_splits[-1]:
+        return name
+    path = '/'.join(name_splits[0:-1])
+    file_name_new = '_'.join([name_splits[0], name_splits[2], name_splits[3]])
+    return path + '/' + file_name_new
+
+
 def slice_generator(sequence_length, n_blocks):
     """ Creates a generator to get start/end indexes for dividing a
         sequence_length into n blocks
@@ -63,3 +82,43 @@ def read_config_file(cfg_file_path):
     config = configparser.ConfigParser()
     config.read(cfg_file_path)
     return config
+
+
+def id_to_zero_one(value):
+    """ Deterministically assign string to value 0-1 """
+    hashed = hash_string(value, constant="")
+    num = assign_hash_to_zero_one(hashed)
+    return num
+
+
+def hash_string(value, constant=""):
+    """ Return hashed value """
+    to_hash = str(value) + str(constant)
+    hashed = md5(to_hash.encode('ascii')).hexdigest()
+    return hashed
+
+
+def assign_hash_to_zero_one(value):
+    """ Assign a md5 string to a value between 0 and 1 """
+    assert type(value) == str
+    assert len(value) == 32
+
+    value_6_chars = value[:6]
+    value_hex = int(value_6_chars, base=16)
+
+    max_6_char_hex_value = 0xFFFFFF
+
+    zero_one = value_hex / max_6_char_hex_value
+
+    return zero_one
+
+
+def assign_zero_one_to_split(zero_one_value, split_percents, split_names):
+    """ Assign a value between 0 and 1 to a split according to a percentage
+        distribution
+    """
+    split_props_cum = [sum(split_percents[0:(i+1)]) for i in
+                       range(0, len(split_percents))]
+    for sn, sp in zip(split_names, split_props_cum):
+        if zero_one_value <= sp:
+            return sn

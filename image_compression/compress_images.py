@@ -1,6 +1,7 @@
-""" Copy Images from one Directory to another while Processing them
-    - resizing and compressing
+""" Copy Images from one Directory to another while processing them
+    - resizing and compressing is possible
     - uses multiprocessing (default 24 processes)
+    - keeps image names
 """
 import csv
 import os
