@@ -27,7 +27,7 @@ if __name__ == '__main__':
         "-season", type=str, required=True,
         help="season (1-9) or all")
     parser.add_argument(
-        "-season_prefix", type=str, required=True, default='',
+        "-season_prefix", type=str, default='',
         help="prefix for the season identifier (e.g. SER_S)")
     parser.add_argument("-split_names", nargs='+', type=str,
                         help='split dataset into these named splits',
@@ -38,7 +38,7 @@ if __name__ == '__main__':
                         default=[0.9, 0.05, 0.05],
                         required=False)
     parser.add_argument(
-        "-max_n_images", type=int, required=True, default=3,
+        "-max_n_images", type=int, default=3,
         help="maximum number of images per capture")
 
     args = vars(parser.parse_args())
