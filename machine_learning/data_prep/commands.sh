@@ -1,6 +1,16 @@
+module load python3
+cd /home/packerc/shared/scripts/snapshot_safari_misc
+
+python -m machine_learning.data_prep.prep_csv_info_file \
+-season 1 \
+-season_prefix SER_S
+
+
+
 cd /home/packerc/shared/machine_learning/will5448/code/camera-trap-classifier
 module load python3
 source activate ctc
+
 
 python create_dataset_inventory.py csv -path /home/packerc/will5448/data/season_exports/db_export_season_all_cleaned.csv \
 -export_path /home/packerc/will5448/data/inventories/dataset_inventory_season_all.json \
@@ -73,5 +83,6 @@ python train.py \
 
 
 # Singularity
+singularity pull docker://tensorflow/tensorflow:1.9.0-gpu-py3
 singularity exec docker://tensorflow/tensorflow git clone https://github.com/marco-willi/camera-trap-classifier.git
 singularity exec docker://tensorflow/tensorflow cd ~/camera-trap-classifier

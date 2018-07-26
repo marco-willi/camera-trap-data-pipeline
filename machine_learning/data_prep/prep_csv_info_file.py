@@ -137,7 +137,8 @@ if __name__ == '__main__':
     images = ['image%s' % (i + 1) for i in range(0, max_images)]
     header_clean = ['capture_id', 'empty', 'Species', 'Count', 'Standing',
                     'Resting', 'Moving', 'Eating', 'Interacting',
-                    'Babies', 'Season', 'CaptureTimestamp'] + images
+                    'Babies', 'Season', 'CaptureTimestamp',
+                    'location', 'split_name'] + images
     record_clean = ['' for i in range(0, len(header_clean))]
     record_mapper = {v: k for k, v in enumerate(header_clean)}
     for k, v in data_clean.items():
