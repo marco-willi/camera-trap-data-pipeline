@@ -7,7 +7,7 @@ from collections import Counter, OrderedDict
 import argparse
 
 from utils import (
-    correct_image_name, assign_hash_to_zero_one,
+    correct_image_name, id_to_zero_one,
     assign_zero_one_to_split)
 
 
@@ -108,7 +108,7 @@ if __name__ == '__main__':
                                    row[header_to_id["CaptureEventNum"]]])
             row[header_to_id['capture_id']] = capture_id
             # randomly assign to test / train / val
-            zero_one_hash = assign_hash_to_zero_one(capture_id)
+            zero_one_hash = id_to_zero_one(capture_id)
             split_name = assign_zero_one_to_split(
                 zero_one_hash,
                 args['split_percent'], args['split_names'])
