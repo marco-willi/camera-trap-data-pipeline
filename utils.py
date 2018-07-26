@@ -86,8 +86,11 @@ def read_config_file(cfg_file_path):
 
 def id_to_zero_one(value):
     """ Deterministically assign string to value 0-1 """
-    hashed = hash_string(value, constant="")
-    num = assign_hash_to_zero_one(hashed)
+    try:
+        hashed = hash_string(value, constant="")
+        num = assign_hash_to_zero_one(hashed)
+    except:
+        raise ValueError("value %s could not be hashed" % value)
     return num
 
 
@@ -100,8 +103,10 @@ def hash_string(value, constant=""):
 
 def assign_hash_to_zero_one(value):
     """ Assign a md5 string to a value between 0 and 1 """
-    assert type(value) == str
-    assert len(value) == 32
+    assert type(value) == str, \
+        "value is not a string, is of type %s" % type(value)
+    assert len(value) == 32, \
+        "value is not of len 32, has len %s, raw %s" % (len(value), value)
 
     value_6_chars = value[:6]
     value_hex = int(value_6_chars, base=16)
