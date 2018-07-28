@@ -1,0 +1,35 @@
+#!/bin/bash -l
+#PBS -l walltime=24:00:00,nodes=1:ppn=24:gpus=2
+#PBS -j oe
+#PBS -m abe
+#PBS -M will5448@umn.edu
+#PBS -q k40
+#PBS -N train_all
+#PBS -o ${HOME}/job_ml_output_train_all_${PBS_JOBID}.log
+#PBS -e ${HOME}/job_ml_error_train_all_${PBS_JOBID}.log
+
+
+cd /home/packerc/shared/machine_learning/will5448/code/camera-trap-classifier
+module load python3
+source activate ctcgpu
+
+
+python train.py \
+-train_tfr_path /home/packerc/will5448/data/tfr_files/all_species_v3/ \
+-train_tfr_pattern train \
+-val_tfr_path /home/packerc/will5448/data/tfr_files/all_species_v3/ \
+-val_tfr_pattern val \
+-test_tfr_path /home/packerc/will5448/data/tfr_files/all_species_v3/ \
+-test_tfr_pattern test \
+-class_mapping_json /home/packerc/will5448/data/tfr_files/all_species_v3/label_mapping.json \
+-run_outputs_dir /home/packerc/will5448/data/run_outputs/ \
+-model_save_dir /home/packerc/will5448/data/saves/ \
+-model ResNet18 \
+-labels species count standing resting moving eating interacting babies \
+-batch_size 128 \
+-n_cpus 24 \
+-n_gpus 2 \
+-buffer_size 32768 \
+-max_epochs 50 \
+-starting_epoch 0 \
+-color_augmentation ultra_fast
