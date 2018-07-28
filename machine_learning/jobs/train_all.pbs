@@ -26,7 +26,7 @@ python train.py \
 -model_save_dir /home/packerc/will5448/data/saves/ \
 -model ResNet18 \
 -labels species count standing resting moving eating interacting babies \
--batch_size 128 \
+-batch_size 256 \
 -n_cpus 24 \
 -n_gpus 2 \
 -buffer_size 32768 \
