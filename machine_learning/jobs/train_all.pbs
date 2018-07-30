@@ -31,5 +31,7 @@ python train.py \
 -n_gpus 2 \
 -buffer_size 32768 \
 -max_epochs 50 \
--starting_epoch 0 \
--color_augmentation ultra_fast
+-starting_epoch 14 \
+-color_augmentation ultra_fast \
+-continue_training \
+-model_to_load /home/packerc/will5448/data/run_outputs/ \
