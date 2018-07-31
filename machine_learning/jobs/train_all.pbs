@@ -26,12 +26,133 @@ python train.py \
 -model_save_dir /home/packerc/will5448/data/saves/ \
 -model ResNet18 \
 -labels species count standing resting moving eating interacting babies \
+-labels_loss_weights 0.3 0.1 0.1 0.1 0.1 0.1 0.1 0.1 \
 -batch_size 256 \
 -n_cpus 24 \
 -n_gpus 2 \
 -buffer_size 32768 \
 -max_epochs 50 \
--starting_epoch 14 \
--color_augmentation ultra_fast \
--continue_training \
--model_to_load /home/packerc/will5448/data/run_outputs/ \
+-starting_epoch 0 \
+-color_augmentation full
+
+# -continue_training \
+# -model_to_load /home/packerc/will5448/data/run_outputs/
+
+# # SAMPLE
+# python train.py \
+# -train_tfr_path /home/packerc/will5448/data/tfr_files/all_species_sample/ \
+# -train_tfr_pattern train \
+# -val_tfr_path /home/packerc/will5448/data/tfr_files/all_species_sample/ \
+# -val_tfr_pattern val \
+# -test_tfr_path /home/packerc/will5448/data/tfr_files/all_species_sample/ \
+# -test_tfr_pattern test \
+# -class_mapping_json /home/packerc/will5448/data/tfr_files/all_species_sample/label_mapping.json \
+# -run_outputs_dir /home/packerc/will5448/data/run_outputs_sample/ \
+# -model_save_dir /home/packerc/will5448/data/saves_sample/ \
+# -model ResNet18 \
+# -labels species count standing resting moving eating interacting babies \
+# -batch_size 256 \
+# -n_cpus 24 \
+# -n_gpus 2 \
+# -buffer_size 32768 \
+# -max_epochs 5 \
+# -starting_epoch 0 \
+# -color_augmentation ultra_fast
+#
+#
+# # Sample continue training
+# python train.py \
+# -train_tfr_path /home/packerc/will5448/data/tfr_files/all_species_sample/ \
+# -train_tfr_pattern train \
+# -val_tfr_path /home/packerc/will5448/data/tfr_files/all_species_sample/ \
+# -val_tfr_pattern val \
+# -test_tfr_path /home/packerc/will5448/data/tfr_files/all_species_sample/ \
+# -test_tfr_pattern test \
+# -class_mapping_json /home/packerc/will5448/data/tfr_files/all_species_sample/label_mapping.json \
+# -run_outputs_dir /home/packerc/will5448/data/run_outputs_sample/ \
+# -model_save_dir /home/packerc/will5448/data/saves_sample/ \
+# -model ResNet18 \
+# -labels species count standing resting moving eating interacting babies \
+# -batch_size 256 \
+# -n_cpus 24 \
+# -n_gpus 2 \
+# -buffer_size 32768 \
+# -max_epochs 7 \
+# -starting_epoch 5 \
+# -color_augmentation ultra_fast \
+# -continue_training \
+# -model_to_load /home/packerc/will5448/data/run_outputs_sample/
+#
+#
+#
+# # Sample pseudo transfer learning
+# python train.py \
+# -train_tfr_path /home/packerc/will5448/data/tfr_files/all_species_sample/ \
+# -train_tfr_pattern train \
+# -val_tfr_path /home/packerc/will5448/data/tfr_files/all_species_sample/ \
+# -val_tfr_pattern val \
+# -test_tfr_path /home/packerc/will5448/data/tfr_files/all_species_sample/ \
+# -test_tfr_pattern test \
+# -class_mapping_json /home/packerc/will5448/data/tfr_files/all_species_sample/label_mapping.json \
+# -run_outputs_dir /home/packerc/will5448/data/run_outputs_sample/ \
+# -model_save_dir /home/packerc/will5448/data/saves_sample/ \
+# -model ResNet18 \
+# -labels species count standing resting moving \
+# -batch_size 256 \
+# -n_cpus 24 \
+# -n_gpus 2 \
+# -buffer_size 32768 \
+# -max_epochs 9 \
+# -starting_epoch 7 \
+# -color_augmentation ultra_fast \
+# -transfer_learning \
+# -model_to_load /home/packerc/will5448/data/run_outputs_sample/
+#
+#
+# # Sample continue training 1 GPU - should fail
+# python train.py \
+# -train_tfr_path /home/packerc/will5448/data/tfr_files/all_species_sample/ \
+# -train_tfr_pattern train \
+# -val_tfr_path /home/packerc/will5448/data/tfr_files/all_species_sample/ \
+# -val_tfr_pattern val \
+# -test_tfr_path /home/packerc/will5448/data/tfr_files/all_species_sample/ \
+# -test_tfr_pattern test \
+# -class_mapping_json /home/packerc/will5448/data/tfr_files/all_species_sample/label_mapping.json \
+# -run_outputs_dir /home/packerc/will5448/data/run_outputs_sample/ \
+# -model_save_dir /home/packerc/will5448/data/saves_sample/ \
+# -model ResNet18 \
+# -labels species count standing resting moving \
+# -batch_size 256 \
+# -n_cpus 24 \
+# -n_gpus 1 \
+# -buffer_size 32768 \
+# -max_epochs 12 \
+# -starting_epoch 10 \
+# -color_augmentation ultra_fast \
+# -continue_training \
+# -model_to_load /home/packerc/will5448/data/run_outputs_sample/
+#
+#
+# # Sample continue training 1 GPU - should work
+# python train.py \
+# -train_tfr_path /home/packerc/will5448/data/tfr_files/all_species_sample/ \
+# -train_tfr_pattern train \
+# -val_tfr_path /home/packerc/will5448/data/tfr_files/all_species_sample/ \
+# -val_tfr_pattern val \
+# -test_tfr_path /home/packerc/will5448/data/tfr_files/all_species_sample/ \
+# -test_tfr_pattern test \
+# -class_mapping_json /home/packerc/will5448/data/tfr_files/all_species_sample/label_mapping.json \
+# -run_outputs_dir /home/packerc/will5448/data/run_outputs_sample/ \
+# -model_save_dir /home/packerc/will5448/data/saves_sample/ \
+# -model ResNet18 \
+# -labels species count standing resting moving \
+# -batch_size 256 \
+# -n_cpus 24 \
+# -n_gpus 1 \
+# -buffer_size 32768 \
+# -max_epochs 12 \
+# -starting_epoch 10 \
+# -color_augmentation ultra_fast \
+# -continue_training \
+# -rebuild_model \
+# -model_to_load /home/packerc/will5448/data/run_outputs_sample/
