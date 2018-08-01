@@ -22,8 +22,8 @@ python train.py \
 -test_tfr_path /home/packerc/will5448/data/tfr_files/all_species_v3/ \
 -test_tfr_pattern test \
 -class_mapping_json /home/packerc/will5448/data/tfr_files/all_species_v3/label_mapping.json \
--run_outputs_dir /home/packerc/will5448/data/run_outputs/ \
--model_save_dir /home/packerc/will5448/data/saves/ \
+-run_outputs_dir /home/packerc/will5448/data/run_outputs2/ \
+-model_save_dir /home/packerc/will5448/data/saves2/ \
 -model ResNet18 \
 -labels species count standing resting moving eating interacting babies \
 -labels_loss_weights 0.3 0.1 0.1 0.1 0.1 0.1 0.1 0.1 \
