@@ -87,11 +87,11 @@ if __name__ == '__main__':
                 row[header_to_id[behav]] = binarize(row[header_to_id[behav]])
             # convert empty non-empty
             if row[header_to_id["NumberOfSpecies"]] == '0':
-                row[header_to_id["empty"]] = '1'
+                row[header_to_id["empty"]] = 'empty'
                 row[header_to_id["Species"]] = 'empty'
                 row[header_to_id["Count"]] = '0'
             else:
-                row[header_to_id["empty"]] = '0'
+                row[header_to_id["empty"]] = 'species'
                 if row[header_to_id["Count"]] == '0':
                     print("Wrong count for: %s" % row)
             counts.append(row[header_to_id["Count"]])
