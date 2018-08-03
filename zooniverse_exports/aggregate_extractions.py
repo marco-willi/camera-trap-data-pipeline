@@ -15,6 +15,15 @@
     python3 aggregate_extractions.py \
             -classifications_extracted classifications_extracted.csv \
             -output_csv classifications_aggregated.csv
+
+    Output CSV (example):
+    -------------------
+    subject_id,label_num,species,count,moving,eating,standing,...
+    17512921,1,WILDEBEEST,10,1,0,1,0,0,1
+    17520346,1,NOTHINGHERE,0,0,0,0,0,0,0
+    17521219,1,NOTHINGHERE,0,0,0,0,0,0,0
+    17523475,1,WILDEBEEST,1,1,0,0,0,0,0
+    17529581,1,WILDEBEEST,1,0,0,1,0,0,0
 """
 import csv
 import argparse
