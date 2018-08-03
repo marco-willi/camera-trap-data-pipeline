@@ -95,6 +95,10 @@ if __name__ == '__main__':
                 row[header_to_id["empty"]] = 'species'
                 if row[header_to_id["Count"]] == '0':
                     print("Wrong count for: %s" % row)
+            # map counts
+            if row[header_to_id["Count"]] in label_mappings['counts_db_to_ml']:
+                row[header_to_id["Count"]] = label_mappings['counts_db_to_ml'][row[header_to_id["Count"]]]
+
             counts.append(row[header_to_id["Count"]])
             # lower case for species
             row[header_to_id["Species"]] = row[header_to_id["Species"]].lower()
@@ -133,9 +137,6 @@ if __name__ == '__main__':
             dat['images'].append(img)
         dat['species'].add(row[header_to_id['Species']])
         dat['record'][row[header_to_id['Species']]] = row
-        # map counts
-        if dat['count'] in label_mappings['counts_db_to_ml']:
-            dat['count'] = label_mappings['counts_db_to_ml'][dat['count']]
 
     # Create list for writing to disk
     data_list_clean = list()
