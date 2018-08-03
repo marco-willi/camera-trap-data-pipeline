@@ -198,6 +198,18 @@ python3 -m zooniverse_exports.simulate_aggregations_ml \
 -aggregated_predictions /home/packerc/shared/machine_learning/data/zooniverse_exports/RUA/RUA_S1/RUA_S1_predictions_SER_old_all_val_old.json
 
 
+# Generate TFRecord info base file
+cd /home/packerc/shared/scripts/snapshot_safari_misc
+module load python3
+python3 -m zooniverse_exports.add_meta_data_to_aggregated_class \
+-classifications_aggregated /home/packerc/shared/machine_learning/data/zooniverse_exports/RUA/RUA_S1/classifications_aggregated.csv \
+-season_cleaned /home/packerc/shared/season_captures/RUA/cleaned/RUA_S1_cleaned_A.csv \
+-output_csv /home/packerc/will5448/data/season_exports/db_export_rua_season_1.csv \
+-season RUA_S1 \
+-manifest_files_old /home/packerc/shared/zooniverse/Manifests/RUA/RUA_S1_A1_manifest_v1 \
+-max_n_images 3
+
+
 ###################################
 # Grumeti
 ####################################
@@ -235,6 +247,18 @@ python3 -m zooniverse_exports.generate_predict_file_from_zooids \
 -output_file /home/packerc/shared/machine_learning/data/info_files/GRU/GRU_S1/GRU_S1_all.csv \
 -files GRU_S1_ZOOID.csv \
 -path_field path
+
+
+# Generate TFRecord info base file
+cd /home/packerc/shared/scripts/snapshot_safari_misc
+module load python3
+python3 -m zooniverse_exports.add_meta_data_to_aggregated_class \
+-classifications_aggregated /home/packerc/shared/machine_learning/data/zooniverse_exports/GRU/GRU_S1/classifications_aggregated.csv \
+-season_cleaned /home/packerc/shared/season_captures/GRU/cleaned/GRU_S1_cleaned.csv \
+-output_csv /home/packerc/will5448/data/season_exports/db_export_gru_season_1.csv \
+-season GRU_S1 \
+-manifest_files_old /home/packerc/shared/zooniverse/Manifests/GRU/GRU_S1_manifest_v1 \
+-max_n_images 3
 
 
 

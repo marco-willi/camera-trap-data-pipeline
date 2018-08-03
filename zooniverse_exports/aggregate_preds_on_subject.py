@@ -1,4 +1,5 @@
-""" Map Predictions to Subject Ids to Simulate Combinations
+""" Aggregate predictions for individual images to Capture Events /
+    Subject Ids to Assign prediction to Capture Events
 """
 import csv
 import json
@@ -6,6 +7,8 @@ import os
 import argparse
 from collections import Counter
 from statistics import mean
+
+from global_vars import label_mappings
 
 
 # # subjects_path = 'D:\\Studium_GD\\Zooniverse\\SnapshotSafari\\data\\zooniverse_exports\\SER\\subjects.csv'
@@ -18,15 +21,15 @@ from statistics import mean
 # output_file = 'D:\\Studium_GD\\Zooniverse\\SnapshotSafari\\data\\zooniverse_exports\\SER\\SER_S11_predictions.json'
 # label_mapping_path = 'D:\\Studium_GD\\Zooniverse\\SnapshotSafari\\data\\zooniverse_exports\\SER\\label_mapping.json'
 
-# subjects_path = 'D:\\Studium_GD\\Zooniverse\\SnapshotSafari\\data\\zooniverse_exports\\SER\\subjects.csv'
-# manifest_root_path = 'D:\\Studium_GD\\Zooniverse\\SnapshotSafari\\data\\zooniverse\\Manifests\\RUA\\'
-# manifest_files = ['RUA_S1_A1_manifest_v1']
-# zooid_root_path = 'D:\\Studium_GD\\Zooniverse\\SnapshotSafari\\data\\zooniverse\\ZOOIDs\\RUA\\'
-# zooid_files = ['RUA_S1_A1_ZOOID.csv']
-# predictions_empty_path = 'D:\\Studium_GD\\Zooniverse\\SnapshotSafari\\data\\predictions\\empty_or_not\\RUA\\RUA_S1\\evals_run_SER_fine_tune_20180627.json'
-# predictions_species_path = 'D:\\Studium_GD\\Zooniverse\\SnapshotSafari\\data\\predictions\\species\\RUA\\RUA_S1\\evals_run_originalSERmodel_20180626.json'
-# output_file = 'D:\\Studium_GD\\Zooniverse\\SnapshotSafari\\data\\zooniverse_exports\\RUA\\RUA_S1_predictions.json'
-# label_mapping_path = 'D:\\Studium_GD\\Zooniverse\\SnapshotSafari\\data\\zooniverse_exports\\RUA\\label_mapping.json'
+subjects_path = 'D:\\Studium_GD\\Zooniverse\\SnapshotSafari\\data\\zooniverse_exports\\SER\\subjects.csv'
+manifest_root_path = 'D:\\Studium_GD\\Zooniverse\\SnapshotSafari\\data\\zooniverse\\Manifests\\RUA\\'
+manifest_files = ['RUA_S1_A1_manifest_v1']
+zooid_root_path = 'D:\\Studium_GD\\Zooniverse\\SnapshotSafari\\data\\zooniverse\\ZOOIDs\\RUA\\'
+zooid_files = ['RUA_S1_A1_ZOOID.csv']
+predictions_empty_path = 'D:\\Studium_GD\\Zooniverse\\SnapshotSafari\\data\\predictions\\empty_or_not\\RUA\\RUA_S1\\evals_run_SER_fine_tune_20180627.json'
+predictions_species_path = 'D:\\Studium_GD\\Zooniverse\\SnapshotSafari\\data\\predictions\\species\\RUA\\RUA_S1\\evals_run_originalSERmodel_20180626.json'
+output_file = 'D:\\Studium_GD\\Zooniverse\\SnapshotSafari\\data\\zooniverse_exports\\RUA\\RUA_S1_predictions.json'
+label_mapping_path = 'D:\\Studium_GD\\Zooniverse\\SnapshotSafari\\data\\zooniverse_exports\\RUA\\label_mapping.json'
 
 # subjects_path = 'D:\\Studium_GD\\Zooniverse\\SnapshotSafari\\data\\zooniverse_exports\\SER\\subjects.csv'
 # manifest_root_path = '/home/packerc/shared/zooniverse/Manifests/RUA/'
@@ -52,6 +55,9 @@ if __name__ == '__main__':
     parser.add_argument("-predictions_species_path", type=str, required=True)
     parser.add_argument("-output_file", type=str, required=True)
     parser.add_argument("-label_mapping_path", type=str, required=True)
+    parser.add_argument("-export_meta_data", action='store_true', default=False)
+    parser.add_argument("-site_season_id", type=str, default='',
+                        help="E.g. SER_S11")
 
     args = vars(parser.parse_args())
 
@@ -91,26 +97,11 @@ if __name__ == '__main__':
     with open(label_mapping_path, 'r') as f:
         label_mapping = json.load(f)
     # overwrite with old label mapping
-    label_mapping = {
-         'AARDVARK': 0, 'AARDWOLF': 1, 'BABOON': 2,
-         'BATEAREDFOX': 3, 'BUFFALO': 4, 'BUSHBUCK': 5, 'CARACAL': 6, 'CHEETAH': 7,
-         'CIVET': 8, 'DIKDIK': 9, 'ELAND': 10, 'ELEPHANT': 11,
-         'GAZELLEGRANTS': 12, 'GAZELLETHOMSONS': 13, 'GENET': 14, 'GIRAFFE': 15,
-         'GUINEAFOWL': 16, 'HARE': 17, 'HARTEBEEST': 18, 'HIPPOPOTAMUS': 19,
-         'HONEYBADGER': 20, 'HUMAN': 21, 'HYENASPOTTED': 22, 'HYENASTRIPED': 23,
-         'IMPALA': 24, 'JACKAL': 25, 'KORIBUSTARD': 26, 'LEOPARD': 27,
-         'LIONFEMALE': 28, 'LIONMALE': 29, 'MONGOOSE': 30, 'OSTRICH': 31,
-         'BIRDOTHER': 32, 'PORCUPINE': 33, 'REEDBUCK': 34, 'REPTILES': 35,
-         'RHINOCEROS': 36, 'RODENTS': 37, 'SECRETARYBIRD': 38, 'SERVAL': 39,
-         'TOPI': 40, 'MONKEYVERVET': 41, 'WARTHOG': 42, 'WATERBUCK': 43,
-         'WILDCAT': 44, 'WILDEBEEST': 45, 'ZEBRA': 46, 'ZORILLA': 47}
-
+    label_mapping = label_mappings['old_ser_label_mapping']
     label_mapping_empty = {'NOTHINGHERE': 0}
 
     # count mapping
-    counts_map_to_numeric = {"1": 0, "2": 1, "3": 2, "4": 3,
-                             "5": 4, "6": 5, "7": 6, "8": 7, "9": 8,
-                              "10": 9, "1150": 10, "51": 11}
+    counts_map_to_numeric = label_mappings['counts_to_numeric']
     count_num_to_label = {v: k for k, v in counts_map_to_numeric.items()}
 
     # Read Manifest file
@@ -119,17 +110,22 @@ if __name__ == '__main__':
         full_path = os.path.join(manifest_root_path, file)
         with open(full_path, newline='') as csvfile:
             reader = csv.reader(csvfile, delimiter=',')
+            header = next(reader)
+            col_mapping = {x: i for i, x in enumerate(header)}
+            images = [x for x in col_mapping.keys() if 'Image' in x]
             for row_id, row in enumerate(reader):
-                if row_id == 0:
-                    header = row
-                    name_to_id_mapping = {x: i for i, x in enumerate(header)}
-                    images = [x for x in name_to_id_mapping.keys() if 'Image' in x]
-                    continue
-                else:
-                    subject_id = row[name_to_id_mapping['zoosubjid']]
-                    for img in images:
-                        anonym_name = row[name_to_id_mapping[img]]
-                        anonym_to_subj[anonym_name] = subject_id
+                subject_id = row[col_mapping['zoosubjid']]
+                site = row[col_mapping['site']]
+                roll = row[col_mapping['roll']]
+                capture = row[col_mapping['capture']]
+                # unique capture id
+                capture_id = '#'.join([args['site_season_id'],
+                                       site,
+                                       roll,
+                                       capture])
+                for img in images:
+                    anonym_name = row[col_mapping[img]]
+                    anonym_to_subj[anonym_name] = subject_id
 
     # Collect all predictions per Subject
     im_to_anonym = {v: k for k, v in anonym_to_im.items()}
