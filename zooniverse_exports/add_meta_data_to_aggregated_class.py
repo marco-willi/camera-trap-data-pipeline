@@ -9,7 +9,7 @@ import datetime
 from collections import Counter
 
 from utils import assign_zero_one_to_split, id_to_zero_one
-from gloval_vars import label_mappings
+from global_vars import label_mappings
 
 
 # # Manifest
