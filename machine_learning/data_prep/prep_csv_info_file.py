@@ -117,7 +117,8 @@ if __name__ == '__main__':
             all_records.append(row)
 
     # check counts
-    Counter(counts)
+    print("Counts distribution:")
+    print(Counter(counts))
 
     # Convert and Clean data
     data_clean = OrderedDict()
