@@ -9,6 +9,7 @@ import argparse
 from utils import (
     correct_image_name, id_to_zero_one,
     assign_zero_one_to_split)
+from global_vars import label_mappings
 
 
 def binarize(x):
@@ -131,6 +132,9 @@ if __name__ == '__main__':
             dat['images'].append(img)
         dat['species'].add(row[header_to_id['Species']])
         dat['record'][row[header_to_id['Species']]] = row
+        # map counts
+        if dat['count'] in label_mappings['counts_db_to_ml']:
+            dat['count'] = label_mappings['counts_db_to_ml'][dat['count']]
 
     # Create list for writing to disk
     data_list_clean = list()
