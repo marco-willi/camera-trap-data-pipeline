@@ -2,6 +2,7 @@
     - to create (preliminary) reports
     - to create machine learning (tfrecord) files
 """
+import os
 import csv
 import argparse
 import datetime
@@ -45,6 +46,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("-classifications_aggregated", type=str, required=True)
     parser.add_argument("-season", type=str, required=True, help="e.g GRU_S1")
+    parser.add_argument("-site", type=str, required=True, help="e.g GRU")
     parser.add_argument("-manifest_files_old", default=None, nargs='+', type=str)
     parser.add_argument("-manifest_file_new", default=None, type=str)
     parser.add_argument("-season_cleaned", default=None, nargs='+', type=str)
@@ -90,6 +92,8 @@ if __name__ == '__main__':
                         ts = datetime.datetime.strptime('1900', '%Y')
                     # image path
                     image = row[col_mapping['path']]
+                    # add site to image path
+                    image = os.path.join(args['site'], image)
                     image_num = row[col_mapping['image']]
                     # add record
                     if capture_id in captures:

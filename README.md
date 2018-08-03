@@ -89,6 +89,7 @@ python3 -m zooniverse_exports.add_meta_data_to_aggregated_class \
 -season_cleaned /home/packerc/shared/season_captures/GRU/cleaned/GRU_S1_cleaned.csv \
 -output_csv /home/packerc/will5448/data/season_exports/db_export_gru_season_1.csv \
 -season GRU_S1 \
+-site GRU \
 -manifest_files_old /home/packerc/shared/zooniverse/Manifests/GRU/GRU_S1_manifest_v1 \
 -max_n_images 3
 ```

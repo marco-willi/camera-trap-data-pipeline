@@ -14,7 +14,7 @@ cd /home/packerc/shared/machine_learning/will5448/code/camera-trap-classifier
 module load python3
 source activate ctc
 
-
+# Create dataset inventory SER
 python create_dataset_inventory.py csv -path /home/packerc/will5448/data/season_exports/db_export_season_all_cleaned.csv \
 -export_path /home/packerc/will5448/data/inventories/dataset_inventory_season_all.json \
 -capture_id_field capture_id \
@@ -22,8 +22,15 @@ python create_dataset_inventory.py csv -path /home/packerc/will5448/data/season_
 -label_fields empty species count standing resting moving eating interacting babies empty \
 -meta_data_fields season capturetimestamp location split_name
 
+# Create dataset inventory RUA
+python create_dataset_inventory.py csv -path /home/packerc/will5448/data/season_exports/db_export_rua_season_1.csv \
+-export_path /home/packerc/will5448/data/inventories/dataset_inventory_rua_season_1.json \
+-capture_id_field capture_id \
+-image_fields image1 image2 image3 \
+-label_fields empty species count standing resting moving eating interacting babies empty \
+-meta_data_fields season capturetimestamp location split_name
 
-# Parallel Images Writes Species
+# Parallel Images Writes Species SER
 python create_dataset.py -inventory /home/packerc/will5448/data/inventories/dataset_inventory_season_all.json \
 -output_dir /home/packerc/will5448/data/tfr_files/all_species/ \
 -image_save_side_max 500 \
@@ -31,6 +38,19 @@ python create_dataset.py -inventory /home/packerc/will5448/data/inventories/data
 -remove_label_name empty \
 -remove_label_value empty \
 -image_root_path /home/packerc/shared/albums \
+-process_images_in_parallel \
+-process_images_in_parallel_size 320 \
+-processes_images_in_parallel_n_processes 8 \
+-max_records_per_file 5000
+
+# Parallel Images Writes Species RUA
+python create_dataset.py -inventory /home/packerc/will5448/data/inventories/dataset_inventory_rua_season_1.json \
+-output_dir /home/packerc/will5448/data/tfr_files/all_species/ \
+-image_save_side_max 500 \
+-split_by_meta split_name \
+-remove_label_name empty \
+-remove_label_value empty \
+-image_root_path /home/packerc/shared/albums/RUA/ \
 -process_images_in_parallel \
 -process_images_in_parallel_size 320 \
 -processes_images_in_parallel_n_processes 8 \
