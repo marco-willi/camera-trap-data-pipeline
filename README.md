@@ -1,5 +1,9 @@
 # snapshot_safari_misc
-Misc Code for Snapshot Safari
+Misc Code for Snapshot Safari.
+1. Prepare Data for Upload to Zooniverse
+2. Machine Learning Codes
+3. Download and Aggregate Data from Zooniverse
+
 
 ## Pre-Requisites
 
@@ -73,6 +77,22 @@ python3 -m zooniverse_exports.aggregate_extractions \
         -output_csv /home/packerc/shared/zooniverse/Exports/RUA/RUA_S1_classifications_aggregated.csv
 ```
 
+### Add Meta-Data to Aggregated Classifications (work in progress..)
+
+This function adds meta-data to aggregated classifications, like location, timestamp, and
+other data currently used for input to machine learning models. This function is unfinished
+and currently only works with the 'old' manifest formats.
+
+```
+python3 -m zooniverse_exports.add_meta_data_to_aggregated_class \
+-classifications_aggregated /home/packerc/shared/machine_learning/data/zooniverse_exports/GRU/GRU_S1/classifications_aggregated.csv \
+-season_cleaned /home/packerc/shared/season_captures/GRU/cleaned/GRU_S1_cleaned.csv \
+-output_csv /home/packerc/will5448/data/season_exports/db_export_gru_season_1.csv \
+-season GRU_S1 \
+-manifest_files_old /home/packerc/shared/zooniverse/Manifests/GRU/GRU_S1_manifest_v1 \
+-max_n_images 3
+```
+
 ## Upload new Data to Zooniverse
 
 The following steps are required to upload new data to Zooniverse including machine learning scores. The following codes show an example for processing RUA data.
@@ -99,6 +119,7 @@ cd /home/packerc/shared/scripts/snapshot_safari_misc/image_compression
 qsub compress_images.pbs
 ```
 
+This job can run for a long time, i.e. many hours.
 
 ### Generate Manifest
 
@@ -185,3 +206,5 @@ python3 -m zooniverse_uploads.upload_manifest \
 -subject_set_name RUA_S1_machine_learning_v1 \
 -password_file ~/keys/passwords.ini
 ```
+
+This code can run for a long time, i.e. multiple days.
