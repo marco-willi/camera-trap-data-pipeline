@@ -155,7 +155,7 @@ if __name__ == '__main__':
         # assign capture id to test/val/train split
         hash = id_to_zero_one(capture_id)
         split = assign_zero_one_to_split(hash, [0.9, 0.1, 0.1],
-                                         ['test', 'val', 'train'])
+                                         ['train', 'val', 'test'])
         record_data['split_name'] = '_'.join([split, season.lower()])
         # images
         images = ['image%s' % i for i in range(1, args['max_n_images']+1)]
