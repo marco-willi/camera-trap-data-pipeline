@@ -80,6 +80,9 @@ if __name__ == '__main__':
             for row_id, row in enumerate(reader):
                     row = _remove_quotes_from_list(row)
                     season = row[col_mapping['season']]
+                    # add hack
+                    if len(season) == 1:
+                        season = args['season']
                     site = row[col_mapping['site']]
                     roll = row[col_mapping['roll']]
                     capture = row[col_mapping['capture']]
