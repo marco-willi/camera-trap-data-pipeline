@@ -166,7 +166,7 @@ if __name__ == '__main__':
         record_data['babies'] = record_data['young_present']
         # assign capture id to test/val/train split
         hash = id_to_zero_one(capture_id)
-        split = assign_zero_one_to_split(hash, [0.9, 0.1, 0.1],
+        split = assign_zero_one_to_split(hash, [0.9, 0.05, 0.05],
                                          ['train', 'val', 'test'])
         record_data['split_name'] = '_'.join([split, season.lower()])
         # images
