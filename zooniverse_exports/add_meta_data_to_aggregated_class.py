@@ -66,14 +66,19 @@ if __name__ == '__main__':
                     'eating', 'standing', 'resting', 'interacting',
                     'young_present']
 
+    def _remove_quotes_from_list(lst):
+        return [x.strip('"') for x in lst]
+
     # Read Cleaned Season Files
     captures = dict()
     for season_cleaned_file in args['season_cleaned']:
         with open(season_cleaned_file, newline='') as csvfile:
             reader = csv.reader(csvfile, delimiter=',')
             header = next(reader)
+            header = _remove_quotes_from_list(header)
             col_mapping = {x: i for i, x in enumerate(header)}
             for row_id, row in enumerate(reader):
+                    row = _remove_quotes_from_list(row)
                     season = row[col_mapping['season']]
                     site = row[col_mapping['site']]
                     roll = row[col_mapping['roll']]
