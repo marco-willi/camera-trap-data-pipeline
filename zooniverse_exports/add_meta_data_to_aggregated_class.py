@@ -196,13 +196,13 @@ if __name__ == '__main__':
     all_species = list()
     for f in final:
         all_species.append(f[2])
-    Counter(all_species)
+    print(Counter(all_species))
 
     # print all counts
     all_counts = list()
     for f in final:
         all_counts.append(f[3])
-    Counter(all_counts)
+    print(Counter(all_counts))
 
     with open(args['output_csv'], "w", newline='') as outs:
         csv_writer = csv.writer(outs, delimiter=',')
