@@ -206,6 +206,7 @@ python3 -m zooniverse_exports.add_meta_data_to_aggregated_class \
 -season_cleaned /home/packerc/shared/season_captures/RUA/cleaned/RUA_S1_cleaned_A.csv \
 -output_csv /home/packerc/will5448/data/season_exports/db_export_rua_season_1.csv \
 -season RUA_S1 \
+-site RUA \
 -manifest_files_old /home/packerc/shared/zooniverse/Manifests/RUA/RUA_S1_A1_manifest_v1 \
 -max_n_images 3
 
@@ -257,9 +258,103 @@ python3 -m zooniverse_exports.add_meta_data_to_aggregated_class \
 -season_cleaned /home/packerc/shared/season_captures/GRU/cleaned/GRU_S1_cleaned.csv \
 -output_csv /home/packerc/will5448/data/season_exports/db_export_gru_season_1.csv \
 -season GRU_S1 \
+-site GRU \
 -manifest_files_old /home/packerc/shared/zooniverse/Manifests/GRU/GRU_S1_manifest_v1 \
 -max_n_images 3
 
 
-
 # write_first_nrows_of_csv_to_csv('/home/packerc/shared/machine_learning/data/zooniverse_exports/GRU/GRU_S1/classifications.csv', '/home/packerc/shared/machine_learning/data/zooniverse_exports/GRU/GRU_S1/classifications_sampled.csv', 50000)
+
+###################################
+# Gondwana
+####################################
+
+
+# Get classifications
+cd /home/packerc/shared/scripts/snapshot_safari_misc
+module load python3
+python3 -m zooniverse_exports.get_zooniverse_export -password_file ~/keys/passwords.ini \
+        -project_id 3812 \
+        -output_file /home/packerc/shared/zooniverse/Exports/GON/GON_S1_classifications.csv \
+        -export_type classifications \
+        -new_export 0
+
+
+# Extract classifications
+python3 -m zooniverse_exports.extract_classifications \
+        -classification_csv /home/packerc/shared/zooniverse/Exports/GON/GON_S1_classifications.csv \
+        -output_csv /home/packerc/shared/zooniverse/Exports/GON/GON_S1_classifications_extracted.csv \
+        -workflow_id 3360 \
+        -workflow_version 497
+
+# aggregate classifications
+python3 -m zooniverse_exports.aggregate_extractions \
+          -classifications_extracted /home/packerc/shared/zooniverse/Exports/GON/GON_S1_classifications_extracted.csv \
+          -output_csv /home/packerc/shared/zooniverse/Exports/GON/GON_S1_classifications_aggregated.csv
+
+# Create Label-Mapping Plus Meta-Data (for TFRecord)
+python3 -m zooniverse_exports.add_meta_data_to_aggregated_class \
+-classifications_aggregated /home/packerc/shared/zooniverse/Exports/GON/GON_S1_classifications_aggregated.csv \
+-season GON_S1 \
+-site GON \
+-manifest_files_old /home/packerc/shared/zooniverse/Manifests/GON/GON_S1_manifest_v1 \
+-season_cleaned /home/packerc/shared/season_captures/GON/cleaned/GON_S1_cleaned.csv \
+-output_csv /home/packerc/shared/zooniverse/Exports/GON/GON_S1_export.csv
+
+
+###################################
+# Niassa / Mariri (NIA)
+####################################
+
+# Get classifications
+cd /home/packerc/shared/scripts/snapshot_safari_misc
+module load python3
+python3 -m zooniverse_exports.get_zooniverse_export -password_file ~/keys/passwords.ini \
+        -project_id 5044 \
+        -output_file /home/packerc/shared/zooniverse/Exports/NIA/NIA_S1_classifications.csv \
+        -export_type classifications \
+        -new_export 0
+
+# Extract classifications
+python3 -m zooniverse_exports.extract_classifications \
+        -classification_csv /home/packerc/shared/zooniverse/Exports/NIA/NIA_S1_classifications.csv \
+        -output_csv /home/packerc/shared/zooniverse/Exports/NIA/NIA_S1_classifications_extracted.csv \
+        -workflow_id 4986 \
+        -workflow_version 531
+
+# aggregate classifications
+python3 -m zooniverse_exports.aggregate_extractions \
+          -classifications_extracted /home/packerc/shared/zooniverse/Exports/NIA/NIA_S1_classifications_extracted.csv \
+          -output_csv /home/packerc/shared/zooniverse/Exports/NIA/NIA_S1_classifications_aggregated.csv
+
+
+# Create Label-Mapping Plus Meta-Data (for TFRecord)
+python3 -m zooniverse_exports.add_meta_data_to_aggregated_class \
+-classifications_aggregated /home/packerc/shared/zooniverse/Exports/NIA/NIA_S1_classifications_aggregated.csv \
+-season NIA_S1 \
+-site NIA \
+-manifest_files_old /home/packerc/shared/zooniverse/Manifests/NIA/NIA_S1_manifest_v1 \
+-season_cleaned /home/packerc/shared/season_captures/NIA/cleaned/NIA_S1_cleaned_corrected.csv \
+-output_csv /home/packerc/shared/zooniverse/Exports/NIA/NIA_S1_export.csv
+
+###################################
+# Gorongosa - Incomplete (different format)
+####################################
+
+
+# Get classifications
+cd /home/packerc/shared/scripts/snapshot_safari_misc
+module load python3
+python3 -m zooniverse_exports.get_zooniverse_export -password_file ~/keys/passwords.ini \
+        -project_id 593 \
+        -output_file /home/packerc/shared/zooniverse/Exports/GOR/GOR_S1_classifications.csv \
+        -export_type classifications \
+        -new_export 0
+
+
+# Extract classifications
+python3 -m zooniverse_exports.extract_classifications \
+        -classification_csv /home/packerc/shared/zooniverse/Exports/GOR/GOR_S1_classifications.csv \
+        -output_csv /home/packerc/shared/zooniverse/Exports/GOR/GOR_S1_classifications_extracted.csv \
+        -workflow_id 338 \
+        -workflow_version 1899

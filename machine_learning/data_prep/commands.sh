@@ -22,17 +22,12 @@ python create_dataset_inventory.py csv -path /home/packerc/will5448/data/season_
 -label_fields empty species count standing resting moving eating interacting babies empty \
 -meta_data_fields season capturetimestamp location split_name
 
-# Create dataset inventory RUA
-python create_dataset_inventory.py csv -path /home/packerc/will5448/data/season_exports/db_export_rua_season_1.csv \
--export_path /home/packerc/will5448/data/inventories/dataset_inventory_rua_season_1.json \
--capture_id_field capture_id \
--image_fields image1 image2 image3 \
--label_fields empty species count standing resting moving eating interacting babies empty \
--meta_data_fields season capturetimestamp location split_name
+
+
 
 # Parallel Images Writes Species SER
 python create_dataset.py -inventory /home/packerc/will5448/data/inventories/dataset_inventory_season_all.json \
--output_dir /home/packerc/will5448/data/tfr_files/all_species/ \
+-output_dir /home/packerc/will5448/data/tfr_files/all_species/SER/ \
 -image_save_side_max 500 \
 -split_by_meta split_name \
 -remove_label_name empty \
@@ -43,23 +38,11 @@ python create_dataset.py -inventory /home/packerc/will5448/data/inventories/data
 -processes_images_in_parallel_n_processes 8 \
 -max_records_per_file 5000
 
-# Parallel Images Writes Species RUA
-python create_dataset.py -inventory /home/packerc/will5448/data/inventories/dataset_inventory_rua_season_1.json \
--output_dir /home/packerc/will5448/data/tfr_files/all_species/ \
--image_save_side_max 500 \
--split_by_meta split_name \
--remove_label_name empty \
--remove_label_value empty \
--image_root_path /home/packerc/shared/albums/RUA/ \
--process_images_in_parallel \
--process_images_in_parallel_size 320 \
--processes_images_in_parallel_n_processes 8 \
--max_records_per_file 5000
 
 
-# Parallel Images Writes Empty or Not
+# Parallel Images Writes Empty or Not SER
 python create_dataset.py -inventory /home/packerc/will5448/data/inventories/dataset_inventory_season_all.json \
--output_dir /home/packerc/will5448/data/tfr_files/all_empty_or_not/ \
+-output_dir /home/packerc/will5448/data/tfr_files/all_empty_or_not/SER/ \
 -image_save_side_max 500 \
 -split_by_meta split_name \
 -balanced_sampling_min \
@@ -69,6 +52,11 @@ python create_dataset.py -inventory /home/packerc/will5448/data/inventories/data
 -process_images_in_parallel_size 320 \
 -processes_images_in_parallel_n_processes 8 \
 -max_records_per_file 5000
+
+
+
+
+
 
 
 # Train a model
@@ -125,3 +113,169 @@ python create_dataset.py -inventory /home/packerc/will5448/data/inventories/data
 -remove_label_value 1 \
 -image_root_path /home/packerc/shared/albums \
 -overwrite
+
+###############################################
+# RUAHA
+###############################################
+
+# Create dataset inventory RUA
+python create_dataset_inventory.py csv -path /home/packerc/will5448/data/season_exports/db_export_rua_season_1.csv \
+-export_path /home/packerc/will5448/data/inventories/dataset_inventory_rua_season_1.json \
+-capture_id_field capture_id \
+-image_fields image1 image2 image3 \
+-label_fields empty species count standing resting moving eating interacting babies empty \
+-meta_data_fields season capturetimestamp location split_name
+
+# Parallel Images Writes Species RUA
+python create_dataset.py -inventory /home/packerc/will5448/data/inventories/dataset_inventory_rua_season_1.json \
+-output_dir /home/packerc/will5448/data/tfr_files/all_species/RUA/ \
+-image_save_side_max 500 \
+-split_by_meta split_name \
+-remove_label_name empty \
+-remove_label_value empty \
+-image_root_path /home/packerc/shared/albums/ \
+-process_images_in_parallel \
+-process_images_in_parallel_size 320 \
+-processes_images_in_parallel_n_processes 8 \
+-max_records_per_file 5000
+
+
+# Parallel Images Writes Empty or Not RUA
+python create_dataset.py -inventory /home/packerc/will5448/data/inventories/dataset_inventory_rua_season_1.json \
+-output_dir /home/packerc/will5448/data/tfr_files/all_empty_or_not/RUA/ \
+-image_save_side_max 500 \
+-split_by_meta split_name \
+-balanced_sampling_min \
+-balanced_sampling_label empty \
+-image_root_path /home/packerc/shared/albums/ \
+-process_images_in_parallel \
+-process_images_in_parallel_size 320 \
+-processes_images_in_parallel_n_processes 8 \
+-max_records_per_file 5000
+
+###############################################
+# Grumeti
+###############################################
+
+# Create dataset inventory GRU
+python create_dataset_inventory.py csv -path /home/packerc/will5448/data/season_exports/db_export_gru_season_1.csv \
+-export_path /home/packerc/will5448/data/inventories/dataset_inventory_gru_season_1.json \
+-capture_id_field capture_id \
+-image_fields image1 image2 image3 \
+-label_fields empty species count standing resting moving eating interacting babies empty \
+-meta_data_fields season capturetimestamp location split_name
+
+
+# Parallel Images Writes Species GRU
+python create_dataset.py -inventory /home/packerc/will5448/data/inventories/dataset_inventory_gru_season_1.json \
+-output_dir /home/packerc/will5448/data/tfr_files/all_species/GRU/ \
+-image_save_side_max 500 \
+-split_by_meta split_name \
+-remove_label_name empty \
+-remove_label_value empty \
+-image_root_path /home/packerc/shared/albums/ \
+-process_images_in_parallel \
+-process_images_in_parallel_size 320 \
+-processes_images_in_parallel_n_processes 8 \
+-max_records_per_file 5000
+
+# Parallel Images Writes Empty or Not GRU
+python create_dataset.py -inventory /home/packerc/will5448/data/inventories/dataset_inventory_gru_season_1.json \
+-output_dir /home/packerc/will5448/data/tfr_files/all_empty_or_not/GRU/ \
+-image_save_side_max 500 \
+-split_by_meta split_name \
+-balanced_sampling_min \
+-balanced_sampling_label empty \
+-image_root_path /home/packerc/shared/albums/ \
+-process_images_in_parallel \
+-process_images_in_parallel_size 320 \
+-processes_images_in_parallel_n_processes 8 \
+-max_records_per_file 5000
+
+
+###############################################
+# Gondwana
+###############################################
+
+
+cd /home/packerc/shared/machine_learning/will5448/code/camera-trap-classifier
+module load python3
+source activate ctc
+
+# Create dataset inventory
+python create_dataset_inventory.py csv -path //home/packerc/shared/zooniverse/Exports/GON/GON_S1_export.csv \
+-export_path /home/packerc/will5448/data/inventories/dataset_inventory_gon_season_1.json \
+-capture_id_field capture_id \
+-image_fields image1 image2 image3 \
+-label_fields empty species count standing resting moving eating interacting babies empty \
+-meta_data_fields season capturetimestamp location split_name
+
+# Parallel Images Writes Species
+python create_dataset.py -inventory /home/packerc/will5448/data/inventories/dataset_inventory_gon_season_1.json \
+-output_dir /home/packerc/will5448/data/tfr_files/all_species/GON/ \
+-image_save_side_max 500 \
+-split_by_meta split_name \
+-remove_label_name empty \
+-remove_label_value empty \
+-image_root_path /home/packerc/shared/albums/ \
+-process_images_in_parallel \
+-process_images_in_parallel_size 320 \
+-processes_images_in_parallel_n_processes 8 \
+-max_records_per_file 5000
+
+# Parallel Images Writes Empty or Not
+python create_dataset.py -inventory /home/packerc/will5448/data/inventories/dataset_inventory_gon_season_1.json \
+-output_dir /home/packerc/will5448/data/tfr_files/all_empty_or_not/GON/ \
+-image_save_side_max 500 \
+-split_by_meta split_name \
+-balanced_sampling_min \
+-balanced_sampling_label empty \
+-image_root_path /home/packerc/shared/albums/ \
+-process_images_in_parallel \
+-process_images_in_parallel_size 320 \
+-processes_images_in_parallel_n_processes 8 \
+-max_records_per_file 5000
+
+
+###############################################
+# Niassa
+###############################################
+
+
+cd /home/packerc/shared/machine_learning/will5448/code/camera-trap-classifier
+module load python3
+source activate ctc
+
+# Create dataset inventory
+python create_dataset_inventory.py csv -path /home/packerc/shared/zooniverse/Exports/NIA/NIA_S1_export.csv \
+-export_path /home/packerc/will5448/data/inventories/dataset_inventory_nia_season_1.json \
+-capture_id_field capture_id \
+-image_fields image1 image2 image3 \
+-label_fields empty species count standing resting moving eating interacting babies empty \
+-meta_data_fields season capturetimestamp location split_name
+
+# Parallel Images Writes Species
+python create_dataset.py -inventory /home/packerc/will5448/data/inventories/dataset_inventory_nia_season_1.json \
+-output_dir /home/packerc/will5448/data/tfr_files/all_species/NIA/ \
+-image_save_side_max 500 \
+-split_by_meta split_name \
+-remove_label_name empty \
+-remove_label_value empty \
+-image_root_path /home/packerc/shared/albums/ \
+-process_images_in_parallel \
+-process_images_in_parallel_size 320 \
+-processes_images_in_parallel_n_processes 8 \
+-max_records_per_file 5000
+
+# Parallel Images Writes Empty or Not
+python create_dataset.py -inventory /home/packerc/will5448/data/inventories/dataset_inventory_nia_season_1.json \
+-output_dir /home/packerc/will5448/data/tfr_files/all_empty_or_not/NIA/ \
+-image_save_side_max 500 \
+-split_by_meta split_name \
+-balanced_sampling_min \
+-balanced_sampling_label empty \
+-image_root_path /home/packerc/shared/albums/ \
+-process_images_in_parallel \
+-process_images_in_parallel_size 320 \
+-processes_images_in_parallel_n_processes 8 \
+-max_records_per_file 5000
