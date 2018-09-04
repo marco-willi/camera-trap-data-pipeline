@@ -29,7 +29,7 @@ cd /home/packerc/shared/scripts/snapshot_safari_misc
 git pull
 ```
 
-The easiest way to exectue the following codes is to copy & paste them to a text editor, change the paramters (e.g. paths) and then copy & paste that to the command line to execute them.
+The easiest way to exectue the following codes is to copy & paste them to a text editor, change the parameters (e.g. paths) and then copy & paste that to the command line to execute them.
 
 ## Get and Extract Zooniverse Exports
 
