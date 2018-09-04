@@ -8,7 +8,8 @@ Misc Code for Snapshot Safari.
 ## Pre-Requisites
 
 For code that accesses Zooniverse via Panoptes (e.g. requires a password),
-a file with Zooniverse credentials should be stored (e.g. in ~/keys/passwords.ini). The '~' refers to the home directory, therefore, a directory named 'keys' has to be created in the home directory, containing the passwords.ini file). It should have the following content:
+a file with Zooniverse credentials should be stored (e.g. in ~/keys/passwords.ini).
+The '~' refers to the home directory, therefore, a directory named 'keys' has to be created in the home directory, containing the passwords.ini file). It should have the following content:
 
 ```
 [zooniverse]
