@@ -8,8 +8,7 @@ Misc Code for Snapshot Safari.
 ## Pre-Requisites
 
 For code that accesses Zooniverse via Panoptes (e.g. requires a password),
-a file with Zooniverse credentials should be stored (e.g. in ~/keys/passwords.ini).
-It should have the following content:
+a file with Zooniverse credentials should be stored (e.g. in ~/keys/passwords.ini, the '~' refers to the home directory, therefore, a directory named 'keys' has to be created in the home directory, containing the passwords.ini file). It should have the following content:
 
 ```
 [zooniverse]
@@ -30,13 +29,16 @@ cd /home/packerc/shared/scripts/snapshot_safari_misc
 git pull
 ```
 
+The easiest way to exectue the following codes is to copy & paste them to a text editor, change the paramters (e.g. paths) and then copy & paste that to the command line to execute them.
+
 ## Get and Extract Zooniverse Exports
 
 ### Get Zooniverse Exports
 
 Download Zooniverse exports. Requires Zooniverse account credentials and
 collaborator status with the project. The project_id can be found in the project builder
-in the top left corner.
+in the top left corner. To create a 'fresh' export it is easiest to go on Zooniverse, to the project page,
+click on 'Data Exports', and click on new 'Request new classification export'.
 
 ```
 python3 -m zooniverse_exports.get_zooniverse_export \
