@@ -8,7 +8,7 @@ Misc Code for Snapshot Safari.
 ## Pre-Requisites
 
 For code that accesses Zooniverse via Panoptes (e.g. requires a password),
-a file with Zooniverse credentials should be stored (e.g. in ~/keys/passwords.ini, the '~' refers to the home directory, therefore, a directory named 'keys' has to be created in the home directory, containing the passwords.ini file). It should have the following content:
+a file with Zooniverse credentials should be stored (e.g. in ~/keys/passwords.ini). The '~' refers to the home directory, therefore, a directory named 'keys' has to be created in the home directory, containing the passwords.ini file). It should have the following content:
 
 ```
 [zooniverse]
@@ -87,9 +87,9 @@ and currently only works with the 'old' manifest formats.
 
 ```
 python3 -m zooniverse_exports.add_meta_data_to_aggregated_class \
--classifications_aggregated /home/packerc/shared/machine_learning/data/zooniverse_exports/GRU/GRU_S1/classifications_aggregated.csv \
+-classifications_aggregated /home/packerc/shared/zooniverse/Exports/GRU/GRU_S1_classifications_aggregated.csv \
 -season_cleaned /home/packerc/shared/season_captures/GRU/cleaned/GRU_S1_cleaned.csv \
--output_csv /home/packerc/will5448/data/season_exports/db_export_gru_season_1.csv \
+-output_csv /home/packerc/shared/zooniverse/Exports/GRU/GRU_S1_export.csv \
 -season GRU_S1 \
 -site GRU \
 -manifest_files_old /home/packerc/shared/zooniverse/Manifests/GRU/GRU_S1_manifest_v1 \
