@@ -27,11 +27,14 @@ ssh lab
 module load python3
 cd /home/packerc/shared/scripts/snapshot_safari_misc
 git pull
+chmod -R g+rw /home/packerc/shared/scripts/snapshot_safari_misc
 ```
 
 The easiest way to exectue the following codes is to copy & paste them to a text editor, change the parameters (e.g. paths) and then copy & paste that to the command line to execute them.
 
 ## Get and Extract Zooniverse Exports
+
+Some of the scripts used for different sites can be found here: [zooniverse_exports/scripts.sh](zooniverse_exports/scripts.sh)
 
 ### Get Zooniverse Exports
 

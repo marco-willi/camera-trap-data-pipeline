@@ -215,31 +215,54 @@ python3 -m zooniverse_exports.add_meta_data_to_aggregated_class \
 # Grumeti
 ####################################
 
-cd /home/packerc/shared/machine_learning/will5448/code/snapshot_safari_misc
+# Get Classifications
+cd /home/packerc/shared/scripts/snapshot_safari_misc
+python3 -m zooniverse_exports.get_zooniverse_export \
+        -password_file ~/keys/passwords.ini \
+        -project_id 5115 \
+        -output_file /home/packerc/shared/zooniverse/Exports/GRU/GRU_S1_classifications.csv \
+        -export_type classifications \
+        -new_export 0
+
+# Extract Classifications
 python3 -m zooniverse_exports.extract_classifications \
-        -classification_csv /home/packerc/shared/machine_learning/data/zooniverse_exports/GRU/GRU_S1/classifications.csv \
-        -output_csv /home/packerc/shared/machine_learning/data/zooniverse_exports/GRU/GRU_S1/classifications_extracted.csv \
+        -classification_csv /home/packerc/shared/zooniverse/Exports/GRU/GRU_S1_classifications.csv \
+        -output_csv /home/packerc/shared/zooniverse/Exports/GRU/GRU_S1_classifications_extracted.csv \
         -workflow_id 4979 \
         -workflow_version 275
 
+# Aggregate Classifications
 python3 -m zooniverse_exports.aggregate_extractions \
-          -classifications_extracted /home/packerc/shared/machine_learning/data/zooniverse_exports/GRU/GRU_S1/classifications_extracted.csv \
-          -output_csv /home/packerc/shared/machine_learning/data/zooniverse_exports/GRU/GRU_S1/classifications_aggregated.csv
+        -classifications_extracted /home/packerc/shared/zooniverse/Exports/GRU/GRU_S1_classifications_extracted.csv \
+        -output_csv /home/packerc/shared/zooniverse/Exports/GRU/GRU_S1_classifications_aggregated.csv
 
 
-python3 -m zooniverse_exports.extract_choices_from_workflow \
-  -workflow_csv /home/packerc/shared/machine_learning/data/zooniverse_exports/GRU/GRU_S1/workflows.csv \
-  -output /home/packerc/shared/machine_learning/data/zooniverse_exports/GRU/GRU_S1/label_mapping.json
+# Add Meta-Data to Aggregated Classifications
+python3 -m zooniverse_exports.add_meta_data_to_aggregated_class \
+-classifications_aggregated /home/packerc/shared/zooniverse/Exports/GRU/GRU_S1_classifications_aggregated.csv \
+-season_cleaned /home/packerc/shared/season_captures/GRU/cleaned/GRU_S1_cleaned.csv \
+-output_csv /home/packerc/shared/zooniverse/Exports/GRU/GRU_S1_export.csv \
+-season GRU_S1 \
+-site GRU \
+-manifest_files_old /home/packerc/shared/zooniverse/Manifests/GRU/GRU_S1_manifest_v1 \
+-max_n_images 3
 
 
-python3 -m zooniverse_exports.create_image_to_label \
--zooid_path /home/packerc/shared/zooniverse/ZOOIDs/GRU/ \
--manifest_path /home/packerc/shared/zooniverse/Manifests/GRU/ \
--zoo_exports_path /home/packerc/shared/machine_learning/data/zooniverse_exports/GRU/GRU_S1/ \
--ml_info_path /home/packerc/shared/machine_learning/data/info_files/GRU/GRU_S1/ \
--manifest_files GRU_S1_manifest_v1 \
--zooid_files GRU_S1_ZOOID.csv \
--season_id GRU_S1
+
+
+# python3 -m zooniverse_exports.extract_choices_from_workflow \
+#   -workflow_csv /home/packerc/shared/machine_learning/data/zooniverse_exports/GRU/GRU_S1/workflows.csv \
+#   -output /home/packerc/shared/machine_learning/data/zooniverse_exports/GRU/GRU_S1/label_mapping.json
+
+
+# python3 -m zooniverse_exports.create_image_to_label \
+# -zooid_path /home/packerc/shared/zooniverse/ZOOIDs/GRU/ \
+# -manifest_path /home/packerc/shared/zooniverse/Manifests/GRU/ \
+# -zoo_exports_path /home/packerc/shared/machine_learning/data/zooniverse_exports/GRU/GRU_S1/ \
+# -ml_info_path /home/packerc/shared/machine_learning/data/info_files/GRU/GRU_S1/ \
+# -manifest_files GRU_S1_manifest_v1 \
+# -zooid_files GRU_S1_ZOOID.csv \
+# -season_id GRU_S1
 
 
 # Generate Info Files from ZOOID files for prediction
