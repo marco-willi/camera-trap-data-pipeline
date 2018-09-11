@@ -27,7 +27,15 @@ ssh lab
 module load python3
 cd /home/packerc/shared/scripts/snapshot_safari_misc
 git pull
-chmod -R g+rw /home/packerc/shared/scripts/snapshot_safari_misc
+chmod -R g+rwx /home/packerc/shared/scripts/snapshot_safari_misc
+```
+
+If there are any problems with updating the code (git pull) just delete and clone it again:
+```
+rm -r -f /home/packerc/shared/scripts/snapshot_safari_misc
+cd /home/packerc/shared/scripts/
+git clone https://github.com/marco-willi/snapshot_safari_misc.git
+chmod -R g+rwx /home/packerc/shared/scripts/snapshot_safari_misc
 ```
 
 The easiest way to exectue the following codes is to copy & paste them to a text editor, change the parameters (e.g. paths) and then copy & paste that to the command line to execute them.
