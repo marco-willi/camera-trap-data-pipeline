@@ -173,7 +173,7 @@ python3 -m zooniverse_uploads.create_predict_file_from_manifest \
 
 ### Generate new Predictions
 
-The following steps describe how to run the machine learning models. Note that the files 'predict_species.pbs' and 'predict_empty.pbs' have to be adapted.
+The following steps describe how to run the machine learning models. Note that the files 'predict_species.pbs' and 'predict_empty.pbs' have to be adapted. The files can also be copied to generate new versions for specific sites, e.g., 'predict_species_rua.pbs' which can then be run with 'qsub predict_species_rua.pbs'.
 
 ```
 cd /home/packerc/shared/scripts/snapshot_safari_misc/machine_learning
@@ -184,6 +184,48 @@ ssh mesabi
 qsub predict_species.pbs
 qsub predict_empty.pbs
 ```
+
+#### Example: Adapting parameters in .pbs files for RUA
+
+The following examples show some parameters that can be adapted to apply the original Snapshot Serengeti model on data from Ruaha (RUA) season 1. Parameters that are not shown but are in the .pbs file don't generally need to be adapted. The most important parameters are 'SITE' and 'SEASON', as well as 'DATA_INFO' (the prediction_file from the previous step) which are used to define the data the model needs to classify. The paramters 'MODEL' and 'MODEL_NAME' refer to the model, e.g., 'SER' refers to the standard Snapshot Serengeti model.
+
+Parameters in 'predict_empty.pbs':
+```
+# Parameters
+SITE=RUA
+SEASON=RUA_S1
+MODEL=SER
+MODEL_NAME=phase1
+ROOT=/home/packerc/shared/machine_learning/
+CODE=${ROOT}code/deep_learning_for_camera_trap_images/phase1
+LOG_DIR=${ROOT}data/models/${MODEL}/empty_or_not/${MODEL_NAME}/
+PREDICTIONS=${ROOT}data/predictions/empty_or_not/${SITE}/${SEASON}/predictions_${ID}.json
+IMAGES_ROOT=/home/packerc/shared/albums/${SITE}/
+DATA_INFO=${ROOT}data/info_files/${SITE}/${SEASON}/${SEASON}_manifest.csv
+```
+
+Parameters in 'predict_species.pbs':
+```
+# Parameters
+SITE=RUA
+SEASON=RUA_S1
+MODEL=SER
+MODEL_NAME=phase2
+NUMCLASS=48
+ROOT=/home/packerc/shared/machine_learning/
+CODE=${ROOT}code/deep_learning_for_camera_trap_images/phase2
+LOG_DIR=${ROOT}data/models/${MODEL}/species/${MODEL_NAME}/
+PREDICTIONS=${ROOT}data/predictions/species/${SITE}/${SEASON}/predictions_${ID}.json
+IMAGES_ROOT=/home/packerc/shared/albums/${SITE}/
+DATA_INFO=${ROOT}data/info_files/${SITE}/${SEASON}/${SEASON}_manifest.csv
+```
+
+
+Additionally, adapt the mail address in the .pbs files to get alerts by mail:
+```
+#PBS -M will5448@umn.edu
+```
+
 
 ### Aggregte Predictions
 
