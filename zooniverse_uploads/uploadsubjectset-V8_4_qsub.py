@@ -5,6 +5,7 @@ import argparse
 from panoptes_client import Project, Panoptes, Subject, SubjectSet
 import pandas as pd
 import numpy as np
+import configparser
 
 
 #_________ FUNCTIONS __________#
