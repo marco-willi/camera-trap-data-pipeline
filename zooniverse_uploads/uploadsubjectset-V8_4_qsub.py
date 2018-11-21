@@ -173,7 +173,7 @@ if __name__ == "__main__":
         help="Zooniverse subject set name")
 
     parser.add_argument(
-        "-subject_set_id", type=int, required=False, default=None,
+        "-subject_set_id", type=int, required=False, default='',
         help="Zooniverse subject set id")
 
     parser.add_argument("-attribution", type=str, required=True)
