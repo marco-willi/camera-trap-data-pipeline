@@ -173,7 +173,7 @@ if __name__ == "__main__":
         help="Zooniverse subject set name")
 
     parser.add_argument(
-        "-subject_set_id", type=int, required=False, default='',
+        "-subject_set_id", type=int, required=False, default=None,
         help="Zooniverse subject set id")
 
     parser.add_argument("-attribution", type=str, required=True)
@@ -228,7 +228,7 @@ if __name__ == "__main__":
     zoo_vars['password'] = config['zooniverse']['password']
     zoo_vars['project_id'] = args['project_id']
 
-    if args['subject_set_id'].isdigit(): #
+    if args['subject_set_id'] is not None: #
         zoo_vars['subject_set_id'] = args['subject_set_id']
         zoo_vars['subject_set_name'] = ""
     else:
