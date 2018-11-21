@@ -52,9 +52,19 @@ def add_capture_as_subject(capture_event,uvar,zvar):
                     capture_event['uploadstatus'] = "UC" #Upload complete
                     print("Subject " + str(capture_event['zoosubjid']) + " added to subject set "+ str(zvar['subject_set_id']), flush=True)
                 except Exception as e:
-                    capture_event['uploadstatus'] = "SO" #Subject Saved but not added
-                    print(e)
-                    print("Subject " + str(capture_event['zoosubjid']) + " NOT added to subject set "+ str(zvar['subject_set_id']), flush=True)
+                    # try to re-connect subject set
+                    print("Failed to add subject to subject set, trying to re-initialize connection to Panoptes...", flush=True)
+                    zvar = test_zoo_vars(zvar)
+                    #zvar['subject_set_obj'] = SubjectSet.find(zvar['subject_set_id'])
+                    try:
+                        zvar['subject_set_obj'].add(subject)
+                        capture_event['zoosubjsetid'] = zvar['subject_set_id']
+                        capture_event['uploadstatus'] = "UC" #Upload complete
+                        print("Subject " + str(capture_event['zoosubjid']) + " added to subject set "+ str(zvar['subject_set_id']), flush=True)
+                    except Exception as e:
+                        capture_event['uploadstatus'] = "SO" #Subject Saved but not added
+                        print(e)
+                        print("Subject " + str(capture_event['zoosubjid']) + " NOT added to subject set "+ str(zvar['subject_set_id']), flush=True)
         else:
             capture_event['uploadstatus'] = "NVI"  #No valid/viable images
             print("No viable/valid images in capture", flush=True)
@@ -159,7 +169,7 @@ if __name__ == "__main__":
 
     # # For Testing
     # args = {'manifest': '/home/packerc/shared/zooniverse/Manifests/SER/SER_S11_4_manifest_v0.csv',
-    #  'project_id': 4996, 'subject_set_name': 'SER_S11_4_v5_TEST', 'password_file': '~/keys/passwords.ini',
+    #  'project_id': 4996, 'subject_set_name': 'SER_S11_4_v4', 'password_file': '~/keys/passwords.ini',
     # 'attribution': 'University of Minnesota Lion Center + SnapshotSafari + Snapshot Serengeti + Serengeti National Park + Tanzania',
     # 'license': 'SnapshotSafari + Snapshot Serengeti', 'subject_set_id': None}
 
