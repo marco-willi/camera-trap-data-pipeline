@@ -41,7 +41,7 @@ def add_capture_as_subject(capture_event,uvar,zvar):
             try:
                 subject.save()
                 capture_event['zoosubjid'] = int(subject.id) #from unicode
-                print("Subject " + str(capture_event['zoosubjid']) + " saved.")
+                print("Subject " + str(capture_event['zoosubjid']) + " saved.", flush=True)
             except Exception as e:
                 print(e)
                 capture_event['uploadstatus'] = "ERR" #Error saving subject - subject not created
@@ -50,22 +50,16 @@ def add_capture_as_subject(capture_event,uvar,zvar):
                     zvar['subject_set_obj'].add(subject)
                     capture_event['zoosubjsetid'] = zvar['subject_set_id']
                     capture_event['uploadstatus'] = "UC" #Upload complete
-                    print("Subject " + str(capture_event['zoosubjid']) + " added to subject set "+ str(zvar['subject_set_id']))
+                    print("Subject " + str(capture_event['zoosubjid']) + " added to subject set "+ str(zvar['subject_set_id']), flush=True)
                 except Exception as e:
                     capture_event['uploadstatus'] = "SO" #Subject Saved but not added
                     print(e)
-                    print("Subject " + str(capture_event['zoosubjid']) + " NOT added to subject set "+ str(zvar['subject_set_id']))
+                    print("Subject " + str(capture_event['zoosubjid']) + " NOT added to subject set "+ str(zvar['subject_set_id']), flush=True)
         else:
             capture_event['uploadstatus'] = "NVI"  #No valid/viable images
-            print("No viable/valid images in capture")
+            print("No viable/valid images in capture", flush=True)
     elif capture_event['zoosubjsetid'] == "SO":
-        try:
-            subject_set.add(subject)
-            capture_event['zoosubjsetid'] = zvar['subject_set_id']
-            capture_event['uploadstatus'] = "UC"
-            print("Subject " + str(capture_event['zoosubjid']) + " added to subject set "+ str(capture_event['zoosubjsetid']))
-        except:
-            capture_event['uploadstatus'] = "SO" #Subject Saved but not added
+        capture_event['uploadstatus'] = "SO" #Subject Saved but not added
     return capture_event
 
     #####RECONNECT TO ZOONIVERSE#####
