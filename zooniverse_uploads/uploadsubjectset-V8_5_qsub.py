@@ -289,7 +289,6 @@ if __name__ == "__main__":
         # check if already uploaded
         n_current += 1
         if capture_id in uploaded_subjects:
-            'zoosubjsetid', 'zoosubjid', 'uploadstatus']
             manifest[capture_id]['zoosubjid'] = uploaded_subjects[capture_id]
             manifest[capture_id]['zoosubjsetid'] = my_set.id
             manifest[capture_id]['uploadstatus'] = 'UC'
@@ -298,7 +297,7 @@ if __name__ == "__main__":
             try:
                 print("--------------------------------------------------")
                 print("Uploading subject: %s" % capture_id, flush=True)
-                upload_subject(manifest_row, uvar, zvar)
+                upload_subject(manifest_row, upld_vars, zoo_vars)
             except Exception as e:
                 print(e)
                 print("Failed to upload subject: %s" % capture_id)
@@ -312,7 +311,7 @@ if __name__ == "__main__":
     # print stats
     for us, us_val in upld_stat.iteritems():
         print("\t"+us_val['status'] + ": " + str(us_val['new_total']))
-    print (time.strftime("%H:%M:%S",time.gmtime(time.time()-t0)) + " to save/add "+str(upld_stat['UC']['change'])+" captures.")
+    print(time.strftime("%H:%M:%S",time.gmtime(time.time()-t0)) + " to save/add "+str(upld_stat['UC']['change'])+" captures.")
 
 
     ########################
