@@ -10,20 +10,20 @@ module load python3
 
 cd /home/packerc/shared/scripts/snapshot_safari_misc
 
-python3 -m zooniverse_uploads.uploadsubjectset-V8_5_qsub \
--manifest /home/packerc/shared/zooniverse/Manifests/SER/SER_S11_4_manifest_v0.csv \
--project_id 4996 \
--subject_set_name SER_S11_4_v6 \
--password_file ~/keys/passwords.ini \
--attribution 'University of Minnesota Lion Center + SnapshotSafari + Snapshot Serengeti + Serengeti National Park + Tanzania' \
--license 'SnapshotSafari + Snapshot Serengeti'
-
-
-
 # python3 -m zooniverse_uploads.uploadsubjectset-V8_5_qsub \
 # -manifest /home/packerc/shared/zooniverse/Manifests/SER/SER_S11_4_manifest_v0.csv \
 # -project_id 4996 \
-# -subject_set_id 66839 \
+# -subject_set_name SER_S11_4_v6 \
 # -password_file ~/keys/passwords.ini \
 # -attribution 'University of Minnesota Lion Center + SnapshotSafari + Snapshot Serengeti + Serengeti National Park + Tanzania' \
 # -license 'SnapshotSafari + Snapshot Serengeti'
+
+
+
+python3 -m zooniverse_uploads.uploadsubjectset-V8_5_qsub \
+-manifest /home/packerc/shared/zooniverse/Manifests/SER/SER_S11_4_manifest_v0.csv \
+-project_id 4996 \
+-subject_set_id 66813 \
+-password_file ~/keys/passwords.ini \
+-attribution 'University of Minnesota Lion Center + SnapshotSafari + Snapshot Serengeti + Serengeti National Park + Tanzania' \
+-license 'SnapshotSafari + Snapshot Serengeti'
