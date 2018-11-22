@@ -3,7 +3,6 @@ import time
 import csv
 import argparse
 from panoptes_client import Project, Panoptes, Subject, SubjectSet
-import pandas as pd
 from utils import read_config_file, estimate_remaining_time
 from collections import OrderedDict
 
@@ -199,7 +198,6 @@ if __name__ == "__main__":
             roll = row[col_mapper['roll']]
             site = row[col_mapper['site']]
             capture = row[col_mapper['capture']]
-            subject_id = int(subject.id)
             capture_id = '#'.join([site, roll, capture])
             manifest[capture_id] = {col_name: row[col_mapper[col_name]]
                                     for col_name in col_mapper.keys()}
