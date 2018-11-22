@@ -254,11 +254,8 @@ if __name__ == "__main__":
     # check content of existing subject set
     my_set = zoo_vars['subject_set_obj']
     uploaded_subjects = dict()
+    print("Looking for already uploaded subject_sets..")
     for i, subject in enumerate(my_set.subjects):
-        if (i % 1000) == 0:
-            print("Found %s records in existing subject set" % i,
-                  flush=True)
-
         roll = subject.metadata['#roll']
         site = subject.metadata['#site']
         capture = subject.metadata['#capture']
@@ -287,9 +284,9 @@ if __name__ == "__main__":
         # check if already uploaded
         n_current += 1
         if capture_id in uploaded_subjects:
-            manifest[capture_id]['zoosubjid'] = uploaded_subjects[capture_id]
-            manifest[capture_id]['zoosubjsetid'] = my_set.id
-            manifest[capture_id]['uploadstatus'] = 'UC'
+            manifest_row['zoosubjid'] = uploaded_subjects[capture_id]
+            manifest_row['zoosubjsetid'] = my_set.id
+            manifest_row['uploadstatus'] = 'UC'
         if manifest_row['uploadstatus'] not in cap_excl_code:
             # upload subject
             try:
@@ -304,13 +301,14 @@ if __name__ == "__main__":
         if upload_stat in upld_stat:
             upld_stat[upload_stat]['new_total'] += 1
 
-        estimate_remaining_time(t0, n_total, n_current)
+        est_remaining = estimate_remaining_time(t0, n_total, n_current)
+        print("Estimated remaining time: %s" % est_remaining)
 
     # print stats
     for us, us_val in upld_stat.iteritems():
         print("\t"+us_val['status'] + ": " + str(us_val['new_total']))
-    print(time.strftime("%H:%M:%S",time.gmtime(time.time()-t0)) + " to save/add "+str(upld_stat['UC']['change'])+" captures.")
-
+    print(time.strftime("%H:%M:%S", time.gmtime(time.time()-t0)) +
+          " to save/add "+str(upld_stat['UC']['change'])+" captures.")
 
     ########################
     # Save output Manifest
