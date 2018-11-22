@@ -195,9 +195,9 @@ if __name__ == "__main__":
         col_mapper = {x: header.index(x) for x in
                       manifest_headers}
         for i, row in enumerate(csv_reader):
-            roll = row[col_mapper['roll']]
-            site = row[col_mapper['site']]
-            capture = row[col_mapper['capture']]
+            roll = str(row[col_mapper['roll']])
+            site = str(row[col_mapper['site']])
+            capture = str(row[col_mapper['capture']])
             capture_id = '#'.join([site, roll, capture])
             manifest[capture_id] = {col_name: row[col_mapper[col_name]]
                                     for col_name in col_mapper.keys()}
@@ -256,9 +256,9 @@ if __name__ == "__main__":
     uploaded_subjects = dict()
     print("Looking for already uploaded subject_sets..")
     for i, subject in enumerate(my_set.subjects):
-        roll = subject.metadata['#roll']
-        site = subject.metadata['#site']
-        capture = subject.metadata['#capture']
+        roll = str(subject.metadata['#roll'])
+        site = str(subject.metadata['#site'])
+        capture = str(subject.metadata['#capture'])
         subject_id = int(subject.id)
 
         capture_id = '#'.join([site, roll, capture])
