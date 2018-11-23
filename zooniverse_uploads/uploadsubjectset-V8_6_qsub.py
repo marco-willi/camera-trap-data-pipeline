@@ -296,7 +296,7 @@ if __name__ == "__main__":
                     subject = create_and_upload_subject(manifest_row,
                                                         upld_vars, zoo_vars)
                     if subject is not None:
-                        subjects_to_upload.add(subject)
+                        subjects_to_upload.append(subject)
                 except Exception as e:
                     print(e)
                     print("Failed to upload subject: %s" % capture_id)
