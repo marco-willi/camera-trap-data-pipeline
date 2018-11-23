@@ -319,7 +319,7 @@ if __name__ == "__main__":
                 upld_stat[upload_stat]['new_total'] += 1
 
     # print stats
-    for us, us_val in upld_stat.iteritems():
+    for us, us_val in upld_stat.items():
         print("\t"+us_val['status'] + ": " + str(us_val['new_total']))
     print(time.strftime("%H:%M:%S", time.gmtime(time.time()-t0)) +
           " to save/add "+str(upld_stat['UC']['change'])+" captures.")
