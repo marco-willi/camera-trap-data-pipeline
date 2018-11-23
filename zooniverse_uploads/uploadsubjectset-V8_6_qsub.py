@@ -3,11 +3,11 @@ import time
 import csv
 import argparse
 from panoptes_client import Project, Panoptes, Subject, SubjectSet
-from utils import read_config_file, estimate_remaining_time
+from utils import read_config_file, estimate_remaining_time, slice_generator
 from collections import OrderedDict
 
 
-def upload_subject(capture_event, uvar, zvar):
+def create_and_upload_subject(capture_event, uvar, zvar):
     # NA-Not Applicable, IN-Invalid, NF-Not found, CR - Compression Error
     img_excl_code = ["NA", "IN", "NF", "CR"]
 
@@ -22,7 +22,7 @@ def upload_subject(capture_event, uvar, zvar):
     image_msipath_cols = [imgn for imgn in capture_cols if 'path' in imgn]
     for img_n, path_col in zip(image_anonym_cols, image_msipath_cols):
         if capture_event[img_n] not in img_excl_code:
-            print("Adding image: %s" % img_n, flush=True)
+            print("Adding image: %s" % img_n)
             subject.add_location(os.path.join(uvar['upload_dir_path'],
                                  capture_event[img_n]))
             subject.metadata[img_n] = capture_event[img_n]
@@ -43,27 +43,15 @@ def upload_subject(capture_event, uvar, zvar):
             subject.save()
             capture_event['zoosubjid'] = int(subject.id)
             print("Subject %s saved" % capture_event['zoosubjid'], flush=True)
+            return subject
         except Exception as e:
             print(e)
             capture_event['uploadstatus'] = "ERR"
-        else:
-            try:
-                zvar['subject_set_obj'].add(subject)
-                capture_event['zoosubjsetid'] = zvar['subject_set_id']
-                # Upload complete
-                capture_event['uploadstatus'] = "UC"
-                print("Subject %s added to set %s" %
-                      (capture_event['zoosubjid'], zvar['subject_set_id']),
-                      flush=True)
-            except Exception as e:
-                # try to re-connect subject set
-                print("Failed to add subject to subject set")
-                # Subject Saved but not added
-                capture_event['uploadstatus'] = "SO"
     else:
         # No valid/viable images
         capture_event['uploadstatus'] = "NVI"
         print("No viable/valid images in capture", flush=True)
+    return None
 
 
 def set_upload_vars(uplvars):
@@ -256,7 +244,7 @@ if __name__ == "__main__":
     uploaded_subjects = dict()
     print("Looking for already uploaded subject_sets..", flush=True)
     for i, subject in enumerate(my_set.subjects):
-        if (i % 500) == 0:
+        if ((i % 500) == 0) and (i > 0):
             print("Found %s subjects and continuing..." % i, flush=True)
         roll = str(subject.metadata['#roll'])
         site = str(subject.metadata['#site'])
@@ -266,7 +254,8 @@ if __name__ == "__main__":
         capture_id = '#'.join([site, roll, capture])
         uploaded_subjects[capture_id] = subject_id
 
-    print("Found %s already existing subjects" % len(uploaded_subjects.keys()))
+    print("Found %s already existing subjects" %
+          len(uploaded_subjects.keys()), flush=True)
 
     ########################
     # upload subjects
@@ -277,34 +266,57 @@ if __name__ == "__main__":
     # UC - Upload Complete
     cap_excl_code = ["NVI", "SO", "UC"]
 
-    print("\nAttempting upload...")
+    print("Starting subject upload...", flush=True)
     t0 = time.time()
 
+    # Divide upload into separate blocks of 500 subjects
     n_total = len(manifest.keys())
     n_current = 0
-    for capture_id, manifest_row in manifest.items():
-        # check if already uploaded
-        n_current += 1
-        if capture_id in uploaded_subjects:
-            manifest_row['zoosubjid'] = uploaded_subjects[capture_id]
-            manifest_row['zoosubjsetid'] = my_set.id
-            manifest_row['uploadstatus'] = 'UC'
-        if manifest_row['uploadstatus'] not in cap_excl_code:
-            # upload subject
-            try:
-                print("--------------------------------------------------")
-                print("Uploading subject: %s" % capture_id, flush=True)
-                upload_subject(manifest_row, upld_vars, zoo_vars)
-            except Exception as e:
-                print(e)
-                print("Failed to upload subject: %s" % capture_id)
-        # add stat
-        upload_stat = manifest[capture_id]['uploadstatus']
-        if upload_stat in upld_stat:
-            upld_stat[upload_stat]['new_total'] += 1
+    uploads_per_cycle = 500
+    n_blocks = max(round(n_total / uploads_per_cycle), 1)
+    capture_ids_all = list(manifest.keys())
 
-        est_remaining = estimate_remaining_time(t0, n_total, n_current)
-        print("Estimated remaining time: %s" % est_remaining)
+    # Loop over blocks
+    for start_i, end_i in slice_generator(n_total, n_blocks):
+        capture_ids = capture_ids_all[start_i: end_i]
+        subjects_to_upload = list()
+        # Loop over all subjects/captures in a block
+        for capture_id in capture_ids:
+            n_current += 1
+            manifest_row = manifest[capture_id]
+            if capture_id in uploaded_subjects:
+                manifest_row['zoosubjid'] = uploaded_subjects[capture_id]
+                manifest_row['zoosubjsetid'] = my_set.id
+                manifest_row['uploadstatus'] = 'UC'
+            if manifest_row['uploadstatus'] not in cap_excl_code:
+                # upload subject
+                try:
+                    print("--------------------------------------------------")
+                    print("Uploading subject: %s" % capture_id, flush=True)
+                    subject = create_and_upload_subject(manifest_row,
+                                                        upld_vars, zoo_vars)
+                    if subject is not None:
+                        subjects_to_upload.add(subject)
+                except Exception as e:
+                    print(e)
+                    print("Failed to upload subject: %s" % capture_id)
+
+            est_remaining = estimate_remaining_time(t0, n_total, n_current)
+            print("Estimated remaining time: %s" % est_remaining)
+
+        print("Adding subjects of block to subject_set..", flush=True)
+        zoo_vars['subject_set_obj'].add(subjects_to_upload)
+        for capture_id in capture_ids:
+            manifest_row = manifest[capture_id]
+            manifest_row['uploadstatus'] = 'UC'
+
+        print("Finished adding subjects to subject_set", flush=True)
+
+        # add stat
+        for capture_id in capture_ids:
+            upload_stat = manifest[capture_id]['uploadstatus']
+            if upload_stat in upld_stat:
+                upld_stat[upload_stat]['new_total'] += 1
 
     # print stats
     for us, us_val in upld_stat.iteritems():
