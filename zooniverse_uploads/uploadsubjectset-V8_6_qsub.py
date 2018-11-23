@@ -1,3 +1,6 @@
+""" Upload Sujects to a Subject-Set using a Manifest based on a .csv file
+    This script was made to process remaining batches of SER S11 data specifically.
+"""
 import os
 import time
 import csv
@@ -8,6 +11,9 @@ from collections import OrderedDict
 
 
 def create_and_upload_subject(capture_event, uvar, zvar):
+    """ Create a Subject and Upload it to Zooniverse
+        Returns the Subject object or None
+    """
     # NA-Not Applicable, IN-Invalid, NF-Not found, CR - Compression Error
     img_excl_code = ["NA", "IN", "NF", "CR"]
 
@@ -55,6 +61,7 @@ def create_and_upload_subject(capture_event, uvar, zvar):
 
 
 def set_upload_vars(uplvars):
+    """ Set various variables """
     uplvars['input_manifest'] = os.path.basename(uplvars['input_manifest_path'])
     uplvars['loc_code'] = uplvars['input_manifest'].split("_")[0]
     uplvars['prefix'] = uplvars['input_manifest'].rsplit("_",2)[0]
@@ -70,6 +77,7 @@ def set_upload_vars(uplvars):
 
 
 def test_upload_paths(uplvars):
+    """ Check paths """
     error = []
     for loc in [uplvars['upload_dir_path'],uplvars['upload_loc'],uplvars['manifest_loc']]:
         if os.path.isdir(loc)==False:
@@ -81,6 +89,7 @@ def test_upload_paths(uplvars):
 
 
 def test_zoo_vars(zoovars):
+    """ Connect to Zooniverse and create Subject-Set if required """
     Panoptes.connect(username=zoovars['username'], password=zoovars['password'])
     zoovars['project_id'] = int(zoovars['project_id'])
     zoovars['project_obj'] = Project.find(zoovars['project_id'])
@@ -280,6 +289,7 @@ if __name__ == "__main__":
     for start_i, end_i in slice_generator(n_total, n_blocks):
         capture_ids = capture_ids_all[start_i: end_i]
         subjects_to_upload = list()
+        capture_ids_to_upload = list()
         # Loop over all subjects/captures in a block
         for capture_id in capture_ids:
             n_current += 1
@@ -297,6 +307,7 @@ if __name__ == "__main__":
                                                         upld_vars, zoo_vars)
                     if subject is not None:
                         subjects_to_upload.append(subject)
+                        capture_ids_to_upload.append(capture_id)
                 except Exception as e:
                     print(e)
                     print("Failed to upload subject: %s" % capture_id)
@@ -306,7 +317,7 @@ if __name__ == "__main__":
 
         print("Adding subjects of block to subject_set..", flush=True)
         zoo_vars['subject_set_obj'].add(subjects_to_upload)
-        for capture_id in capture_ids:
+        for capture_id in capture_ids_to_upload:
             manifest_row = manifest[capture_id]
             manifest_row['uploadstatus'] = 'UC'
 
@@ -337,3 +348,5 @@ if __name__ == "__main__":
         for capture_id, manifest_row in manifest.items():
             line = [manifest_row[col] for col in manifest_headers]
             csv_writer.writerow(line)
+
+    print("Finished writing output to file %s" % output_file, flush=True)
