@@ -242,14 +242,14 @@ if __name__ == "__main__":
     # check content of existing subject set
     my_set = zoo_vars['subject_set_obj']
     uploaded_subjects = dict()
-    print("Looking for already uploaded subject_sets..", flush=True)
+    print("Looking for already uploaded subjects..", flush=True)
     for i, subject in enumerate(my_set.subjects):
         if ((i % 500) == 0) and (i > 0):
-            print("Found %s subjects and continuing..." % i, flush=True)
+            print("Found %s subjects and counting..." % i, flush=True)
         roll = str(subject.metadata['#roll'])
         site = str(subject.metadata['#site'])
         capture = str(subject.metadata['#capture'])
-        subject_id = int(subject.id)
+        subject_id = subject.id
 
         capture_id = '#'.join([site, roll, capture])
         uploaded_subjects[capture_id] = subject_id
@@ -285,7 +285,7 @@ if __name__ == "__main__":
             n_current += 1
             manifest_row = manifest[capture_id]
             if capture_id in uploaded_subjects:
-                manifest_row['zoosubjid'] = uploaded_subjects[capture_id]
+                manifest_row['zoosubjid'] = int(uploaded_subjects[capture_id])
                 manifest_row['zoosubjsetid'] = my_set.id
                 manifest_row['uploadstatus'] = 'UC'
             if manifest_row['uploadstatus'] not in cap_excl_code:
