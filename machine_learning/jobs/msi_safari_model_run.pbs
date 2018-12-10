@@ -8,6 +8,18 @@
 #PBS -o ${HOME}/job_ml_output_train_empty_${PBS_JOBID}.log
 #PBS -e ${HOME}/job_ml_error_train_empty_${PBS_JOBID}.log
 
+# Load Tensorflow
+module load singularity
+module load python3
+
+# download container
+cd $HOME
+singularity pull docker://tensorflow/tensorflow:1.12.0-gpu-py3
+
+# Start container
+export SINGULARITY_SHELL="/bin/bash --norc"
+singularity shell --nv -B /home/packerc/shared:/home/packerc/shared ./tensorflow-1.12.0-gpu-py3.simg
+
 # Parameters
 TIMESTAMP=`date +%Y%m%d%H%M`
 DATE=`date +%Y%m%d`
@@ -40,21 +52,8 @@ echo "LABEL_MAPPINGS: $LABEL_MAPPINGS"
 mkdir -p $RUN_OUTPUT
 mkdir -p $MODEL_SAVE
 
-# Load Tensorflow
-module load singularity
-module load python3
+cd $CODE
 
-# download container
-cd $HOME
-singularity pull docker://tensorflow/tensorflow:1.12.0-gpu-py3
-
-# Start container with interactive shell
-singularity shell --nv -B /home/packerc/shared:/home/packerc/shared ./tensorflow-1.12.0-gpu-py3.simg
-
-# Execute code
-cd ${CODE}
-
-# Train Model
 python -m camera_trap_classifier.train \
 -train_tfr_path $TFR_FILES \
 -val_tfr_path $TFR_FILES \
