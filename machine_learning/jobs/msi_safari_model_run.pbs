@@ -1,0 +1,75 @@
+#!/bin/bash -l
+#PBS -l walltime=24:00:00,nodes=1:ppn=24:gpus=2
+#PBS -j oe
+#PBS -m abe
+#PBS -M will5448@umn.edu
+#PBS -q k40
+#PBS -N train
+#PBS -o ${HOME}/job_ml_output_train_empty_${PBS_JOBID}.log
+#PBS -e ${HOME}/job_ml_error_train_empty_${PBS_JOBID}.log
+
+# Parameters
+TIMESTAMP=`date +%Y%m%d%H%M`
+DATE=`date +%Y%m%d`
+SITE=SNAPSHOT_SAFARI
+ID=run_snapshot_safari_${DATE}
+ROOT=${HOME}
+CODE=${HOME}/code/camera-trap-classifier
+RUN_OUTPUT=${ROOT}/dummy_files/run_outputs_empty_resnet18/
+MODEL_SAVE=${ROOT}/dummy_files/model_save_empty_resnet18/
+TFR_FILES_EMPTY=/home/packerc/will5448/data/tfr_files_v2/all_empty_or_not/
+TFR_FILES_SPECIES=/home/packerc/will5448/data/tfr_files_v2/all_species/
+LABEL_MAPPINGS_SPECIES=/home/packerc/will5448/data/tfr_files_v2/all_species/SER/label_mapping.json
+LABEL_MAPPINGS_EMPTY=/home/packerc/will5448/data/tfr_files_v2/all_empty_or_not/SER/label_mapping.json
+TFR_FILES=${TFR_FILES_EMPTY}
+LABEL_MAPPINGS=${LABEL_MAPPINGS_EMPTY}
+
+# Log Parameters
+echo "TIMESTAMP: $TIMESTAMP"
+echo "DATE: $DATE"
+echo "ID: $ID"
+echo "SITE: $SITE"
+echo "ROOT: $ROOT"
+echo "CODE: $CODE"
+echo "RUN_OUTPUT: $RUN_OUTPUT"
+echo "MODEL_SAVE: $MODEL_SAVE"
+echo "TFR_FILES: $TFR_FILES"
+echo "LABEL_MAPPINGS: $LABEL_MAPPINGS"
+
+# create output paths if they dont exist
+mkdir -p $RUN_OUTPUT
+mkdir -p $MODEL_SAVE
+
+# Load Tensorflow
+module load singularity
+module load python3
+
+# download container
+cd $HOME
+singularity pull docker://tensorflow/tensorflow:1.12.0-gpu-py3
+
+# Start container with interactive shell
+singularity shell --nv -B /home/packerc/shared:/home/packerc/shared ./tensorflow-1.12.0-gpu-py3.simg
+
+# Execute code
+cd ${CODE}
+
+# Train Model
+python -m camera_trap_classifier.train \
+-train_tfr_path $TFR_FILES \
+-val_tfr_path $TFR_FILES \
+-test_tfr_path $TFR_FILES \
+-class_mapping_json  $LABEL_MAPPINGS \
+-run_outputs_dir $RUN_OUTPUT \
+-model_save_dir $MODEL_SAVE \
+-model ResNet18 \
+-labels empty \
+-batch_size 256 \
+-n_cpus 24 \
+-n_gpus 2 \
+-buffer_size 512 \
+-max_epochs 70
+
+
+# -labels species count standing resting moving eating interacting babies \
+# -labels_loss_weights 1 0.2 0.2 0.2 0.2 0.2 0.2 0.2  \
