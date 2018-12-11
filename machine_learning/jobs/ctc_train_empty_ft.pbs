@@ -69,4 +69,5 @@ singularity exec --nv -B /home/packerc/shared:/home/packerc/shared ./camera-trap
   -starting_epoch 31 \
   -max_epochs 70 \
   -continue_training \
-  -model_to_load $MODEL_LOAD
+  -model_to_load $MODEL_LOAD \
+  -initial_learning_rate 0.005    
