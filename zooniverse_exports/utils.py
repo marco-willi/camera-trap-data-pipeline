@@ -72,13 +72,14 @@ class BinaryLabel(LabelType):
 
 class CountLabel(LabelType):
     """ Count Label """
-    def __init__(self, name="count", confidence=1):
+    def __init__(self, name="count", confidence=1, set_zero_to_missing=False):
         self.name = name
         self.confidence = confidence
         self.allowed_values = (
-            "0", "1", "2", "3", "4", "5", "6",
+            "", "0", "1", "2", "3", "4", "5", "6",
             "7", "8", "9",
             "10", "1150", "51")
+        self.set_zero_to_missing = set_zero_to_missing
 
     def setValue(self, value):
         if isinstance(value, list):
@@ -102,7 +103,7 @@ class CountLabel(LabelType):
 
     def _aggregateLabels(self, label_list):
         """ Aggregate list of count annotations """
-        counts_map_to_numeric = {"0": 0, "1": 1, "2": 2, "3": 3, "4": 4,
+        counts_map_to_numeric = {'': 0, "0": 0, "1": 1, "2": 2, "3": 3, "4": 4,
                                  "5": 5, "6": 6, "7": 7, "8": 8, "9": 9,
                                  "10": 10, "1150": 11, "51": 12}
 
@@ -113,7 +114,12 @@ class CountLabel(LabelType):
             counts_numerics.append(counts_map_to_numeric[count])
 
         aggregated_counts = int(median(counts_numerics))
-        return counts_map_to_string[aggregated_counts]
+        aggregated_string = counts_map_to_string[aggregated_counts]
+
+        if self.set_zero_to_missing and (aggregated_string == '0'):
+            return ''
+        else:
+            return aggregated_string
 
 
 class ClassLabel(LabelType):
@@ -160,7 +166,9 @@ class SnapshotSafariAnnotation(object):
         species_label = ClassLabel('species')
         species_label.setValue(species)
 
-        count_label = CountLabel('count')
+        is_species = (species_label.value is not 'empty')
+
+        count_label = CountLabel('count', set_zero_to_missing=is_species)
         count_label.setValue(count)
 
         moving_label = BinaryLabel('moving')
@@ -198,7 +206,9 @@ class SnapshotSafariAnnotation(object):
         species_label = ClassLabel('species', species[1])
         species_label.setValue(species[0])
 
-        count_label = CountLabel('count', count[1])
+        is_species = (species_label.value is not 'empty')
+
+        count_label = CountLabel('count', count[1], is_species)
         count_label.setValue(count[0])
 
         moving_label = BinaryLabel('moving', moving[1])
