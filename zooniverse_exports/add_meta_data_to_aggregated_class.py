@@ -186,6 +186,10 @@ if __name__ == '__main__':
         # map counts
         if record_data['count'] in label_mappings['counts_db_to_ml']:
             record_data['count'] = label_mappings['counts_db_to_ml'][record_data['count']]
+        # set records with species and count == 0 to missing
+        if (record_data['empty'] == 'species') and (record_data['count'] == '0'):
+            record_data['count'] = ''
+
         # build record
         row = [record_data[x] for x in output_header]
         final.append(row)
@@ -203,6 +207,19 @@ if __name__ == '__main__':
     for f in final:
         all_counts.append(f[3])
     print(Counter(all_counts))
+
+    # print all counts / species
+    species_counts = dict()
+    for f in final:
+        species = f[2]
+        count = f[3]
+        if species not in species_counts:
+            species_counts[species] = list()
+        species_counts[species].append(count)
+    for s, current_counts in species_counts.items():
+        print("Count Distribution: %s" % s)
+        print(Counter(current_counts))
+
 
     with open(args['output_csv'], "w", newline='') as outs:
         csv_writer = csv.writer(outs, delimiter=',')
