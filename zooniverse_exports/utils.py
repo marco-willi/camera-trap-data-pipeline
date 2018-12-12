@@ -148,6 +148,7 @@ class SnapshotSafariAnnotation(object):
     def __init__(self, user_id, time):
         self.user_id = user_id
         self.time = time
+        self.empty_class = ('empty', 'NOTHINGHERE')
 
     def __repr__(self):
         if self.labels is None:
@@ -166,7 +167,7 @@ class SnapshotSafariAnnotation(object):
         species_label = ClassLabel('species')
         species_label.setValue(species)
 
-        is_species = (species_label.value is not 'empty')
+        is_species = (species_label.value not in self.empty_class)
 
         count_label = CountLabel('count', set_zero_to_missing=is_species)
         count_label.setValue(count)
@@ -206,7 +207,7 @@ class SnapshotSafariAnnotation(object):
         species_label = ClassLabel('species', species[1])
         species_label.setValue(species[0])
 
-        is_species = (species_label.value is not 'empty')
+        is_species = (species_label.value not in self.empty_class)
 
         count_label = CountLabel('count', count[1], is_species)
         count_label.setValue(count[0])
