@@ -54,6 +54,7 @@ Before executing (most of) the code, you need to execute the follwing:
 ```
 ssh lab
 module load python3
+pip install --upgrade --user panoptes-client
 cd ~/snapshot_safari_misc
 ```
 
@@ -161,6 +162,12 @@ qsub compress_images.pbs
 ```
 
 This job can run for a long time, i.e. many hours.
+
+Finally, set the correct permissions for the directory and all the files.
+
+```
+chmod -R g+rw /home/packerc/shared/zooniverse/ToUpload/RUA/RUA_S1_Compressed
+```
 
 ### Generate Manifest
 
