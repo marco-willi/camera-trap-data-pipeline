@@ -40,6 +40,14 @@ cd ~/snapshot_safari_misc
 git pull
 ```
 
+Should there be any conflicts / issues, just delete your code and clone again. Any changes you made to the code are lost after this.
+```
+rm -r -f ~/snapshot_safari_misc
+cd
+git clone https://github.com/marco-willi/snapshot_safari_misc.git
+```
+
+
 ### Prepare Python
 
 Before executing (most of) the code, you need to execute the follwing:
