@@ -7,8 +7,11 @@ Misc Code for Snapshot Safari.
 
 ## Pre-Requisites
 
+
+### Prepare Zooniverse-Access (one-time only)
+
 For code that accesses Zooniverse via Panoptes (e.g. requires a password),
-a file with Zooniverse credentials should be stored (e.g. in ~/keys/passwords.ini). It should have the following content:
+a file with Zooniverse credentials should be stored. Default location for that file is:  "~/keys/passwords.ini". It should have the following content:
 
 ```
 [zooniverse]
@@ -16,27 +19,37 @@ username: my_username
 password: my_password
 ```
 
-Set permissions of that file by using this command:
+Set permissions of that file by using this command (remove any access rights other than yours):
 ```
 chmod 600 ~/keys/passwords.ini
 ```
+
+### Get the codes from GitHub
+
+To execute the following codes we need the most recent version of the GitHub code. We will clone the code into the our home directory. This avoids any conflicts with permissions and will create a directory 'snapshot_safari_misc' in your home directory.
+
+```
+cd
+git clone https://github.com/marco-willi/snapshot_safari_misc.git
+```
+
+If that code / directory already exists you can update it using following command:
+
+```
+cd ~/snapshot_safari_misc
+git pull
+```
+
+### Prepare Python
 
 Before executing (most of) the code, you need to execute the follwing:
 ```
 ssh lab
 module load python3
-cd /home/packerc/shared/scripts/snapshot_safari_misc
-git pull
-chmod -R g+rwx /home/packerc/shared/scripts/snapshot_safari_misc
+cd ~/snapshot_safari_misc
 ```
 
-If there are any problems with updating the code (git pull) just delete and clone it again:
-```
-rm -r -f /home/packerc/shared/scripts/snapshot_safari_misc
-cd /home/packerc/shared/scripts/
-git clone https://github.com/marco-willi/snapshot_safari_misc.git
-chmod -R g+rwx /home/packerc/shared/scripts/snapshot_safari_misc
-```
+### Execute Codes
 
 The easiest way to exectue the following codes is to copy & paste them to a text editor, change the parameters (e.g. paths) and then copy & paste that to the command line to execute them.
 
@@ -113,23 +126,29 @@ The following steps are required to upload new data to Zooniverse including mach
 
 ### Compress Images
 
-The code 'compress_images.pbs' compresses images and has to be ADAPTED in the following way (NOT EXECUTED):
+The script 'image_compression/compress_images.pbs' compresses images and has to be ADAPTED in the following way (NOT EXECUTED). You can find the script in this directory: '~/snapshot_safari_misc/image_compression/compress_images.pbs'.
 
 ```
 module load python3
 
-cd /home/packerc/shared/scripts/snapshot_safari_misc
+cd $HOME/snapshot_safari_misc
 
 python3 -m image_compression.compress_images \
 -cleaned_captures_csv /home/packerc/shared/season_captures/RUA/cleaned/RUA_S1_cleaned.csv \
--output_image_dir  /home/packerc/shared/zooniverse/ToUpload/RUA_will5448/RUA_S1_Compressed \
+-output_image_dir /home/packerc/shared/zooniverse/ToUpload/RUA/RUA_S1_Compressed \
 -root_image_path /home/packerc/shared/albums/RUA/
 ```
 
-After that we create the folders and submit the job:
+After adapting the file 'compress_images.pbs' we have to create the 'output_image_dir' as specified in the file. For the example shown above:
+
 ```
-mkdir /home/packerc/shared/zooniverse/ToUpload/RUA_will5448/RUA_S1_Compressed
-cd /home/packerc/shared/scripts/snapshot_safari_misc/image_compression
+mkdir /home/packerc/shared/zooniverse/ToUpload/RUA/RUA_S1_Compressed
+```
+
+Then we submit the job by issuing this command:
+
+```
+cd $HOME/snapshot_safari_misc/image_compression
 qsub compress_images.pbs
 ```
 
@@ -176,7 +195,7 @@ python3 -m zooniverse_uploads.create_predict_file_from_manifest \
 The following steps describe how to run the machine learning models. Note that the files 'predict_species.pbs' and 'predict_empty.pbs' have to be adapted. The files can also be copied to generate new versions for specific sites, e.g., 'predict_species_rua.pbs' which can then be run with 'qsub predict_species_rua.pbs'.
 
 ```
-cd /home/packerc/shared/scripts/snapshot_safari_misc/machine_learning
+cd $HOME/snapshot_safari_misc/machine_learning
 # ADAPT predict_species.pbs
 # ADAPT predict_empty.pbs
 
@@ -254,7 +273,7 @@ python3 -m zooniverse_uploads.merge_predictions_with_manifest \
 
 This code uploads the manifest to Zooniverse. Note that the Zooniverse credentials have to be available in '~/keys/passwords.ini' and that it is better to use the .qsub version of this code due to the long potential run-time.
 ```
-cd /home/packerc/shared/machine_learning/will5448/code/snapshot_safari_misc
+cd $HOME/snapshot_safari_misc
 python3 -m zooniverse_uploads.upload_manifest \
 -manifest /home/packerc/shared/zooniverse/Manifests/RUA/RUA_S1_manifest1.json \
 -output_file /home/packerc/shared/zooniverse/Manifests/RUA/RUA_S1_manifest2.json \
