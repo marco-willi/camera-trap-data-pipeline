@@ -5,8 +5,8 @@
 #PBS -M will5448@umn.edu
 #PBS -q k40
 #PBS -N train
-#PBS -o ${HOME}/job_ml_output_train_species_${PBS_JOBID}.log
-#PBS -e ${HOME}/job_ml_error_train_species_${PBS_JOBID}.log
+#PBS -o ${HOME}/job_ml_output_train_empty_${PBS_JOBID}.log
+#PBS -e ${HOME}/job_ml_error_train_empty_${PBS_JOBID}.log
 
 # Load Tensorflow
 module load singularity
@@ -20,12 +20,13 @@ singularity pull docker://will5448/camera-trap-classifier:latest-gpu
 TIMESTAMP=`date +%Y%m%d%H%M`
 DATE=`date +%Y%m%d`
 SITE=SNAPSHOT_SAFARI
-ID=run_snapshot_safari_${DATE}
-ROOT=${HOME}
-CODE=${HOME}/code/camera-trap-classifier
-RUN_OUTPUT=${ROOT}/dummy_files/run_outputs_empty_resnet18_ft/
-MODEL_SAVE=${ROOT}/dummy_files/model_save_empty_resnet18_ft/
-MODEL_LOAD=${ROOT}/dummy_files/run_outputs_empty_resnet18/
+MODEL_TYPE=empty_or_not
+ID=run_snapshot_safari_gs_${DATE}
+ROOT=/home/packerc/shared/machine_learning/data/runs/${SITE}/${MODEL_TYPE}
+RUN_OUTPUT=${ROOT}/run_outputs_empty_resnet18_gs/
+MODEL_SAVE=${ROOT}/model_save_empty_resnet18_gs/
+#MODEL_LOAD=${ROOT}/run_outputs_empty_resnet18/
+
 TFR_FILES_EMPTY=${HOME}/data/tfr_files_v2/all_empty_or_not/
 TFR_FILES_SPECIES=${HOME}/data/tfr_files_v2/all_species/SER/
 #LABEL_MAPPINGS_SPECIES=${HOME}/data/tfr_files/all_species/label_mapping_ser.json
@@ -41,7 +42,6 @@ echo "DATE: $DATE"
 echo "ID: $ID"
 echo "SITE: $SITE"
 echo "ROOT: $ROOT"
-echo "CODE: $CODE"
 echo "RUN_OUTPUT: $RUN_OUTPUT"
 echo "MODEL_SAVE: $MODEL_SAVE"
 echo "TFR_FILES: $TFR_FILES"
@@ -66,8 +66,6 @@ singularity exec --nv -B /home/packerc/shared:/home/packerc/shared ./camera-trap
   -n_cpus 24 \
   -n_gpus 2 \
   -buffer_size 512 \
-  -starting_epoch 31 \
+  -starting_epoch 0 \
   -max_epochs 70 \
-  -continue_training \
-  -model_to_load $MODEL_LOAD \
-  -initial_learning_rate 0.005    
+  -image_choice_for_sets grayscale_stacking

@@ -19,7 +19,7 @@ python create_dataset_inventory.py csv -path /home/packerc/will5448/data/season_
 -export_path /home/packerc/will5448/data/inventories/dataset_inventory_season_all.json \
 -capture_id_field capture_id \
 -image_fields image1 image2 image3 \
--label_fields empty species count standing resting moving eating interacting babies empty \
+-label_fields empty species count standing resting moving eating interacting babies \
 -meta_data_fields season capturetimestamp location split_name
 
 
@@ -119,7 +119,7 @@ python create_dataset.py -inventory /home/packerc/will5448/data/inventories/data
 ###############################################
 
 # Create dataset inventory RUA
-python create_dataset_inventory.py csv -path /home/packerc/will5448/data/season_exports/db_export_rua_season_1.csv \
+python -m camera_trap_classifier.create_dataset_inventory csv -path /home/packerc/shared/zooniverse/Exports/RUA/RUA_S1_export.csv \
 -export_path /home/packerc/will5448/data/inventories/dataset_inventory_rua_season_1.json \
 -capture_id_field capture_id \
 -image_fields image1 image2 image3 \
@@ -158,7 +158,7 @@ python create_dataset.py -inventory /home/packerc/will5448/data/inventories/data
 ###############################################
 
 # Create dataset inventory GRU
-python create_dataset_inventory.py csv -path /home/packerc/will5448/data/season_exports/db_export_gru_season_1.csv \
+python -m camera_trap_classifier.create_dataset_inventory csv -path /home/packerc/shared/zooniverse/Exports/GRU/GRU_S1_export.csv \
 -export_path /home/packerc/will5448/data/inventories/dataset_inventory_gru_season_1.json \
 -capture_id_field capture_id \
 -image_fields image1 image2 image3 \
@@ -203,7 +203,7 @@ module load python3
 source activate ctc
 
 # Create dataset inventory
-python create_dataset_inventory.py csv -path //home/packerc/shared/zooniverse/Exports/GON/GON_S1_export.csv \
+python -m camera_trap_classifier.create_dataset_inventory csv -path /home/packerc/shared/zooniverse/Exports/GON/GON_S1_export.csv \
 -export_path /home/packerc/will5448/data/inventories/dataset_inventory_gon_season_1.json \
 -capture_id_field capture_id \
 -image_fields image1 image2 image3 \
@@ -247,7 +247,7 @@ module load python3
 source activate ctc
 
 # Create dataset inventory
-python create_dataset_inventory.py csv -path /home/packerc/shared/zooniverse/Exports/NIA/NIA_S1_export.csv \
+python -m camera_trap_classifier.create_dataset_inventory csv -path /home/packerc/shared/zooniverse/Exports/NIA/NIA_S1_export.csv \
 -export_path /home/packerc/will5448/data/inventories/dataset_inventory_nia_season_1.json \
 -capture_id_field capture_id \
 -image_fields image1 image2 image3 \

@@ -20,15 +20,19 @@ singularity pull docker://will5448/camera-trap-classifier:latest-gpu
 TIMESTAMP=`date +%Y%m%d%H%M`
 DATE=`date +%Y%m%d`
 SITE=SNAPSHOT_SAFARI
+MODEL_TYPE=empty_or_not
 ID=run_snapshot_safari_${DATE}
-ROOT=${HOME}
-CODE=${HOME}/code/camera-trap-classifier
-RUN_OUTPUT=${ROOT}/dummy_files/run_outputs_empty_resnet18/
-MODEL_SAVE=${ROOT}/dummy_files/model_save_empty_resnet18/
-TFR_FILES_EMPTY=/home/packerc/will5448/data/tfr_files_v2/all_empty_or_not/
-TFR_FILES_SPECIES=/home/packerc/will5448/data/tfr_files_v2/all_species/
-LABEL_MAPPINGS_SPECIES=/home/packerc/will5448/data/tfr_files_v2/all_species/SER/label_mapping.json
-LABEL_MAPPINGS_EMPTY=/home/packerc/will5448/data/tfr_files_v2/all_empty_or_not/SER/label_mapping.json
+ROOT=/home/packerc/shared/machine_learning/data/runs/${SITE}/${MODEL_TYPE}
+RUN_OUTPUT=${ROOT}/run_outputs_empty_resnet18/
+MODEL_SAVE=${ROOT}/model_save_empty_resnet18/
+#MODEL_LOAD=${ROOT}/run_outputs_empty_resnet18/
+
+TFR_FILES_EMPTY=${HOME}/data/tfr_files_v2/all_empty_or_not/
+TFR_FILES_SPECIES=${HOME}/data/tfr_files_v2/all_species/SER/
+#LABEL_MAPPINGS_SPECIES=${HOME}/data/tfr_files/all_species/label_mapping_ser.json
+LABEL_MAPPINGS_SPECIES=${HOME}/data/tfr_files_v2/all_species/SER/label_mapping.json
+#LABEL_MAPPINGS_SPECIES=${HOME}/data/tfr_files_v2/all_species/label_mapping_combined.json
+LABEL_MAPPINGS_EMPTY=${HOME}/data/tfr_files_v2/all_empty_or_not/SER/label_mapping.json
 TFR_FILES=${TFR_FILES_EMPTY}
 LABEL_MAPPINGS=${LABEL_MAPPINGS_EMPTY}
 
@@ -38,7 +42,6 @@ echo "DATE: $DATE"
 echo "ID: $ID"
 echo "SITE: $SITE"
 echo "ROOT: $ROOT"
-echo "CODE: $CODE"
 echo "RUN_OUTPUT: $RUN_OUTPUT"
 echo "MODEL_SAVE: $MODEL_SAVE"
 echo "TFR_FILES: $TFR_FILES"
@@ -48,6 +51,7 @@ echo "LABEL_MAPPINGS: $LABEL_MAPPINGS"
 mkdir -p $RUN_OUTPUT
 mkdir -p $MODEL_SAVE
 
+# run the script
 singularity exec --nv -B /home/packerc/shared:/home/packerc/shared ./camera-trap-classifier-latest-gpu.simg \
   ctc.train \
   -train_tfr_path $TFR_FILES \
@@ -62,8 +66,5 @@ singularity exec --nv -B /home/packerc/shared:/home/packerc/shared ./camera-trap
   -n_cpus 24 \
   -n_gpus 2 \
   -buffer_size 512 \
+  -starting_epoch 0 \
   -max_epochs 70
-
-
-# -labels species count standing resting moving eating interacting babies \
-# -labels_loss_weights 1 0.2 0.2 0.2 0.2 0.2 0.2 0.2  \
