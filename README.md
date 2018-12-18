@@ -157,6 +157,7 @@ mkdir /home/packerc/shared/zooniverse/ToUpload/RUA/RUA_S1_Compressed
 Then we submit the job by issuing this command:
 
 ```
+ssh mesabi
 cd $HOME/snapshot_safari_misc/image_compression
 qsub compress_images.pbs
 ```
