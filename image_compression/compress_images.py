@@ -136,13 +136,6 @@ def process_images_multiprocess(
     return status_messages
 
 
-# For testing
-# args = dict()
-# args['cleaned_captures_csv'] = "D:\\Studium_GD\\Zooniverse\\SnapshotSafari\\data\\season_captures\\RUA\\cleaned\\RUA_S1_cleaned.csv"
-# args['csv_quotechar'] = '"'
-# args['output_image_dir'] = "/home/packerc/shared/zooniverse/ToUpload/RUA/Compressed_S1/"
-# args['root_image_path'] = '/home/packerc/shared/albums/SER/'
-
 if __name__ == "__main__":
 
     # Parse command line arguments
@@ -193,13 +186,25 @@ if __name__ == "__main__":
 
     # Define source and destination paths for all images
     images = OrderedDict()
+    n_duplicates = 0
     for img in cleaned_captures:
         img_name = img[name_to_id_mapper['imname']]
         img_path = img[name_to_id_mapper['path']]
+
+        # check for duplicates and print message
+        if img_name in images:
+            n_duplicates += 1
+            print("WARNING: duplicate 'imname' found: %s" % img_name)
+
         images[img_name] = {
             'source': os.path.join(args['root_image_path'], img_path),
             'dest': os.path.join(args['output_image_dir'], img_name)
             }
+
+    # print duplicate stat
+    if n_duplicates > 0:
+        print("WARNING: Found %s duplicated entries for 'imname'" %
+              n_duplicates)
 
     # Remove already processed files
     files_in_dest = os.listdir(args['output_image_dir'])
