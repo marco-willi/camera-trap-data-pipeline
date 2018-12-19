@@ -12,13 +12,12 @@ from utils import read_config_file, estimate_remaining_time, slice_generator
 
 # # For Testing
 # args = dict()
-# args['manifest'] = "/home/packerc/shared/zooniverse/Manifests/RUA/RUA_S1_manifest1.json"
-# args['output_file'] = "/home/packerc/shared/zooniverse/Manifests/RUA/RUA_S1_manifest2_TEST.json"
-# args['project_id'] = 5155
-# args['subject_set_id'] = '40557'
-# args['subject_set_name'] = 'RUA_S1_machine_learning_TEST'
+# args['manifest'] = "/home/packerc/shared/zooniverse/Manifests/KAR/KAR_S1_manifest1.json"
+# args['output_file'] = "/home/packerc/shared/zooniverse/Manifests/KAR/KAR_S1_manifest2.json"
+# args['project_id'] = 7679
+# #args['subject_set_id'] = '40557'
+# args['subject_set_name'] = 'KAR_S1_TEST_v2'
 # args['password_file'] = '~/keys/passwords.ini'
-# # 40557
 
 
 def add_subject_data_to_manifest(subject_set, subject, data):
@@ -174,11 +173,10 @@ if __name__ == "__main__":
             if not data['info']['uploaded']:
                 try:
                     subject = create_subject(my_project, capture_id, data)
-                    subjects_to_upload.append(subject)
-                    # add information to manifes
+                    # add information to manifest
                     add_subject_data_to_manifest(my_set, subject, data)
                     # add subject to subject set list to upload later
-                    subjects_to_upload.add(subject)
+                    subjects_to_upload.append(subject)
                 except:
                     print("Failed to save subject %s" % capture_id)
             counter += 1
