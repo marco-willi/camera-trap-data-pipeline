@@ -131,7 +131,7 @@ python3 -m zooniverse_exports.add_meta_data_to_aggregated_class \
 
 ## Upload new Data to Zooniverse
 
-The following steps are required to upload new data to Zooniverse including machine learning scores. The following codes show an example for processing RUA data.
+The following steps are required to upload new data to Zooniverse including machine learning scores. The following codes show an example for processing RUA data. If no machine learning scores are required one can skip to 'Upload Manifest' after 'Compress Images'.
 
 ### Compress Images
 
@@ -184,112 +184,80 @@ python3 -m zooniverse_uploads.generate_manifest \
 -license 'SnapshotSafari + Ruaha Carnivore Project'
 ```
 
+### Create Prediction Input File for Machine Lerning Model
 
-### OPTIONAL (hack) - Remove specific capture events from the manifest
-
-This code is only required if data has already been uploaded using the old process in order to remove already uploaded capture events.
-
-```
-python3 -m zooniverse_uploads.remove_records_from_manifest \
--manifest /home/packerc/shared/zooniverse/Manifests/RUA/RUA_S1_manifest.json \
--old_manifest_to_remove /home/packerc/shared/zooniverse/Manifests/RUA/RUA_S1_A1_manifest_v1 \
--season RUA_S1
-```
-
-### Create Prediction Info File for Machine Lerning Model
-
-This code creates a 'prediction file' that is the input to the model for classifying the images.
+This code creates a 'prediction file' that has the correct format for the machine learning models for classifying the images in the manifest.
 
 ```
 python3 -m zooniverse_uploads.create_predict_file_from_manifest \
 -manifest /home/packerc/shared/zooniverse/Manifests/RUA/RUA_S1_manifest.json \
--prediction_file /home/packerc/shared/machine_learning/data/info_files/RUA/RUA_S1/RUA_S1_manifest.csv
+-prediction_file /home/packerc/shared/zooniverse/Manifests/RUA/RUA_S1_machine_learning_input.csv
 ```
 
 ### Generate new Predictions
 
-The following steps describe how to run the machine learning models. Note that the files 'predict_species.pbs' and 'predict_empty.pbs' have to be adapted. The files can also be copied to generate new versions for specific sites, e.g., 'predict_species_rua.pbs' which can then be run with 'qsub predict_species_rua.pbs'.
+The following steps describe how to run the machine learning models. Note that the files 'ctc_predict_species.pbs' and 'ctc_predict_empty.pbs' have to be adapted. The predictions process is split into two parts: predict the presence of an animal (empty or not) and predict the animal species. Both of the following scripts can be run in parallel. The scripts process approximately 300 capture events / minute on a CPU queue so it can take several hours for large manifests to process.
 
+#### Generating 'Empty or Not' Predictions
+
+The following file needs to be adapted:
 ```
-cd $HOME/snapshot_safari_misc/machine_learning
-# ADAPT predict_species.pbs
-# ADAPT predict_empty.pbs
-
+$HOME/snapshot_safari_misc/machine_learning/jobs/ctc_predict_empty.pbs
+```
+Adapt the following parameters:
+```
+SITE=RUA
+SEASON=RUA_S1
+```
+After that we can run the script using this command:
+```
 ssh mesabi
-qsub predict_species.pbs
-qsub predict_empty.pbs
+cd $HOME/snapshot_safari_misc/machine_learning/jobs
+qsub ctc_predict_empty.pbs
 ```
 
-#### Example: Adapting parameters in .pbs files for RUA
+#### Generating 'Species' Predictions
 
-The following examples show some parameters that can be adapted to apply the original Snapshot Serengeti model on data from Ruaha (RUA) season 1. Parameters that are not shown but are in the .pbs file don't generally need to be adapted. The most important parameters are 'SITE' and 'SEASON', as well as 'DATA_INFO' (the prediction_file from the previous step) which are used to define the data the model needs to classify. The paramters 'MODEL' and 'MODEL_NAME' refer to the model, e.g., 'SER' refers to the standard Snapshot Serengeti model.
-
-Parameters in 'predict_empty.pbs':
+The following file needs to be adapted:
 ```
-# Parameters
+$HOME/snapshot_safari_misc/machine_learning/jobs/ctc_predict_species.pbs
+```
+Adapt the following parameters:
+```
 SITE=RUA
 SEASON=RUA_S1
-MODEL=SER
-MODEL_NAME=phase1
-ROOT=/home/packerc/shared/machine_learning/
-CODE=${ROOT}code/deep_learning_for_camera_trap_images/phase1
-LOG_DIR=${ROOT}data/models/${MODEL}/empty_or_not/${MODEL_NAME}/
-PREDICTIONS=${ROOT}data/predictions/empty_or_not/${SITE}/${SEASON}/predictions_${ID}.json
-IMAGES_ROOT=/home/packerc/shared/albums/${SITE}/
-DATA_INFO=${ROOT}data/info_files/${SITE}/${SEASON}/${SEASON}_manifest.csv
+```
+After that we can run the script using this command:
+```
+ssh mesabi
+cd $HOME/snapshot_safari_misc/machine_learning/jobs
+qsub ctc_predict_species.pbs
 ```
 
-Parameters in 'predict_species.pbs':
-```
-# Parameters
-SITE=RUA
-SEASON=RUA_S1
-MODEL=SER
-MODEL_NAME=phase2
-NUMCLASS=48
-ROOT=/home/packerc/shared/machine_learning/
-CODE=${ROOT}code/deep_learning_for_camera_trap_images/phase2
-LOG_DIR=${ROOT}data/models/${MODEL}/species/${MODEL_NAME}/
-PREDICTIONS=${ROOT}data/predictions/species/${SITE}/${SEASON}/predictions_${ID}.json
-IMAGES_ROOT=/home/packerc/shared/albums/${SITE}/
-DATA_INFO=${ROOT}data/info_files/${SITE}/${SEASON}/${SEASON}_manifest.csv
-```
-
-
-Additionally, adapt the mail address in the .pbs files to get alerts by mail:
-```
-#PBS -M will5448@umn.edu
-```
-
-
-### Aggregte Predictions
-
-This code aggregates the individual image classifications on capture event level.
-
-```
-python3 -m zooniverse_uploads.import_and_aggregate_predictions \
--manifest /home/packerc/shared/zooniverse/Manifests/RUA/RUA_S1_manifest.json \
--empty_predictions /home/packerc/shared/machine_learning/data/predictions/empty_or_not/RUA/RUA_S1/predictions_run_manifest_20180628.json \
--species_predictions /home/packerc/shared/machine_learning/data/predictions/species/RUA/RUA_S1/predictions_run_manifest_20180628.json \
--output_file /home/packerc/shared/zooniverse/Manifests/RUA/RUA_S1_preds_aggregated.json
-```
-
-### Merge Predictions into Manifest
+#### Merge Predictions into Manifest
 
 This code merges the aggregated predictions into the manifest.
 
 ```
+cd $HOME/snapshot_safari_misc
 python3 -m zooniverse_uploads.merge_predictions_with_manifest \
 -manifest /home/packerc/shared/zooniverse/Manifests/RUA/RUA_S1_manifest.json \
--predictions /home/packerc/shared/zooniverse/Manifests/RUA/RUA_S1_preds_aggregated.json \
+-predictions_empty /home/packerc/shared/zooniverse/Manifests/RUA/RUA_S1_predictions_empty_or_not.json \
+-predictions_species /home/packerc/shared/zooniverse/Manifests/RUA/RUA_S1_predictions_species.json \
 -output_file /home/packerc/shared/zooniverse/Manifests/RUA/RUA_S1_manifest1.json
 ```
 
 ### Upload Manifest
 
-This code uploads the manifest to Zooniverse. Note that the Zooniverse credentials have to be available in '~/keys/passwords.ini' and that it is better to use the .qsub version of this code due to the long potential run-time.
+This code uploads the manifest to Zooniverse. Note that the Zooniverse credentials have to be available in '~/keys/passwords.ini' and that it is better to use the .qsub version of this code due to the (very!) long potential run-time. Make sure that your account has enough allowance on how many subjects can be uploaded to Zooniverse.
+
+Adapt the following file:
 ```
-cd $HOME/snapshot_safari_misc
+$HOME/snapshot_safari_misc/zooniverse_uploads/upload_manifest.pbs
+```
+
+Change the paths analogue to this example:
+```
 python3 -m zooniverse_uploads.upload_manifest \
 -manifest /home/packerc/shared/zooniverse/Manifests/RUA/RUA_S1_manifest1.json \
 -output_file /home/packerc/shared/zooniverse/Manifests/RUA/RUA_S1_manifest2.json \
@@ -298,4 +266,41 @@ python3 -m zooniverse_uploads.upload_manifest \
 -password_file ~/keys/passwords.ini
 ```
 
+To submit the job use the following command:
+
+```
+ssh lab
+cd $HOME/snapshot_safari_misc/zooniverse_uploads/
+qsub upload_manifest.pbs
+```
+
 This code can run for a long time, i.e. multiple days.
+
+
+#### In case of a failure
+
+If the upload fails (which can happen if the connection to Zooniverse crashes) you can add the missing subjects to the already (partially) uploaded set by specifying the SUBJECT_SET_ID of the already created set. DO NOT specify the parameter '-subject_set_name', instead use '-subject_set_id' and use the id on the 'Subject Sets' page after clicking on the name of the set of your project on Zooniverse.
+
+
+Adapt the following file:
+```
+$HOME/snapshot_safari_misc/zooniverse_uploads/upload_manifest.pbs
+```
+
+Change the paths analogue to this example:
+```
+python3 -m zooniverse_uploads.upload_manifest \
+-manifest /home/packerc/shared/zooniverse/Manifests/RUA/RUA_S1_manifest1.json \
+-output_file /home/packerc/shared/zooniverse/Manifests/RUA/RUA_S1_manifest2.json \
+-project_id 5155 \
+-subject_set_id 7845 \
+-password_file ~/keys/passwords.ini
+```
+
+To submit the job use the following command:
+
+```
+ssh lab
+cd $HOME/snapshot_safari_misc/zooniverse_uploads/
+qsub upload_manifest.pbs
+```

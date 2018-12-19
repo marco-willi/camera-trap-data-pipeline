@@ -1,4 +1,7 @@
-""" Create a Manifest """
+""" Create a Manifest
+    - File that contains all information about capture-events for uploading
+      to Zooniverse
+"""
 import csv
 import json
 import os
@@ -142,12 +145,5 @@ if __name__ == "__main__":
                 json.dump(values, outfile)
         outfile.write('}')
 
-# with open(manifest_path, 'r') as f:
-#     mani = json.load(f)
-
-# Read the Manifest
-# mani = OrderedDict()
-# with open(manifest_path, 'r') as f:
-#     for line in f:
-#         dict_entry = json.loads(line)
-#         mani.update(dict_entry)
+    # change permmissions to read/write for group
+    os.chmod(manifest_path, 0o660)

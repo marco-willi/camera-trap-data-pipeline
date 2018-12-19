@@ -1,21 +1,16 @@
 """ Create a Prediction File from a Manifest for a Model to
     Generate Predictions
-
-    Arguments:
-    ----------
-    manifest: Path to a manifest (.json)
-    prediction_file: Path to the new file that is generated for calculating
-        predictions(.csv)
 """
 import json
 import os
+import csv
 import argparse
 
-# For Testing
+#For Testing
 # args = dict()
-# args['manifest'] = "/home/packerc/shared/zooniverse/Manifests/RUA/RUA_S1_manifest.json"
-# args['prediction_file'] = "/home/packerc/shared/machine_learning/data/info_files/RUA/RUA_S1/RUA_S1_new.csv"
-
+# args['manifest'] = "/home/packerc/shared/zooniverse/Manifests/KAR/KAR_S1_manifest.json"
+# args['prediction_file'] = "/home/packerc/shared/zooniverse/Manifests/KAR/KAR_S1_machine_learning_input.csv"
+# args['max_images_per_capture'] = 3
 
 if __name__ == "__main__":
 
@@ -27,6 +22,9 @@ if __name__ == "__main__":
     parser.add_argument(
         "-prediction_file", type=str, required=True,
         help="Output file for the model to create predictions for (.csv)")
+    parser.add_argument(
+        "-max_images_per_capture", type=int, default=3,
+        help="The maximum number of images per capture event (default 3)")
 
     args = vars(parser.parse_args())
 
@@ -51,9 +49,21 @@ if __name__ == "__main__":
     print("Found %s capture events in %s" %
           (len(manifest.keys()), args['manifest']))
 
-    # Extract all image paths and store them to disk
-    with open(args['prediction_file'], "w", newline='') as f:
-        print("Writing file to %s" % args['prediction_file'])
+    print("Writing file to %s" % args['prediction_file'])
+    with open(args['prediction_file'], 'w') as csvfile:
+        csvwriter = csv.writer(csvfile, delimiter=',')
+        # write header
+        n_images = args['max_images_per_capture']
+        image_cols = ['image%s' % x for x in range(1,  n_images + 1)]
+        header = ['capture_id'] + image_cols
+        csvwriter.writerow(header)
+        # Write each capture event and the associated images
         for capture_id, mani_data in manifest.items():
-            for image in mani_data['images']['original_images']:
-                f.write(image + '\n')
+            row_to_write = [capture_id]
+            images_to_write = ['' for i in range(0, n_images)]
+            for i, image in enumerate(mani_data['images']['original_images']):
+                images_to_write[i] = image
+            row_to_write += images_to_write
+            csvwriter.writerow(row_to_write)
+
+    os.chmod(args['prediction_file'], 0o660)

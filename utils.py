@@ -40,6 +40,17 @@ def write_first_nrows_of_csv_to_csv(input_file, output_file, n_rows):
             outs.write(line)
 
 
+def open_file_with_rw_permissions(file):
+    """ Open a file with rw permissions on group level """
+    umask_original = os.umask(0o117)
+    try:
+        flags = os.O_WRONLY | os.O_CREAT
+        fdesc = os.open(file, flags, 0o770)
+    finally:
+        os.umask(umask_original)
+    return fdesc
+
+
 def correct_image_name(name):
     """ change image name
     OLD: S1/G12/G12_R1/PICT3981.JPG

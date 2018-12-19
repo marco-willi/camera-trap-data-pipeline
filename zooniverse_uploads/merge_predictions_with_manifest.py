@@ -1,4 +1,4 @@
-""" Integrate Aggregated Predictions with Manifest """
+""" Integrate Aggregated Predictions into Manifest """
 import json
 import os
 import argparse
