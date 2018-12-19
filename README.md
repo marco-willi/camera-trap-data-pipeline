@@ -131,7 +131,7 @@ python3 -m zooniverse_exports.add_meta_data_to_aggregated_class \
 
 ## Upload new Data to Zooniverse
 
-The following steps are required to upload new data to Zooniverse including machine learning scores. The following codes show an example for processing RUA data. If no machine learning scores are required one can skip to 'Upload Manifest' after 'Compress Images'.
+The following steps are required to upload new data to Zooniverse including machine learning scores. The following codes show an example for processing RUA data. If no machine learning scores are required one can skip to 'Upload Manifest' after 'Compress Images'. Some (partial) examples can be found here: [zooniverse_uploads/commands.sh](zooniverse_uploads/commands.sh).
 
 ### Compress Images
 
@@ -245,6 +245,13 @@ python3 -m zooniverse_uploads.merge_predictions_with_manifest \
 -predictions_empty /home/packerc/shared/zooniverse/Manifests/RUA/RUA_S1_predictions_empty_or_not.json \
 -predictions_species /home/packerc/shared/zooniverse/Manifests/RUA/RUA_S1_predictions_species.json \
 -output_file /home/packerc/shared/zooniverse/Manifests/RUA/RUA_S1_manifest1.json
+```
+
+Note: If the script is 'killed' the most likely reason is memory usage. In that case use this command to launch a session with more memory and try again:
+
+```
+qsub -I -l walltime=01:00:00,nodes=1:ppn=4,mem=16gb
+module load python3
 ```
 
 ### Upload Manifest
