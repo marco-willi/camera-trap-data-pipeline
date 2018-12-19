@@ -18,7 +18,7 @@ IMAGES_ROOT=/home/packerc/shared/albums/${SITE}/
 OUTPUT_PATH=${MANIFEST_ROOT_DIR}${SITE}/${SEASON}_predictions_species.json
 
 MODEL_ROOT_PATH=/home/packerc/shared/machine_learning/data/models/SNAPSHOT_SAFARI/species/
-MODEL_NAME=run_outputs_species_no_weights_resnet18
+MODEL_NAME=model_save_species_no_weights_resnet18
 MODEL_PATH=${MODEL_ROOT_PATH}${MODEL_NAME}/model_best.hdf5
 MODEL_CLASS_MAPPING=${MODEL_ROOT_PATH}${MODEL_NAME}/label_mappings.json
 MODEL_PRE_PROCESSING=${MODEL_ROOT_PATH}${MODEL_NAME}/image_processing.json
