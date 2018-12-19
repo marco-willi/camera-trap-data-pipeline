@@ -190,7 +190,7 @@ if __name__ == "__main__":
                 st = datetime.datetime.fromtimestamp(ts).strftime('%H:%M:%S')
                 msg = "Completed %s/%s (%s %%) - Current Time: %s - \
                        Estimated Time Remaining: %s" % \
-                      (counter, n_tot, 100 * round(counter/n_tot, 2), st, tr)
+                      (counter, n_tot, round((counter/n_tot) * 100, 2), st, tr)
                 print(textwrap.shorten(msg, width=99), flush=True)
 
         # link the current block of subjects to the subjec set
