@@ -206,3 +206,6 @@ if __name__ == "__main__":
                 outfile.write('"%s":' % _id)
                 json.dump(values, outfile)
         outfile.write('}')
+
+    # change permmissions to read/write for group
+    os.chmod(args['output_file'], 0o660)
