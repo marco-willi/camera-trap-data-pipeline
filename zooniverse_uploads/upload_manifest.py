@@ -5,6 +5,7 @@ import argparse
 import time
 import datetime
 import hashlib
+import traceback
 import textwrap
 
 from panoptes_client import Project, Panoptes, SubjectSet, Subject
@@ -37,7 +38,6 @@ def create_subject(project, capture_id, data):
     """ Create a specific subject
         Args:
         - project: a Project() object defining the Zooniverse project
-        - subject_set: a SubjectSet() object
         - capture_id: a str defining the capture id
         - data: a dictionary containing all info to upload
     """
@@ -169,8 +169,12 @@ if __name__ == "__main__":
     n_blocks = max(round(n_tot / uploads_per_cycle), 1)
 
     # Loop over blocks
-    for start_i, end_i in slice_generator(n_tot, n_blocks):
+    slices = slice_generator(n_tot, n_blocks)
+    for block_nr, (start_i, end_i) in enumerate(slices):
         subjects_to_upload = list()
+        print("Starting to process batch %s/%s" % (block_nr + 1, n_blocks),
+              flush=True)
+        n_failed = 0
         for capture_id in capture_ids_all[start_i:end_i]:
             data = mani[capture_id]
             # upload if not already uploaded
@@ -182,7 +186,9 @@ if __name__ == "__main__":
                     # add subject to subject set list to upload later
                     subjects_to_upload.append(subject)
                 except:
+                    traceback.print_exc()
                     print("Failed to save subject %s" % capture_id)
+                    n_failed += 1
             counter += 1
             if (counter % 500) == 0:
                 ts = time.time()
@@ -194,7 +200,13 @@ if __name__ == "__main__":
                 print(textwrap.shorten(msg, width=99), flush=True)
 
         # link the current block of subjects to the subjec set
+        n_to_upload = len(subjects_to_upload)
+        print("Number of subjects failed to save in batch: %s" % n_failed)
+        print("Adding %s subjects of batch to subject_set" % n_to_upload,
+              flush=True)
         my_set.add(subjects_to_upload)
+        print("Finished processing batch %s/%s" % (block_nr + 1, n_blocks),
+              flush=True)
 
     # Export Manifest
     with open(args['output_file'], 'w') as outfile:
