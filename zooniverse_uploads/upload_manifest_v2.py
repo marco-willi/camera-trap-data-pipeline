@@ -169,6 +169,7 @@ if __name__ == "__main__":
     for start_i, end_i in slice_generator(n_tot, n_blocks):
         subjects_to_upload = list()
         for capture_id in capture_ids_all[start_i:end_i]:
+            data = mani[capture_id]
             # upload if not already uploaded
             if not data['info']['uploaded']:
                 try:
