@@ -4,8 +4,8 @@
 #PBS -m abe
 #PBS -q small
 #PBS -N predict_species
-#PBS -o ${HOME}/job_ml_output_pred_empty_${PBS_JOBID}.log
-#PBS -e ${HOME}/job_ml_error_pred_empty_${PBS_JOBID}.log
+#PBS -o ${HOME}/job_ml_output_pred_species_${PBS_JOBID}.log
+#PBS -e ${HOME}/job_ml_error_pred_species_${PBS_JOBID}.log
 
 # Parameters To Adapt
 SITE=KAR
