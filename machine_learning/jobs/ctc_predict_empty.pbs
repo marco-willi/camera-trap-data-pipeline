@@ -19,7 +19,7 @@ OUTPUT_PATH=${MANIFEST_ROOT_DIR}${SITE}/${SEASON}_predictions_empty_or_not.json
 
 MODEL_ROOT_PATH=/home/packerc/shared/machine_learning/data/models/SNAPSHOT_SAFARI/empty_or_not/
 MODEL_NAME=model_save_empty_resnet18
-MODEL_PATH=${MODEL_ROOT_PATH}${MODEL_NAME}/model_best.hdf5
+MODEL_PATH=${MODEL_ROOT_PATH}${MODEL_NAME}/best_model.hdf5
 MODEL_CLASS_MAPPING=${MODEL_ROOT_PATH}${MODEL_NAME}/label_mappings.json
 MODEL_PRE_PROCESSING=${MODEL_ROOT_PATH}${MODEL_NAME}/image_processing.json
 
