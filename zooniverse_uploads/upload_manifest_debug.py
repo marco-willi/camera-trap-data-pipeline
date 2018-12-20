@@ -36,7 +36,7 @@ def add_subject_data_to_manifest(subject_set, subject, data):
     data['info']['anonymized_capture_id'] = subject.metadata['capture_id']
 
 
-def create_subject(project, capture_id, data):
+def create_subject(project, capture_id, data, debug):
     """ Create a specific subject
         Args:
         - project: a Project() object defining the Zooniverse project
@@ -50,12 +50,14 @@ def create_subject(project, capture_id, data):
     subject = Subject()
     subject.links.project = my_project
     # add images
-    print("adding locations for %s - %s" % (capture_id, current_time_str()),
-          flush=True)
+    if debug:
+        print("adding locations for %s - %s" %
+              (capture_id, current_time_str()), flush=True)
     for image in images:
         subject.add_location(image)
-    print("finished locations for %s - %s" % (capture_id, current_time_str()),
-          flush=True)
+    if debug:
+        print("finished locations for %s - %s" %
+              (capture_id, current_time_str()), flush=True)
     # original images
     original_images = data['images']['original_images']
     # add metadata
@@ -65,10 +67,12 @@ def create_subject(project, capture_id, data):
     # add anonymized id to easily find and map images on
     # the zooniverse interface in the database
     subject.metadata['capture_id'] = anonymized_capture_id
-    print("saving %s - %s" % (capture_id, current_time_str()), flush=True)
+    if debug:
+        print("saving %s - %s" % (capture_id, current_time_str()), flush=True)
     subject.save()
-    print("finished saving %s - %s" % (capture_id, current_time_str()),
-          flush=True)
+    if debug:
+        print("finished saving %s - %s" %
+              (capture_id, current_time_str()), flush=True)
     return subject
 
 
@@ -104,6 +108,10 @@ if __name__ == "__main__":
               [zooniverse]\
               username: dummy\
               password: 1234")
+
+    parser.add_argument(
+        "-debug_mode", action='store_true',
+        help="Activate debug mode which will print more status messages.")
 
     args = vars(parser.parse_args())
 
@@ -144,11 +152,11 @@ if __name__ == "__main__":
               flush=True)
         # find already uploaded subjects
         n_already_uploaded = 0
-        for i, subject in enumerate(my_set.subjects):
+        for subject in my_set.subjects:
             n_already_uploaded += 1
-            if (i % 1000) == 0:
-                print("Found %s uploaded records and counting..." % i,
-                      flush=True)
+            if (n_already_uploaded % 100) == 0:
+                print("Found %s uploaded records and counting..." %
+                      n_already_uploaded, flush=True)
             roll = subject.metadata['#roll']
             site = subject.metadata['#site']
             capture = subject.metadata['#capture']
@@ -189,11 +197,14 @@ if __name__ == "__main__":
             # upload if not already uploaded
             if not data['info']['uploaded']:
                 try:
-                    print("creating %s - %s" % (capture_id, current_time_str()),
-                          flush=True)
-                    subject = create_subject(my_project, capture_id, data)
-                    print("finished %s - %s" % (capture_id, current_time_str()),
-                          flush=True)
+                    if args['debug_mode']:
+                        print("creating %s - %s" %
+                              (capture_id, current_time_str()), flush=True)
+                    subject = create_subject(my_project, capture_id,
+                                             data, args['debug_mode'])
+                    if args['debug_mode']:
+                        print("finished %s - %s" %
+                              (capture_id, current_time_str()), flush=True)
                     # add information to manifest
                     add_subject_data_to_manifest(my_set, subject, data)
                     # add subject to subject set list to upload later

@@ -1,5 +1,5 @@
 #!/bin/bash -l
-#PBS -l walltime=120:00:00,nodes=1:ppn=16
+#PBS -l walltime=120:00:00,nodes=1:ppn=4
 #PBS -j oe
 #PBS -q lab-long
 #PBS -N upload_manifest
