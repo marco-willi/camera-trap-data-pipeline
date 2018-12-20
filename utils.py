@@ -2,6 +2,7 @@
 import sys
 import os
 import time
+import datetime
 from hashlib import md5
 import configparser
 
@@ -25,6 +26,12 @@ def estimate_remaining_time(start_time, n_total, n_current):
     avg_time_per_record = time_elapsed / (n_current + 1)
     estimated_time = n_remaining * avg_time_per_record
     return time.strftime("%H:%M:%S", time.gmtime(estimated_time))
+
+
+def current_time_str():
+    """ Return current time as formatted string """
+    st = datetime.datetime.fromtimestamp(time.time()).strftime('%H:%M:%S')
+    return st
 
 
 def write_first_nrows_of_csv_to_csv(input_file, output_file, n_rows):
