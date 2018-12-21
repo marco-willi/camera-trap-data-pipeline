@@ -130,7 +130,7 @@ if __name__ == "__main__":
     print("Found %s capture ids that were uploaded more than once" %
           n_captures_with_dups, flush=True)
 
-    if args['remove_duplicates'] and False:
+    if args['remove_duplicates']:
         n_dups = len(duplicated_subject_ids)
         print("Found %s subjects to unlink" % n_dups, flush=True)
         for subject_id_to_remove in duplicated_subject_ids:
@@ -138,14 +138,14 @@ if __name__ == "__main__":
         subjects_to_remove_list = list(duplicated_subject_ids)
         print("REMOVING ALL DUPLICATES NOW", flush=True)
         try:
-            my_set.remove(subjects_to_remove_list)
+            # my_set.remove(subjects_to_remove_list)
             print("FINISHED REMOVING ALL DUPLICATES", flush=True)
         except:
             print("FAILED TO REMOVE DUPLICATES AT ONCE", flush=True)
             print("TRYING AGAIN ONE-BY-ONE", flush=True)
             for subject_id_to_remove in subjects_to_remove_list:
                 try:
-                    my_set.remove(subject_id_to_remove)
+                    #my_set.remove(subject_id_to_remove)
                     print("removed subject: %s" %
                           subject_id_to_remove, flush=True)
                 except:
