@@ -17,7 +17,7 @@ from utils import read_config_file
 
 
 # python3 -m zooniverse_uploads.find_duplicates \
-# -output_file ${HOME}/duplicates_test.csv \
+# -output_file ${HOME}/duplicates_test2.csv \
 # -project_id 5880 \
 # -subject_set_id 71542 \
 # -password_file ~/keys/passwords.ini \
@@ -33,9 +33,8 @@ if __name__ == "__main__":
         help="Zooniverse project id")
 
     parser.add_argument(
-        "-subject_set_id", type=str, required=False, default='',
-        help="Zooniverse subject set id. Specify if you want to add subjects\
-              to an existing set (useful if upload crashed)")
+        "-subject_set_id", type=str, required=True,
+        help="Zooniverse subject set id.")
 
     parser.add_argument(
         "-password_file", type=str, required=True,
@@ -68,49 +67,76 @@ if __name__ == "__main__":
     # Get Project
     my_project = Project(args['project_id'])
 
-    # Get or Create a subject set
-    # Get a subject set
+    # Get the  subject set
     my_set = SubjectSet().find(args['subject_set_id'])
     print("Subject set found, looking for already uploaded subjects",
           flush=True)
-    # find already uploaded subjects
-    ids_uploaded = dict()
+    # store stats about capture_ids
+    capture_ids_uploaded = dict()
+
+    # total uploaded records (including duplicates)
     n_already_uploaded = 0
+
+    # store subject_ids which are duplicates and thus can be deleted
     duplicated_subject_ids = set()
+
+    # Loop over all subjects in the set
     for subject in my_set.subjects:
+
+        # Count number of uploads
         n_already_uploaded += 1
         if (n_already_uploaded % 100) == 0:
             print("Found %s uploaded records and counting..." %
                   n_already_uploaded, flush=True)
+
+        # Extract info from current subject
         roll = subject.metadata['#roll']
         site = subject.metadata['#site']
         capture = subject.metadata['#capture']
         season = subject.metadata['#season']
         capture_id = '#'.join([season, site, roll, capture])
         subject_id = subject.id
-        if capture_id not in ids_uploaded:
-            ids_uploaded[capture_id] = 0
+
+        # Check if duplicate
+        if capture_id not in capture_ids_uploaded:
+            capture_ids_uploaded[capture_id] = 0
         else:
+            # if it already exists it must be a duplicate
             duplicated_subject_ids.add(subject_id)
-            n_already_found = ids_uploaded[capture_id]
-            print("Duplicate for id: %s already found %s times" %
+            # get how often it was already uploaded
+            n_already_found = capture_ids_uploaded[capture_id]
+            print("Duplicate for capture id: %s already found %s times" %
                   (capture_id, n_already_found), flush=True)
 
-        ids_uploaded[capture_id] += 1
+        # increase counter of current capture_id
+        capture_ids_uploaded[capture_id] += 1
+
+        # Check a specific Test case
         if subject_id in ('28821178', '28935939'):
-            print("TEST case id %s" % subject_id)
-            print("FOUND ids_uploaded %s" % ids_uploaded[capture_id])
-            print("IS IN DUPLICATE: %s" % (subject_id in duplicated_subject_ids))
+            print("TEST case subejct id %s" % subject_id)
+            print("FOUND in capture_ids_uploaded %s" %
+                  capture_ids_uploaded[capture_id])
+            print("IS IN DUPLICATES for removal: %s" %
+                  (subject_id in duplicated_subject_ids))
+
+    print("Found %s subject ids that need to be removed" %
+          len(duplicated_subject_ids))
+
+    n_captures_with_dups = 0
+    for capture_id, n_upl in capture_ids_uploaded.items():
+        if n_upl > 1:
+            n_captures_with_dups += 1
 
     print("Found %s capture ids that were uploaded more than once" %
-          len(duplicated_subject_ids))
+          n_captures_with_dups)
 
     if args['remove_duplicates']:
         n_dups = len(duplicated_subject_ids)
         print("Found %s subjects to unlink" % n_dups)
         for subject_id_to_remove in duplicated_subject_ids:
-            print("Removing id %s" % subject_id_to_remove)
+            print("Going to remove id %s" % subject_id_to_remove)
         subjects_to_remove_list = list(duplicated_subject_ids)
+        print("REMOVING ALL DUPLICATES NOW")
         # my_set.remove(subjects_to_remove_list)
 
     # Export Manifest
@@ -120,5 +146,5 @@ if __name__ == "__main__":
         header = ['capture_id', 'n_uploads']
         csvwriter.writerow(header)
         # Write each capture event and the associated images
-        for capture_id, n_uploaded in ids_uploaded.items():
+        for capture_id, n_uploaded in capture_ids_uploaded.items():
             csvwriter.writerow([capture_id, n_uploaded])
