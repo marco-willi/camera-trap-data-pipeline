@@ -20,8 +20,8 @@ from utils import read_config_file
 # -output_file ${HOME}/duplicates_test.csv \
 # -project_id 5880 \
 # -subject_set_id 71542 \
-# -password_file ~/keys/passwords.ini
-
+# -password_file ~/keys/passwords.ini \
+# -remove_duplicates
 
 if __name__ == "__main__":
 
@@ -49,6 +49,10 @@ if __name__ == "__main__":
         "-output_file", type=str, required=True,
         help="Output file for duplicates (.csv)")
 
+    parser.add_argument(
+        "-remove_duplicates", action='store_true',
+        help="Remove duplicate subjects")
+
     args = vars(parser.parse_args())
 
     for k, v in args.items():
@@ -72,7 +76,7 @@ if __name__ == "__main__":
     # find already uploaded subjects
     ids_uploaded = dict()
     n_already_uploaded = 0
-    duplicates = set()
+    duplicated_subject_ids = set()
     for subject in my_set.subjects:
         n_already_uploaded += 1
         if (n_already_uploaded % 100) == 0:
@@ -83,18 +87,31 @@ if __name__ == "__main__":
         capture = subject.metadata['#capture']
         season = subject.metadata['#season']
         capture_id = '#'.join([season, site, roll, capture])
+        subject_id = subject.id
         if capture_id not in ids_uploaded:
             ids_uploaded[capture_id] = 0
         else:
-            duplicates.add(capture_id)
+            duplicated_subject_ids.add(subject_id)
             n_already_found = ids_uploaded[capture_id]
             print("Duplicate for id: %s already found %s times" %
                   (capture_id, n_already_found), flush=True)
 
         ids_uploaded[capture_id] += 1
+        if subject_id in ('28821178', '28935939'):
+            print("TEST case id %s" % subject_id)
+            print("FOUND ids_uploaded %s" % ids_uploaded[capture_id])
+            print("IS IN DUPLICATE: %s" % (subject_id in duplicated_subject_ids))
 
     print("Found %s capture ids that were uploaded more than once" %
-          len(duplicates))
+          len(duplicated_subject_ids))
+
+    if args['remove_duplicates']:
+        n_dups = len(duplicated_subject_ids)
+        print("Found %s subjects to unlink" % n_dups)
+        for subject_id_to_remove in duplicated_subject_ids:
+            print("Removing id %s" % subject_id_to_remove)
+        subjects_to_remove_list = list(duplicated_subject_ids)
+        # my_set.remove(subjects_to_remove_list)
 
     # Export Manifest
     with open(args['output_file'], 'w') as csvfile:
