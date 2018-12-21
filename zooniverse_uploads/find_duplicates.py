@@ -138,14 +138,14 @@ if __name__ == "__main__":
         subjects_to_remove_list = list(duplicated_subject_ids)
         print("REMOVING ALL DUPLICATES NOW", flush=True)
         try:
-            # my_set.remove(subjects_to_remove_list)
+            my_set.remove(subjects_to_remove_list)
             print("FINISHED REMOVING ALL DUPLICATES", flush=True)
         except:
             print("FAILED TO REMOVE DUPLICATES AT ONCE", flush=True)
             print("TRYING AGAIN ONE-BY-ONE", flush=True)
             for subject_id_to_remove in subjects_to_remove_list:
                 try:
-                    #my_set.remove(subject_id_to_remove)
+                    my_set.remove(subject_id_to_remove)
                     print("removed subject: %s" %
                           subject_id_to_remove, flush=True)
                 except:
