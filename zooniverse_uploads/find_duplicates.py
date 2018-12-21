@@ -16,6 +16,13 @@ from utils import read_config_file
 # args['password_file'] = '~/keys/passwords.ini'
 
 
+# python3 -m zooniverse_uploads.find_duplicates \
+# -output_file ${HOME}/duplicates_test.csv \
+# -project_id 5880 \
+# -subject_set_id 71542 \
+# -password_file ~/keys/passwords.ini
+
+
 if __name__ == "__main__":
 
     # Parse command line arguments
@@ -78,11 +85,12 @@ if __name__ == "__main__":
         capture_id = '#'.join([season, site, roll, capture])
         if capture_id not in ids_uploaded:
             ids_uploaded[capture_id] = 0
-        if capture_id in ids_uploaded:
+        else:
             duplicates.add(capture_id)
             n_already_found = ids_uploaded[capture_id]
             print("Duplicate for id: %s already found %s times" %
                   (capture_id, n_already_found), flush=True)
+
         ids_uploaded[capture_id] += 1
 
     print("Found %s capture ids that were uploaded more than once" %
