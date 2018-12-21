@@ -113,14 +113,14 @@ if __name__ == "__main__":
 
         # Check a specific Test case
         if subject_id in ('28821178', '28935939'):
-            print("TEST case subejct id %s" % subject_id)
+            print("TEST case subejct id %s" % subject_id, flush=True)
             print("FOUND in capture_ids_uploaded %s" %
-                  capture_ids_uploaded[capture_id])
+                  capture_ids_uploaded[capture_id], flush=True)
             print("IS IN DUPLICATES for removal: %s" %
-                  (subject_id in duplicated_subject_ids))
+                  (subject_id in duplicated_subject_ids), flush=True)
 
     print("Found %s subject ids that need to be removed" %
-          len(duplicated_subject_ids))
+          len(duplicated_subject_ids), flush=True)
 
     n_captures_with_dups = 0
     for capture_id, n_upl in capture_ids_uploaded.items():
@@ -128,16 +128,29 @@ if __name__ == "__main__":
             n_captures_with_dups += 1
 
     print("Found %s capture ids that were uploaded more than once" %
-          n_captures_with_dups)
+          n_captures_with_dups, flush=True)
 
-    if args['remove_duplicates']:
+    if args['remove_duplicates'] and False:
         n_dups = len(duplicated_subject_ids)
-        print("Found %s subjects to unlink" % n_dups)
+        print("Found %s subjects to unlink" % n_dups, flush=True)
         for subject_id_to_remove in duplicated_subject_ids:
-            print("Going to remove id %s" % subject_id_to_remove)
+            print("Going to remove id %s" % subject_id_to_remove, flush=True)
         subjects_to_remove_list = list(duplicated_subject_ids)
-        print("REMOVING ALL DUPLICATES NOW")
-        # my_set.remove(subjects_to_remove_list)
+        print("REMOVING ALL DUPLICATES NOW", flush=True)
+        try:
+            my_set.remove(subjects_to_remove_list)
+            print("FINISHED REMOVING ALL DUPLICATES", flush=True)
+        except:
+            print("FAILED TO REMOVE DUPLICATES AT ONCE", flush=True)
+            print("TRYING AGAIN ONE-BY-ONE", flush=True)
+            for subject_id_to_remove in subjects_to_remove_list:
+                try:
+                    my_set.remove(subject_id_to_remove)
+                    print("removed subject: %s" %
+                          subject_id_to_remove, flush=True)
+                except:
+                    print("failed to remove subject: %s" %
+                          subject_id_to_remove, flush=True)
 
     # Export Manifest
     with open(args['output_file'], 'w') as csvfile:
