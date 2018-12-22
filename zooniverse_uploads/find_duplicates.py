@@ -52,10 +52,18 @@ if __name__ == "__main__":
         "-remove_duplicates", action='store_true',
         help="Remove duplicate subjects")
 
+    parser.add_argument(
+        "-remove_duplicates_immediately", action='store_true',
+        help="Remove duplicate subjects immediately")
+
     args = vars(parser.parse_args())
 
     for k, v in args.items():
         print("Argument %s: %s" % (k, v))
+
+    if args['remove_duplicates'] and args['remove_duplicates_immediately']:
+        raise ValueError("Specify only one of remove_duplicates and \
+                          remove_duplicates_immediately")
 
     # read Zooniverse credentials
     config = read_config_file(args['password_file'])
@@ -107,6 +115,9 @@ if __name__ == "__main__":
             n_already_found = capture_ids_uploaded[capture_id]
             print("Duplicate for capture id: %s already found %s times" %
                   (capture_id, n_already_found), flush=True)
+            if args['remove_duplicates_immediately']:
+                print("Removing subject_id %s" % subject_id)
+                my_set.remove(subject_id)
 
         # increase counter of current capture_id
         capture_ids_uploaded[capture_id] += 1
@@ -130,7 +141,7 @@ if __name__ == "__main__":
     print("Found %s capture ids that were uploaded more than once" %
           n_captures_with_dups, flush=True)
 
-    if args['remove_duplicates']:
+    if args['remove_duplicates'] and not args['remove_duplicates_immediately']:
         n_dups = len(duplicated_subject_ids)
         print("Found %s subjects to unlink" % n_dups, flush=True)
         for subject_id_to_remove in duplicated_subject_ids:
