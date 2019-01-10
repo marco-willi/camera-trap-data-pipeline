@@ -55,6 +55,7 @@ Before executing (most of) the code, you need to execute the follwing:
 ssh lab
 module load python3
 pip install --upgrade --user panoptes-client
+pip install --upgrade --user pillow
 cd ~/snapshot_safari_misc
 ```
 
@@ -132,6 +133,7 @@ python3 -m zooniverse_exports.add_meta_data_to_aggregated_class \
 ## Upload new Data to Zooniverse
 
 The following steps are required to upload new data to Zooniverse including machine learning scores. The following codes show an example for processing RUA data. If no machine learning scores are required one can skip to 'Upload Manifest' after 'Compress Images'. Some (partial) examples can be found here: [zooniverse_uploads/commands.sh](zooniverse_uploads/commands.sh).
+
 
 ### Compress Images
 
@@ -311,3 +313,8 @@ ssh lab
 cd $HOME/snapshot_safari_misc/zooniverse_uploads/
 qsub upload_manifest.pbs
 ```
+
+#### Notes
+
+1. It is possible to add subjects to a subject-set that is linked to a workflow and is itself in an active project volunteers are currently working on.
+2. It can happen that the upload_manifest.pbs script crashes frequently and early. So far, such phases have been temporary hence the advise: "keep trying!".
