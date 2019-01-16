@@ -252,9 +252,6 @@ if __name__ == "__main__":
         data = mani[capture_id]
         add_subject_data_to_manifest(my_set, capture_id, subject_id, data)
 
-    # delete the tracker file
-    os.remove(tracker_file_path)
-
     print("Finished uploading subjects - total %s/%s successfully uploaded" %
           (uploaded_subjects_count, n_tot))
 
@@ -275,3 +272,6 @@ if __name__ == "__main__":
 
     # change permmissions to read/write for group
     os.chmod(args['output_file'], 0o660)
+
+    # delete the tracker file
+    os.remove(tracker_file_path)
