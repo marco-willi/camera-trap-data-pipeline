@@ -4,15 +4,16 @@ import os
 import argparse
 import time
 import datetime
-import hashlib
-import traceback
 import textwrap
+import signal
 
-from panoptes_client import Project, Panoptes, SubjectSet, Subject
+from panoptes_client import Project, Panoptes, SubjectSet
+from panoptes_client.panoptes import PanoptesAPIException
 
+from zooniverse_uploads import uploader
 from utils import (
     read_config_file, estimate_remaining_time,
-    slice_generator, current_time_str)
+    current_time_str)
 
 # # For Testing
 # args = dict()
@@ -24,13 +25,14 @@ from utils import (
 # args['password_file'] = '~/keys/passwords.ini'
 
 
-def add_subject_data_to_manifest(subject_set, subject, data):
+def add_subject_data_to_manifest(subject_set, capture_id, subject_id, data):
     """ Add subject data to manifest
         - extracts data as uploaded and created to/by Zooniverse
         - saves data into the manifest for local storage
         Args:
         - subject_set: the SubjectSet object
-        - subject: the current Subject object
+        - capture_id: the capture_id
+        - subject_id: the subject_id
         - data: a dictionary linking the current subject to the manifest
     """
     data['info']['uploaded'] = True
@@ -39,48 +41,14 @@ def add_subject_data_to_manifest(subject_set, subject, data):
     ts = time.time()
     st = datetime.datetime.fromtimestamp(ts).strftime('%Y%m%d%H%M%S')
     data['info']['upload_time'] = st
-    data['info']['subject_id'] = subject.id
-    data['info']['anonymized_capture_id'] = subject.metadata['capture_id']
+    data['info']['subject_id'] = subject_id
+    data['info']['anonymized_capture_id'] = uploader.anonymize_id(capture_id)
 
 
-def create_subject(project, capture_id, data, debug):
-    """ Create a specific subject
-        Args:
-        - project: a Project() object defining the Zooniverse project
-        - capture_id: a str defining the capture id
-        - data: a dictionary containing all info to upload
-    """
-    meta_data = data["upload_metadata"]
-    images = data['images']["compressed_images"]
-    anonymized_capture_id = hashlib.sha1(str.encode(capture_id)).hexdigest()
-    # create subject
-    subject = Subject()
-    subject.links.project = my_project
-    # add images
-    if debug:
-        print("adding locations for %s - %s" %
-              (capture_id, current_time_str()), flush=True)
-    for image in images:
-        subject.add_location(image)
-    if debug:
-        print("finished locations for %s - %s" %
-              (capture_id, current_time_str()), flush=True)
-    # original images
-    original_images = data['images']['original_images']
-    # add metadata
-    subject.metadata = meta_data
-    # add image information
-    subject.metadata['#original_images'] = original_images
-    # add anonymized id to easily find and map images on
-    # the zooniverse interface in the database
-    subject.metadata['capture_id'] = anonymized_capture_id
-    if debug:
-        print("saving %s - %s" % (capture_id, current_time_str()), flush=True)
-    subject.save()
-    if debug:
-        print("finished saving %s - %s" %
-              (capture_id, current_time_str()), flush=True)
-    return subject
+def batch_data_storage():
+    return {'subjects_to_link': list(),
+            'capture_ids': list(),
+            'subject_ids': list()}
 
 
 if __name__ == "__main__":
@@ -122,17 +90,33 @@ if __name__ == "__main__":
 
     args = vars(parser.parse_args())
 
+    # Print arguments
     for k, v in args.items():
         print("Argument %s: %s" % (k, v))
 
-    # Check Inputs
+    # Check Manifest file
     if not os.path.exists(args['manifest']):
         raise FileNotFoundError("manifest: %s not found" %
                                 args['manifest'])
 
+    # Check one of subject_set_id and subject_set_name exists
     if (args['subject_set_name'] == '') and (args['subject_set_id'] == ''):
         raise ValueError("Either 'subject_set_name or 'subject_set_id must \
             be specified")
+
+    # define tracker file path
+    tracker_file_path = os.path.join(
+        os.path.dirname(os.path.abspath(args['manifest'])),
+        'upload_tracker_file.txt')
+
+    # read upload tracker file
+    if not os.path.exists(tracker_file_path):
+        uploader.create_tracker_file(tracker_file_path)
+    tracker_data = uploader.read_tracker_file(tracker_file_path)
+
+    n_in_tracker_file = len(tracker_data.keys())
+    print("Found %s already uploaded subjects in tracker file" %
+          n_in_tracker_file)
 
     # import manifest
     with open(args['manifest'], 'r') as f:
@@ -151,100 +135,128 @@ if __name__ == "__main__":
     # Get Project
     my_project = Project(args['project_id'])
 
-    # Get or Create a subject set
+    # get or create a subject set
     if args['subject_set_id'] is not '':
-        # Get a subject set
+        # Get an existing subject_set
         my_set = SubjectSet().find(args['subject_set_id'])
-        print("Subject set found, looking for already uploaded subjects",
-              flush=True)
-        # find already uploaded subjects
-        n_already_uploaded = 0
-        for subject in my_set.subjects:
-            n_already_uploaded += 1
-            if (n_already_uploaded % 100) == 0:
-                print("Found %s uploaded records and counting..." %
-                      n_already_uploaded, flush=True)
-            roll = subject.metadata['#roll']
-            site = subject.metadata['#site']
-            capture = subject.metadata['#capture']
-            season = subject.metadata['#season']
-            capture_id = '#'.join([season, site, roll, capture])
-            data = mani[capture_id]
-            add_subject_data_to_manifest(my_set, subject, data)
-        print("Found %s already uploaded records" % n_already_uploaded)
+        print("Subject set %s found, will upload into this set" %
+              args['subject_set_id'], flush=True)
     else:
-        # Create a new subject set
-        my_set = SubjectSet()
-        my_set.links.project = my_project
-        my_set.display_name = args['subject_set_name']
-        my_set.save()
+        my_set = uploader.create_subject_set(
+            my_project, args['subject_set_name'])
         print("Created new subject set with id %s, name %s" %
               (my_set.id, my_set.display_name))
-        my_project.add_subject_sets(my_set)
 
-    # Loop through manifest and upload subjects in blocks of 500 at a time
     time_start = time.time()
-    counter = 0
+    uploaded_subjects_count = 0
 
     capture_ids_all = list(mani.keys())
-    n_tot = len(mani.keys())
 
-    uploads_per_cycle = 500
-    n_blocks = max(round(n_tot / uploads_per_cycle), 1)
+    n_tot = len(capture_ids_all)
 
-    # Loop over blocks
-    slices = slice_generator(n_tot, n_blocks)
-    for block_nr, (start_i, end_i) in enumerate(slices):
-        subjects_to_link = list()
-        print("Starting to process batch %s/%s" % (block_nr + 1, n_blocks),
-              flush=True)
-        n_failed = 0
-        batch_counter = 0
-        for capture_id in capture_ids_all[start_i:end_i]:
-            data = mani[capture_id]
-            # upload if not already uploaded
-            if not data['info']['uploaded']:
-                try:
-                    if args['debug_mode']:
-                        print("processing record %s of batch %s" %
-                              (batch_counter, block_nr))
-                        print("creating %s - %s" %
-                              (capture_id, current_time_str()), flush=True)
-                    subject = create_subject(my_project, capture_id,
-                                             data, args['debug_mode'])
-                    if args['debug_mode']:
-                        print("finished %s - %s" %
-                              (capture_id, current_time_str()), flush=True)
-                    # add information to manifest
-                    # e.g. subject id, upload time, upload status ...
-                    add_subject_data_to_manifest(my_set, subject, data)
-                    # add subject to subject set list to upload / link later
-                    subjects_to_link.append(subject)
-                except:
-                    traceback.print_exc()
-                    print("Failed to save subject %s" % capture_id)
-                    n_failed += 1
-            batch_counter += 1
-            counter += 1
-            # Print status message, including estimated remaining time
-            if (counter % 500) == 0:
-                ts = time.time()
-                tr = estimate_remaining_time(time_start, n_tot, counter)
-                st = datetime.datetime.fromtimestamp(ts).strftime('%H:%M:%S')
-                msg = "Saved %s/%s (%s %%) - Current Time: %s - \
-                       Estimated Time Remaining: %s" % \
-                      (counter, n_tot, round((counter/n_tot) * 100, 2), st, tr)
-                print(textwrap.shorten(msg, width=99), flush=True)
+    upload_batch_size = 100
+    batch_data = batch_data_storage()
 
-        # link the current block of (saved / uploaded) subjects to the
-        # subjec set (as recommended by the panoptes_client docs)
-        n_to_link = len(subjects_to_link)
-        print("Number of subjects failed to save in batch: %s" % n_failed)
-        print("Linking %s subjects of current batch to subject_set at %s"
-              % (n_to_link, current_time_str()), flush=True)
-        my_set.add(subjects_to_link)
-        print("Finished processing batch %s/%s at %s" %
-              (block_nr + 1, n_blocks, current_time_str()), flush=True)
+    # handle (Ctrl+C) keyboard interrupt
+    def signal_handler(*args):
+        print('You pressed Ctrl+C! - attempting to clean up gracefully')
+        remaining_subjects_to_link = len(batch_data['subjects_to_link'])
+        try:
+            print("Linking %s remaining uploaded subjects" %
+                  remaining_subjects_to_link)
+            uploader.add_batch_to_subject_set(
+                my_set, batch_data['subjects_to_link'])
+            uploader.update_tracker_file(
+                tracker_file_path, batch_data['capture_ids'],
+                batch_data['subject_ids'])
+        except PanoptesAPIException as e:
+            print('Failed to link %s remaining subjects' %
+                  remaining_subjects_to_link)
+            uploader.handle_batch_failure(batch_data['subjects_to_link'])
+        finally:
+            raise SystemExit
+
+    # register the handler for interrupt signal
+    signal.signal(signal.SIGINT, signal_handler)
+
+    # loop over manifest
+    for capture_id in capture_ids_all:
+
+        # current subject data
+        data = mani[capture_id]
+
+        # skip if capture_id arleady in tracker_file / uploaded
+        if capture_id in tracker_data:
+            uploaded_subjects_count += 1
+            continue
+        try:
+            images_to_upload = data['images']['compressed_images']
+            metadata = data['upload_metadata']
+            metadata['#original_images'] = data['images']['original_images']
+            metadata['capture_id'] = uploader.anonymize_id(capture_id)
+            subject = uploader.create_subject(
+                my_project, images_to_upload, metadata)
+            batch_data['subjects_to_link'].append(subject)
+            batch_data['capture_ids'].append(capture_id)
+            batch_data['subject_ids'].append(subject.id)
+            if args['debug_mode']:
+                print("finished saving %s - %s" %
+                      (capture_id, current_time_str()), flush=True)
+
+        except PanoptesAPIException as e:
+            print('Error occurred for capture_id: %s' % capture_id)
+            print('Details of error: {}'.format(e))
+            uploader.handle_batch_failure(batch_data['subjects_to_link'])
+            raise SystemExit
+
+        # link each batch of new subjects to the subject set
+        if len(batch_data['subjects_to_link']) % upload_batch_size == 0:
+            uploader.add_batch_to_subject_set(
+                my_set, batch_data['subjects_to_link'])
+            uploaded_subjects_count += len(batch_data['subjects_to_link'])
+
+            # update upload tracker
+            uploader.update_tracker_file(
+                tracker_file_path,
+                batch_data['capture_ids'],
+                batch_data['subject_ids'])
+
+            # reset batch data
+            batch_data = batch_data_storage()
+
+            # print progress information
+            ts = time.time()
+            tr = estimate_remaining_time(
+                time_start, n_tot, uploaded_subjects_count)
+            st = datetime.datetime.fromtimestamp(ts).strftime('%H:%M:%S')
+            msg = "Saved %s/%s (%s %%) - Current Time: %s - \
+                   Estimated Time Remaining: %s" % \
+                  (uploaded_subjects_count, n_tot,
+                   round((uploaded_subjects_count/n_tot) * 100, 2), st, tr)
+            print(textwrap.shorten(msg, width=99), flush=True)
+
+    # catch any left over batches in the file
+    if len(batch_data['subjects_to_link']) > 0:
+        uploader.add_batch_to_subject_set(
+            my_set, batch_data['subjects_to_link'])
+        uploaded_subjects_count += len(batch_data['subjects_to_link'])
+        uploader.update_tracker_file(
+            tracker_file_path,
+            batch_data['capture_ids'],
+            batch_data['subject_ids'])
+
+    # update manifest
+    tracker_data = uploader.read_tracker_file(tracker_file_path)
+
+    for capture_id, subject_id in tracker_data.items():
+        data = mani[capture_id]
+        add_subject_data_to_manifest(my_set, capture_id, subject_id, data)
+
+    # delete the tracker file
+    # os.remove(tracker_file_path)
+
+    print("Finished uploading subjects - total %s/%s successfully uploaded" %
+          (uploaded_subjects_count, n_tot))
 
     # Export Manifest
     with open(args['output_file'], 'w') as outfile:
