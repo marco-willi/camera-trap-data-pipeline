@@ -253,7 +253,7 @@ if __name__ == "__main__":
         add_subject_data_to_manifest(my_set, capture_id, subject_id, data)
 
     # delete the tracker file
-    # os.remove(tracker_file_path)
+    os.remove(tracker_file_path)
 
     print("Finished uploading subjects - total %s/%s successfully uploaded" %
           (uploaded_subjects_count, n_tot))
