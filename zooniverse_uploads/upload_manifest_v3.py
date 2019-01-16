@@ -25,6 +25,17 @@ from utils import (
 # args['password_file'] = '~/keys/passwords.ini'
 
 
+# # For Testing
+# args = dict()
+# args['manifest'] = "/home/packerc/shared/zooniverse/Manifests/MTZ/MTZ_S1_manifest1.json"
+# args['output_file'] = "/home/packerc/shared/zooniverse/Manifests/MTZ/MTZ_S1_manifest2_TEST.json"
+# args['project_id'] = 5124
+# #args['subject_set_id'] = '72048'
+# args['subject_set_id'] = ''
+# args['subject_set_name'] = 'MTZ_S1_TEST'
+# args['password_file'] = '~/keys/passwords.ini'
+# args['debug_mode'] = True
+
 def add_subject_data_to_manifest(subject_set, capture_id, subject_id, data):
     """ Add subject data to manifest
         - extracts data as uploaded and created to/by Zooniverse
@@ -110,10 +121,9 @@ if __name__ == "__main__":
         'upload_tracker_file.txt')
 
     # read upload tracker file
-    if os.path.exists(tracker_file_path):
-        tracker_data = uploader.read_tracker_file(tracker_file_path)
-    else:
-        tracker_data = dict()
+    if not os.path.exists(tracker_file_path):
+        uploader.create_tracker_file(tracker_file_path)
+    tracker_data = uploader.read_tracker_file(tracker_file_path)
 
     n_in_tracker_file = len(tracker_data.keys())
     print("Found %s already uploaded subjects in tracker file" %
@@ -155,7 +165,7 @@ if __name__ == "__main__":
 
     n_tot = len(capture_ids_all)
 
-    upload_batch_size = 500
+    upload_batch_size = 100
     batch_data = batch_data_storage()
 
     # handle (Ctrl+C) keyboard interrupt
@@ -200,7 +210,6 @@ if __name__ == "__main__":
             batch_data['subjects_to_link'].append(subject)
             batch_data['capture_ids'].append(capture_id)
             batch_data['subject_ids'].append(subject.id)
-
             if args['debug_mode']:
                 print("finished saving %s - %s" %
                       (capture_id, current_time_str()), flush=True)

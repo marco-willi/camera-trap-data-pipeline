@@ -31,7 +31,7 @@ def handle_batch_failure(subjects_to_link):
 
 def create_tracker_file(file_path):
     with open(file_path, 'w') as f:
-        f.write('unique_id,subject_id')
+        f.write('unique_id,subject_id\n')
 
 
 def update_tracker_file(file_path, unique_ids, subject_ids):
