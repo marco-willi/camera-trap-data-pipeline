@@ -1,0 +1,18 @@
+#!/bin/bash -l
+#PBS -l walltime=120:00:00,nodes=1:ppn=4
+#PBS -j oe
+#PBS -q lab-long
+#PBS -N upload_manifest
+#PBS -o ${HOME}/upload_manifest_${PBS_JOBID}.log
+#PBS -e ${HOME}/upload_manifest_error_${PBS_JOBID}.log
+
+module load python3
+
+cd $HOME/snapshot_safari_misc
+
+python3 -m zooniverse_uploads.upload_manifest_v3 \
+-manifest /home/packerc/shared/zooniverse/Manifests/RUA/RUA_S1_manifest1.json \
+-output_file /home/packerc/shared/zooniverse/Manifests/RUA/RUA_S1_manifest2.json \
+-project_id 5155 \
+-subject_set_name RUA_S1_machine_learning_v1 \
+-password_file ~/keys/passwords.ini

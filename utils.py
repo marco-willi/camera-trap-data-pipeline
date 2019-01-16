@@ -33,6 +33,11 @@ def current_time_str():
     st = datetime.datetime.fromtimestamp(time.time()).strftime('%H:%M:%S')
     return st
 
+def current_date_time_str():
+    """ Return current time as formatted string """
+    st = datetime.datetime.fromtimestamp(time.time()).strftime('%Y%m%d%H%M%S')
+    return st
+
 
 def write_first_nrows_of_csv_to_csv(input_file, output_file, n_rows):
     """ Write the first n rows of a input csv to a new csv """
