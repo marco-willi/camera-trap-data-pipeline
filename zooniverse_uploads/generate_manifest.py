@@ -17,6 +17,14 @@ from collections import OrderedDict
 # args['csv_quotechar'] = '"'
 # args['attribution'] = 'University of Minnesota Lion Center + SnapshotSafari + Ruaha Carnivore Project + Tanzania + Ruaha National Park'
 # args['license'] =  'SnapshotSafari + Ruaha Carnivore Project'
+#
+# args['cleaned_captures_csv'] = "/home/packerc/shared/season_captures/GRU/cleaned/GRU_S1_cleaned.csv"
+# args['compressed_image_dir'] = "/home/packerc/shared/zooniverse/ToUpload/GRU/GRU_S1_Compressed/"
+# args['output_manifest_dir'] = "/home/packerc/shared/zooniverse/Manifests/GRU/"
+# args['manifest_prefix'] = 'RUA_S1'
+# args['csv_quotechar'] = '"'
+# args['attribution'] = 'University of Minnesota Lion Center + Snapshot Safari + Singita Grumeti + Tanzania'
+# args['license'] =  'Snapshot Safari + Singita Grumeti'
 
 
 if __name__ == "__main__":
@@ -64,12 +72,10 @@ if __name__ == "__main__":
     with open(args['cleaned_captures_csv'], newline='') as csvfile:
         csv_reader = csv.reader(csvfile, delimiter=',',
                                 quotechar=args['csv_quotechar'])
+        header = next(csv_reader)
+        name_to_id_mapper = {x: i for i, x in enumerate(header)}
         for _id, row in enumerate(csv_reader):
-            if _id == 0:
-                header = row
-                name_to_id_mapper = {x: i for i, x in enumerate(header)}
-            else:
-                cleaned_captures.append(row)
+            cleaned_captures.append(row)
 
     print("Found %s images in %s" %
           (len(cleaned_captures), args['cleaned_captures_csv']))
@@ -81,6 +87,9 @@ if __name__ == "__main__":
     # containing all information about the dataset
 
     manifest = OrderedDict()
+    omitted_images_counter = 0
+    images_not_found_counter = 0
+    valid_codes = ('0', '3')
     for row in cleaned_captures:
         # Extract important fields
         season = row[name_to_id_mapper['season']]
@@ -91,12 +100,13 @@ if __name__ == "__main__":
         image_name = row[name_to_id_mapper['imname']]
         image_path = row[name_to_id_mapper['path']]
         invalid = row[name_to_id_mapper['invalid']]
-        valid_codes = ('0', '3')
         # Skip image if not in valid codes
         if invalid not in valid_codes:
+            omitted_images_counter += 1
             continue
         # Skip if image is not on disk
         if image_name not in images_on_disk:
+            images_not_found_counter += 1
             continue
         # unique capture id
         capture_id = '#'.join([season, site, roll, capture])
@@ -129,6 +139,12 @@ if __name__ == "__main__":
             image_disk_path)
         manifest[capture_id]['images']['original_images'].append(
             image_path)
+
+    print("Omitted %s images due to invalid code in 'invalid' column" %
+          omitted_images_counter)
+    print("Number of images not found in images folder %s" %
+          images_not_found_counter)
+    print("Writing %s captures to %s" % (len(manifest.keys()), manifest_path))
 
     # Export Manifest
     with open(manifest_path, 'w') as outfile:
