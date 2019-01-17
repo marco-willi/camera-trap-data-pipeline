@@ -110,6 +110,10 @@ if __name__ == "__main__":
         raise FileNotFoundError("output_image_dir: %s is not a directory" %
                                 args['output_image_dir'])
 
+    if args['input_image_dir'] == args['output_image_dir']:
+        raise ValueError("input_image_dir is the same as output_image_dir,\
+                          must be different")
+
     if not ((args['image_quality'] > 0) and (args['image_quality'] <= 100)):
         raise ValueError("image_quality has to be between 1 and 100")
 
