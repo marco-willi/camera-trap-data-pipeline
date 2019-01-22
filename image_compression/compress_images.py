@@ -3,7 +3,6 @@
     - uses multiprocessing (default 24 processes)
     - keeps image names
 """
-import csv
 import os
 import sys
 import argparse
@@ -13,7 +12,8 @@ import traceback
 import time
 from multiprocessing import Process, Manager
 
-from utils import estimate_remaining_time, slice_generator
+from utils import (
+    estimate_remaining_time, slice_generator, read_cleaned_season_file)
 
 
 ###############################
@@ -140,13 +140,13 @@ if __name__ == "__main__":
 
     # Parse command line arguments
     parser = argparse.ArgumentParser()
-    parser.add_argument("-cleaned_captures_csv", type=str, required=True)
-    parser.add_argument("-output_image_dir", type=str, required=True)
-    parser.add_argument("-root_image_path", type=str, required=True)
-    parser.add_argument("-n_processes", type=int, default=24, required=False)
-    parser.add_argument("-max_image_pixel_side", type=int, default=1440)
-    parser.add_argument("-image_quality", type=int, default=50)
-    parser.add_argument("-csv_quotechar", type=str, default='"')
+    parser.add_argument("--captures_csv", type=str, required=True)
+    parser.add_argument("--output_image_dir", type=str, required=True)
+    parser.add_argument("--root_image_path", type=str, required=True)
+    parser.add_argument("--n_processes", type=int, default=24, required=False)
+    parser.add_argument("--max_image_pixel_side", type=int, default=1440)
+    parser.add_argument("--image_quality", type=int, default=50)
+    parser.add_argument("--csv_quotechar", type=str, default='"')
 
     args = vars(parser.parse_args())
 
@@ -169,17 +169,9 @@ if __name__ == "__main__":
     if not ((args['image_quality'] > 0) and (args['image_quality'] <= 100)):
         raise ValueError("image_quality has to be between 1 and 100")
 
-    # Read Season Captures CSV
-    cleaned_captures = list()
-    with open(args['cleaned_captures_csv'], newline='') as csvfile:
-        csv_reader = csv.reader(csvfile, delimiter=',',
-                                quotechar=args['csv_quotechar'])
-        for _id, row in enumerate(csv_reader):
-            if _id == 0:
-                header = row
-                name_to_id_mapper = {x: i for i, x in enumerate(header)}
-            else:
-                cleaned_captures.append(row)
+    cleaned_captures, name_to_id_mapper = \
+        read_cleaned_season_file(args['cleaned_captures_csv'],
+                                 args['csv_quotechar'])
 
     print("Found %s images in %s" %
           (len(cleaned_captures), args['cleaned_captures_csv']))

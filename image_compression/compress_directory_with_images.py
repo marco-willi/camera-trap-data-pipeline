@@ -91,10 +91,11 @@ if __name__ == "__main__":
 
     # Parse command line arguments
     parser = argparse.ArgumentParser()
-    parser.add_argument("-input_image_dir", type=str, required=True)
-    parser.add_argument("-output_image_dir", type=str, required=True)
-    parser.add_argument("-max_image_pixel_side", type=int, default=1440)
-    parser.add_argument("-image_quality", type=int, default=50)
+    parser.add_argument("--input_image_dir", type=str, required=True)
+    parser.add_argument("--output_image_dir", type=str, required=True)
+    parser.add_argument("--max_image_pixel_side", type=int, default=1440)
+    parser.add_argument("--image_quality", type=int, default=50)
+    parser.add_argument("--image_types", type=str, default='jpg|jpeg|png')
 
     args = vars(parser.parse_args())
 
@@ -118,7 +119,8 @@ if __name__ == "__main__":
         raise ValueError("image_quality has to be between 1 and 100")
 
     # Read Season Captures CSV
-    image_names = find_images_in_dir(args['input_image_dir'])
+    image_names = find_images_in_dir(
+        args['input_image_dir'], args['image_types'])
 
     print("Found %s images in %s" %
           (len(image_names), args['input_image_dir']))
