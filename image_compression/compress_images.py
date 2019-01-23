@@ -226,11 +226,12 @@ if __name__ == "__main__":
         max_pixel_of_largest_side=args['max_image_pixel_side']
     )
 
-    # set r/w permissions to group
+    # set r/w permissions of all images to group
     print("Setting file permissions for all images")
     for img in image_dest_path_list:
         try:
             os.chmod(img, 0o660)
         except:
             pass
-    os.chmod(args['output_image_dir'], 0o660)
+    # set r/w/x permissions of directory to group
+    os.chmod(args['output_image_dir'], 0o770)

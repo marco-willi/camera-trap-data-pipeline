@@ -6,26 +6,39 @@ cd ~/snapshot_safari_misc
 
 
 ###################################
+# GRU
+###################################
+
+SITE=GRU
+SEASON=GRU_S1
+
+# compress images
+python3 -m image_compression.compress_images \
+--captures_csv /home/packerc/shared/season_captures/${SITE}/cleaned/${SEASON}_cleaned.csv \
+--output_image_dir /home/packerc/shared/zooniverse/ToUpload/${SITE}/${SEASON}_Compressed \
+--root_image_path /home/packerc/shared/albums/${SITE}/
+
+# generate manifest
+python3 -m zooniverse_uploads.generate_manifest \
+--captures_csv /home/packerc/shared/season_captures/RUA/cleaned/${SEASON}_cleaned.csv \
+--compressed_image_dir /home/packerc/shared/zooniverse/ToUpload/${SITE}/${SEASON}_Compressed/ \
+--output_manifest_dir /home/packerc/shared/zooniverse/Manifests/${SITE}/ \
+--manifest_id ${SEASON} \
+--attribution 'University of Minnesota Lion Center + SnapshotSafari + Singita Grumeti' \
+--license 'SnapshotSafari'
+
+###################################
+# SER
+###################################
+
+
+
+###################################
 # MTZ
 ###################################
 
 SITE=MTZ
 SEASON=MTZ_S1
-
-# Create Prediction File
-python3 -m zooniverse_uploads.create_predict_file_from_manifest \
--manifest /home/packerc/shared/zooniverse/Manifests/${SITE}/${SEASON}_manifest.json \
--prediction_file /home/packerc/shared/zooniverse/Manifests/${SITE}/${SEASON}_machine_learning_input.csv
-
-# Merge Predictions with Manifest
-cd $HOME/snapshot_safari_misc
-
-python3 -m zooniverse_uploads.merge_predictions_with_manifest \
--manifest /home/packerc/shared/zooniverse/Manifests/${SITE}/${SEASON}_manifest.json \
--predictions_empty /home/packerc/shared/zooniverse/Manifests/${SITE}/${SEASON}_predictions_empty_or_not.json \
--predictions_species /home/packerc/shared/zooniverse/Manifests/${SITE}/${SEASON}_predictions_species.json \
--output_file /home/packerc/shared/zooniverse/Manifests/${SITE}/${SEASON}_manifest1.json
-
 
 
 ###################################
@@ -34,17 +47,3 @@ python3 -m zooniverse_uploads.merge_predictions_with_manifest \
 
 SITE=KAR
 SEASON=KAR_S1
-
-# Create Prediction File
-python3 -m zooniverse_uploads.create_predict_file_from_manifest \
--manifest /home/packerc/shared/zooniverse/Manifests/${SITE}/${SEASON}_manifest.json \
--prediction_file /home/packerc/shared/zooniverse/Manifests/${SITE}/${SEASON}_machine_learning_input.csv
-
-# Merge Predictions with Manifest
-cd $HOME/snapshot_safari_misc
-
-python3 -m zooniverse_uploads.merge_predictions_with_manifest \
--manifest /home/packerc/shared/zooniverse/Manifests/${SITE}/${SEASON}_manifest.json \
--predictions_empty /home/packerc/shared/zooniverse/Manifests/${SITE}/${SEASON}_predictions_empty_or_not.json \
--predictions_species /home/packerc/shared/zooniverse/Manifests/${SITE}/${SEASON}_predictions_species.json \
--output_file /home/packerc/shared/zooniverse/Manifests/${SITE}/${SEASON}_manifest1.json
