@@ -89,7 +89,7 @@ if __name__ == "__main__":
         batch_path = file_path_generator(
             dir=os.path.dirname(args['manifest']),
             id=file_name_parts['id'],
-            batch="batch%s" % batch_no,
+            batch="batch_%s" % batch_no,
             name=file_name_parts['name'],
             file_delim=file_name_parts['file_delim'],
             file_ext=file_name_parts['file_ext']
@@ -104,4 +104,4 @@ if __name__ == "__main__":
         export_dict_to_json_with_newlines(batch_manifest, batch_path)
 
         # change permmissions to read/write for group
-        os.chmod(batch_manifest, 0o660)
+        os.chmod(batch_path, 0o660)
