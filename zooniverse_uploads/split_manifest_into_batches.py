@@ -89,7 +89,7 @@ if __name__ == "__main__":
         batch_path = file_path_generator(
             dir=os.path.dirname(args['manifest']),
             id=file_name_parts['id'],
-            batch="batch_%s" % batch_no,
+            batch="batch_%s" % (batch_no + 1),
             name=file_name_parts['name'],
             file_delim=file_name_parts['file_delim'],
             file_ext=file_name_parts['file_ext']
