@@ -3,6 +3,9 @@ import json
 import os
 import argparse
 
+from utils import (
+    export_dict_to_json_with_newlines, file_path_splitter, file_path_generator)
+
 # # For Testing
 # args = dict()
 # args['manifest'] = "/home/packerc/shared/zooniverse/Manifests/KAR/KAR_S1_manifest.json"
@@ -15,17 +18,20 @@ if __name__ == "__main__":
     # Parse command line arguments
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "-manifest", type=str, required=True,
+        "--manifest", type=str, required=True,
         help="Path to manifest file (.json)")
     parser.add_argument(
-        "-predictions_empty", type=str, required=True,
-        help="Path to the file with predictions from the empty model (.json)")
+        "--predictions_empty", type=str, default=None,
+        help="Path to the file with predictions from the empty model \
+              (.json). Default is to generate the name based on the manifest.")
     parser.add_argument(
-        "-predictions_species", type=str, required=True,
-        help="Path to the file with predictions from the species model (.json)")
+        "--predictions_species", type=str, default=None,
+        help="Path to the file with predictions from the species model \
+              (.json). Default is to generate the name based on the manifest.")
     parser.add_argument(
-        "-output_file", type=str, required=True,
-        help="Output file to write new manifest to (.json)")
+        "--output_file", type=str, default=None,
+        help="Output file to write new manifest to (.json). \
+              Default is to overwrite the manifest.")
 
     args = vars(parser.parse_args())
 
@@ -36,6 +42,34 @@ if __name__ == "__main__":
     if not os.path.exists(args['manifest']):
         raise FileNotFoundError("manifest: %s not found" %
                                 args['manifest'])
+
+    if args['output_file'] is None:
+        args['output_file'] = args['manifest']
+        print("Updating %s with machine scores" % args['output_file'])
+
+    file_name_parts = file_path_splitter(args['manifest'])
+    if args['predictions_empty'] is None:
+        args['predictions_empty'] = file_path_generator(
+            dir=os.path.dirname(args['manifest']),
+            id=file_name_parts['id'],
+            name='predictions_empty_or_not',
+            batch=file_name_parts['batch'],
+            file_delim=file_name_parts['file_delim'],
+            file_ext='json'
+        )
+        print("Reading empty predictions from %s" % args['predictions_empty'])
+    if args['predictions_species'] is None:
+        args['predictions_species'] = file_path_generator(
+            dir=os.path.dirname(args['manifest']),
+            id=file_name_parts['id'],
+            name='predictions_species',
+            batch=file_name_parts['batch'],
+            file_delim=file_name_parts['file_delim'],
+            file_ext='json'
+        )
+        print("Reading species predictions from %s" %
+              args['predictions_species'])
+
     if not os.path.exists(args['predictions_species']):
         raise FileNotFoundError("predictions: %s not found" %
                                 args['predictions_species'])
@@ -43,6 +77,7 @@ if __name__ == "__main__":
     if not os.path.exists(args['predictions_empty']):
         raise FileNotFoundError("predictions: %s not found" %
                                 args['predictions_empty'])
+
     # import manifest
     with open(args['manifest'], 'r') as f:
         mani = json.load(f)
@@ -100,19 +135,7 @@ if __name__ == "__main__":
           (captures_with_preds, n_total))
 
     # Export Manifest
-    with open(args['output_file'], 'w') as outfile:
-        first_row = True
-        for _id, values in mani.items():
-            if first_row:
-                outfile.write('{')
-                outfile.write('"%s":' % _id)
-                json.dump(values, outfile)
-                first_row = False
-            else:
-                outfile.write(',\n')
-                outfile.write('"%s":' % _id)
-                json.dump(values, outfile)
-        outfile.write('}')
+    export_dict_to_json_with_newlines(mani, args['output_file'])
 
     # change permmissions to read/write for group
     os.chmod(args['output_file'], 0o660)
