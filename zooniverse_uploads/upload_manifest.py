@@ -134,6 +134,18 @@ if __name__ == "__main__":
     print("Found %s already uploaded subjects in tracker file" %
           n_in_tracker_file)
 
+    # define output_file
+    if args['output_file'] is None:
+        args['output_file'] = file_path_generator(
+            dir=os.path.dirname(args['manifest']),
+            id=file_name_parts['id'],
+            name="%s_%s" % (file_name_parts['name'], 'uploaded'),
+            batch=file_name_parts['batch'],
+            file_delim=file_name_parts['file_delim'],
+            file_ext='json'
+            )
+        print("Outputfile is %s" % args['output_file'])
+
     # import manifest
     with open(args['manifest'], 'r') as f:
         mani = json.load(f)
