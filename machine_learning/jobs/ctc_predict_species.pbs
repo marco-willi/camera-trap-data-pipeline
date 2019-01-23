@@ -7,9 +7,11 @@
 #PBS -o ${HOME}/job_ml_output_pred_species_${PBS_JOBID}.log
 #PBS -e ${HOME}/job_ml_error_pred_species_${PBS_JOBID}.log
 
-# Parameters To Adapt
-SITE=KAR
-SEASON=KAR_S1
+# Parameters to Adapt (Mandatory)
+SITE=GRU
+SEASON=GRU_S1
+
+# Parameters to Adapt (Optional)
 BATCH=complete
 DELIMITER=__
 

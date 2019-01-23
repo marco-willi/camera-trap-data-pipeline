@@ -57,8 +57,6 @@ if __name__ == "__main__":
 
     file_name_parts = file_path_splitter(args['manifest'])
 
-    print("Machine learning file is %s" % args['machine_learning_file'])
-
     # import manifest
     with open(args['manifest'], 'r') as f:
         manifest = json.load(f)
