@@ -31,6 +31,12 @@ python3 -m zooniverse_uploads.generate_manifest \
 # SER
 ###################################
 
+SITE=SER
+SEASON=SER_S11
+
+# Create machine learning file
+python3 -m zooniverse_uploads.create_machine_learning_file \
+--manifest /home/packerc/shared/zooniverse/Manifests/${SITE}/${SEASON}__batch_5__manifest.json
 
 
 ###################################

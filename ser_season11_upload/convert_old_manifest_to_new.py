@@ -10,8 +10,9 @@ from utils import (
 # site,roll,capture,Image 1,Image 2,Image 3,path 1,path 2,path 3,zoosubjsetid,zoosubjid,uploadstatus
 # J09,2,1604,2382_6351_7502.JPG,3567_3709_6837.JPG,0974_6262_3717.JPG,SER_S11/J09/J09_R2/SER_S11_J09_R2_IMAG4235.JPG,SER_S11/J09/J09_R2/SER_S11_J09_R2_IMAG4236.JPG,SER_S11                    /J09/J09_R2/SER_S11_J09_R2_IMAG4237.JPG,N0,N0,N0
 
-input_path_old = '/home/packerc/shared/zooniverse/Manifests/SER/SER_S11_5_manifest_v0.csv'
-manifest_path = '/home/packerc/shared/zooniverse/Manifests/SER/SER_S11__batch_5__manifest.json'
+batch_no = '6'
+input_path_old = '/home/packerc/shared/zooniverse/Manifests/SER/SER_S11_%s_manifest_v0.csv' % batch_no
+manifest_path = '/home/packerc/shared/zooniverse/Manifests/SER/SER_S11__batch_%s__manifest.json' % batch_no
 
 season = 'SER_S11'
 attribution = 'University of Minnesota Lion Center + SnapshotSafari + Snapshot Serengeti + Serengeti National Park + Tanzania'
@@ -39,9 +40,15 @@ for row in input:
     compressed_images = [
         os.path.join(compressed_images_path, row[name_to_id_mapper[x]])
         for x in ['Image 1', 'Image 2', 'Image 3']]
-    orginal_images = [
+    original_images = [
         row[name_to_id_mapper[x]] for x in
         ['path 1', 'path 2', 'path 3']]
+    # replace NA string
+    original_images = ['' if x == 'NA' else x for x in original_images]
+    compressed_images = ['' if x.endswith('NA') else x for x in compressed_images]
+    # skip if no images
+    if not any([x is not '' for x in original_images]):
+        continue
     # unique capture id
     capture_id = '#'.join([season, site, roll, capture])
     # Create a new entry in the manifest
@@ -60,7 +67,7 @@ for row in input:
             'uploaded': False
         }
         images = {
-            'original_images': orginal_images,
+            'original_images': original_images,
             'compressed_images': compressed_images
         }
         manifest[capture_id] = {
