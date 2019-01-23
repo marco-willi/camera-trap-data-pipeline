@@ -8,14 +8,16 @@
 #PBS -e ${HOME}/job_ml_error_pred_empty_${PBS_JOBID}.log
 
 # Parameters To Adapt
-SITE=KAR
-SEASON=KAR_S1
+SITE=GRU
+SEASON=GRU_S1
+BATCH=complete
+DELIMITER=__
 
 # Parameters Static
 MANIFEST_ROOT_DIR=/home/packerc/shared/zooniverse/Manifests/
-TO_PREDICT_PATH=${MANIFEST_ROOT_DIR}${SITE}/${SEASON}_machine_learning_input.csv
+TO_PREDICT_PATH=${MANIFEST_ROOT_DIR}${SITE}/${SEASON}${DELIMITER}${BATCH}${DELIMITER}machine_learning_input.csv
 IMAGES_ROOT=/home/packerc/shared/albums/${SITE}/
-OUTPUT_PATH=${MANIFEST_ROOT_DIR}${SITE}/${SEASON}_predictions_empty_or_not.json
+OUTPUT_PATH=${MANIFEST_ROOT_DIR}${SITE}/${SEASON}${DELIMITER}${BATCH}${DELIMITER}predictions_empty_or_not.json
 
 MODEL_ROOT_PATH=/home/packerc/shared/machine_learning/data/models/SNAPSHOT_SAFARI/empty_or_not/
 MODEL_NAME=model_save_empty_resnet18

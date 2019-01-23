@@ -1,8 +1,10 @@
 """ Util Functions """
 import sys
 import os
+import csv
 import time
 import datetime
+import json
 from hashlib import md5
 import configparser
 
@@ -32,6 +34,7 @@ def current_time_str():
     """ Return current time as formatted string """
     st = datetime.datetime.fromtimestamp(time.time()).strftime('%H:%M:%S')
     return st
+
 
 def current_date_time_str():
     """ Return current time as formatted string """
@@ -150,3 +153,69 @@ def assign_zero_one_to_split(zero_one_value, split_percents, split_names):
     for sn, sp in zip(split_names, split_props_cum):
         if zero_one_value <= sp:
             return sn
+
+
+def export_dict_to_json_with_newlines(data, path):
+    """ Export a dictionary to a json file with newlines between each
+        dictionary entry
+    """
+    with open(path, 'w') as outfile:
+        first_row = True
+        for _id, values in data.items():
+            if first_row:
+                outfile.write('{')
+                outfile.write('"%s":' % _id)
+                json.dump(values, outfile)
+                first_row = False
+            else:
+                outfile.write(',\n')
+                outfile.write('"%s":' % _id)
+                json.dump(values, outfile)
+        outfile.write('}')
+
+
+def file_path_generator(
+        dir, id, name, batch="complete",
+        file_delim="__", file_ext='json'):
+    """ Create consistent file paths based on dir/id/name """
+    file_name = file_delim.join([x for x in [id, batch, name] if x is not ''])
+    file_name = '%s.%s' % (file_name, file_ext)
+    file_path = os.path.join(dir, file_name)
+    return file_path
+
+
+def file_path_splitter(path, file_delim="__", file_ext='json'):
+    """ Split a file created with 'file_path_generator' into components """
+    fname = os.path.basename(path)
+    f_ext = ".%s" % file_ext
+    # Check if file extension matches
+    if f_ext not in fname:
+        raise ValueError("Specified file extension %s does not match %s" %
+                         (file_ext, fname))
+    fname_no_ext = fname.split(".%s" % file_ext)[0]
+    fname_splits = fname_no_ext.split(file_delim)
+    id = fname_splits[0]
+    batch = fname_splits[1]
+    name = fname_splits[2]
+    return {'id': id, 'batch': batch, 'name': name,
+            'file_delim': file_delim, 'file_ext': file_ext}
+
+
+def read_cleaned_season_file(path, quotechar='"'):
+    """ Check the input file """
+    cleaned_captures = list()
+    required_header_cols = ('season', 'site', 'roll', 'capture', 'image',
+                            'imname', 'path', 'invalid')
+    with open(path, newline='') as csvfile:
+        csv_reader = csv.reader(csvfile, delimiter=',', quotechar=quotechar)
+        header = next(csv_reader)
+        name_to_id_mapper = {x: i for i, x in enumerate(header)}
+        # check header
+        if not all([x in header for x in required_header_cols]):
+            print("Missing columns -- found %s, require %s" %
+                  (header, required_header_cols))
+
+        for _id, row in enumerate(csv_reader):
+            cleaned_captures.append(row)
+
+    return cleaned_captures, name_to_id_mapper
