@@ -99,7 +99,7 @@ if __name__ == "__main__":
             batch_manifest[batch_id] = manifest[batch_id]
 
         print("Writing batch %s to %s with %s records" %
-              (batch_no, batch_path, len(batch_manifest.keys())))
+              (batch_no + 1, batch_path, len(batch_manifest.keys())))
 
         export_dict_to_json_with_newlines(batch_manifest, batch_path)
 

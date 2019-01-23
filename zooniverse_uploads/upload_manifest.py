@@ -125,6 +125,8 @@ if __name__ == "__main__":
         file_ext='txt'
     )
 
+    print("Definint upload tracker file at: %s" % tracker_file_path)
+
     # read upload tracker file
     if not os.path.exists(tracker_file_path):
         uploader.create_tracker_file(tracker_file_path)
