@@ -11,7 +11,7 @@ from utils import (
 # J09,2,1604,2382_6351_7502.JPG,3567_3709_6837.JPG,0974_6262_3717.JPG,SER_S11/J09/J09_R2/SER_S11_J09_R2_IMAG4235.JPG,SER_S11/J09/J09_R2/SER_S11_J09_R2_IMAG4236.JPG,SER_S11                    /J09/J09_R2/SER_S11_J09_R2_IMAG4237.JPG,N0,N0,N0
 
 input_path_old = '/home/packerc/shared/zooniverse/Manifests/SER/SER_S11_5_manifest_v0.csv'
-manifest_path = '/home/packerc/shared/zooniverse/Manifests/SER/SER_S11__manifest__batch5.json'
+manifest_path = '/home/packerc/shared/zooniverse/Manifests/SER/SER_S11__batch_5__manifest.json'
 
 season = 'SER_S11'
 attribution = 'University of Minnesota Lion Center + SnapshotSafari + Snapshot Serengeti + Serengeti National Park + Tanzania'
