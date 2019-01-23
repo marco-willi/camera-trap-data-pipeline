@@ -162,19 +162,19 @@ if __name__ == "__main__":
         raise FileNotFoundError("output_image_dir: %s is not a directory" %
                                 args['output_image_dir'])
 
-    if not os.path.exists(args['cleaned_captures_csv']):
-        raise FileNotFoundError("cleaned_captures_csv: %s not found" %
-                                args['cleaned_captures_csv'])
+    if not os.path.exists(args['captures_csv']):
+        raise FileNotFoundError("captures_csv: %s not found" %
+                                args['captures_csv'])
 
     if not ((args['image_quality'] > 0) and (args['image_quality'] <= 100)):
         raise ValueError("image_quality has to be between 1 and 100")
 
     cleaned_captures, name_to_id_mapper = \
-        read_cleaned_season_file(args['cleaned_captures_csv'],
+        read_cleaned_season_file(args['captures_csv'],
                                  args['csv_quotechar'])
 
     print("Found %s images in %s" %
-          (len(cleaned_captures), args['cleaned_captures_csv']))
+          (len(cleaned_captures), args['captures_csv']))
 
     # Define source and destination paths for all images
     images = OrderedDict()
