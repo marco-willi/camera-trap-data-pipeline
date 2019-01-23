@@ -10,9 +10,7 @@ module load python3
 
 cd $HOME/snapshot_safari_misc
 
-python3 -m zooniverse_uploads.upload_manifest_v3 \
--manifest /home/packerc/shared/zooniverse/Manifests/RUA/RUA_S1_manifest1.json \
--output_file /home/packerc/shared/zooniverse/Manifests/RUA/RUA_S1_manifest2.json \
--project_id 5155 \
--subject_set_name RUA_S1_complete \
--password_file ~/keys/passwords.ini
+python3 -m zooniverse_uploads.upload_manifest \
+--manifest /home/packerc/shared/zooniverse/Manifests/RUA/RUA_S1__batch_0__manifest.json \
+--project_id 5155 \
+--password_file ~/keys/passwords.ini

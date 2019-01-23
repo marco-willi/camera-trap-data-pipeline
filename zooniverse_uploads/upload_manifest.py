@@ -65,11 +65,12 @@ if __name__ == "__main__":
         help="Zooniverse project id")
 
     parser.add_argument(
-        "--subject_set_name", type=str, required=False, default='',
-        help="Zooniverse subject set name")
+        "--subject_set_name", type=str, default=None,
+        help="Zooniverse subject set name. Default is to automatically derive\
+              it from the manifest name.")
 
     parser.add_argument(
-        "--subject_set_id", type=str, required=False, default='',
+        "--subject_set_id", type=str, default=None,
         help="Zooniverse subject set id. Specify if you want to add subjects\
               to an existing set (useful if upload crashed)")
 
@@ -102,11 +103,17 @@ if __name__ == "__main__":
                                 args['manifest'])
 
     # Check one of subject_set_id and subject_set_name exists
-    if (args['subject_set_name'] == '') and (args['subject_set_id'] == ''):
-        raise ValueError("Either 'subject_set_name or 'subject_set_id must \
-            be specified")
+    if None not in (args['subject_set_name'], args['subject_set_id']):
+        raise ValueError("Only one of 'subject_set_name' and 'subject_set_id' \
+                          should be specified")
 
     file_name_parts = file_path_splitter(args['manifest'])
+
+    # generate subject_set name if not specified
+    if args['subject_set_name'] is None:
+        sub_name = "%s_%s" % (file_name_parts['id'], file_name_parts['batch'])
+        args['subject_set_name'] = sub_name
+        print("Automatically generated subject_set_name: %s" % sub_name)
 
     # define tracker file path
     tracker_file_path = file_path_generator(
@@ -145,7 +152,7 @@ if __name__ == "__main__":
     my_project = Project(args['project_id'])
 
     # get or create a subject set
-    if args['subject_set_id'] is not '':
+    if args['subject_set_id'] is not None:
         # Get an existing subject_set
         my_set = SubjectSet().find(args['subject_set_id'])
         print("Subject set %s found, will upload into this set" %
