@@ -31,7 +31,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--number_of_batches", type=int, default=None,
         help="How many batches to create. \
-             Choose either batch_size or number_of_batches.")
+             Choose either max_batch_size or number_of_batches.")
 
     args = vars(parser.parse_args())
 
@@ -70,7 +70,7 @@ if __name__ == "__main__":
     if args['number_of_batches'] is not None:
         n_batches = args['number_of_batches']
     else:
-        n_batches = math.ceil(n_captures / args['batch_size'])
+        n_batches = math.ceil(n_captures / args['max_batch_size'])
 
     slices = slice_generator(n_captures, n_batches)
 
