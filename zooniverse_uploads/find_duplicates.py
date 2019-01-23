@@ -122,14 +122,6 @@ if __name__ == "__main__":
         # increase counter of current capture_id
         capture_ids_uploaded[capture_id] += 1
 
-        # Check a specific Test case
-        if subject_id in ('28821178', '28935939'):
-            print("TEST case subejct id %s" % subject_id, flush=True)
-            print("FOUND in capture_ids_uploaded %s" %
-                  capture_ids_uploaded[capture_id], flush=True)
-            print("IS IN DUPLICATES for removal: %s" %
-                  (subject_id in duplicated_subject_ids), flush=True)
-
     print("Found %s subject ids that need to be removed" %
           len(duplicated_subject_ids), flush=True)
 
