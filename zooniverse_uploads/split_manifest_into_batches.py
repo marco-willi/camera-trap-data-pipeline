@@ -83,7 +83,7 @@ if __name__ == "__main__":
 
     print("Creating %s splits" % (n_batches))
 
-    for batch_no, i_start, i_end in enumerate(slices):
+    for batch_no, (i_start, i_end) in enumerate(slices):
         batch_manifest = OrderedDict()
 
         batch_path = file_path_generator(
