@@ -46,6 +46,7 @@ if __name__ == "__main__":
         args['machine_learning_file'] = file_path_generator(
             dir=os.path.dirname(args['manifest']),
             id=file_name_parts['id'],
+            batch=file_name_parts['batch'],
             name='machine_learning_input',
             file_delim=file_name_parts['file_delim'],
             file_ext='csv'
