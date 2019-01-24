@@ -125,7 +125,7 @@ if __name__ == "__main__":
         file_ext='txt'
     )
 
-    print("Definint upload tracker file at: %s" % tracker_file_path)
+    print("Defining upload tracker file at: %s" % tracker_file_path)
 
     # read upload tracker file
     if not os.path.exists(tracker_file_path):
@@ -183,6 +183,7 @@ if __name__ == "__main__":
     capture_ids_all = list(mani.keys())
 
     n_tot = len(capture_ids_all)
+    n_remaining = n_tot - n_in_tracker_file
 
     upload_batch_size = 100
     batch_data = batch_data_storage()
@@ -257,7 +258,7 @@ if __name__ == "__main__":
             # print progress information
             ts = time.time()
             tr = estimate_remaining_time(
-                time_start, n_tot, uploaded_subjects_count)
+                time_start, n_remaining, uploaded_subjects_count)
             st = datetime.datetime.fromtimestamp(ts).strftime('%H:%M:%S')
             msg = "Saved %s/%s (%s %%) - Current Time: %s - \
                    Estimated Time Remaining: %s" % \
