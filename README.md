@@ -64,7 +64,16 @@ The easiest way to exectue the following codes is to copy & paste them to a text
 
 ## Upload Data to Zooniverse
 
-The following steps are required to upload new data to Zooniverse, including machine learning scores. The following codes show an example for processing RUA data. If no machine learning scores are required one can skip to 'Split/Batch Manifest' after 'Compress Images'.
+The following steps are required to upload new data to Zooniverse. The following codes show an example for processing RUA data. These are the steps:
+
+1. Compress Images (Zooniverse has a size limit)
+2. Generate Manifest (a file containing all info for the Zooniverse upload)
+3. Create Machine Lerning File for Model Input (Optional - create input for machine classifier)
+4. Generate new Predictions (Optional - run a machine classifier)
+5. Split/Batch Manifest (Optional - Zooniverse recommends not to use too large batches at once)
+6. Upload Manifest
+
+The optional steps can simply be skipped.
 
 ### Compress Images
 
@@ -284,7 +293,12 @@ qsub upload_manifest.pbs
 
 ## Get and Extract Zooniverse Exports
 
-Some of the scripts used for different sites can be found here: [zooniverse_exports/scripts.sh](zooniverse_exports/scripts.sh)
+Some of the scripts used for different sites can be found here: [zooniverse_exports/scripts.sh](zooniverse_exports/scripts.sh). The following steps are required:
+
+1. Get Zooniverse Exports (download data through the Python API)
+2. Extract Zooniverse Classifications (currently works for SnapshotSafari data only)
+3. Aggregate Extracted Zooniverse Classifications (on capture-event aggregation)
+4. Add Meta-Data to Aggregated Classifications (work-in-progress)
 
 ### Get Zooniverse Exports
 

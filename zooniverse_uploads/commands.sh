@@ -20,12 +20,32 @@ python3 -m image_compression.compress_images \
 
 # generate manifest
 python3 -m zooniverse_uploads.generate_manifest \
---captures_csv /home/packerc/shared/season_captures/RUA/cleaned/${SEASON}_cleaned.csv \
+--captures_csv /home/packerc/shared/season_captures/${SITE}/cleaned/${SEASON}_cleaned.csv \
 --compressed_image_dir /home/packerc/shared/zooniverse/ToUpload/${SITE}/${SEASON}_Compressed/ \
 --output_manifest_dir /home/packerc/shared/zooniverse/Manifests/${SITE}/ \
 --manifest_id ${SEASON} \
---attribution 'University of Minnesota Lion Center + SnapshotSafari + Singita Grumeti' \
---license 'SnapshotSafari'
+--attribution 'University of Minnesota Lion Center + Snapshot Safari + Singita Grumeti + Tanzania' \
+--license 'Snapshot Safari + Singita Grumeti'
+
+# Create machine learning file
+python3 -m zooniverse_uploads.create_machine_learning_file \
+--manifest /home/packerc/shared/zooniverse/Manifests/${SITE}/${SEASON}__complete__manifest.json
+
+# add machine scores to batch
+python3 -m zooniverse_uploads.add_predictions_to_manifest \
+--manifest /home/packerc/shared/zooniverse/Manifests/${SITE}/${SEASON}__complete__manifest.json
+
+# Split into batches
+python3 -m zooniverse_uploads.split_manifest_into_batches \
+--manifest /home/packerc/shared/zooniverse/Manifests/${SITE}/${SEASON}__complete__manifest.json \
+--max_batch_size 10000
+
+# Upload manifest
+python3 -m zooniverse_uploads.upload_manifest \
+--manifest /home/packerc/shared/zooniverse/Manifests/${SITE}/${SEASON}__batch_1__manifest.json \
+--project_id 5115 \
+--password_file ~/keys/passwords.ini
+
 
 ###################################
 # SER
@@ -38,6 +58,15 @@ SEASON=SER_S11
 python3 -m zooniverse_uploads.create_machine_learning_file \
 --manifest /home/packerc/shared/zooniverse/Manifests/${SITE}/${SEASON}__batch_5__manifest.json
 
+# add machine scores to batch
+python3 -m zooniverse_uploads.add_predictions_to_manifest \
+--manifest /home/packerc/shared/zooniverse/Manifests/${SITE}/${SEASON}__batch_5__manifest.json
+
+# Upload manifest
+python3 -m zooniverse_uploads.upload_manifest \
+--manifest /home/packerc/shared/zooniverse/Manifests/${SITE}/${SEASON}__batch_5__manifest.json \
+--project_id 4996 \
+--password_file ~/keys/passwords.ini
 
 ###################################
 # MTZ
