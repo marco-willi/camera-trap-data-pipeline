@@ -13,7 +13,8 @@ from panoptes_client.panoptes import PanoptesAPIException
 from zooniverse_uploads import uploader
 from utils import (
     read_config_file, estimate_remaining_time,
-    current_time_str)
+    current_time_str, export_dict_to_json_with_newlines,
+    file_path_splitter, file_path_generator)
 
 # # For Testing
 # args = dict()
@@ -56,28 +57,30 @@ if __name__ == "__main__":
     # Parse command line arguments
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "-manifest", type=str, required=True,
+        "--manifest", type=str, required=True,
         help="Path to manifest file (.json)")
 
     parser.add_argument(
-        "-project_id", type=int, required=True,
+        "--project_id", type=int, required=True,
         help="Zooniverse project id")
 
     parser.add_argument(
-        "-subject_set_name", type=str, required=False, default='',
-        help="Zooniverse subject set name")
+        "--subject_set_name", type=str, default=None,
+        help="Zooniverse subject set name. Default is to automatically derive\
+              it from the manifest name.")
 
     parser.add_argument(
-        "-subject_set_id", type=str, required=False, default='',
+        "--subject_set_id", type=str, default=None,
         help="Zooniverse subject set id. Specify if you want to add subjects\
               to an existing set (useful if upload crashed)")
 
     parser.add_argument(
-        "-output_file", type=str, required=True,
-        help="Output file for updated manifest (.json)")
+        "--output_file", type=str, default=None,
+        help="Output file for updated manifest (.json). \
+              Default is to overwrite the manifest.")
 
     parser.add_argument(
-        "-password_file", type=str, required=True,
+        "--password_file", type=str, required=True,
         help="File that contains the Zooniverse password (.ini),\
               Example File:\
               [zooniverse]\
@@ -85,7 +88,7 @@ if __name__ == "__main__":
               password: 1234")
 
     parser.add_argument(
-        "-debug_mode", action='store_true',
+        "--debug_mode", action='store_true',
         help="Activate debug mode which will print more status messages.")
 
     args = vars(parser.parse_args())
@@ -100,14 +103,29 @@ if __name__ == "__main__":
                                 args['manifest'])
 
     # Check one of subject_set_id and subject_set_name exists
-    if (args['subject_set_name'] == '') and (args['subject_set_id'] == ''):
-        raise ValueError("Either 'subject_set_name or 'subject_set_id must \
-            be specified")
+    if None not in (args['subject_set_name'], args['subject_set_id']):
+        raise ValueError("Only one of 'subject_set_name' and 'subject_set_id' \
+                          should be specified")
+
+    file_name_parts = file_path_splitter(args['manifest'])
+
+    # generate subject_set name if not specified
+    if args['subject_set_name'] is None:
+        sub_name = "%s_%s" % (file_name_parts['id'], file_name_parts['batch'])
+        args['subject_set_name'] = sub_name
+        print("Automatically generated subject_set_name: %s" % sub_name)
 
     # define tracker file path
-    tracker_file_path = os.path.join(
-        os.path.dirname(os.path.abspath(args['manifest'])),
-        'upload_tracker_file.txt')
+    tracker_file_path = file_path_generator(
+        dir=os.path.dirname(args['manifest']),
+        id=file_name_parts['id'],
+        name='upload_tracker_file',
+        batch=file_name_parts['batch'],
+        file_delim=file_name_parts['file_delim'],
+        file_ext='txt'
+    )
+
+    print("Definint upload tracker file at: %s" % tracker_file_path)
 
     # read upload tracker file
     if not os.path.exists(tracker_file_path):
@@ -117,6 +135,18 @@ if __name__ == "__main__":
     n_in_tracker_file = len(tracker_data.keys())
     print("Found %s already uploaded subjects in tracker file" %
           n_in_tracker_file)
+
+    # define output_file
+    if args['output_file'] is None:
+        args['output_file'] = file_path_generator(
+            dir=os.path.dirname(args['manifest']),
+            id=file_name_parts['id'],
+            name="%s_%s" % (file_name_parts['name'], 'uploaded'),
+            batch=file_name_parts['batch'],
+            file_delim=file_name_parts['file_delim'],
+            file_ext='json'
+            )
+        print("Outputfile is %s" % args['output_file'])
 
     # import manifest
     with open(args['manifest'], 'r') as f:
@@ -136,7 +166,7 @@ if __name__ == "__main__":
     my_project = Project(args['project_id'])
 
     # get or create a subject set
-    if args['subject_set_id'] is not '':
+    if args['subject_set_id'] is not None:
         # Get an existing subject_set
         my_set = SubjectSet().find(args['subject_set_id'])
         print("Subject set %s found, will upload into this set" %
@@ -256,19 +286,7 @@ if __name__ == "__main__":
           (uploaded_subjects_count, n_tot))
 
     # Export Manifest
-    with open(args['output_file'], 'w') as outfile:
-        first_row = True
-        for _id, values in mani.items():
-            if first_row:
-                outfile.write('{')
-                outfile.write('"%s":' % _id)
-                json.dump(values, outfile)
-                first_row = False
-            else:
-                outfile.write(',\n')
-                outfile.write('"%s":' % _id)
-                json.dump(values, outfile)
-        outfile.write('}')
+    export_dict_to_json_with_newlines(mani, args['output_file'])
 
     # change permmissions to read/write for group
     os.chmod(args['output_file'], 0o660)

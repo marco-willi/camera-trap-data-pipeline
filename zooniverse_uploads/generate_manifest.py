@@ -1,27 +1,28 @@
-""" Create a Manifest
-    - File that contains all information about capture-events for uploading
-      to Zooniverse
+""" Create a Manifest - Information about capture-events for uploading to
+    Zooniverse
 """
-import csv
-import json
 import os
 import argparse
 from collections import OrderedDict
 
+from utils import (
+    export_dict_to_json_with_newlines,
+    read_cleaned_season_file, file_path_generator)
+
 # For Testing
 # args = dict()
-# args['cleaned_captures_csv'] = "/home/packerc/shared/season_captures/RUA/cleaned/RUA_S1_cleaned.csv"
+# args['captures_csv'] = "/home/packerc/shared/season_captures/RUA/cleaned/RUA_S1_cleaned.csv"
 # args['compressed_image_dir'] = "/home/packerc/shared/zooniverse/ToUpload/RUA_will5448/RUA_S1_Compressed/"
 # args['output_manifest_dir'] = "/home/packerc/shared/zooniverse/Manifests/RUA/"
-# args['manifest_prefix'] = 'RUA_S1'
+# args['manifest_id'] = 'RUA_S1'
 # args['csv_quotechar'] = '"'
 # args['attribution'] = 'University of Minnesota Lion Center + SnapshotSafari + Ruaha Carnivore Project + Tanzania + Ruaha National Park'
 # args['license'] =  'SnapshotSafari + Ruaha Carnivore Project'
 #
-# args['cleaned_captures_csv'] = "/home/packerc/shared/season_captures/GRU/cleaned/GRU_S1_cleaned.csv"
+# args['captures_csv'] = "/home/packerc/shared/season_captures/GRU/cleaned/GRU_S1_cleaned.csv"
 # args['compressed_image_dir'] = "/home/packerc/shared/zooniverse/ToUpload/GRU/GRU_S1_Compressed/"
 # args['output_manifest_dir'] = "/home/packerc/shared/zooniverse/Manifests/GRU/"
-# args['manifest_prefix'] = 'RUA_S1'
+# args['manifest_id'] = 'RUA_S1'
 # args['csv_quotechar'] = '"'
 # args['attribution'] = 'University of Minnesota Lion Center + Snapshot Safari + Singita Grumeti + Tanzania'
 # args['license'] =  'Snapshot Safari + Singita Grumeti'
@@ -31,13 +32,30 @@ if __name__ == "__main__":
 
     # Parse command line arguments
     parser = argparse.ArgumentParser()
-    parser.add_argument("-cleaned_captures_csv", type=str, required=True)
-    parser.add_argument("-compressed_image_dir", type=str, required=True)
-    parser.add_argument("-output_manifest_dir", type=str, required=True)
-    parser.add_argument("-manifest_prefix", type=str, required=True)
-    parser.add_argument("-attribution", type=str, required=True)
-    parser.add_argument("-license", type=str, required=True)
-    parser.add_argument("-csv_quotechar", type=str, default='"')
+    parser.add_argument(
+        "--captures_csv", type=str, required=True,
+        help="Path to the cleaned captures csv.")
+    parser.add_argument(
+        "--compressed_image_dir", type=str, required=True,
+        help="Path to a directory with all images as referenced in the \
+              captures_csv")
+    parser.add_argument(
+        "--output_manifest_dir", type=str, required=True,
+        help="Output directory to write the manifest into.")
+    parser.add_argument(
+        "--manifest_id", type=str, required=True,
+        help="A unique identifier for the manifest, e.g,\
+              RUA_S1. Typically, this is used for a season of data and \
+              describes the content of the captures_csv.")
+    parser.add_argument(
+        "--attribution", type=str, required=True,
+        help="Attribution text.")
+    parser.add_argument(
+        "--license", type=str, required=True,
+        help="license information")
+    parser.add_argument(
+        "--csv_quotechar", type=str, default='"',
+        help="Quotechar used to import the captures_csv")
 
     args = vars(parser.parse_args())
 
@@ -53,39 +71,33 @@ if __name__ == "__main__":
         raise FileNotFoundError("compressed_image_dir: %s is not a directory" %
                                 args['compressed_image_dir'])
 
-    if not os.path.exists(args['cleaned_captures_csv']):
-        raise FileNotFoundError("cleaned_captures_csv: %s not found" %
-                                args['cleaned_captures_csv'])
+    if not os.path.exists(args['captures_csv']):
+        raise FileNotFoundError("captures_csv: %s not found" %
+                                args['captures_csv'])
 
-    if '.' in args['manifest_prefix']:
-        raise ValueError("manifest_prefix must not contain a dot")
+    if any([x in args['manifest_id'] for x in ['.', '__']]):
+        raise ValueError("manifest_id must not contain any of '.'/'__'")
 
-    manifest_file_name = args['manifest_prefix'] + '_manifest.json'
-    manifest_path = os.path.join(args['output_manifest_dir'],
-                                 manifest_file_name)
+    manifest_path = file_path_generator(
+        dir=args['output_manifest_dir'],
+        id=args['manifest_id'],
+        name="manifest")
 
     if os.path.exists(manifest_path):
         raise FileExistsError("manifest already exists: %s" % manifest_path)
 
     # Read Season Captures CSV
-    cleaned_captures = list()
-    with open(args['cleaned_captures_csv'], newline='') as csvfile:
-        csv_reader = csv.reader(csvfile, delimiter=',',
-                                quotechar=args['csv_quotechar'])
-        header = next(csv_reader)
-        name_to_id_mapper = {x: i for i, x in enumerate(header)}
-        for _id, row in enumerate(csv_reader):
-            cleaned_captures.append(row)
+    cleaned_captures, name_to_id_mapper = \
+        read_cleaned_season_file(args['captures_csv'],
+                                 args['csv_quotechar'])
 
     print("Found %s images in %s" %
-          (len(cleaned_captures), args['cleaned_captures_csv']))
+          (len(cleaned_captures), args['captures_csv']))
 
     # Find all processed images
     images_on_disk = set(os.listdir(args['compressed_image_dir']))
 
-    # Create a Manifest which is a dictionary / json like structure
-    # containing all information about the dataset
-
+    # Create the manifest
     manifest = OrderedDict()
     omitted_images_counter = 0
     images_not_found_counter = 0
@@ -146,20 +158,7 @@ if __name__ == "__main__":
           images_not_found_counter)
     print("Writing %s captures to %s" % (len(manifest.keys()), manifest_path))
 
-    # Export Manifest
-    with open(manifest_path, 'w') as outfile:
-        first_row = True
-        for _id, values in manifest.items():
-            if first_row:
-                outfile.write('{')
-                outfile.write('"%s":' % _id)
-                json.dump(values, outfile)
-                first_row = False
-            else:
-                outfile.write(',\n')
-                outfile.write('"%s":' % _id)
-                json.dump(values, outfile)
-        outfile.write('}')
+    export_dict_to_json_with_newlines(manifest, manifest_path)
 
     # change permmissions to read/write for group
     os.chmod(manifest_path, 0o660)

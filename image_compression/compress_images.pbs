@@ -11,6 +11,6 @@ cd $HOME/snapshot_safari_misc
 module load python3
 
 python3 -m image_compression.compress_images \
--cleaned_captures_csv /home/packerc/shared/season_captures/RUA/cleaned/RUA_S1_cleaned.csv \
--output_image_dir  /home/packerc/shared/zooniverse/ToUpload/RUA_will5448/RUA_S1_Compressed \
--root_image_path /home/packerc/shared/albums/RUA/
+--captures_csv /home/packerc/shared/season_captures/RUA/cleaned/RUA_S1_cleaned.csv \
+--output_image_dir  /home/packerc/shared/zooniverse/ToUpload/RUA_will5448/RUA_S1_Compressed \
+--root_image_path /home/packerc/shared/albums/RUA/

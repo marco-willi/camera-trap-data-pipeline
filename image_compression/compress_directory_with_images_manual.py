@@ -17,6 +17,7 @@ args['input_image_dir'] = 'C:\\my_images\\'
 args['output_image_dir'] = 'C:\\my_compressed_images\\'
 args['max_image_pixel_side'] = 1440
 args['image_quality'] = 50
+args['image_types'] = 'jpg|jpeg|png'
 
 
 ###############################
@@ -108,7 +109,7 @@ if not ((args['image_quality'] > 0) and (args['image_quality'] <= 100)):
     raise ValueError("image_quality has to be between 1 and 100")
 
 # Read Season Captures CSV
-image_names = find_images_in_dir(args['input_image_dir'])
+image_names = find_images_in_dir(args['input_image_dir'], args['image_types'])
 
 print("Found %s images in %s" %
       (len(image_names), args['input_image_dir']))
