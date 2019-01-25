@@ -253,6 +253,11 @@ python3 -m zooniverse_uploads.upload_manifest \
 --password_file ~/keys/passwords.ini
 ```
 
+Note: to upload a specific batch instead use something analogue to:
+```
+--manifest /home/packerc/shared/zooniverse/Manifests/RUA/RUA_S1__batch_1__manifest.json \
+```
+
 To submit the job use the following command:
 
 ```
