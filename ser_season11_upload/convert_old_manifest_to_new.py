@@ -31,6 +31,10 @@ manifest = OrderedDict()
 omitted_images_counter = 0
 images_not_found_counter = 0
 valid_codes = ('0', '3')
+images_on_disk = set(os.listdir(compressed_images_path))
+missing_on_disk = 0
+
+# Testcase: "SER_S11#J09#2#1842"
 
 for row in input:
     # Extract important fields
@@ -43,12 +47,36 @@ for row in input:
     original_images = [
         row[name_to_id_mapper[x]] for x in
         ['path 1', 'path 2', 'path 3']]
-    # replace NA string
+    # remove if NA string
     original_images = ['' if x == 'NA' else x for x in original_images]
     compressed_images = ['' if x.endswith('NA') else x for x in compressed_images]
+    # check existence of images on disk
+    to_remove = list()
+    for i, (orig, comp) in enumerate(zip(original_images, compressed_images)):
+        if (comp == '') or (orig == ''):
+            to_remove.append(i)
+            missing_on_disk += 1
+            continue
+        if os.path.basename(comp) not in images_on_disk:
+            to_remove.append(i)
+            print("Removing image %s - orig: %s comp: %s" % (i, orig, comp))
+            missing_on_disk += 1
+    original_images = [original_images[i] for i in range(0, 3) if i not in to_remove]
+    compressed_images = [compressed_images[i] for i in range(0, 3) if i not in to_remove]
     # skip if no images
     if not any([x is not '' for x in original_images]):
         continue
+    # Correct bug of original season captures
+    bug_found = False
+    for i, orig in enumerate(original_images):
+        bug = 'SER_S11/SER_S11/SER_S11_R1/SER_S11_SER_S11_R1'
+        correct = 'SER_S11/S11/S11_R1/SER_S11_S11_R1'
+        if bug in orig:
+            bug_found = True
+            print("Potential issue: %s" % orig)
+    if bug_found:
+        original_images = [x.replace(bug, correct) for x in original_images]
+        print("Corrected paths: %s" % original_images)
     # unique capture id
     capture_id = '#'.join([season, site, roll, capture])
     # Create a new entry in the manifest
