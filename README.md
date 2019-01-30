@@ -402,6 +402,17 @@ The script does the following:
 2. Extract annotations and do some cleaning and mapping
 3. Write extracted annotations to a file
 
+
+To run the code use the following command:
+```
+cd $HOME/snapshot_safari_misc
+
+python3 -m zooniverse_exports.extract_legacy_serengeti \
+--classification_csv '/home/packerc/shared/zooniverse/Exports/SER/2019-01-27_serengeti_classifications.csv' \
+--output_path '/home/packerc/shared/zooniverse/Exports/SER/' \
+--season_to_process 'S3'
+```
+
 ### Output
 
 The data has the following output-format:
