@@ -309,7 +309,7 @@ def process_season_classifications(path, img_to_capture, flags):
             try:
                 # extract classification-level info
                 classification_info = extract_classification_info(
-                    line, row_name_to_id_mapper)
+                    line, row_name_to_id_mapper, flags)
                 # build lookup key to get capture id
                 season = build_season_id(classification_info['season'])
                 image_name = classification_info['filenames'].split(';')[0]
@@ -344,7 +344,6 @@ def process_season_classifications(path, img_to_capture, flags):
             species_not_empty = (answers['species'] is not '')
             if ret_blank and species_not_empty:
                 n_retire_reason_blank_but_species += 1
-
     print("Removed {} non-eligible classifications".format(
          n_not_eligible))
     print("Capture Id not found {}".format(
@@ -353,7 +352,6 @@ def process_season_classifications(path, img_to_capture, flags):
         n_annos_without_images))
     print("Found {} classifications with blank and species annotation".format(
         n_retire_reason_blank_but_species))
-
     return classifications
 
 
