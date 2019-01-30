@@ -326,24 +326,25 @@ def process_season_classifications(path, img_to_capture, flags):
                         n_annos_without_images += 1
                 classification_info['capture_id'] = capture_id
                 # get answers
-                answers = extract_questions(line, row_name_to_id_mapper)
+                answers = extract_questions(line, row_name_to_id_mapper, flags)
                 # map answers
-                map_answers(answers, row_name_to_id_mapper)
+                map_answers(answers, row_name_to_id_mapper, flags)
                 record = {**classification_info, **answers}
                 # store in classifiations dict
                 c_id = classification_info['classification_id']
                 if c_id not in classifications:
                     classifications[c_id] = list()
                 classifications[c_id].append(record)
+                # checks
+                ret_blank = (classification_info['retire_reason'] == 'blank')
+                species_not_empty = (answers['species'] is not '')
+                if ret_blank and species_not_empty:
+                    n_retire_reason_blank_but_species += 1
             except Exception:
                 print("Error - Skipping Record %s" % line_no)
                 print("Full line:\n %s" % line)
                 print(traceback.format_exc())
-            # checks
-            ret_blank = (classification_info['retire_reason'] == 'blank')
-            species_not_empty = (answers['species'] is not '')
-            if ret_blank and species_not_empty:
-                n_retire_reason_blank_but_species += 1
+
     print("Removed {} non-eligible classifications".format(
          n_not_eligible))
     print("Capture Id not found {}".format(
