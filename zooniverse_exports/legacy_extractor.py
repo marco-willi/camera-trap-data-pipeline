@@ -365,7 +365,7 @@ def consolidate_all_classifications(classifications):
     for c_id, annotations in classifications.items():
         if needs_consolidation(annotations):
             try:
-                consolidated = consolidate_annotations(annotations)
+                consolidated = consolidate_annotations(annotations, flags)
                 consolidated_classifications[c_id] = consolidated
                 n_consolidations += 1
             except:
