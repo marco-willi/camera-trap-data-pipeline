@@ -356,7 +356,7 @@ def process_season_classifications(path, img_to_capture, flags):
     return classifications
 
 
-def consolidate_all_classifications(classifications):
+def consolidate_all_classifications(classifications, flags):
     """ Consolidate classifications with multiple entries of the same
         species
     """
@@ -374,3 +374,15 @@ def consolidate_all_classifications(classifications):
     print("Consolidated {} classifications with multiple entries for \
           the same species".format(n_consolidations))
     return consolidated_classifications
+
+
+def export_cleaned_annotations(path, classifications, header):
+    """ Export Cleaned Annotation """
+    with open(path, 'w') as f:
+        csv_writer = csv.writer(f, delimiter=',')
+        print("Writing output to %s" % path)
+        csv_writer.writerow(header)
+        for line_no, (_c_id, data) in classifications.items():
+            for annotation in data:
+                row = [annotation[x] for x in header]
+                csv_writer.writerow(row)

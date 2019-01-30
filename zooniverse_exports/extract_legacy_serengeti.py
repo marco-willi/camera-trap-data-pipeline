@@ -100,13 +100,22 @@ from zooniverse_exports import legacy_extractor
 
 args = dict()
 args['classification_csv'] = '/home/packerc/shared/zooniverse/Exports/SER/2019-01-27_serengeti_classifications.csv'
-args['output_csv'] = '/home/packerc/shared/zooniverse/Exports/SER/SER_S1_S10_classifications_extracted.csv'
 args['output_path'] = '/home/packerc/shared/zooniverse/Exports/SER/'
 args['season_captures_path'] = '/home/packerc/shared/season_captures/SER/captures/'
+args['season_to_process'] = 'S1'
+
 args['split_raw_file'] = False
+
+s_id = args['season_to_process']
+
 all_seasons_ids = [
     'S1', 'S2', 'S3', 'S4', 'S5', 'S6',
     'S7', 'S8', 'S9', '10', 'WF1', 'tutorial']
+
+if args['season_to_process'] not in all_seasons_ids:
+    raise ValueError("season_to_process must be one of {}".format(
+        all_seasons_ids))
+
 
 ######################################
 # Configuration
@@ -204,9 +213,6 @@ season_capture_files['10'] = os.path.join(
     args['season_captures_path'],
     '{}_captures.csv'.format('S10'))
 
-
-s_id = 'S1'
-
 img_to_capture = legacy_extractor.build_img_to_capture_map(
     season_capture_files[s_id], flags)
 
@@ -218,7 +224,6 @@ season_file = all_seasons[s_id]
 
 classifications = legacy_extractor.process_season_classifications(
     season_file, img_to_capture, flags)
-
 
 ######################################
 # Consolidate Classifications with
@@ -257,9 +262,9 @@ answers_stats = {k: Counter(v).most_common() for k, v in answers.items()}
 season_stats.most_common()
 retire_reasons_stats.most_common()
 
-for stat in answers_stats:
-    for question, n in stat.items():
-        print('{:10}:{}'.formate(question, n))
+for question, question_stats in answers_stats.items():
+    for (answer, n) in question_stats:
+        print('{:10} - {:10} - {}'.format(question, answer, n))
 
 # Print examples
 for i, (_id, data) in enumerate(classifications.items()):
@@ -269,24 +274,18 @@ for i, (_id, data) in enumerate(classifications.items()):
 
 
 ######################################
-# Export File
+# Export Annotations to a File
 ######################################
 
-args['output_csv']
-def export_cleaned_annotations(path, classifications):
-    """ Export Cleaned Annotation """
-    with open(path, 'w') as f:
-        csv_writer = csv.writer(f, delimiter=',')
-        print("Writing output to %s" % path)
-        csv_writer.writerow(header)
-        tot = len(all_records)
-        for line_no, (_c_id, data) in classifications.items():
+# access a random classification and get all the keys of the first
+# annotation -- this is consistent for all other annotations
+header = list(classifications[list(classifications.keys())[0]][0].keys())
 
-        for line_no, record in enumerate(all_records):
-            # get classification info data
-            class_data = [record[x] for x in CLASSIFICATION_INFO_TO_ADD]
-            # get annotation info data
-            answers = unpack_annotations(record['annos'])
-            answers_ordered = [answers[x] if x in answers else '' for x in questions]
-            csv_writer.writerow(class_data + answers_ordered)
-            print_progress(line_no, tot)
+output_paths = {
+    k: os.path.join(
+        args['output_path'],
+        'SER_{}_classifications_extracted.csv'.format(k))
+    for k in all_seasons.keys()}
+
+legacy_extractor.export_cleaned_annotations(
+    output_paths[s_id], classifications, header)
