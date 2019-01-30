@@ -264,7 +264,7 @@ retire_reasons_stats.most_common()
 
 for question, question_stats in answers_stats.items():
     for (answer, n) in question_stats:
-        print('{:10} - {:10} - {}'.format(question, answer, n))
+        print('{:15} - {:15} - {}'.format(question, answer, n))
 
 # Print examples
 for i, (_id, data) in enumerate(classifications.items()):

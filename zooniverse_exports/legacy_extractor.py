@@ -319,7 +319,10 @@ def process_season_classifications(path, img_to_capture, flags):
                 try:
                     capture_id = img_to_capture[img_key]
                 except:
-                    print("Did not find img_key: {}".format(img_key))
+                    if n_capture_id_not_found < 10:
+                        print("Did not find img_key: {}".format(img_key))
+                    elif n_capture_id_not_found == 10:
+                        print("Not printing more not found img_key msgs...")
                     n_capture_id_not_found += 1
                     capture_id = ''
                     if len(image_name) == 0:
@@ -382,7 +385,11 @@ def export_cleaned_annotations(path, classifications, header):
         csv_writer = csv.writer(f, delimiter=',')
         print("Writing output to %s" % path)
         csv_writer.writerow(header)
-        for line_no, (_c_id, data) in classifications.items():
+        n_annos_written = 0
+        for line_no, (_c_id, data) in enumerate(classifications.items()):
             for annotation in data:
                 row = [annotation[x] for x in header]
                 csv_writer.writerow(row)
+                n_annos_written += 1
+        print("Wrote {} classifications and {} annotations".format(
+            line_no, n_annos_written))
