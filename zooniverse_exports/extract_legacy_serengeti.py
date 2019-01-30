@@ -89,203 +89,221 @@
 """
 import time
 import os
+import argparse
 from collections import Counter
 
 from zooniverse_exports import legacy_extractor
 
+# To Test
+# args = dict()
+# args['classification_csv'] = '/home/packerc/shared/zooniverse/Exports/SER/2019-01-27_serengeti_classifications.csv'
+# args['output_path'] = '/home/packerc/shared/zooniverse/Exports/SER/'
+# args['season_captures_path'] = '/home/packerc/shared/season_captures/SER/captures/'
+# args['season_to_process'] = 'S2'
+# args['split_raw_file'] = False
 
 ######################################
 # Parameters
 ######################################
 
-args = dict()
-args['classification_csv'] = '/home/packerc/shared/zooniverse/Exports/SER/2019-01-27_serengeti_classifications.csv'
-args['output_path'] = '/home/packerc/shared/zooniverse/Exports/SER/'
-args['season_captures_path'] = '/home/packerc/shared/season_captures/SER/captures/'
-args['season_to_process'] = 'S1'
+if __name__ == '__main__':
 
-args['split_raw_file'] = False
+    # Parse command line arguments
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--classification_csv", type=str, required=True,
+        help="classifications csv")
+    parser.add_argument(
+        "--output_path", type=str, required=True,
+        help="Output path for csv results")
+    parser.add_argument(
+        '--season_to_process', type=str, required=True)
+    parser.add_argument(
+        '--season_captures_path', type=str,
+        default='/home/packerc/shared/season_captures/SER/captures/',
+        help="Path to dir with captures.csvs")
+    parser.add_argument('--split_raw_file', action='store_true')
 
-s_id = args['season_to_process']
+    args = vars(parser.parse_args())
+    s_id = args['season_to_process']
 
-all_seasons_ids = [
-    'S1', 'S2', 'S3', 'S4', 'S5', 'S6',
-    'S7', 'S8', 'S9', '10', 'WF1', 'tutorial']
+    all_seasons_ids = [
+        'S1', 'S2', 'S3', 'S4', 'S5', 'S6',
+        'S7', 'S8', 'S9', '10', 'WF1', 'tutorial']
 
-if args['season_to_process'] not in all_seasons_ids:
-    raise ValueError("season_to_process must be one of {}".format(
-        all_seasons_ids))
+    if args['season_to_process'] not in all_seasons_ids:
+        raise ValueError("season_to_process must be one of {}".format(
+            all_seasons_ids))
 
+    ######################################
+    # Configuration
+    ######################################
 
-######################################
-# Configuration
-######################################
+    flags = dict()
 
-flags = dict()
-
-# map column names of the input csv for clarity and consistency
-flags['CSV_HEADER_MAPPER'] = {
-    'id': 'classification_id',
-    'subject_zooniverse_id': 'subject_id',
-    "species_count": 'count',
-    "babies": 'young_present'
-    }
-
-# map different answers to the question columns
-flags['ANSWER_TYPE_MAPPER'] = {
-    'species': {
-        'no animals present': 'blank',
-        'nothing': 'blank',
-        '': 'blank'
-        },
-    'young_present': {
-        'false': 0,
-        'true': 1
-        },
-    'standing': {
-        'false': 0,
-        'true': 1
-        },
-    'resting': {
-        'false': 0,
-        'true': 1
-        },
-    'moving': {
-        'false': 0,
-        'true': 1
-        },
-    'eating': {
-        'false': 0,
-        'true': 1
-        },
-    'interacting': {
-        'false': 0,
-        'true': 1
+    # map column names of the input csv for clarity and consistency
+    flags['CSV_HEADER_MAPPER'] = {
+        'id': 'classification_id',
+        'subject_zooniverse_id': 'subject_id',
+        "species_count": 'count',
+        "babies": 'young_present'
         }
-    }
 
-# Define the question columns
-flags['CSV_QUESTIIONS'] = [
-    'species', 'count', 'young_present',
-    "standing", "resting", "moving", "eating", "interacting"]
+    # map different answers to the question columns
+    flags['ANSWER_TYPE_MAPPER'] = {
+        'species': {
+            'no animals present': 'blank',
+            'nothing': 'blank',
+            '': 'blank'
+            },
+        'young_present': {
+            'false': 0,
+            'true': 1
+            },
+        'standing': {
+            'false': 0,
+            'true': 1
+            },
+        'resting': {
+            'false': 0,
+            'true': 1
+            },
+        'moving': {
+            'false': 0,
+            'true': 1
+            },
+        'eating': {
+            'false': 0,
+            'true': 1
+            },
+        'interacting': {
+            'false': 0,
+            'true': 1
+            }
+        }
 
-# Columns to export
-flags['CLASSIFICATION_INFO_TO_ADD'] = [
-    'user_name', 'created_at', 'subject_id', 'capture_event_id',
-    "retire_reason", "season", "site", "roll", "filenames", "timestamps",
-    'classification_id']
+    # Define the question columns
+    flags['CSV_QUESTIIONS'] = [
+        'species', 'count', 'young_present',
+        "standing", "resting", "moving", "eating", "interacting"]
 
-######################################
-# Split the complete Zooniverse export
-# into season files
-# - SER_{}_classifications_raw.csv
-######################################
+    # Columns to export
+    flags['CLASSIFICATION_INFO_TO_ADD'] = [
+        'user_name', 'created_at', 'subject_id', 'capture_event_id',
+        "retire_reason", "season", "site", "roll", "filenames", "timestamps",
+        'classification_id']
 
-if args['split_raw_file']:
-    file_writers = legacy_extractor.split_raw_classification_csv(
-        args['classification_csv'], args['output_path'])
-    all_seasons = {
-        k: os.path.join(
-            args['output_path'],
-            'SER_{}_classifications_raw.csv'.format(k))
-        for k in file_writers.keys()}
-else:
-    # create the season file paths
-    all_seasons = {
-        k: os.path.join(
-            args['output_path'],
-            'SER_{}_classifications_raw.csv'.format(k))
-        for k in all_seasons_ids}
+    ######################################
+    # Split the complete Zooniverse export
+    # into season files
+    # - SER_{}_classifications_raw.csv
+    ######################################
 
-######################################
-# Read meta-data from season capture
-# files
-######################################
+    if args['split_raw_file']:
+        file_writers = legacy_extractor.split_raw_classification_csv(
+            args['classification_csv'], args['output_path'])
+        all_seasons = {
+            k: os.path.join(
+                args['output_path'],
+                'SER_{}_classifications_raw.csv'.format(k))
+            for k in file_writers.keys()}
+    else:
+        # create the season file paths
+        all_seasons = {
+            k: os.path.join(
+                args['output_path'],
+                'SER_{}_classifications_raw.csv'.format(k))
+            for k in all_seasons_ids}
 
-season_capture_files = dict()
-for k, v in all_seasons.items():
-    season_capture_files[k] = os.path.join(
+    ######################################
+    # Read meta-data from season capture
+    # files
+    ######################################
+
+    season_capture_files = dict()
+    for k, v in all_seasons.items():
+        season_capture_files[k] = os.path.join(
+            args['season_captures_path'],
+            '{}_captures.csv'.format(k))
+
+    # special fix for S10
+    season_capture_files['10'] = os.path.join(
         args['season_captures_path'],
-        '{}_captures.csv'.format(k))
+        '{}_captures.csv'.format('S10'))
 
-# special fix for S10
-season_capture_files['10'] = os.path.join(
-    args['season_captures_path'],
-    '{}_captures.csv'.format('S10'))
+    img_to_capture = legacy_extractor.build_img_to_capture_map(
+        season_capture_files[s_id], flags)
 
-img_to_capture = legacy_extractor.build_img_to_capture_map(
-    season_capture_files[s_id], flags)
+    ######################################
+    # Process Classifications
+    ######################################
 
-######################################
-# Process Classifications
-######################################
+    season_file = all_seasons[s_id]
 
-season_file = all_seasons[s_id]
+    classifications = legacy_extractor.process_season_classifications(
+        season_file, img_to_capture, flags)
 
-classifications = legacy_extractor.process_season_classifications(
-    season_file, img_to_capture, flags)
+    ######################################
+    # Consolidate Classifications with
+    # multiple entries of the same
+    # species
+    ######################################
 
-######################################
-# Consolidate Classifications with
-# multiple entries of the same
-# species
-######################################
+    consolidated_classifications = \
+        legacy_extractor.consolidate_all_classifications(classifications)
 
-consolidated_classifications = \
-    legacy_extractor.consolidate_all_classifications(classifications)
+    # merge consolidated annotations into classifications dict
+    for c_id, annotations in consolidated_classifications.items():
+        classifications[c_id] = annotations
 
-# merge consolidated annotations into classifications dict
-for c_id, annotations in consolidated_classifications.items():
-    classifications[c_id] = annotations
+    ######################################
+    # Print Stats
+    ######################################
 
-######################################
-# Print Stats
-######################################
+    retire_reasons = list()
+    seasons = list()
+    answers = {k: list() for k in flags['CSV_QUESTIIONS']}
 
-retire_reasons = list()
-seasons = list()
-answers = {k: list() for k in flags['CSV_QUESTIIONS']}
+    for c_id, annotations in classifications.items():
+        if not isinstance(annotations, list):
+            print(annotations)
+            time.sleep(3)
+        for annotation in annotations:
+            retire_reasons.append(annotation['retire_reason'])
+            seasons.append(annotation['season'])
+            for question, _answers_list in answers.items():
+                _answers_list.append(annotation[question])
 
-for c_id, annotations in classifications.items():
-    if not isinstance(annotations, list):
-        print(annotations)
-        time.sleep(3)
-    for annotation in annotations:
-        retire_reasons.append(annotation['retire_reason'])
-        seasons.append(annotation['season'])
-        for question, _answers_list in answers.items():
-            _answers_list.append(annotation[question])
+    season_stats = Counter(seasons)
+    retire_reasons_stats = Counter(retire_reasons)
+    answers_stats = {k: Counter(v).most_common() for k, v in answers.items()}
+    season_stats.most_common()
+    retire_reasons_stats.most_common()
 
-season_stats = Counter(seasons)
-retire_reasons_stats = Counter(retire_reasons)
-answers_stats = {k: Counter(v).most_common() for k, v in answers.items()}
-season_stats.most_common()
-retire_reasons_stats.most_common()
+    for question, question_stats in answers_stats.items():
+        for (answer, n) in question_stats:
+            print('{:15} - {:15} - {}'.format(question, answer, n))
 
-for question, question_stats in answers_stats.items():
-    for (answer, n) in question_stats:
-        print('{:15} - {:15} - {}'.format(question, answer, n))
+    # Print examples
+    print("Show some example classifications")
+    for i, (_id, data) in enumerate(classifications.items()):
+        if i > 10:
+            break
+        print("ID: {}, Data: {}".format(_id, data))
 
-# Print examples
-for i, (_id, data) in enumerate(classifications.items()):
-    if i > 10:
-        break
-    print("ID: {}, Data: {}".format(_id, data))
+    ######################################
+    # Export Annotations to a File
+    ######################################
 
+    # access a random classification and get all the keys of the first
+    # annotation -- this is consistent for all other annotations
+    header = list(classifications[list(classifications.keys())[0]][0].keys())
 
-######################################
-# Export Annotations to a File
-######################################
+    output_paths = {
+        k: os.path.join(
+            args['output_path'],
+            'SER_{}_classifications_extracted.csv'.format(k))
+        for k in all_seasons.keys()}
 
-# access a random classification and get all the keys of the first
-# annotation -- this is consistent for all other annotations
-header = list(classifications[list(classifications.keys())[0]][0].keys())
-
-output_paths = {
-    k: os.path.join(
-        args['output_path'],
-        'SER_{}_classifications_extracted.csv'.format(k))
-    for k in all_seasons.keys()}
-
-legacy_extractor.export_cleaned_annotations(
-    output_paths[s_id], classifications, header)
+    legacy_extractor.export_cleaned_annotations(
+        output_paths[s_id], classifications, header)
