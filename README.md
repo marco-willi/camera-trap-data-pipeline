@@ -372,3 +372,40 @@ python3 -m zooniverse_exports.add_meta_data_to_aggregated_class \
 
 1. It is possible to add subjects to a subject-set that is linked to a workflow and is itself in an active project volunteers are currently working on.
 2. It can happen that the upload_manifest.pbs script crashes frequently and early. So far, such phases have been temporary hence the advise: "keep trying!".
+
+## Processing Snapshot Serengeti S1-S10 data (legacy format)
+
+Data for Snapshot Serengeti (S1-S10) has been collected via an old Zooniverse platform (Oruboros) and has a different format than the newer Snapshot Safari data. Therefore, it requires a separate script for processing that data to be standardized, claned and flattened for loading into a SQL database.
+
+### Data
+
+The data has been saved to MSI shared drives:
+/home/packerc/shared/zooniverse/Exports/SER/2019-01-27_serengeti_classifications.csv
+
+### Processing Codes
+
+The following codes take as input the full export from Zooniverse. Note that the data is quite large (over 6GB and more than 25 mio records).
+
+The scripts can be found here:
+[Scripts for S1-S10](zooniverse_exports/extract_legacy_serengeti.py)
+
+The script is a re-implementation of the following code:
+https://github.com/mkosmala/SnapshotSerengetiScripts/
+
+Reimplemented due to:
+- dealing with additional seasons with different format
+- efficiency reasons
+- getting rid of certain undocumented pre-processing steps
+
+The script does the following:
+1. Split the raw file into seasons
+2. Extract annotations and do some cleaning and mapping
+3. Write extracted annotations to a file
+
+### Output
+
+The data has the following output-format:
+```
+user_name,created_at,subject_id,capture_event_id,retire_reason,season,site,roll,filenames,timestamps,classification_id,capture_id,species,count,young_present,standing,resting,moving,eating,interacting
+XYZ,2012-12-11 06:27:56 UTC,ASG0004fwr,221374,consensus,S2,E04,R3,IMAG1524.JPG;IMAG1523.JPG;IMAG1522.JPG,2011-07-14T17:27:04-05:00;2011-07-14T17:27:04-05:00;2011-07-14T17:27:04-05:00,50c6d26c9177d0340a0001c5,SER_S2#E04#R3#570,zebra,3,0,0,0,1,1,0
+```
