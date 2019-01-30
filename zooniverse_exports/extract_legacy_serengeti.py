@@ -255,7 +255,7 @@ if __name__ == '__main__':
     ######################################
 
     consolidated_classifications = \
-        legacy_extractor.consolidate_all_classifications(classifications)
+        legacy_extractor.consolidate_all_classifications(classifications, flags)
 
     # merge consolidated annotations into classifications dict
     for c_id, annotations in consolidated_classifications.items():
