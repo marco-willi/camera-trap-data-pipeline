@@ -146,6 +146,13 @@ if __name__ == '__main__':
 
     flags = dict()
 
+    flags['QUESTION_PREFIX'] = 'question'
+    flags['QUESTION_DELIMITER'] = '__'
+
+    flags['QUESTIONS'] = (
+        'species', 'young_present', 'standing',
+        'resting', 'moving', 'eating', 'interacting')
+
     # map column names of the input csv for clarity and consistency
     flags['CSV_HEADER_MAPPER'] = {
         'id': 'classification_id',
@@ -255,7 +262,8 @@ if __name__ == '__main__':
     ######################################
 
     consolidated_classifications = \
-        legacy_extractor.consolidate_all_classifications(classifications, flags)
+        legacy_extractor.consolidate_all_classifications(
+            classifications, flags)
 
     # merge consolidated annotations into classifications dict
     for c_id, annotations in consolidated_classifications.items():
@@ -311,4 +319,4 @@ if __name__ == '__main__':
         for k in all_seasons.keys()}
 
     legacy_extractor.export_cleaned_annotations(
-        output_paths[s_id], classifications, header)
+        output_paths[s_id], classifications, header, flags)

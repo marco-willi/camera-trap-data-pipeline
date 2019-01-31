@@ -413,10 +413,16 @@ python3 -m zooniverse_exports.extract_legacy_serengeti \
 --season_to_process 'S3'
 ```
 
+Available seasons:
+```
+'S1', 'S2', 'S3', 'S4', 'S5', 'S6',
+'S7', 'S8', 'S9', '10', 'WF1', 'tutorial'
+```
+
 ### Output
 
 The data has the following output-format:
 ```
-user_name,created_at,subject_id,capture_event_id,retire_reason,season,site,roll,filenames,timestamps,classification_id,capture_id,species,count,young_present,standing,resting,moving,eating,interacting
+user_name,created_at,subject_id,capture_event_id,retire_reason,season,site,roll,filenames,timestamps,classification_id,capture_id,question__species,question__count,question__young_present,question__standing,question__resting,question__moving,question__eating,question__interacting
 XYZ,2012-12-11 06:27:56 UTC,ASG0004fwr,221374,consensus,S2,E04,R3,IMAG1524.JPG;IMAG1523.JPG;IMAG1522.JPG,2011-07-14T17:27:04-05:00;2011-07-14T17:27:04-05:00;2011-07-14T17:27:04-05:00,50c6d26c9177d0340a0001c5,SER_S2#E04#R3#570,zebra,3,0,0,0,1,1,0
 ```

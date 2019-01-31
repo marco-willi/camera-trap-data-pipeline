@@ -156,6 +156,84 @@ def is_eligible(line, mapper, cond):
     return True
 
 
+# build question_answer pairs
+def analyze_question_types(all_records):
+    """ Analyze annotations to determine question types
+        Output: {'species': 'single',
+                 'whatbehaviorsdoyousee': 'multi'}
+    """
+    question_types = dict()
+    for record in all_records:
+        annos = record['annos']
+        for anno in annos:
+            for question, answers in anno.items():
+                if isinstance(answers, str):
+                    question_types[question] = 'single'
+                elif isinstance(answers, list):
+                    question_types[question] = 'multi'
+    return question_types
+
+
+def define_question_answers(all_records):
+    """ Analyze annotations to determine question and answer mappings
+        Output:
+         {'species': ['vulture', 'zebra', 'nyala', ...],
+          'young_present': ['yes', 'no'],
+          }
+    """
+    question_answers = dict()
+    for record in all_records:
+        annos = record['annos']
+        for anno in annos:
+            for question, answers in anno.items():
+                if question not in question_answers:
+                    question_answers[question] = set()
+                if isinstance(answers, str):
+                    question_answers[question].add(answers)
+                elif isinstance(answers, list):
+                    for answer in answers:
+                        question_answers[question].add(answer)
+    return {k: list(v) for k, v in question_answers.items()}
+
+
+def build_question_header(question_answers, question_types):
+    """ Build a header based on question type an answers
+        Output: ['species', 'count', 'eating', 'interacting',
+                 'moving', 'resting', 'standing',
+                 'young_present', 'horns_visible']
+    """
+    question_header = list()
+    for k, v in question_answers.items():
+        if question_types[k] == 'single':
+            question_header.append(k)
+        else:
+            sub_answers = [x for x in v]
+            sub_answers.sort()
+            question_header += sub_answers
+    return question_header
+
+
+def flatten_annotations(annotations, question_types, question_answers):
+    """ Unpack / Flatten Annotations
+    Input: [{'species': 'zebra', 'whatbehaviorsdoyousee':
+            ['standing', 'resting']}]
+    Output: {'species': 'zebra',
+            'standing': '1', 'resting': '1', 'moving': '0', ...}
+    """
+    flattened = dict()
+    for question_answer in annotations:
+        for question, answers in question_answer.items():
+            if question_types[question] == 'multi':
+                for choice in question_answers[question]:
+                    if choice in answers:
+                        flattened[choice] = '1'
+                    else:
+                        flattened[choice] = '0'
+            else:
+                flattened[question] = answers
+    return flattened
+
+
 def rename_dict_keys(input, map):
     """ Rename keys of a dict
     Example:

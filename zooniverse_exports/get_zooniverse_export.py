@@ -10,6 +10,7 @@
 """
 import argparse
 import csv
+import os
 
 from panoptes_client import Project, Panoptes
 
@@ -70,3 +71,5 @@ if __name__ == '__main__':
 
     print("Finished Writing File %s - Wrote %s records" %
           (args['output_file'], i))
+
+    os.chmod(args['output_file'], 0o660)

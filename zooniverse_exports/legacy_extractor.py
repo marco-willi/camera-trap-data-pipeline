@@ -379,12 +379,23 @@ def consolidate_all_classifications(classifications, flags):
     return consolidated_classifications
 
 
-def export_cleaned_annotations(path, classifications, header):
+def export_cleaned_annotations(path, classifications, header, flags):
     """ Export Cleaned Annotation """
+
+    # map questions if necessary
+    header_to_print = list()
+    for col in header:
+        if col in flags['QUESTIONS']:
+            header_to_print.append(
+                flags['QUESTION_DELIMITER'].join(
+                    [flags['QUESTION_PREFIX'], col]))
+        else:
+            header_to_print.append(col)
+
     with open(path, 'w') as f:
         csv_writer = csv.writer(f, delimiter=',')
         print("Writing output to %s" % path)
-        csv_writer.writerow(header)
+        csv_writer.writerow(header_to_print)
         n_annos_written = 0
         for line_no, (_c_id, data) in enumerate(classifications.items()):
             for annotation in data:
