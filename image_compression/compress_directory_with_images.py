@@ -13,6 +13,12 @@ import time
 from utils import estimate_remaining_time
 
 
+# python3 -m image_compression.compress_directory_with_images \
+# --input_image_dir '/home/packerc/shared/snapshot_websites/SpeciesImages_Master/' \
+# --output_image_dir '/home/packerc/shared/snapshot_websites/SpeciesImages_Master_Compressed/' \
+# --max_image_pixel_side 1200 \
+# --image_quality 50
+
 ###############################
 # Image Compression and
 # multiprocessing Functions
@@ -64,8 +70,13 @@ def compress_images(image_source_list,
                                         max_pixel_of_largest_side],
                                   resample=1)
             if save_quality is not None:
-                img.save(dest, "JPEG",
-                         quality=save_quality)
+                try:
+                    img.save(dest, "JPEG",
+                             quality=save_quality)
+                except:
+                    img.save(dest)
+                    print("Failed to change save_quality of {}".format(dest))
+
             else:
                 img.save(dest)
             img.close()
@@ -147,3 +158,13 @@ if __name__ == "__main__":
         image_dest_list=image_dest_path_list,
         save_quality=args['image_quality'],
         max_pixel_of_largest_side=args['max_image_pixel_side'])
+
+    # set r/w permissions of all images to group
+    print("Setting file permissions for all images")
+    for img in image_dest_path_list:
+        try:
+            os.chmod(img, 0o660)
+        except:
+            pass
+    # set r/w/x permissions of directory to group
+    os.chmod(args['output_image_dir'], 0o770)
