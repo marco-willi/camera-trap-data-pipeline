@@ -104,10 +104,10 @@ from zooniverse_exports import legacy_extractor
 # args['season_to_process'] = 'S2'
 # args['split_raw_file'] = False
 
-python3 -m zooniverse_exports.extract_legacy_serengeti \
---classification_csv '/home/packerc/shared/zooniverse/Exports/SER/2019-01-27_serengeti_classifications.csv' \
---output_path '/home/packerc/shared/zooniverse/Exports/SER/' \
---season_to_process 'S3'
+# python3 -m zooniverse_exports.extract_legacy_serengeti \
+# --classification_csv '/home/packerc/shared/zooniverse/Exports/SER/2019-01-27_serengeti_classifications.csv' \
+# --output_path '/home/packerc/shared/zooniverse/Exports/SER/' \
+# --season_to_process 'S3'
 
 ######################################
 # Parameters
