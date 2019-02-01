@@ -142,6 +142,14 @@ if __name__ == '__main__':
         raise ValueError("season_to_process must be one of {}".format(
             all_seasons_ids))
 
+    if not os.path.isdir(args['output_path']):
+        raise ValueError("output_path: {} must be a directory".format(
+            args['output_path']))
+
+    if not os.path.isfile(args['classification_csv']):
+        raise ValueError("classification_csv: {} must be a file".format(
+            args['classification_csv']))
+
     ######################################
     # Configuration
     ######################################
@@ -149,8 +157,7 @@ if __name__ == '__main__':
     # logging
     log_file_name = create_logfile_name(
         'extract_legacy_classifications_{}'.format(s_id))
-    log_file_path = os.path.join(
-        os.path.dirname(args['output_csv']), log_file_name)
+    log_file_path = os.path.join(args['output_path'], log_file_name)
     setup_logger(log_file_path)
     logger = logging.getLogger(__name__)
 
