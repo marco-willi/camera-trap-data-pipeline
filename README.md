@@ -314,15 +314,29 @@ click on 'Data Exports', and click on new 'Request new classification export'.
 
 ```
 python3 -m zooniverse_exports.get_zooniverse_export \
-        -password_file ~/keys/passwords.ini \
-        -project_id 5155 \
-        -output_file /home/packerc/shared/zooniverse/Exports/RUA/RUA_S1_classifications.csv \
-        -export_type classifications \
-        -new_export 0
+        --password_file ~/keys/passwords.ini \
+        --project_id 5155 \
+        --output_file /home/packerc/shared/zooniverse/Exports/RUA/RUA_S1_classifications.csv \
+        --export_type classifications \
+        --new_export 0
 ```
 
+#### Structure of Zooniverse Data (to be verified)
 
-### Extract Zooniverse Classifications
+1. One classification contains 1:N tasks
+2. One task contains 1:N identifications (for survey task)
+3. One task contains 1:N answers (for questions task)
+4. One identification contains 1:N answers (for survey task)
+5. One answer has 1:N sub-answers (for survey task)
+
+Example:
+1. A task is to identify animals (survey task)
+2. One task contains two animal identifications, e.g, zebra and wildebeest
+3. One identification has multiple answers, e.g., species name and behavior
+4. One answer may have multiple selections, e.g, different behaviors
+
+
+### Extract Zooniverse Classifications (in development)
 
 This extracts the relevant fields of a Zooniverse classification file
 and creates a csv with one line per annotation. All classifications have to
@@ -339,7 +353,7 @@ python3 -m zooniverse_exports.extract_classifications \
 ```
 
 
-### Aggregate Extracted Zooniverse Classifications
+### Aggregate Extracted Zooniverse Classifications (in development)
 
 This aggregates the extracted Zooniverse classifications using the
 plurality algorithm to get one single label per species detection for each
@@ -351,7 +365,7 @@ python3 -m zooniverse_exports.aggregate_extractions \
         -output_csv /home/packerc/shared/zooniverse/Exports/RUA/RUA_S1_classifications_aggregated.csv
 ```
 
-### Add Meta-Data to Aggregated Classifications (work in progress..)
+### Add Meta-Data to Aggregated Classifications (in development)
 
 This function adds meta-data to aggregated classifications, like location, timestamp, and
 other data currently used for input to machine learning models. This function is unfinished
@@ -373,7 +387,7 @@ python3 -m zooniverse_exports.add_meta_data_to_aggregated_class \
 1. It is possible to add subjects to a subject-set that is linked to a workflow and is itself in an active project volunteers are currently working on.
 2. It can happen that the upload_manifest.pbs script crashes frequently and early. So far, such phases have been temporary hence the advise: "keep trying!".
 
-## Processing Snapshot Serengeti S1-S10 data (legacy format)
+## Processing Snapshot Serengeti S1-S10 data (legacy format) - (in development)
 
 Data for Snapshot Serengeti (S1-S10) has been collected via an old Zooniverse platform (Oruboros) and has a different format than the newer Snapshot Safari data. Therefore, it requires a separate script for processing that data to be standardized, claned and flattened for loading into a SQL database.
 
@@ -421,7 +435,30 @@ Available seasons:
 
 ### Output
 
-The data has the following output-format:
+The output is on level annotation. There is no unique identifier for an annotation.
+The data has the following columns:
+
+```
+user_name: dispaly name of user (if logged in, else 'not-logged-in..')
+created_at: when the classification was made
+subject_id: zooniverse subject_id (unique id per capture event)
+capture_event_id: old capture_event_id as uploaded to zooniverse
+retire_reason: string defining the retirement reason as defined by Zooniverse
+season,site,roll: internal id for season, site, roll
+filenames: image names, separated by ; if multiple
+timestamps: image timestamps, separated by ; if multiple
+classification_id: unique id per classification
+capture_id: new-style capture_id
+question__species: task-answer
+question__count: task-answer
+question__young_present: task-answer
+question__standing: task-answer
+question__resting: task-answer
+question__moving: task-answer
+question__eating: task-answer
+question__interacting: task-answer
+```
+
 ```
 user_name,created_at,subject_id,capture_event_id,retire_reason,season,site,roll,filenames,timestamps,classification_id,capture_id,question__species,question__count,question__young_present,question__standing,question__resting,question__moving,question__eating,question__interacting
 XYZ,2012-12-11 06:27:56 UTC,ASG0004fwr,221374,consensus,S2,E04,R3,IMAG1524.JPG;IMAG1523.JPG;IMAG1522.JPG,2011-07-14T17:27:04-05:00;2011-07-14T17:27:04-05:00;2011-07-14T17:27:04-05:00,50c6d26c9177d0340a0001c5,SER_S2#E04#R3#570,zebra,3,0,0,0,1,1,0

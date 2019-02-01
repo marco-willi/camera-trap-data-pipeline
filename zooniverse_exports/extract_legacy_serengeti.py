@@ -42,7 +42,7 @@
           'S10_Q07_R1_IMAG1016.JPG;S10_Q07_R1_IMAG1017.JPG;S10_Q07_R1_IMAG1018.JPG',
           '2015-02-10 17:53:47;2015-02-10 17:53:47;2015-02-10 17:53:47',
           '', '', '', '', '', '', '', '']
-    - Season WTF example (messed up - no capture_id):
+    - Season WF1 example (messed up - no capture_id):
         ['578909a76053a9532d00052f', 'maricksu', 'ASG001qto9', 'tutorial',
          '2016-07-15 16:04:55 UTC', 'none', 'WF1', 'SIM', '13',
          'WF1_SIM_R13_EK001358.JPG', '2014-12-16 10:06:00',

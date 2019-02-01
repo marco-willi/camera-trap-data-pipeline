@@ -22,8 +22,11 @@
 import csv
 from collections import Counter
 import traceback
+import logging
+from logger import setup_logger
 
 from zooniverse_exports import extractor
+from utils import print_nested_dict
 
 
 # Cedar Creek
@@ -43,9 +46,13 @@ args['workflow_version'] = None
 args = dict()
 args['classification_csv'] = '/home/packerc/shared/zooniverse/Exports/GRU/GRU_S1_classifications.csv'
 args['output_csv'] = '/home/packerc/shared/zooniverse/Exports/GRU/GRU_S1_classifications_extracted_v2.csv'
+args['manifest'] = '/home/packerc/shared/zooniverse/Manifests/GRU/'
 args['workflow_id'] = None
 args['workflow_version'] = None
 
+
+setup_logger()
+logger = logging.getLogger(__name__)
 
 
 ######################################
@@ -97,10 +104,20 @@ flags['CLASSIFICATION_INFO_MAPPER'] = {
     'subject_ids': 'subject_id'
 }
 
+flags['SUBJECT_INFO_TO_ADD'] = ['#season', '#site', '#roll', '#capture']
+flags['SUBJECT_INFO_MAPPER'] = {
+    '#season': 'season', '#site': 'site',
+    '#roll': 'roll', '#capture': 'capture'}
+
+
+# logging flags
+print_nested_dict('', flags)
+
 
 classification_condition = dict()
 if args['workflow_id'] is not None:
     classification_condition['workflow_id'] = args['workflow_id']
+
 if args['workflow_version'] is not None:
     classification_condition['workflow_version'] = args['workflow_version']
 
@@ -119,7 +136,7 @@ with open(args['classification_csv'], "r") as ins:
     for line_no, line in enumerate(csv_reader):
         # print status
         if ((line_no % 10000) == 0) and (line_no > 0):
-            print("Processed %s classifications" % line_no)
+            print("Processed {:,} classifications".format(line_no))
         # check eligibility of classification
         eligible = extractor.is_eligible(
             line, row_name_to_id_mapper, classification_condition)
@@ -132,9 +149,21 @@ with open(args['classification_csv'], "r") as ins:
             # map classification info header
             classification_info = extractor.rename_dict_keys(
                 classification_info, flags['CLASSIFICATION_INFO_MAPPER'])
+            # extract subject-level data
+            subject_info_raw = extractor.extract_key_from_json(
+                line, 'subject_data', row_name_to_id_mapper
+                )[classification_info['subject_id']]
+            subject_info_to_add = dict()
+            for field in flags['SUBJECT_INFO_TO_ADD']:
+                try:
+                    subject_info_to_add[field] = subject_info_raw[field]
+                except:
+                    subject_info_to_add[field] = ''
+            subject_info_to_add = extractor.rename_dict_keys(
+                subject_info_to_add, flags['SUBJECT_INFO_MAPPER'])
             # get all annotations (list of annotations)
-            annotations_list = extractor.extract_annotations_from_json(
-                line, row_name_to_id_mapper)
+            annotations_list = extractor.extract_key_from_json(
+                line, 'annotations', row_name_to_id_mapper)
             # if classification_info['classification_id'] == '142058886':
             #     break
             # get all tasks of an annotation
@@ -153,13 +182,13 @@ with open(args['classification_csv'], "r") as ins:
                               'annos': _id_answer_mapped}
                     all_records.append(record)
         except Exception:
-            print("Error - Skipping Record %s" % line_no)
-            print("Full line:\n %s" % line)
-            print(traceback.format_exc())
+            logger.warning("Error - Skipping Record %s" % line_no)
+            logger.warning("Full line:\n %s" % line)
+            logger.warning(traceback.format_exc())
 
-print("Processed {} classifications".format(line_no))
-print("Extracted {} tasks".format(len(all_records)))
-print("Incomplete tasks: {}".format(n_incomplete_tasks))
+logger.info("Processed {:,} classifications".format(line_no))
+logger.info("Extracted {:,} tasks".format(len(all_records)))
+logger.info("Incomplete tasks: {:,}".format(n_incomplete_tasks))
 
 ######################################
 # Analyse Classifications
@@ -201,34 +230,35 @@ for record in all_records:
             user_stats[un]['classifications'].add(record['classification_id'])
 
 # print header info
-print("Found the following questions/tasks: {}".format(
+logger.info("Found the following questions/tasks: {}".format(
     [x for x in question_stats.keys()]))
 
 # Stats not-logged-in users
-print("Number of classifications by not logged in users: {}".format(
+logger.info("Number of classifications by not logged in users: {}".format(
     not_logged_in_counter))
 
 # print label stats
 for question, answer_data in question_stats.items():
-    print("Stats for question: %s" % question)
+    logger.info("Stats for question: %s" % question)
     total = sum([x for x in answer_data.values()])
     for answer, count in answer_data.most_common():
-        print("Answer: {:20} -- counts: {:10} / {} ({:.2f} %)".format(
+        logger.info("Answer: {:20} -- counts: {:10} / {} ({:.2f} %)".format(
             answer, count, total, 100*count/total))
 # workflow stats
-print("Workflow stats:")
+logger.info("Workflow stats:")
 for workflow_id, workflow_version_data in worfklow_stats.items():
     for workflow_version, count in workflow_version_data.items():
-        print("Workflow id: {:7} Workflow version: {:10} -- counts: {}".format(
+        logger.info("Workflow id: {:7} Workflow version: {:10} -- counts: {}".format(
               workflow_id, workflow_version, count))
 # user stats
 user_n_classifications = Counter()
 for user_name, user_data in user_stats.items():
     n_class = len(user_data['classifications'])
     user_n_classifications.update({user_name: n_class})
-print("The top-10 most active users are:")
+
+logger.info("The top-10 most active users are:")
 for i, (user, count) in enumerate(user_n_classifications.most_common(10)):
-    print("Rank {:3} - User: {:20} - Classifications: {}".format(
+    logger.info("Rank {:3} - User: {:20} - Classifications: {}".format(
         i+1, user, count))
 
 
@@ -253,6 +283,12 @@ for question in question_header:
     question_header_print.append(
         flags['QUESTION_DELIMITER'].join([flags['QUESTION_PREFIX'], question]))
 
+logger.info("Automatically generated question header: {}".format(
+    question_header))
+
+logger.info("Automatically generated cleaned question header: {}".format(
+    question_header_print))
+
 ######################################
 # Export
 ######################################
@@ -265,9 +301,12 @@ classification_header_cols = [
     x in classification_header_cols]
 header = classification_header_cols + question_header_print
 
+logger.info("Automatically generated output header: {}".format(
+    header))
+
 with open(args['output_csv'], 'w') as f:
     csv_writer = csv.writer(f, delimiter=',')
-    print("Writing output to %s" % args['output_csv'])
+    logger.info("Writing output to {}".format(args['output_csv']))
     csv_writer.writerow(header)
     tot = len(all_records)
     for line_no, record in enumerate(all_records):
@@ -280,3 +319,4 @@ with open(args['output_csv'], 'w') as f:
             answers[x] if x in answers else '' for x
             in question_header]
         csv_writer.writerow(class_data + answers_ordered)
+    logger.info("Wrote {} records to {}".format(line_no, args['output_csv']))

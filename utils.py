@@ -6,7 +6,11 @@ import time
 import datetime
 import json
 from hashlib import md5
+import logging
 import configparser
+
+
+logger = logging.getLogger(__name__)
 
 
 def print_progress(count, total):
@@ -219,3 +223,19 @@ def read_cleaned_season_file(path, quotechar='"'):
             cleaned_captures.append(row)
 
     return cleaned_captures, name_to_id_mapper
+
+
+def print_nested_dict(key, dic):
+    """ Print potentially nested dictionary """
+    if isinstance(dic, dict):
+        for _id, _data in dic.items():
+            if isinstance(_data, list):
+                for _sub_data in _data:
+                    print_nested_dict("{}_{}".format(key, _id), _sub_data)
+            else:
+                print_nested_dict("{}_{}".format(key, _id), _data)
+    elif isinstance(dic, list):
+        for _sub_data in dic:
+            print_nested_dict(key, _sub_data)
+    else:
+        logger.info("Key: {:20} - Value: {:20}".format(key, dic))

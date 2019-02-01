@@ -1,4 +1,9 @@
-""" Functions to Extract Zooniverse classifications """
+""" Functions to Extract Zooniverse classifications
+    - extraction comprises the analysis of Zooniverse exports to
+      clean and extract relevant information
+    - Zooniverse exports are csvs with nested json structures which capture
+      the complexity of volunteer tasks
+"""
 import json
 import copy
 
@@ -25,7 +30,7 @@ def task_is_completed(task):
     return len(task['value']) > 0
 
 
-def extract_annotations_from_json(line, mapper):
+def extract_key_from_json(line, key, mapper):
     """ Convert annotations to list
     Input: list with Json string
     Output:
@@ -37,7 +42,7 @@ def extract_annotations_from_json(line, mapper):
            }]
         }]
     """
-    json_annos = line[mapper['annotations']]
+    json_annos = line[mapper[key]]
     dict_annos = json.loads(json_annos)
     return dict_annos
 

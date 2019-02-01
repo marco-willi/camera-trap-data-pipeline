@@ -201,7 +201,6 @@ if __name__ == '__main__':
 
     annos_extracted = list()
 
-
     with open(input_file, "r") as ins:
         csv_reader = csv.reader(ins, delimiter=',', quotechar='"')
         for _id, line in enumerate(csv_reader):
