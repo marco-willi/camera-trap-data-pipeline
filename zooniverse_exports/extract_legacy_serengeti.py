@@ -178,7 +178,8 @@ if __name__ == '__main__':
         'id': 'classification_id',
         'subject_zooniverse_id': 'subject_id',
         "species_count": 'count',
-        "babies": 'young_present'
+        "babies": 'young_present',
+        "retire_reason": 'retirement_reason'
         }
 
     # map different answers to the question columns
@@ -222,7 +223,7 @@ if __name__ == '__main__':
     # Columns to export
     flags['CLASSIFICATION_INFO_TO_ADD'] = [
         'user_name', 'created_at', 'subject_id', 'capture_event_id',
-        "retire_reason", "season", "site", "roll", "filenames", "timestamps",
+        "retirement_reason", "season", "site", "roll", "filenames", "timestamps",
         'classification_id']
 
     # logging flags
@@ -296,7 +297,7 @@ if __name__ == '__main__':
     # Print Stats
     ######################################
 
-    retire_reasons = list()
+    retirement_reasons = list()
     seasons = list()
     answers = {k: list() for k in flags['CSV_QUESTIIONS']}
 
@@ -304,16 +305,16 @@ if __name__ == '__main__':
         if not isinstance(annotations, list):
             logger.info(annotations)
         for annotation in annotations:
-            retire_reasons.append(annotation['retire_reason'])
+            retirement_reasons.append(annotation['retirement_reason'])
             seasons.append(annotation['season'])
             for question, _answers_list in answers.items():
                 _answers_list.append(annotation[question])
 
     season_stats = Counter(seasons)
-    retire_reasons_stats = Counter(retire_reasons)
+    retirement_reasons_stats = Counter(retirement_reasons)
     answers_stats = {k: Counter(v).most_common() for k, v in answers.items()}
     season_stats.most_common()
-    retire_reasons_stats.most_common()
+    retirement_reasons_stats.most_common()
 
     for question, question_stats in answers_stats.items():
         for (answer, n) in question_stats:
