@@ -301,8 +301,8 @@ qsub upload_manifest.pbs
 Some of the scripts used for different sites can be found here: [zooniverse_exports/scripts.sh](zooniverse_exports/scripts.sh). The following steps are required:
 
 1. Get Zooniverse Exports (download data through the Python API)
-2. Extract Zooniverse Classifications (currently works for SnapshotSafari data only)
-3. Aggregate Extracted Zooniverse Classifications (on capture-event aggregation)
+2. Extract Zooniverse Classifications
+3. Aggregate Extracted Zooniverse Classifications (on capture-event aggregation - work-in-progress)
 4. Add Meta-Data to Aggregated Classifications (work-in-progress)
 
 ### Get Zooniverse Exports
@@ -310,7 +310,7 @@ Some of the scripts used for different sites can be found here: [zooniverse_expo
 Download Zooniverse exports. Requires Zooniverse account credentials and
 collaborator status with the project. The project_id can be found in the project builder
 in the top left corner. To create a 'fresh' export it is easiest to go on Zooniverse, to the project page,
-click on 'Data Exports', and click on new 'Request new classification export'.
+click on 'Data Exports', and click on new 'Request new classification export'. After receiving an e-mail confirming the export was completed, execute the following script (do not download data via e-mail):
 
 ```
 python3 -m zooniverse_exports.get_zooniverse_export \
@@ -324,26 +324,22 @@ python3 -m zooniverse_exports.get_zooniverse_export \
 #### Structure of Zooniverse Data (to be verified)
 
 1. One classification contains 1:N tasks
-2. One task contains 1:N identifications (for survey task)
-3. One task contains 1:N answers (for questions task)
-4. One identification contains 1:N answers (for survey task)
-5. One answer has 1:N sub-answers (for survey task)
+2. One task contains 1:N identifications (for survey task), or 1:N answers (for question tasks)
+3. One identification contains 1:N questions (for survey task)
+4. One question has 0:N answers (for survey task)
 
 Example:
 1. A task is to identify animals (survey task)
 2. One task contains two animal identifications, e.g, zebra and wildebeest
-3. One identification has multiple answers, e.g., species name and behavior
-4. One answer may have multiple selections, e.g, different behaviors
+3. One identification has multiple questions, e.g., species name and behavior
+4. One question may have multiple answres, e.g, different behaviors for the behavior question
 
 
 ### Extract Zooniverse Classifications (subject to changes)
 
-This extracts the relevant fields of a Zooniverse classification file
-and creates a csv with one line per annotation/species identification. Normally, you would
+The following code extracts the relevant fields of a Zooniverse classification file. It creates a csv file with one line per annotation/species identification. Normally, you would
 want to specify the workflow_id and the workflow_version to extract only the workflow that was used
-during the 'live-phase' of the project. If they are not specified every workflow is extracted.
-The workflow_id can be found in the project builder when clicking on the workflow. The workflow_version
-is at the same place slightly further down (e.g. something like 745.34).
+during the 'live-phase' of the project. If neither workflow_id/workflow_version are not specified every workflow is extracted (and can be separated later). The workflow_id can be found in the project builder when clicking on the workflow. The workflow_version is at the same place slightly further down (e.g. something like 745.34).
 
 ```
 python3 -m zooniverse_exports.extract_classifications \
@@ -354,22 +350,22 @@ python3 -m zooniverse_exports.extract_classifications \
 ```
 
 The resulting file may have the following column headers:
-```
-season,site,roll,capture: internal id of the capture
-user_name,user_id: user id information
-created_at: when the classification was created
-subject_id: zooniverse unique id of the capture (a subject)
-workflow_id,workflow_version: workflow info
-classification_id:
-question__count,question__eating,question__interacting: question answrs
-question__lyingdown,question__moving,question__standing: ...
-question__young_present,question__species,question__antlers_visible: ...
-```
+| Columns  | Description |
+| ---------| ----------- |
+|season,site,roll,capture | internal id of the capture
+|user_name,user_id | user id information
+|created_at | when the classification was created
+|subject_id | zooniverse unique id of the capture (a subject)
+|workflow_id,workflow_version | workflow info
+|classification_id | classification_id (multiple annotations possible)
+|question__count,question__eating,question__interacting | question answers
+|question__lyingdown,question__moving,question__standing | ...
+|question__young_present,question__species,question__antlers_visible | ...
+
 
 One record may look like:
 ```
-S2,C087,1,72532,Chetter88,1859182,2019-01-27 22:35:09 UTC,
-29236647,5702,289.16,142688819,2,1,0,0,0,0,no,deer,no
+S2,C087,1,72532,Chetter88,1859182,2019-01-27 22:35:09 UTC,29236647,5702,289.16,142688819,2,1,0,0,0,0,no,deer,no
 ```
 
 ### Aggregate Extracted Zooniverse Classifications (in development)

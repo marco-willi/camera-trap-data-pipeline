@@ -2,16 +2,42 @@
 import json
 import os
 import argparse
+import logging
 
+from logger import setup_logger, create_logfile_name
 from utils import (
     export_dict_to_json_with_newlines, file_path_splitter, file_path_generator)
 
 # # For Testing
 # args = dict()
-# args['manifest'] = "/home/packerc/shared/zooniverse/Manifests/KAR/KAR_S1_manifest.json"
-# args['predictions_empty'] = "/home/packerc/shared/zooniverse/Manifests/KAR/KAR_S1_predictions_empty_or_not.json"
-# args['predictions_species'] = "/home/packerc/shared/zooniverse/Manifests/KAR/KAR_S1_predictions_species.json"
-# args['output_file'] = "/home/packerc/shared/zooniverse/Manifests/KAR/KAR_S1_manifest1.json"
+# args['manifest'] = "/home/packerc/shared/zooniverse/Manifests/KAR/KAR_S1__complete__manifest.json"
+# args['predictions_empty'] = None
+# args['predictions_species'] = None
+# args['add_all_species_scores'] = True
+# args['output_file'] = None
+#
+# args = dict()
+# args['manifest'] = "/home/packerc/shared/zooniverse/Manifests/MTZ/MTZ_S1__complete__manifest.json"
+# args['predictions_empty'] = None
+# args['predictions_species'] = None
+# args['add_all_species_scores'] = True
+# args['output_file'] = None
+#
+#
+# args = dict()
+# args['manifest'] = "/home/packerc/shared/zooniverse/Manifests/PLN/PLN_S1__complete__manifest.json"
+# args['predictions_empty'] = None
+# args['predictions_species'] = None
+# args['add_all_species_scores'] = True
+# args['output_file'] = None
+#
+#
+# args = dict()
+# args['manifest'] = "/home/packerc/shared/zooniverse/Manifests/KAR/KAR_S1__complete__manifest.json"
+# args['predictions_empty'] = "/home/packerc/shared/zooniverse/Manifests/KAR/KAR_S1__complete__predictions_empty_or_not.json"
+# args['predictions_species'] = "/home/packerc/shared/zooniverse/Manifests/KAR/KAR_S1__complete__predictions_species.json"
+# args['output_file'] = "/home/packerc/shared/zooniverse/Manifests/KAR/KAR_S1__complete__manifest_TEST.json"
+# args['add_all_species_scores'] = True
 
 if __name__ == "__main__":
 
@@ -32,11 +58,22 @@ if __name__ == "__main__":
         "--output_file", type=str, default=None,
         help="Output file to write new manifest to (.json). \
               Default is to overwrite the manifest.")
+    parser.add_argument(
+        "--add_all_species_scores", action='store_true',
+        help="Whether to save all species scores into the manifest \
+              (and not just the top prediction).")
 
     args = vars(parser.parse_args())
 
+    # logging
+    log_file_name = create_logfile_name('add_predictions_to_manifest')
+    log_file_path = os.path.join(
+        os.path.dirname(args['manifest']), log_file_name)
+    setup_logger(log_file_path)
+    logger = logging.getLogger(__name__)
+
     for k, v in args.items():
-        print("Argument %s: %s" % (k, v))
+        logger.info("Argument {}: {}".format(k, v))
 
     # Check Inputs
     if not os.path.exists(args['manifest']):
@@ -45,7 +82,8 @@ if __name__ == "__main__":
 
     if args['output_file'] is None:
         args['output_file'] = args['manifest']
-        print("Updating %s with machine scores" % args['output_file'])
+        logger.info("Updating {} with machine scores".format(
+            args['output_file']))
 
     file_name_parts = file_path_splitter(args['manifest'])
     if args['predictions_empty'] is None:
@@ -57,7 +95,8 @@ if __name__ == "__main__":
             file_delim=file_name_parts['file_delim'],
             file_ext='json'
         )
-        print("Reading empty predictions from %s" % args['predictions_empty'])
+        logger.info("Reading empty predictions from {}".format(
+            args['predictions_empty']))
     if args['predictions_species'] is None:
         args['predictions_species'] = file_path_generator(
             dir=os.path.dirname(args['manifest']),
@@ -67,8 +106,8 @@ if __name__ == "__main__":
             file_delim=file_name_parts['file_delim'],
             file_ext='json'
         )
-        print("Reading species predictions from %s" %
-              args['predictions_species'])
+        logger.info("Reading species predictions from {}".format(
+              args['predictions_species']))
 
     if not os.path.exists(args['predictions_species']):
         raise FileNotFoundError("predictions: %s not found" %
@@ -89,20 +128,24 @@ if __name__ == "__main__":
     with open(args['predictions_empty'], 'r') as f:
         preds_empty = json.load(f)
 
-    def _add_prediction_data(preds, meta_data):
+    def _add_prediction_data(preds, meta_data, add_all_species=False):
         """ Add Prediction Data to Meta-Data """
         top_preds = preds["predictions_top"]
         top_conf = preds["confidences_top"]
-
         # Add Top label Text
         for pred_label, pred_value in top_preds.items():
             meta_key = '#machine_prediction_%s' % pred_label
             meta_data[meta_key] = pred_value
-
         # Add Top label Confidence
         for pred_label, pred_value in top_conf.items():
             meta_key = '#machine_confidence_%s' % pred_label
             meta_data[meta_key] = pred_value
+        # add all species scores if specified
+        if add_all_species:
+            species_preds = preds['aggregated_pred']['species']
+            for species, conf in species_preds.items():
+                meta_key = '#machine_prediction_species_{}'.format(species)
+                meta_data[meta_key] = conf
 
     captures_with_preds = 0
     n_total = len(mani.keys())
@@ -112,27 +155,25 @@ if __name__ == "__main__":
         # set ml to False per default
         data['info']['machine_learning'] = False
         meta_data = data['upload_metadata']
-
         # get predictions empty
         if capture_id in preds_empty:
             current_preds = preds_empty[capture_id]
             _add_prediction_data(current_preds, meta_data)
             # adjust status
             data['info']['machine_learning'] = True
-
         # add species predictions
         if capture_id in preds_species:
             current_preds = preds_species[capture_id]
-            _add_prediction_data(current_preds, meta_data)
+            _add_prediction_data(current_preds, meta_data,
+                                 args['add_all_species_scores'])
             # adjust status
             data['info']['machine_learning'] = True
-
         if data['info']['machine_learning']:
             captures_with_preds += 1
 
     # statistic
-    print("Added predictions to %s / %s captures" %
-          (captures_with_preds, n_total))
+    logger.info("Added predictions to {} / {} captures".format(
+          (captures_with_preds, n_total)))
 
     # Export Manifest
     export_dict_to_json_with_newlines(mani, args['output_file'])
