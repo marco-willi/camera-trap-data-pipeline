@@ -141,8 +141,9 @@ def map_task_questions(answers_list, flags):
                 map_answers = map_task_answers(answers, answer_mapper)
                 answers_list_mapped_2[i][question] = map_answers
             # mapp all answers globally
+            answers_updated = answers_list_mapped_2[i][question]
             answers_list_mapped_2[i][question] = \
-                map_task_answers(answers, flags['ANSWER_MAPPER'])
+                map_task_answers(answers_updated, flags['ANSWER_MAPPER'])
     return answers_list_mapped_2
 
 
