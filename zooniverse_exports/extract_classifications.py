@@ -91,7 +91,7 @@ if __name__ == '__main__':
     # Mapping answers to any question according to the following
     flags['ANSWER_MAPPER'] = {
         'yes': '1', 'y': '1', 'no': '0', 'n': '0',
-        0: '0', 1: '1', '': 0}
+        0: '0', 1: '1', '': '0'}
 
     # questions to ignore in the export
     flags['QUESTIONS_TO_IGNORE'] = ('dontcare')
@@ -108,10 +108,18 @@ if __name__ == '__main__':
 
     # add subject level information and map if specified
     # -if not available it will add an empty string in the output
-    flags['SUBJECT_INFO_TO_ADD'] = ['#season', '#site', '#roll', '#capture']
+    flags['SUBJECT_INFO_TO_ADD'] = [
+        '#season', '#site', '#roll', '#capture']
+
     flags['SUBJECT_INFO_MAPPER'] = {
         '#season': 'season', '#site': 'site',
         '#roll': 'roll', '#capture': 'capture'}
+
+    # add retirement information if available
+    flags['RETIREMENT_INFO_TO_ADD'] = [
+        "retirement_reason",
+        "retired_at"
+        ]
 
     # logging flags
     print_nested_dict('', flags)
@@ -162,6 +170,13 @@ if __name__ == '__main__':
                         subject_info_to_add[field] = ''
                 subject_info_to_add = extractor.rename_dict_keys(
                     subject_info_to_add, flags['SUBJECT_INFO_MAPPER'])
+                # add retirement info
+                for field in flags['RETIREMENT_INFO_TO_ADD']:
+                    try:
+                        ret_info = subject_info_raw['retired'][field]
+                        subject_info_to_add[field] = ret_info
+                    except:
+                        subject_info_to_add[field] = ''
                 # get all annotations (list of annotations)
                 annotations_list = extractor.extract_key_from_json(
                     line, 'annotations', row_name_to_id_mapper)
