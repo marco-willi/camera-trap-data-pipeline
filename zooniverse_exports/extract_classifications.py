@@ -63,9 +63,12 @@ if __name__ == '__main__':
     # Flag variables that define the behavior of the extraction
     flags = dict()
 
+    # Prefix each question in the output with the following prefix and delim
+    # Example: 'question__young_present' instead of 'young_present'
     flags['QUESTION_PREFIX'] = 'question'
     flags['QUESTION_DELIMITER'] = '__'
 
+    # map the following questions
     flags['QUESTION_NAME_MAPPER'] = {
         'howmany': 'count',
         'question': 'species',
@@ -75,13 +78,7 @@ if __name__ == '__main__':
         'doyouseeanyantlers': 'antlers_visible'
         }
 
-    flags['ANSWER_DEFAULTS_FOR_EXPORT'] = {
-        'count': '',
-        'species': '',
-        'young_present': '',
-        'horns_visible': ''
-        }
-
+    # Map specific answers of specific questions
     flags['ANSWER_TYPE_MAPPER'] = {
         'species': {
             'no animals present': 'blank',
@@ -91,16 +88,26 @@ if __name__ == '__main__':
             }
         }
 
+    # Mapping answers to any question according to the following
+    flags['ANSWER_MAPPER'] = {
+        'yes': '1', 'y': '1', 'no': '0', 'n': '0',
+        0: '0', 1: '1', '': 0}
+
+    # questions to ignore in the export
     flags['QUESTIONS_TO_IGNORE'] = ('dontcare')
 
+    # classification level fields to add to the export
     flags['CLASSIFICATION_INFO_TO_ADD'] = [
         'user_name', 'user_id', 'created_at', 'subject_ids',
         'workflow_id', 'workflow_version', 'classification_id']
 
+    # map classification level info
     flags['CLASSIFICATION_INFO_MAPPER'] = {
         'subject_ids': 'subject_id'
     }
 
+    # add subject level information and map if specified
+    # -if not available it will add an empty string in the output
     flags['SUBJECT_INFO_TO_ADD'] = ['#season', '#site', '#roll', '#capture']
     flags['SUBJECT_INFO_MAPPER'] = {
         '#season': 'season', '#site': 'site',

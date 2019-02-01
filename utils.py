@@ -234,7 +234,7 @@ def print_nested_dict(key, dic):
                     print_nested_dict("{}_{}".format(key, _id), _sub_data)
             else:
                 print_nested_dict("{}_{}".format(key, _id), _data)
-    elif isinstance(dic, list):
+    elif isinstance(dic, list) or isinstance(dic, tuple):
         for _sub_data in dic:
             print_nested_dict(key, _sub_data)
     else:

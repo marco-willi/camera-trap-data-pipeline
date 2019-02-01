@@ -350,17 +350,21 @@ python3 -m zooniverse_exports.extract_classifications \
 ```
 
 The resulting file may have the following column headers:
-| Columns  | Description |
-| ---------| ----------- |
+
+| Columns   | Description |
+| --------- | ----------- |
 |season,site,roll,capture | internal id of the capture
 |user_name,user_id | user id information
 |created_at | when the classification was created
 |subject_id | zooniverse unique id of the capture (a subject)
 |workflow_id,workflow_version | workflow info
 |classification_id | classification_id (multiple annotations possible)
-|question__count,question__eating,question__interacting | question answers
-|question__lyingdown,question__moving,question__standing | ...
-|question__young_present,question__species,question__antlers_visible | ...
+|question__count, question__eating | question answers
+|question__interacting | question answers
+|question__lyingdown, question__moving | question answers
+|question__standing  | question answers
+|question__young_present,question__species | question answers
+|question__antlers_visible  | question answers
 
 
 One record may look like:

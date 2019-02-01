@@ -113,8 +113,8 @@ def extract_task_info(task, task_type, flags):
 
 def map_task_questions(answers_list, flags):
     """ Map Questions
-        Input:  [{'howmany': '1'}, ...]
-        Output: [{'count': '1'}, ... ]
+        Input:  [{'howmany': '1'}, {'young_present': 'no'}, ...]
+        Output: [{'count': '1'}, {'young_present': '0'}, ...]
     """
     answers_list_mapped = copy.deepcopy(answers_list)
     for i, question_answer in enumerate(answers_list):
@@ -131,6 +131,9 @@ def map_task_questions(answers_list, flags):
                 answer_mapper = flags['ANSWER_TYPE_MAPPER'][question]
                 map_answers = map_task_answers(answers, answer_mapper)
                 answers_list_mapped[i][question] = map_answers
+            # generally map some answers regardless of their question
+            answers_list_mapped[i][question] = \
+                map_task_answers(answers, flags['ANSWER_MAPPER'])
     return answers_list_mapped
 
 
@@ -167,6 +170,7 @@ def is_eligible(line, mapper, cond):
 # build question_answer pairs
 def analyze_question_types(all_records):
     """ Analyze annotations to determine question types
+        Input: - List with all Zooniverse records
         Output: {'species': 'single',
                  'whatbehaviorsdoyousee': 'multi'}
     """
