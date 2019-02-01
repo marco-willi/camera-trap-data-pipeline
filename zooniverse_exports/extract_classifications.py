@@ -68,7 +68,7 @@ if __name__ == '__main__':
     flags['QUESTION_PREFIX'] = 'question'
     flags['QUESTION_DELIMITER'] = '__'
 
-    # map the following questions
+    # map the following question names
     flags['QUESTION_NAME_MAPPER'] = {
         'howmany': 'count',
         'question': 'species',

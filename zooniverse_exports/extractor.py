@@ -113,28 +113,37 @@ def extract_task_info(task, task_type, flags):
 
 def map_task_questions(answers_list, flags):
     """ Map Questions
-        Input:  [{'howmany': '1'}, {'young_present': 'no'}, ...]
-        Output: [{'count': '1'}, {'young_present': '0'}, ...]
+        Input:
+            - [{'howmany': '1'}, {'species': 'zebra_large'},
+               {'young_present': 'no'}, ...]
+            - flags['QUESTION_NAME_MAPPER']:
+                {'howmany': 'count'}
+            - flags['ANSWER_TYPE_MAPPER']:
+                {'species': {'zebra_large': 'zebra'}}
+            - flagsflags['ANSWER_MAPPER']: {'no': '0', ..}
+        Output: [{'count': '1'}, {'young_present': '0'}, {'species': 'zebra'}]
     """
     answers_list_mapped = copy.deepcopy(answers_list)
+    # 1) map question names
     for i, question_answer in enumerate(answers_list):
         for question, answers in question_answer.items():
             if question in flags['QUESTION_NAME_MAPPER']:
                 map_question = flags['QUESTION_NAME_MAPPER'][question]
                 answers_list_mapped[i][map_question] = answers
                 answers_list_mapped[i].pop(question, None)
-                if map_question in flags['ANSWER_TYPE_MAPPER']:
-                    answer_mapper = flags['ANSWER_TYPE_MAPPER'][map_question]
-                    map_answers = map_task_answers(answers, answer_mapper)
-                    answers_list_mapped[i][map_question] = map_answers
-            elif question in flags['ANSWER_TYPE_MAPPER']:
+    # 2) Map answers based on mapped question names
+    answers_list_mapped_2 = copy.deepcopy(answers_list_mapped)
+    for i, question_answer in enumerate(answers_list_mapped_2):
+        for question, answers in question_answer.items():
+            # map specific questions
+            if question in flags['ANSWER_TYPE_MAPPER']:
                 answer_mapper = flags['ANSWER_TYPE_MAPPER'][question]
                 map_answers = map_task_answers(answers, answer_mapper)
-                answers_list_mapped[i][question] = map_answers
-            # generally map some answers regardless of their question
-            answers_list_mapped[i][question] = \
+                answers_list_mapped_2[i][question] = map_answers
+            # mapp all answers globally
+            answers_list_mapped_2[i][question] = \
                 map_task_answers(answers, flags['ANSWER_MAPPER'])
-    return answers_list_mapped
+    return answers_list_mapped_2
 
 
 def map_task_answers(answers, map):

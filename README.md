@@ -1,7 +1,8 @@
 # snapshot_safari_misc
 Misc Code for Snapshot Safari.
-1. Upload data to Zooniverse
+1. Upload Data to Zooniverse
 2. Download Data from Zooniverse
+3. Aggregate Data from Zooniverse
 
 
 ## Pre-Requisites
@@ -124,7 +125,7 @@ The default settings create the following file:
 RUA_S1__complete__manifest.json
 ```
 
-### Create Machine Lerning File for Model Input
+### Create Machine Lerning File for Model Input (Optional)
 
 This code creates a 'machine learning file' that has the correct format for the machine learning models to classify the images in the manifest.
 
@@ -138,7 +139,7 @@ The default settings create the following file:
 RUA_S1__complete__machine_learning_input.csv
 ```
 
-### Generate new Predictions
+### Generate new Predictions (Optional)
 
 The following steps describe how to run the machine learning models. Note that the files 'ctc_predict_species.pbs' and 'ctc_predict_empty.pbs' have to be adapted. The predictions process is split into two parts: predict the presence of an animal (empty or not) and predict the animal species. Both of the following scripts can be run in parallel. The scripts process approximately 300 capture events / minute on a CPU queue so it can take several hours for large manifests to process. Please note that the following codes will create a file in your home directory 'camera-trap-classifier-latest-cpu.simg', you can safely delete that after the scripts have finished (it contains the machine learning software).
 
@@ -201,7 +202,7 @@ The default settings create the following file:
 RUA_S1__complete__predictions_species.json
 ```
 
-#### Add Model Predictions to Manifest
+#### Add Model Predictions to Manifest (Optional)
 
 This code adds the aggregated predictions into the manifest.
 
@@ -321,7 +322,7 @@ python3 -m zooniverse_exports.get_zooniverse_export \
         --new_export 0
 ```
 
-#### Structure of Zooniverse Data (to be verified)
+#### Structure of Zooniverse Data
 
 1. One classification contains 1:N tasks
 2. One task contains 1:N identifications (for survey task), or 1:N answers (for question tasks)
@@ -341,7 +342,15 @@ The following code extracts the relevant fields of a Zooniverse classification f
 want to specify the workflow_id and the workflow_version to extract only the workflow that was used
 during the 'live-phase' of the project. If neither workflow_id/workflow_version are not specified every workflow is extracted (and can be separated later). The workflow_id can be found in the project builder when clicking on the workflow. The workflow_version is at the same place slightly further down (e.g. something like 745.34).
 
+Use a machine with enough memory - for example:
+
 ```
+ssh lab
+qsub -I -l walltime=2:00:00,nodes=1:ppn=4,mem=16gb
+```
+
+```
+cd $HOME/snapshot_safari_misc
 python3 -m zooniverse_exports.extract_classifications \
         --classification_csv /home/packerc/shared/zooniverse/Exports/RUA/RUA_S1_classifications.csv \
         --output_csv /home/packerc/shared/zooniverse/Exports/RUA/RUA_S1_classifications_extracted.csv \
@@ -457,26 +466,27 @@ Available seasons:
 The output is on level annotation. There is no unique identifier for an annotation.
 The data has the following columns:
 
-```
-user_name: dispaly name of user (if logged in, else 'not-logged-in..')
-created_at: when the classification was made
-subject_id: zooniverse subject_id (unique id per capture event)
-capture_event_id: old capture_event_id as uploaded to zooniverse
-retire_reason: string defining the retirement reason as defined by Zooniverse
-season,site,roll: internal id for season, site, roll
-filenames: image names, separated by ; if multiple
-timestamps: image timestamps, separated by ; if multiple
-classification_id: unique id per classification
-capture_id: new-style capture_id
-question__species: task-answer
-question__count: task-answer
-question__young_present: task-answer
-question__standing: task-answer
-question__resting: task-answer
-question__moving: task-answer
-question__eating: task-answer
-question__interacting: task-answer
-```
+| Columns   | Description |
+| --------- | ----------- |
+|user_name | dispaly name of user (if logged in, else 'not-logged-in..')
+|created_at | when the classification was made
+|subject_id | zooniverse subject_id (unique id per capture event)
+|capture_event_id | old capture_event_id as uploaded to zooniverse
+|retire_reason | string defining the retirement reason as defined by Zooniverse
+|season,site,roll | internal id for season, site, roll
+|filenames | image names, separated by ; if multiple
+|timestamps | image timestamps, separated by ; if multiple
+|classification_id | unique id per classification
+|capture_id | new-style capture_id
+|question__species | task-answer
+|question__count | task-answer
+|question__young_present | task-answer
+|question__standing | task-answer
+|question__resting | task-answer
+|question__moving | task-answer
+|question__eating | task-answer
+|question__interacting | task-answer
+
 
 ```
 user_name,created_at,subject_id,capture_event_id,retire_reason,season,site,roll,filenames,timestamps,classification_id,capture_id,question__species,question__count,question__young_present,question__standing,question__resting,question__moving,question__eating,question__interacting
