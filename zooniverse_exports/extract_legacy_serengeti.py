@@ -150,7 +150,7 @@ if __name__ == '__main__':
     log_file_name = create_logfile_name(
         'extract_legacy_classifications_{}'.format(s_id))
     log_file_path = os.path.join(
-        os.path.dir(args['output_csv']), log_file_name)
+        os.path.dirname(args['output_csv']), log_file_name)
     setup_logger(log_file_path)
     logger = logging.getLogger(__name__)
 
