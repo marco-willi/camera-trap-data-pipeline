@@ -87,7 +87,6 @@
         disk and on Zooniverse there are 5k images
         also not found this in the SerengetiDB: grep V13_R1/PICT6148.JPG
 """
-import time
 import os
 import argparse
 from collections import Counter
@@ -95,6 +94,7 @@ import logging
 from logger import setup_logger, create_logfile_name
 
 from zooniverse_exports import legacy_extractor
+from utils import print_nested_dict
 
 # To Test
 # args = dict()
