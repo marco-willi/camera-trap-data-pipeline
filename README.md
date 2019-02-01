@@ -336,22 +336,41 @@ Example:
 4. One answer may have multiple selections, e.g, different behaviors
 
 
-### Extract Zooniverse Classifications (in development)
+### Extract Zooniverse Classifications (subject to changes)
 
 This extracts the relevant fields of a Zooniverse classification file
-and creates a csv with one line per annotation. All classifications have to
-be from the same workflow with the same workflow version. The workflow_id
-can be found in the project builder when clicking on the workflow. The workflow_version
-is at the same place slightly further down (e.g. something like 745.34 - use only 745).
+and creates a csv with one line per annotation/species identification. Normally, you would
+want to specify the workflow_id and the workflow_version to extract only the workflow that was used
+during the 'live-phase' of the project. If they are not specified every workflow is extracted.
+The workflow_id can be found in the project builder when clicking on the workflow. The workflow_version
+is at the same place slightly further down (e.g. something like 745.34).
 
 ```
 python3 -m zooniverse_exports.extract_classifications \
-        -classification_csv /home/packerc/shared/zooniverse/Exports/RUA/RUA_S1_classifications.csv \
-        -output_csv /home/packerc/shared/zooniverse/Exports/RUA/RUA_S1_classifications_extracted.csv \
-        -workflow_id 4889 \
-        -workflow_version 797
+        --classification_csv /home/packerc/shared/zooniverse/Exports/RUA/RUA_S1_classifications.csv \
+        --output_csv /home/packerc/shared/zooniverse/Exports/RUA/RUA_S1_classifications_extracted.csv \
+        --workflow_id 4889 \
+        --workflow_version 797.34
 ```
 
+The resulting file may have the following column headers:
+```
+season,site,roll,capture: internal id of the capture
+user_name,user_id: user id information
+created_at: when the classification was created
+subject_id: zooniverse unique id of the capture (a subject)
+workflow_id,workflow_version: workflow info
+classification_id:
+question__count,question__eating,question__interacting: question answrs
+question__lyingdown,question__moving,question__standing: ...
+question__young_present,question__species,question__antlers_visible: ...
+```
+
+One record may look like:
+```
+S2,C087,1,72532,Chetter88,1859182,2019-01-27 22:35:09 UTC,
+29236647,5702,289.16,142688819,2,1,0,0,0,0,no,deer,no
+```
 
 ### Aggregate Extracted Zooniverse Classifications (in development)
 

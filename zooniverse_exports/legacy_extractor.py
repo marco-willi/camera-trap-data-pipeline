@@ -317,7 +317,9 @@ def process_season_classifications(path, img_to_capture, flags):
                 roll = fix_roll_id(line[row_name_to_id_mapper['roll']])
                 img_key = '#'.join([season, site, roll, image_name])
                 try:
+                    # add full capture_id and capture num
                     capture_id = img_to_capture[img_key]
+                    capture = capture_id.split('#')[-1]
                 except:
                     if n_capture_id_not_found < 10:
                         print("Did not find img_key: {}".format(img_key))
@@ -325,9 +327,11 @@ def process_season_classifications(path, img_to_capture, flags):
                         print("Not printing more not found img_key msgs...")
                     n_capture_id_not_found += 1
                     capture_id = ''
+                    capture = ''
                     if len(image_name) == 0:
                         n_annos_without_images += 1
                 classification_info['capture_id'] = capture_id
+                classification_info['capture'] = capture
                 # get answers
                 answers = extract_questions(line, row_name_to_id_mapper, flags)
                 # map answers

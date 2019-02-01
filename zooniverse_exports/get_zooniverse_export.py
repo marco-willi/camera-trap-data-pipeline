@@ -22,17 +22,17 @@ if __name__ == '__main__':
     # Parse command line arguments
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "-password_file", type=str, required=True,
+        "--password_file", type=str, required=True,
         help="File that contains the Zooniverse password (.ini),\
               Example File:\
               [zooniverse]\
               username: dummy\
               password: 1234")
-    parser.add_argument("-project_id", type=int, required=True)
-    parser.add_argument("-output_file", type=str, required=True)
-    parser.add_argument("-export_type", default='classifications',
+    parser.add_argument("--project_id", type=int, required=True)
+    parser.add_argument("--output_file", type=str, required=True)
+    parser.add_argument("--export_type", default='classifications',
                         type=str, required=False)
-    parser.add_argument("-new_export", default=0, type=int, required=False)
+    parser.add_argument("--new_export", default=0, type=int, required=False)
 
     args = vars(parser.parse_args())
 
