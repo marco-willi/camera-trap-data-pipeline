@@ -10,6 +10,9 @@ import os
 from collections import OrderedDict
 from collections import Counter
 import traceback
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 def split_raw_classification_csv(input_csv, output_path):
@@ -111,7 +114,7 @@ def map_answers(answers, map, flags):
     for question, answer_map in flags['ANSWER_TYPE_MAPPER'].items():
         if question in map:
             if question not in answers:
-                print("Did not find question {} in answers {}".format(
+                logger.warning("Did not find question {} in answers {}".format(
                     question, answers))
             answer = answers[question]
             if answer in answer_map:
@@ -138,7 +141,7 @@ def needs_consolidation(annotations):
             return False
         else:
             return True
-    print("Unexpected case in needs_consolidation for annotations {}".format(
+    logger.warning("Unexpected case in needs_consolidation for annotations {}".format(
         annotations))
 
 
@@ -322,9 +325,9 @@ def process_season_classifications(path, img_to_capture, flags):
                     capture = capture_id.split('#')[-1]
                 except:
                     if n_capture_id_not_found < 10:
-                        print("Did not find img_key: {}".format(img_key))
+                        logger.info("Did not find img_key: {}".format(img_key))
                     elif n_capture_id_not_found == 10:
-                        print("Not printing more not found img_key msgs...")
+                        logger.info("Not printing more not found img_key msgs...")
                     n_capture_id_not_found += 1
                     capture_id = ''
                     capture = ''
@@ -348,17 +351,17 @@ def process_season_classifications(path, img_to_capture, flags):
                 if ret_blank and species_not_empty:
                     n_retire_reason_blank_but_species += 1
             except Exception:
-                print("Error - Skipping Record %s" % line_no)
-                print("Full line:\n %s" % line)
-                print(traceback.format_exc())
+                logger.warning("Error - Skipping Record %s" % line_no)
+                logger.warning("Full line:\n %s" % line)
+                logger.warning(traceback.format_exc())
 
-    print("Removed {} non-eligible classifications".format(
+    logger.info("Removed {} non-eligible classifications".format(
          n_not_eligible))
-    print("Capture Id not found {}".format(
+    logger.info("Capture Id not found {}".format(
         n_capture_id_not_found))
-    print("Image not found in season.csv {}".format(
+    logger.info("Image not found in season.csv {}".format(
         n_annos_without_images))
-    print("Found {} classifications with blank and species annotation".format(
+    logger.info("Found {} classifications with blank and species annotation".format(
         n_retire_reason_blank_but_species))
     return classifications
 
@@ -376,9 +379,9 @@ def consolidate_all_classifications(classifications, flags):
                 consolidated_classifications[c_id] = consolidated
                 n_consolidations += 1
             except:
-                print("Failed to consolidate record: {}".format(annotations))
+                logger.warning("Failed to consolidate record: {}".format(annotations))
 
-    print("Consolidated {} classifications with multiple entries for \
+    logger.info("Consolidated {} classifications with multiple entries for \
           the same species".format(n_consolidations))
     return consolidated_classifications
 
@@ -398,7 +401,7 @@ def export_cleaned_annotations(path, classifications, header, flags):
 
     with open(path, 'w') as f:
         csv_writer = csv.writer(f, delimiter=',')
-        print("Writing output to %s" % path)
+        logger.info("Writing output to %s" % path)
         csv_writer.writerow(header_to_print)
         n_annos_written = 0
         for line_no, (_c_id, data) in enumerate(classifications.items()):
@@ -406,5 +409,5 @@ def export_cleaned_annotations(path, classifications, header, flags):
                 row = [annotation[x] for x in header]
                 csv_writer.writerow(row)
                 n_annos_written += 1
-        print("Wrote {} classifications and {} annotations".format(
+        logger.info("Wrote {} classifications and {} annotations".format(
             line_no, n_annos_written))

@@ -91,6 +91,8 @@ import time
 import os
 import argparse
 from collections import Counter
+import logging
+from logger import setup_logger, create_logfile_name
 
 from zooniverse_exports import legacy_extractor
 
@@ -102,10 +104,10 @@ from zooniverse_exports import legacy_extractor
 # args['season_to_process'] = 'S2'
 # args['split_raw_file'] = False
 
-# python3 -m zooniverse_exports.extract_legacy_serengeti \
-# --classification_csv '/home/packerc/shared/zooniverse/Exports/SER/2019-01-27_serengeti_classifications.csv' \
-# --output_path '/home/packerc/shared/zooniverse/Exports/SER/' \
-# --season_to_process 'S3'
+python3 -m zooniverse_exports.extract_legacy_serengeti \
+--classification_csv '/home/packerc/shared/zooniverse/Exports/SER/2019-01-27_serengeti_classifications.csv' \
+--output_path '/home/packerc/shared/zooniverse/Exports/SER/' \
+--season_to_process 'S3'
 
 ######################################
 # Parameters
@@ -143,6 +145,17 @@ if __name__ == '__main__':
     ######################################
     # Configuration
     ######################################
+
+    # logging
+    log_file_name = create_logfile_name(
+        'extract_legacy_classifications_{}'.format(s_id))
+    log_file_path = os.path.join(
+        os.path.dir(args['output_csv']), log_file_name)
+    setup_logger(log_file_path)
+    logger = logging.getLogger(__name__)
+
+    for k, v in args.items():
+        logger.info("Argument {}: {}".format(k, v))
 
     flags = dict()
 
@@ -204,6 +217,9 @@ if __name__ == '__main__':
         'user_name', 'created_at', 'subject_id', 'capture_event_id',
         "retire_reason", "season", "site", "roll", "filenames", "timestamps",
         'classification_id']
+
+    # logging flags
+    print_nested_dict('', flags)
 
     ######################################
     # Split the complete Zooniverse export
@@ -279,8 +295,7 @@ if __name__ == '__main__':
 
     for c_id, annotations in classifications.items():
         if not isinstance(annotations, list):
-            print(annotations)
-            time.sleep(3)
+            logger.info(annotations)
         for annotation in annotations:
             retire_reasons.append(annotation['retire_reason'])
             seasons.append(annotation['season'])
@@ -295,14 +310,14 @@ if __name__ == '__main__':
 
     for question, question_stats in answers_stats.items():
         for (answer, n) in question_stats:
-            print('{:15} - {:15} - {}'.format(question, answer, n))
+            logger.info('{:15} - {:15} - {}'.format(question, answer, n))
 
     # Print examples
-    print("Show some example classifications")
+    logger.info("Show some example classifications")
     for i, (_id, data) in enumerate(classifications.items()):
         if i > 10:
             break
-        print("ID: {}, Data: {}".format(_id, data))
+        logger.info("ID: {}, Data: {}".format(_id, data))
 
     ######################################
     # Export Annotations to a File

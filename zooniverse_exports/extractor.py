@@ -6,6 +6,9 @@
 """
 import json
 import copy
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 def identify_task_type(task_data):
