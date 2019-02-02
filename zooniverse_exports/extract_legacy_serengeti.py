@@ -129,7 +129,10 @@ if __name__ == '__main__':
         '--season_captures_path', type=str,
         default='/home/packerc/shared/season_captures/SER/captures/',
         help="Path to dir with captures.csvs")
-    parser.add_argument('--split_raw_file', action='store_true')
+    parser.add_argument(
+        '--split_raw_file', action='store_true',
+        help="Split the raw file according to seasons. If not specified, the \
+              script assumes those files exist already.")
 
     args = vars(parser.parse_args())
     s_id = args['season_to_process']

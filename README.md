@@ -362,12 +362,15 @@ The resulting file may have the following column headers:
 
 | Columns   | Description |
 | --------- | ----------- |
-|season,site,roll,capture | internal id of the capture
-|user_name,user_id | user id information
+|season,site,roll,capture | internal descriptors/ids of the subject
+|capture_event_id| internal capture id (legacy format)
+|capture_id| internal capture id (new format)
+|user_name,user_id | user information (user_id null for anonymous users)
 |created_at | when the classification was created
 |subject_id | zooniverse unique id of the capture (a subject)
 |workflow_id,workflow_version | workflow info
 |classification_id | classification_id (multiple annotations possible)
+|retirement_reason| Zooniverse generated retirement reason
 |question__count, question__eating | question answers
 |question__interacting | question answers
 |question__lyingdown, question__moving | question answers
@@ -378,7 +381,10 @@ The resulting file may have the following column headers:
 
 One record may look like:
 ```
-S2,C087,1,72532,Chetter88,1859182,2019-01-27 22:35:09 UTC,29236647,5702,289.16,142688819,2,1,0,0,0,0,no,deer,no
+XYZ,2012-12-11 07:40:53 UTC,ASG000aau3,495255,consensus,S3,K03,R12,
+IMAG0275.JPG;IMAG0276.JPG;IMAG0274.JPG,2011-11-14T15:10:37-06:00;2011-11-14T15:
+10:37-06:00;2011-11-14T15:10:37-06:00,50c6e3859177d033f6000330,
+SER_S3#K03#R12#114,114,wildebeest,11-50,0,0,0,1,0,0
 ```
 
 ### Aggregate Extracted Zooniverse Classifications (in development)
@@ -453,6 +459,11 @@ python3 -m zooniverse_exports.extract_legacy_serengeti \
 --classification_csv '/home/packerc/shared/zooniverse/Exports/SER/2019-01-27_serengeti_classifications.csv' \
 --output_path '/home/packerc/shared/zooniverse/Exports/SER/' \
 --season_to_process 'S3'
+```
+
+Specify the following to split the raw file into seasons (otherwise, the script assumes this was done):
+```
+--split_raw_file
 ```
 
 Available seasons:

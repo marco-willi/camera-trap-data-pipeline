@@ -1,8 +1,34 @@
 
+###################################
+# Grumeti
+####################################
+
+SITE=GRU
+SEASON=GRU_S1
+
+python3 -m zooniverse_exports.extract_classifications \
+        --classification_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_classifications.csv \
+        --output_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_classifications_extracted.csv
+
+
+###################################
+# Snapshot Serengeti - Legacy
+####################################
+
+# Extract Classifications
+cd $HOME/snapshot_safari_misc
+
+python3 -m zooniverse_exports.extract_legacy_serengeti \
+--classification_csv '/home/packerc/shared/zooniverse/Exports/SER/2019-01-27_serengeti_classifications.csv' \
+--output_path '/home/packerc/shared/zooniverse/Exports/SER/' \
+--season_to_process 'S3'
+
+# Aggregate Classifications
 
 ###################################
 # Snapshot Serengeti
 ####################################
+
 
 cd $HOME/snapshot_safari_misc
 python3 -m zooniverse_exports.extract_classifications \
@@ -129,11 +155,23 @@ python3 -m zooniverse_exports.simulate_aggregations_ml \
 # Ruaha
 ####################################
 
-# Extract Zooniverse Classifications
+# get Zooniverse exports
 cd $HOME/snapshot_safari_misc
+SITE=RUA
+SEASON=RUA_S1
+
+python3 -m zooniverse_exports.get_zooniverse_export \
+        -password_file ~/keys/passwords.ini \
+        -project_id 5155 \
+        -output_file /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_classifications.csv \
+        -export_type classifications \
+        -new_export 0
+
+
+# Extract Zooniverse Classifications
 python3 -m zooniverse_exports.extract_classifications \
-        -classification_csv /home/packerc/shared/machine_learning/data/zooniverse_exports/RUA/RUA_S1/classifications.csv \
-        -output_csv /home/packerc/shared/machine_learning/data/zooniverse_exports/RUA/RUA_S1/classifications_extracted.csv \
+        -classification_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_classifications.csv \
+        -output_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_classifications_extracted.csv \
         -workflow_id 4889 \
         -workflow_version 797
 
@@ -203,22 +241,63 @@ python3 -m zooniverse_exports.add_meta_data_to_aggregated_class \
 
 
 ###################################
+# Snapshot Serengeti
+####################################
+cd $HOME/snapshot_safari_misc
+SITE=SER
+SEASON=SER_S11
+PROJECT_ID=4996
+WORFKLOW_ID=4655
+WORFKLOW_VERSION=363.25
+
+python3 -m zooniverse_exports.get_zooniverse_export \
+    -password_file ~/keys/passwords.ini \
+    -project_id ${PROJECT_ID} \
+    -output_file /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_classifications.csv \
+    -export_type classifications \
+    -new_export 0
+
+
+###################################
+# Cedar Creek
+####################################
+cd $HOME/snapshot_safari_misc
+SITE=CC
+SEASON=CC_S1
+PROJECT_ID=5880
+WORFKLOW_ID=5702
+WORFKLOW_VERSION=289.16
+
+
+python3 -m zooniverse_exports.get_zooniverse_export \
+    -password_file ~/keys/passwords.ini \
+    -project_id ${PROJECT_ID} \
+    -output_file /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_classifications.csv \
+    -export_type classifications \
+    -new_export 0
+
+
+###################################
 # Grumeti
 ####################################
 
-# Get Classifications
+
+# get Zooniverse exports
 cd $HOME/snapshot_safari_misc
+SITE=GRU
+SEASON=GRU_S1
+
 python3 -m zooniverse_exports.get_zooniverse_export \
         -password_file ~/keys/passwords.ini \
         -project_id 5115 \
-        -output_file /home/packerc/shared/zooniverse/Exports/GRU/GRU_S1_classifications.csv \
+        -output_file /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_classifications.csv \
         -export_type classifications \
         -new_export 0
 
 # Extract Classifications
 python3 -m zooniverse_exports.extract_classifications \
-        -classification_csv /home/packerc/shared/zooniverse/Exports/GRU/GRU_S1_classifications.csv \
-        -output_csv /home/packerc/shared/zooniverse/Exports/GRU/GRU_S1_classifications_extracted.csv \
+        -classification_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_classifications.csv \
+        -output_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_classifications_extracted.csv \
         -workflow_id 4979 \
         -workflow_version 275
 

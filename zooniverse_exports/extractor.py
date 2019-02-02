@@ -205,7 +205,8 @@ def deduplicate_answers(classification_answers, flags):
         Input: [[{'count': '1'}, {'whatbehaviorsdoyousee': ['resting']},
                  {'young_present': '0'}, {'species': 'blank'}],
                 [{'species': 'blank'}]]
-        Output: [[{'species': 'blank'}]]
+        Output: [[{'count': '1'}, {'whatbehaviorsdoyousee': ['resting']},
+                 {'young_present': '0'}, {'species': 'blank'}]]
     """
     # define on which question/key to de-duplicate
     try:
@@ -217,15 +218,17 @@ def deduplicate_answers(classification_answers, flags):
     for i, task_answers in enumerate(classification_answers):
         deduplicated_all.append(list())
         for answer in task_answers:
+            # add to final if non-primary question
             if primary_question not in answer:
                 deduplicated_all[i].append(answer)
+            # add primary answer to output and add to used list
+            elif answer[primary_question] not in primary_used:
+                deduplicated_all[i].append(answer)
+                primary_used.add(answer[primary_question])
             # if duplicate don't add to final list
-            elif answer[primary_question] in primary_used:
+            else:
                 logger.debug("Removed duplicate answer: {}".format(
                     classification_answers))
-            # add used primary answer
-            else:
-                primary_used.add(answer[primary_question])
     # remove any empty answers
     deduplicated_final = [x for x in deduplicated_all if len(x) > 0]
     return deduplicated_final
