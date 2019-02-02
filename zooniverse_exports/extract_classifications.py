@@ -8,8 +8,9 @@ import traceback
 import os
 import argparse
 import logging
-from logger import setup_logger, create_logfile_name
+import textwrap
 
+from logger import setup_logger, create_logfile_name
 from zooniverse_exports import extractor
 from utils import print_nested_dict
 
@@ -138,6 +139,8 @@ if __name__ == '__main__':
     all_records = list()
     n_incomplete_tasks = 0
     n_seen_before = 0
+    n_duplicate_subject_by_same_user = 0
+    user_subject_dict = dict()
     with open(args['classification_csv'], "r") as ins:
         csv_reader = csv.reader(ins, delimiter=',', quotechar='"')
         header = next(csv_reader)
@@ -179,13 +182,33 @@ if __name__ == '__main__':
                 try:
                     if subject_zooniverse_metadata['seen_before']:
                         if n_seen_before < 10:
-                            logger.debug(
-                                "Removed classification_id: {} due to 'seen_before' flag".format(
-                                 classification_info['classification_id']))
+                            msg = "Removed classification_id: {} due to \
+                                   'seen_before' flag".format(
+                                 classification_info['classification_id'])
+                            logger.debug(textwrap.shorten(msg, width=99))
                         elif n_seen_before == 10:
                             logger.debug("Stop printing 'seen_before' msgs..")
                         n_seen_before += 1
                         continue
+                except:
+                    pass
+                # check if subject was already classiifed by user
+                # if so, skip it
+                try:
+                    user_name = classification_info['user_name']
+                    subject_id = classification_info['subject_id']
+                    if user_name not in user_subject_dict:
+                        user_subject_dict[user_name] = set()
+                    if subject_id in user_subject_dict[user_name]:
+                        msg = "Removed classification_id: {} due \
+                               to subject_id {} already classified by \
+                               user {}".format(
+                         classification_info['classification_id'],
+                         subject_id, user_name)
+                        logger.debug(textwrap.shorten(msg, width=99))
+                        n_duplicate_subject_by_same_user += 1
+                        continue
+                    user_subject_dict[user_name].add(subject_id)
                 except:
                     pass
                 # add retirement info
@@ -230,6 +253,9 @@ if __name__ == '__main__':
     logger.info("Incomplete tasks: {:,}".format(n_incomplete_tasks))
     logger.info("Skipped due to 'seen_before' flag: {:,}".format(
         n_seen_before))
+    logger.info("Skipped {:,} subjects due to prev. annot. by user: ".format(
+        n_duplicate_subject_by_same_user))
+
 
     ######################################
     # Analyse Classifications
