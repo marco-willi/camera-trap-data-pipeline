@@ -137,6 +137,7 @@ if __name__ == '__main__':
 
     all_records = list()
     n_incomplete_tasks = 0
+    n_seen_before = 0
     with open(args['classification_csv'], "r") as ins:
         csv_reader = csv.reader(ins, delimiter=',', quotechar='"')
         header = next(csv_reader)
@@ -170,6 +171,23 @@ if __name__ == '__main__':
                         subject_info_to_add[field] = ''
                 subject_info_to_add = extractor.rename_dict_keys(
                     subject_info_to_add, flags['SUBJECT_INFO_MAPPER'])
+                # extract Zooniverse subject metadata
+                subject_zooniverse_metadata = extractor.extract_key_from_json(
+                    line, 'metadata', row_name_to_id_mapper
+                    )
+                # if subject was flagged as 'seen_before' skip it
+                try:
+                    if subject_zooniverse_metadata['seen_before']:
+                        if n_seen_before < 10:
+                            logger.debug(
+                                "Removed classification_id: {} due to 'seen_before' flag".format(
+                                 classification_info['classification_id']))
+                        elif n_seen_before == 10:
+                            logger.debug("Stop printing 'seen_before' msgs..")
+                        n_seen_before += 1
+                        continue
+                except:
+                    pass
                 # add retirement info
                 for field in flags['RETIREMENT_INFO_TO_ADD']:
                     try:
@@ -210,6 +228,8 @@ if __name__ == '__main__':
     logger.info("Processed {:,} classifications".format(line_no))
     logger.info("Extracted {:,} tasks".format(len(all_records)))
     logger.info("Incomplete tasks: {:,}".format(n_incomplete_tasks))
+    logger.info("Skipped due to 'seen_before' flag: {:,}".format(
+        n_seen_before))
 
     ######################################
     # Analyse Classifications
