@@ -321,8 +321,10 @@ if __name__ == '__main__':
         in flags['SUBJECT_INFO_MAPPER'] else x for
         x in subject_header_cols]
 
+    retirement_header_cols = flags['RETIREMENT_INFO_TO_ADD']
+
     header = subject_header_cols + classification_header_cols + \
-        question_header_print
+        retirement_header_cols + question_header_print
 
     logger.info("Automatically generated output header: {}".format(
         header))
