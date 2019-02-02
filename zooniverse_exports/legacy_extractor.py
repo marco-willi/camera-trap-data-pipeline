@@ -346,7 +346,7 @@ def process_season_classifications(path, img_to_capture, flags):
                     classifications[c_id] = list()
                 classifications[c_id].append(record)
                 # checks
-                ret_blank = (classification_info['retire_reason'] == 'blank')
+                ret_blank = (classification_info['retirement_reason'] == 'blank')
                 species_not_empty = (answers['species'] is not '')
                 if ret_blank and species_not_empty:
                     n_retire_reason_blank_but_species += 1
