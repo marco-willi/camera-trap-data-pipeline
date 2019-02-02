@@ -337,6 +337,8 @@ if __name__ == '__main__':
         for line_no, record in enumerate(all_records):
             # get subject info data
             subject_data = [record[x] for x in subject_header_cols]
+            # get retirement info data
+            retirement_data = [record[x] for x in retirement_header_cols]
             # get classification info data
             class_data = [record[x] for x in classification_header_cols]
             # get annotation info data
@@ -345,6 +347,8 @@ if __name__ == '__main__':
             answers_ordered = [
                 answers[x] if x in answers else '' for x
                 in question_header]
-            csv_writer.writerow(subject_data + class_data + answers_ordered)
+            csv_writer.writerow(
+                subject_data + class_data +
+                retirement_data + answers_ordered)
         logger.info("Wrote {} records to {}".format(
             line_no, args['output_csv']))
