@@ -106,6 +106,8 @@ def extract_task_info(task, task_type, flags):
         elif task_type == 'question_task':
             extracted = extract_question_task(task_id_answer)
         else:
+            logger.error("task_type {} unknown, found in {}".format(
+                task_type, task_id_answer))
             raise ValueError("task_type %s unknown" % task_type)
         extractions.append(extracted)
     return extractions
@@ -194,6 +196,39 @@ def analyze_question_types(all_records):
                 elif isinstance(answers, list):
                     question_types[question] = 'multi'
     return question_types
+
+
+def deduplicate_answers(classification_answers, flags):
+    """ De-duplicate multiple identical answers in the same classification
+        This only happens if there are two or more tasks that allow for the
+        same answer: typically 'blank' annotations
+        Input: [[{'count': '1'}, {'whatbehaviorsdoyousee': ['resting']},
+                 {'young_present': '0'}, {'species': 'blank'}],
+                [{'species': 'blank'}]]
+        Output: [[{'species': 'blank'}]]
+    """
+    # define on which question/key to de-duplicate
+    try:
+        primary_question = flags['QUESTION_NAME_MAPPER']['choice']
+    except:
+        primary_question = 'choice'
+    deduplicated_all = list()
+    primary_used = set()
+    for i, task_answers in enumerate(classification_answers):
+        deduplicated_all.append(list())
+        for answer in task_answers:
+            if primary_question not in answer:
+                deduplicated_all[i].append(answer)
+            # if duplicate don't add to final list
+            elif answer[primary_question] in primary_used:
+                logger.debug("Removed duplicate answer: {}".format(
+                    classification_answers))
+            # add used primary answer
+            else:
+                primary_used.add(answer[primary_question])
+    # remove any empty answers
+    deduplicated_final = [x for x in deduplicated_all if len(x) > 0]
+    return deduplicated_final
 
 
 def define_question_answers(all_records):

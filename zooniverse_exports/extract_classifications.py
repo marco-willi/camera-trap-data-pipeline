@@ -181,6 +181,7 @@ if __name__ == '__main__':
                 annotations_list = extractor.extract_key_from_json(
                     line, 'annotations', row_name_to_id_mapper)
                 # get all tasks of an annotation
+                classification_answers = list()
                 for task in annotations_list:
                     if not extractor.task_is_completed(task):
                         n_incomplete_tasks += 1
@@ -192,9 +193,15 @@ if __name__ == '__main__':
                     for _id_answer in ids_or_answers:
                         _id_answer_mapped = extractor.map_task_questions(
                             _id_answer, flags)
-                        record = {**classification_info, **subject_info_to_add,
-                                  'annos': _id_answer_mapped}
-                        all_records.append(record)
+                        classification_answers.append(_id_answer_mapped)
+                # de-duplicate answers (example: two identical species
+                # annotations from different tasks)
+                classifications_deduplicated = extractor.deduplicate_answers(
+                        classification_answers, flags)
+                for classification_answer in classifications_deduplicated:
+                    record = {**classification_info, **subject_info_to_add,
+                              'annos': classification_answer}
+                    all_records.append(record)
             except Exception:
                 logger.warning("Error - Skipping Record %s" % line_no)
                 logger.warning("Full line:\n %s" % line)
