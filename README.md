@@ -399,6 +399,18 @@ python3 -m zooniverse_exports.aggregate_extractions \
         -output_csv /home/packerc/shared/zooniverse/Exports/RUA/RUA_S1_classifications_aggregated.csv
 ```
 
+#### Aggregation Logic
+
+1. Group / collect all classifications of a specific subject (synonym to capture)
+2. For each species (incl. blanks) calculate the following stats:
+  - how many users identified it (and the proportion of all users)
+  - calculate among the users who identified the species the proportions of users who identified a certain characteristic (e.g. 0.9 may identified a 'moving' behavior)
+  - calculate among the users who identified the species the median number of counts (round up)
+  - characteristics that were not asked for or no user answered are indicated by an empty string: ''
+3. Calculate the median over the number of different species identified by each user (round up)
+4. Flag the top N species (number of different species identified) with 'species_is_plurality_consensus'. Choose a random species on ties.
+5. Export the full dataset including species without consensus, blanks, and additional information.
+
 ### Add Meta-Data to Aggregated Classifications (in development)
 
 This function adds meta-data to aggregated classifications, like location, timestamp, and
@@ -415,6 +427,25 @@ python3 -m zooniverse_exports.add_meta_data_to_aggregated_class \
 -manifest_files_old /home/packerc/shared/zooniverse/Manifests/GRU/GRU_S1_manifest_v1 \
 -max_n_images 3
 ```
+
+### Get Zooniverse Subject Data
+
+This is an example to download subject data from Zooniverse. This data can be used to extract useful meta-data for reports.
+
+```
+cd $HOME/snapshot_safari_misc
+SITE=GRU
+SEASON=GRU_S1
+PROJECT_ID=5115
+
+# Get Zooniverse Subject Data
+python3 -m zooniverse_exports.get_zooniverse_export \
+        --password_file ~/keys/passwords.ini \
+        --project_id $PROJECT_ID \
+        --output_file /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subjects.csv \
+        --export_type subjects \
+        --new_export 0
+```      
 
 #### Notes
 

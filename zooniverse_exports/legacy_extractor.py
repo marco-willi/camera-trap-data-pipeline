@@ -10,6 +10,7 @@ import os
 from collections import OrderedDict
 from collections import Counter
 import traceback
+import textwrap
 import logging
 
 logger = logging.getLogger(__name__)
@@ -292,6 +293,8 @@ def process_season_classifications(path, img_to_capture, flags):
     n_retire_reason_blank_but_species = 0
     n_capture_id_not_found = 0
     n_annos_without_images = 0
+    n_duplicate_subject_answers_by_same_user = 0
+    user_subject_species_dict = dict()
     classifications = OrderedDict()
     with open(path, "r") as ins:
         csv_reader = csv.reader(ins, delimiter=',', quotechar='"')
@@ -339,6 +342,27 @@ def process_season_classifications(path, img_to_capture, flags):
                 answers = extract_questions(line, row_name_to_id_mapper, flags)
                 # map answers
                 map_answers(answers, row_name_to_id_mapper, flags)
+                # check if subject was already classiifed by the same user
+                # with the same species identification if so, skip it
+                user = classification_info['user_name']
+                subject_id = classification_info['subject_id']
+                species_annotation = answers['species']
+                _subject_species_key = '#'.join(
+                    [subject_id, species_annotation])
+                if user not in user_subject_species_dict:
+                    user_subject_species_dict[user] = set()
+                if _subject_species_key in user_subject_species_dict[user]:
+                    msg = "Removed annnotations due \
+                           to subject_id {} already classified by \
+                           user {} with species {}".format(
+                           subject_id,
+                           user,
+                           answers['species'])
+                    logger.debug(textwrap.shorten(msg, width=99))
+                    n_duplicate_subject_answers_by_same_user += 1
+                    continue
+                user_subject_species_dict[user].add(_subject_species_key)
+
                 record = {**classification_info, **answers}
                 # store in classifiations dict
                 c_id = classification_info['classification_id']
@@ -363,7 +387,16 @@ def process_season_classifications(path, img_to_capture, flags):
         n_annos_without_images))
     logger.info("Found {} classifications with blank and species annotation".format(
         n_retire_reason_blank_but_species))
+    logger.info("Removed {} duplicate classifications - same user, subject, and species".format(
+        n_duplicate_subject_answers_by_same_user))
+
     return classifications
+
+
+
+
+
+
 
 
 def consolidate_all_classifications(classifications, flags):

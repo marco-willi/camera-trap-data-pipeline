@@ -1,13 +1,4 @@
-""" Get Zooniverse Data using the Panoptes Client
-
-    Example Usage:
-    --------------
-    python3 get_zooniverse_export.py -password_file ~/keys/passwords.ini \
-            -project_id 4715 \
-            -output_file classifications.csv \
-            -export_type classifications \
-            -new_export 0
-"""
+""" Get Zooniverse Data using the Panoptes Client """
 import argparse
 import csv
 import os

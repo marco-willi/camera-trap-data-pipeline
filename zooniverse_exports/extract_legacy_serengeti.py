@@ -107,7 +107,7 @@ from utils import print_nested_dict
 # python3 -m zooniverse_exports.extract_legacy_serengeti \
 # --classification_csv '/home/packerc/shared/zooniverse/Exports/SER/2019-01-27_serengeti_classifications.csv' \
 # --output_path '/home/packerc/shared/zooniverse/Exports/SER/' \
-# --season_to_process 'S3'
+# --season_to_process 'S1'
 
 ######################################
 # Parameters
@@ -226,7 +226,8 @@ if __name__ == '__main__':
     # Columns to export
     flags['CLASSIFICATION_INFO_TO_ADD'] = [
         'user_name', 'created_at', 'subject_id', 'capture_event_id',
-        "retirement_reason", "season", "site", "roll", "filenames", "timestamps",
+        "retirement_reason", "season", "site", "roll",
+        "filenames", "timestamps",
         'classification_id']
 
     # logging flags
@@ -254,6 +255,10 @@ if __name__ == '__main__':
                 'SER_{}_classifications_raw.csv'.format(k))
             for k in all_seasons_ids}
 
+    for season, season_path in all_seasons.items():
+        logger.info("Season: {} classifications stored at: {}".format(
+            season, season_path))
+
     ######################################
     # Read meta-data from season capture
     # files
@@ -269,6 +274,10 @@ if __name__ == '__main__':
     season_capture_files['10'] = os.path.join(
         args['season_captures_path'],
         '{}_captures.csv'.format('S10'))
+
+    for season, season_path in season_capture_files.items():
+        logger.info("Season: {} meta-data defined to be at: {}".format(
+            season, season_path))
 
     img_to_capture = legacy_extractor.build_img_to_capture_map(
         season_capture_files[s_id], flags)
@@ -320,8 +329,12 @@ if __name__ == '__main__':
     retirement_reasons_stats.most_common()
 
     for question, question_stats in answers_stats.items():
+        logger.info("Stats for question: %s" % question)
+        n_tot = sum([x[1] for x in question_stats])
         for (answer, n) in question_stats:
-            logger.info('{:15} - {:15} - {}'.format(question, answer, n))
+            percent = (n / n_tot) * 100
+            logger.info('{:15} - {:15} - {:10} / {} ({:.2f} %)'.format(
+                question, answer, n, n_tot, percent))
 
     # Print examples
     logger.info("Show some example classifications")
