@@ -423,7 +423,7 @@ python3 -m zooniverse_exports.add_meta_data_to_aggregated_class \
 
 ## Processing Snapshot Serengeti S1-S10 data (legacy format) - (in development)
 
-Data for Snapshot Serengeti (S1-S10) has been collected via an old Zooniverse platform (Oruboros) and has a different format than the newer Snapshot Safari data. Therefore, it requires a separate script for processing that data to be standardized, claned and flattened for loading into a SQL database.
+Data for Snapshot Serengeti (S1-S10) has been collected via an old Zooniverse platform (Oruboros) and has a different format than the newer Snapshot Safari data. Therefore, a separate processing script was implemented to generate csv files.
 
 ### Data
 
@@ -483,7 +483,7 @@ The data has the following columns:
 |created_at | when the classification was made
 |subject_id | zooniverse subject_id (unique id per capture event)
 |capture_event_id | old capture_event_id as uploaded to zooniverse
-|retire_reason | string defining the retirement reason as defined by Zooniverse
+|retirement_reason | string defining the retirement reason as defined by Zooniverse
 |season,site,roll | internal id for season, site, roll
 |filenames | image names, separated by ; if multiple
 |timestamps | image timestamps, separated by ; if multiple

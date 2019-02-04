@@ -122,7 +122,7 @@ def map_task_questions(answers_list, flags):
                 {'howmany': 'count'}
             - flags['ANSWER_TYPE_MAPPER']:
                 {'species': {'zebra_large': 'zebra'}}
-            - flagsflags['ANSWER_MAPPER']: {'no': '0', ..}
+            - flags['ANSWER_MAPPER']: {'no': '0', ..}
         Output: [{'count': '1'}, {'young_present': '0'}, {'species': 'zebra'}]
     """
     answers_list_mapped = copy.deepcopy(answers_list)
@@ -234,36 +234,36 @@ def deduplicate_answers(classification_answers, flags):
     return deduplicated_final
 
 
-def define_question_answers(all_records):
+def find_question_answer_pairs(all_records):
     """ Analyze annotations to determine question and answer mappings
         Output:
          {'species': ['vulture', 'zebra', 'nyala', ...],
           'young_present': ['yes', 'no'],
           }
     """
-    question_answers = dict()
+    question_answer_pairs = dict()
     for record in all_records:
         annos = record['annos']
         for anno in annos:
             for question, answers in anno.items():
-                if question not in question_answers:
-                    question_answers[question] = set()
+                if question not in question_answer_pairs:
+                    question_answer_pairs[question] = set()
                 if isinstance(answers, str):
-                    question_answers[question].add(answers)
+                    question_answer_pairs[question].add(answers)
                 elif isinstance(answers, list):
                     for answer in answers:
-                        question_answers[question].add(answer)
-    return {k: list(v) for k, v in question_answers.items()}
+                        question_answer_pairs[question].add(answer)
+    return {k: list(v) for k, v in question_answer_pairs.items()}
 
 
-def build_question_header(question_answers, question_types):
+def build_question_header(question_answer_pairs, question_types):
     """ Build a header based on question type an answers
         Output: ['species', 'count', 'eating', 'interacting',
                  'moving', 'resting', 'standing',
                  'young_present', 'horns_visible']
     """
     question_header = list()
-    for k, v in question_answers.items():
+    for k, v in question_answer_pairs.items():
         if question_types[k] == 'single':
             question_header.append(k)
         else:
@@ -273,10 +273,19 @@ def build_question_header(question_answers, question_types):
     return question_header
 
 
-def flatten_annotations(annotations, question_types, question_answers):
-    """ Unpack / Flatten Annotations
-    Input: [{'species': 'zebra', 'whatbehaviorsdoyousee':
-            ['standing', 'resting']}]
+def flatten_annotations(
+        annotations,
+        question_types,
+        possible_multi_question_answers):
+    """ Unpack / Flatten Annotations - add 0 to multi-answer questions
+    Input:
+        - possible_question_answers
+            {'whatbehaviorsdoyousee': ['standing', 'resting', 'moving',...]}
+        - question_types:
+            {'species': 'single', 'whatbehaviorsdoyousee': 'multi'}
+        - annotations:
+            [{'species': 'zebra', 'whatbehaviorsdoyousee':
+             ['standing', 'resting']}]
     Output: {'species': 'zebra',
             'standing': '1', 'resting': '1', 'moving': '0', ...}
     """
@@ -284,7 +293,7 @@ def flatten_annotations(annotations, question_types, question_answers):
     for question_answer in annotations:
         for question, answers in question_answer.items():
             if question_types[question] == 'multi':
-                for choice in question_answers[question]:
+                for choice in possible_multi_question_answers[question]:
                     if choice in answers:
                         flattened[choice] = '1'
                     else:

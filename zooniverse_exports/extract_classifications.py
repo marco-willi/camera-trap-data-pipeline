@@ -92,7 +92,7 @@ if __name__ == '__main__':
     # Mapping answers to any question according to the following
     flags['ANSWER_MAPPER'] = {
         'yes': '1', 'y': '1', 'no': '0', 'n': '0',
-        0: '0', 1: '1', '': '0'}
+        0: '0', 1: '1'}
 
     # questions to ignore in the export
     flags['QUESTIONS_TO_IGNORE'] = ('dontcare')
@@ -221,6 +221,8 @@ if __name__ == '__main__':
                 # get all annotations (list of annotations)
                 annotations_list = extractor.extract_key_from_json(
                     line, 'annotations', row_name_to_id_mapper)
+                # if classification_info['classification_id'] == '88928599':
+                #     break
                 # get all tasks of an annotation
                 classification_answers = list()
                 for task in annotations_list:
@@ -253,9 +255,8 @@ if __name__ == '__main__':
     logger.info("Incomplete tasks: {:,}".format(n_incomplete_tasks))
     logger.info("Skipped due to 'seen_before' flag: {:,}".format(
         n_seen_before))
-    logger.info("Skipped {:,} subjects due to prev. annot. by user: ".format(
+    logger.info("Skipped {:,} subjects due to prev. annot. by user".format(
         n_duplicate_subject_by_same_user))
-
 
     ######################################
     # Analyse Classifications
@@ -335,14 +336,14 @@ if __name__ == '__main__':
     ######################################
 
     # get all possible answers to the questions
-    question_answers = extractor.define_question_answers(all_records)
+    question_answer_pairs = extractor.find_question_answer_pairs(all_records)
 
     # analyze the question types
     question_types = extractor.analyze_question_types(all_records)
 
     # build question header for csv export
     question_header = extractor.build_question_header(
-        question_answers, question_types)
+        question_answer_pairs, question_types)
 
     # modify question column names
     question_header_print = list()
@@ -396,7 +397,7 @@ if __name__ == '__main__':
             class_data = [record[x] for x in classification_header_cols]
             # get annotation info data
             answers = extractor.flatten_annotations(
-                record['annos'], question_types,  question_answers)
+                record['annos'], question_types,  question_answer_pairs)
             answers_ordered = [
                 answers[x] if x in answers else '' for x
                 in question_header]

@@ -379,7 +379,8 @@ def consolidate_all_classifications(classifications, flags):
                 consolidated_classifications[c_id] = consolidated
                 n_consolidations += 1
             except:
-                logger.warning("Failed to consolidate record: {}".format(annotations))
+                logger.warning("Failed to consolidate record: {}".format(
+                    annotations))
 
     logger.info("Consolidated {} classifications with multiple entries for \
           the same species".format(n_consolidations))
