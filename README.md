@@ -5,6 +5,12 @@ This repository contains code for the following tasks:
 2. [Download & Extract Data from Zooniverse](docs/zooniverse_exports.md)
 3. [Aggregate Data from Zooniverse](docs/zooniverse_aggregations.md)
 
+## Overview
+
+A high-level overview of how the scripts are connected can be found here:
+[Process Overview](docs/data_processing_overview.pdf)
+
+Note that not all processes are implemented in this repository and some of it represents a roadmap.
 
 ## Pre-Requisites
 

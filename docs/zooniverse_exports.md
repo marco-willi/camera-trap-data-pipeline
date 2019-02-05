@@ -60,6 +60,7 @@ python3 -m zooniverse_exports.extract_classifications \
         --workflow_version 797.34
 ```
 
+
 The resulting file may have the following column headers:
 
 | Columns   | Description |
@@ -73,6 +74,7 @@ The resulting file may have the following column headers:
 |workflow_id,workflow_version | workflow info
 |classification_id | classification_id (multiple annotations possible)
 |retirement_reason| Zooniverse generated retirement reason
+|retired_at| Zooniverse generated retirement date
 |question__count, question__eating | question answers
 |question__interacting | question answers
 |question__lyingdown, question__moving | question answers
