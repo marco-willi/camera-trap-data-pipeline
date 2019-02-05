@@ -5,7 +5,9 @@ import json
 import os
 import csv
 import argparse
+import logging
 
+from logger import setup_logger, create_logfile_name
 from utils import file_path_splitter, file_path_generator
 
 #For Testing
@@ -32,13 +34,19 @@ if __name__ == "__main__":
 
     args = vars(parser.parse_args())
 
-    for k, v in args.items():
-        print("Argument %s: %s" % (k, v))
-
     # Check Inputs
     if not os.path.exists(args['manifest']):
         raise FileNotFoundError("manifest: %s not found" %
                                 args['manifest'])
+
+    # logging
+    log_file_name = create_logfile_name('create_machine_learning_file')
+    log_file_path = os.path.join(args['manifest'], log_file_name)
+    setup_logger(log_file_path)
+    logger = logging.getLogger(__name__)
+
+    for k, v in args.items():
+        logger.info("Argument {}: {}".format(k, v))
 
     # Create / Check path of prediction file
     if args['machine_learning_file'] is None:
@@ -51,7 +59,8 @@ if __name__ == "__main__":
             file_delim=file_name_parts['file_delim'],
             file_ext='csv'
         )
-        print("Machine learning file is %s" % args['machine_learning_file'])
+        logger.info("Machine learning file is %s" %
+                    args['machine_learning_file'])
     else:
         output_dir = os.path.dirname(args['machine_learning_file'])
         if not os.path.isdir(output_dir):
@@ -62,10 +71,10 @@ if __name__ == "__main__":
     with open(args['manifest'], 'r') as f:
         manifest = json.load(f)
 
-    print("Found %s capture events in %s" %
-          (len(manifest.keys()), args['manifest']))
+    logger.info("Found %s capture events in %s" %
+                (len(manifest.keys()), args['manifest']))
 
-    print("Writing file to %s" % args['machine_learning_file'])
+    logger.info("Writing file to %s" % args['machine_learning_file'])
     with open(args['machine_learning_file'], 'w') as csvfile:
         csvwriter = csv.writer(csvfile, delimiter=',')
         # write header
@@ -81,8 +90,9 @@ if __name__ == "__main__":
                 try:
                     images_to_write[i] = image
                 except:
-                    print("WARNING - image no %s for capture %s not found" %
-                          (i, capture_id))
+                    logger.warning(
+                        "WARNING - image no %s for capture %s not found" %
+                        (i, capture_id))
             row_to_write += images_to_write
             csvwriter.writerow(row_to_write)
 

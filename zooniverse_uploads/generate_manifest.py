@@ -4,10 +4,13 @@
 import os
 import argparse
 from collections import OrderedDict
+import logging
 
+from logger import setup_logger, create_logfile_name
 from utils import (
     export_dict_to_json_with_newlines,
     read_cleaned_season_file, file_path_generator)
+
 
 # For Testing
 # args = dict()
@@ -59,9 +62,6 @@ if __name__ == "__main__":
 
     args = vars(parser.parse_args())
 
-    for k, v in args.items():
-        print("Argument %s: %s" % (k, v))
-
     # Check Inputs
     if not os.path.isdir(args['output_manifest_dir']):
         raise FileNotFoundError("output_manifest_dir: %s is not a directory" %
@@ -78,6 +78,15 @@ if __name__ == "__main__":
     if any([x in args['manifest_id'] for x in ['.', '__']]):
         raise ValueError("manifest_id must not contain any of '.'/'__'")
 
+    # logging
+    log_file_name = create_logfile_name('generate_manifest')
+    log_file_path = os.path.join(args['output_manifest_dir'], log_file_name)
+    setup_logger(log_file_path)
+    logger = logging.getLogger(__name__)
+
+    for k, v in args.items():
+        logger.info("Argument {}: {}".format(k, v))
+
     manifest_path = file_path_generator(
         dir=args['output_manifest_dir'],
         id=args['manifest_id'],
@@ -91,8 +100,8 @@ if __name__ == "__main__":
         read_cleaned_season_file(args['captures_csv'],
                                  args['csv_quotechar'])
 
-    print("Found %s images in %s" %
-          (len(cleaned_captures), args['captures_csv']))
+    logger.info("Found %s images in %s" %
+                (len(cleaned_captures), args['captures_csv']))
 
     # Find all processed images
     images_on_disk = set(os.listdir(args['compressed_image_dir']))
@@ -152,11 +161,12 @@ if __name__ == "__main__":
         manifest[capture_id]['images']['original_images'].append(
             image_path)
 
-    print("Omitted %s images due to invalid code in 'invalid' column" %
-          omitted_images_counter)
-    print("Number of images not found in images folder %s" %
-          images_not_found_counter)
-    print("Writing %s captures to %s" % (len(manifest.keys()), manifest_path))
+    logger.info("Omitted %s images due to invalid code in 'invalid' column" %
+                omitted_images_counter)
+    logger.info("Number of images not found in images folder %s" %
+                images_not_found_counter)
+    logger.info("Writing %s captures to %s" %
+                (len(manifest.keys()), manifest_path))
 
     export_dict_to_json_with_newlines(manifest, manifest_path)
 

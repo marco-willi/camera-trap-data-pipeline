@@ -6,7 +6,9 @@ import argparse
 import math
 import random
 from collections import OrderedDict
+import logging
 
+from logger import setup_logger, create_logfile_name
 from utils import (
     slice_generator, export_dict_to_json_with_newlines,
     file_path_splitter, file_path_generator)
@@ -35,9 +37,6 @@ if __name__ == "__main__":
 
     args = vars(parser.parse_args())
 
-    for k, v in args.items():
-        print("Argument %s: %s" % (k, v))
-
     # Check Manifest exists
     if not os.path.exists(args['manifest']):
         raise FileNotFoundError("manifest: %s not found" % args['manifest'])
@@ -55,6 +54,15 @@ if __name__ == "__main__":
         raise ValueError(
             "Only one of: number_of_batches/max_batch_size can be specified")
 
+    # logging
+    log_file_name = create_logfile_name('split_manifest_into_batches')
+    log_file_path = os.path.join(args['output_manifest_dir'], log_file_name)
+    setup_logger(log_file_path)
+    logger = logging.getLogger(__name__)
+
+    for k, v in args.items():
+        logger.info("Argument {}: {}".format(k, v))
+
     file_name_parts = file_path_splitter(args['manifest'])
 
     # import manifest
@@ -63,8 +71,8 @@ if __name__ == "__main__":
 
     n_captures = len(manifest.keys())
 
-    print("Imported Manfest file %s with %s records" %
-          (args['manifest'], n_captures), flush=True)
+    logger.info("Imported Manfest file %s with %s records" %
+                (args['manifest'], n_captures), flush=True)
 
     # Create evenly sized splits
     if args['number_of_batches'] is not None:
@@ -81,7 +89,7 @@ if __name__ == "__main__":
         random.seed(123)
         random.shuffle(capture_ids)
 
-    print("Creating %s splits" % (n_batches))
+    logger.info("Creating %s splits" % (n_batches))
 
     for batch_no, (i_start, i_end) in enumerate(slices):
         batch_manifest = OrderedDict()
@@ -98,8 +106,8 @@ if __name__ == "__main__":
         for batch_id in capture_ids[i_start: i_end]:
             batch_manifest[batch_id] = manifest[batch_id]
 
-        print("Writing batch %s to %s with %s records" %
-              (batch_no + 1, batch_path, len(batch_manifest.keys())))
+        logger.info("Writing batch %s to %s with %s records" %
+                    (batch_no + 1, batch_path, len(batch_manifest.keys())))
 
         export_dict_to_json_with_newlines(batch_manifest, batch_path)
 
