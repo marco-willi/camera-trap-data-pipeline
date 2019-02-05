@@ -101,7 +101,6 @@ if __name__ == '__main__':
         csv_reader = csv.reader(ins, delimiter=',', quotechar='"')
         header = next(csv_reader)
         row_name_to_id_mapper = {x: i for i, x in enumerate(header)}
-        row_id_to_name_mapper = {i: x for i, x in enumerate(header)}
         for line_no, line in enumerate(csv_reader):
             # print status
             if ((line_no % 10000) == 0) and (line_no > 0):
