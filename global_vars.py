@@ -27,3 +27,136 @@ label_mappings = {
                         "5": "5", "6": "6", "7": "7", "8": "8", "9": "9",
                         "10": "10", "11": "11-50", "1150": "11-50", "51": "51+"}
 }
+
+
+###################################################
+# Flags to define the bheavior of the Extractor
+###################################################
+
+extractor_flags = dict()
+
+# Prefix each question in the output with the following prefix and delim
+# Example: 'question__young_present' instead of 'young_present'
+extractor_flags['QUESTION_PREFIX'] = 'question'
+extractor_flags['QUESTION_DELIMITER'] = '__'
+
+# map the following question names
+extractor_flags['QUESTION_NAME_MAPPER'] = {
+    'howmany': 'count',
+    'question': 'species',
+    'arethereanyyoungpresent': 'young_present',
+    'doyouseeanyhorns': 'horns_visible',
+    'choice': 'species',
+    'doyouseeanyantlers': 'antlers_visible'
+    }
+
+# Map specific answers of specific questions
+extractor_flags['ANSWER_TYPE_MAPPER'] = {
+    'species': {
+        'no animals present': 'blank',
+        'nothing': 'blank',
+        'nothinghere': 'blank',
+        'nothingthere': 'blank'
+        }
+    }
+
+# Mapping answers to any question according to the following
+extractor_flags['ANSWER_MAPPER'] = {
+    'yes': '1', 'y': '1', 'no': '0', 'n': '0',
+    0: '0', 1: '1'}
+
+# questions to ignore in the export
+extractor_flags['QUESTIONS_TO_IGNORE'] = ('dontcare')
+
+# classification level fields to add to the export
+extractor_flags['CLASSIFICATION_INFO_TO_ADD'] = [
+    'user_name', 'user_id', 'created_at', 'subject_ids',
+    'workflow_id', 'workflow_version', 'classification_id']
+
+# map classification level info
+extractor_flags['CLASSIFICATION_INFO_MAPPER'] = {
+    'subject_ids': 'subject_id'
+}
+
+# add subject level information and map if specified
+# -if not available it will add an empty string in the output
+extractor_flags['SUBJECT_INFO_TO_ADD'] = [
+    '#season', '#site', '#roll', '#capture']
+
+extractor_flags['SUBJECT_INFO_MAPPER'] = {
+    '#season': 'season', '#site': 'site',
+    '#roll': 'roll', '#capture': 'capture'}
+
+# add retirement information if available
+extractor_flags['RETIREMENT_INFO_TO_ADD'] = [
+    "retirement_reason",
+    "retired_at"
+    ]
+
+###################################################
+# Flags to define the bheavior of the
+# Legacy Extractor
+###################################################
+
+legacy_extractor_flags = dict()
+
+legacy_extractor_flags['QUESTION_PREFIX'] = 'question'
+legacy_extractor_flags['QUESTION_DELIMITER'] = '__'
+
+legacy_extractor_flags['QUESTIONS'] = (
+    'species', 'young_present', 'standing',
+    'resting', 'moving', 'eating', 'interacting')
+
+# map column names of the input csv for clarity and consistency
+legacy_extractor_flags['CSV_HEADER_MAPPER'] = {
+    'id': 'classification_id',
+    'subject_zooniverse_id': 'subject_id',
+    "species_count": 'count',
+    "babies": 'young_present',
+    "retire_reason": 'retirement_reason'
+    }
+
+# map different answers to the question columns
+legacy_extractor_flags['ANSWER_TYPE_MAPPER'] = {
+    'species': {
+        'no animals present': 'blank',
+        'nothing': 'blank',
+        '': 'blank'
+        },
+    'young_present': {
+        'false': 0,
+        'true': 1
+        },
+    'standing': {
+        'false': 0,
+        'true': 1
+        },
+    'resting': {
+        'false': 0,
+        'true': 1
+        },
+    'moving': {
+        'false': 0,
+        'true': 1
+        },
+    'eating': {
+        'false': 0,
+        'true': 1
+        },
+    'interacting': {
+        'false': 0,
+        'true': 1
+        }
+    }
+
+# Define the question columns
+legacy_extractor_flags['CSV_QUESTIIONS'] = [
+    'species', 'count', 'young_present',
+    "standing", "resting", "moving", "eating", "interacting"]
+
+# Columns to export
+legacy_extractor_flags['CLASSIFICATION_INFO_TO_ADD'] = [
+    'user_name', 'created_at', 'subject_id', 'capture_event_id',
+    "retirement_reason", "season", "site", "roll",
+    "filenames", "timestamps",
+    'classification_id']

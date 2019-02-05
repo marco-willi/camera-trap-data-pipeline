@@ -95,6 +95,7 @@ from logger import setup_logger, create_logfile_name
 
 from zooniverse_exports import legacy_extractor
 from utils import print_nested_dict
+from global_vars import legacy_extractor_flags as flags
 
 # To Test
 # args = dict()
@@ -166,69 +167,6 @@ if __name__ == '__main__':
 
     for k, v in args.items():
         logger.info("Argument {}: {}".format(k, v))
-
-    flags = dict()
-
-    flags['QUESTION_PREFIX'] = 'question'
-    flags['QUESTION_DELIMITER'] = '__'
-
-    flags['QUESTIONS'] = (
-        'species', 'young_present', 'standing',
-        'resting', 'moving', 'eating', 'interacting')
-
-    # map column names of the input csv for clarity and consistency
-    flags['CSV_HEADER_MAPPER'] = {
-        'id': 'classification_id',
-        'subject_zooniverse_id': 'subject_id',
-        "species_count": 'count',
-        "babies": 'young_present',
-        "retire_reason": 'retirement_reason'
-        }
-
-    # map different answers to the question columns
-    flags['ANSWER_TYPE_MAPPER'] = {
-        'species': {
-            'no animals present': 'blank',
-            'nothing': 'blank',
-            '': 'blank'
-            },
-        'young_present': {
-            'false': 0,
-            'true': 1
-            },
-        'standing': {
-            'false': 0,
-            'true': 1
-            },
-        'resting': {
-            'false': 0,
-            'true': 1
-            },
-        'moving': {
-            'false': 0,
-            'true': 1
-            },
-        'eating': {
-            'false': 0,
-            'true': 1
-            },
-        'interacting': {
-            'false': 0,
-            'true': 1
-            }
-        }
-
-    # Define the question columns
-    flags['CSV_QUESTIIONS'] = [
-        'species', 'count', 'young_present',
-        "standing", "resting", "moving", "eating", "interacting"]
-
-    # Columns to export
-    flags['CLASSIFICATION_INFO_TO_ADD'] = [
-        'user_name', 'created_at', 'subject_id', 'capture_event_id',
-        "retirement_reason", "season", "site", "roll",
-        "filenames", "timestamps",
-        'classification_id']
 
     # logging flags
     print_nested_dict('', flags)

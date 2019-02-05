@@ -1,11 +1,12 @@
 # Download and Extract Zooniverse Exports
 
-Some of the scripts used for different sites can be found here: [zooniverse_exports/scripts.sh](zooniverse_exports/scripts.sh). The following steps are required:
+The following codes can be used to:
 
 1. Get Zooniverse Exports (download data through the Python API)
 2. Extract Zooniverse Classifications
-3. Aggregate Extracted Zooniverse Classifications (on capture-event aggregation - work-in-progress)
-4. Add Meta-Data to Aggregated Classifications (work-in-progress)
+
+Some of the scripts used for different sites can be found here: [zooniverse_exports/scripts.sh](../zooniverse_exports/scripts.sh).
+
 
 ## Get Zooniverse Exports
 
@@ -41,7 +42,7 @@ Example:
 
 The following code extracts the relevant fields of a Zooniverse classification file. It creates a csv file with one line per annotation/species identification. Normally, you would
 want to specify the workflow_id and the workflow_version to extract only the workflow that was used
-during the 'live-phase' of the project. If neither workflow_id/workflow_version are not specified every workflow is extracted (and can be separated later). The workflow_id can be found in the project builder when clicking on the workflow. The workflow_version is at the same place slightly further down (e.g. something like 745.34).
+during the 'live-phase' of the project. If neither workflow_id/workflow_version are specified every workflow is extracted (and can be separated later). The workflow_id can be found in the project builder when clicking on the workflow. The workflow_version is at the same place slightly further down (e.g. something like 745.34).
 
 Use a machine with enough memory - for example:
 
