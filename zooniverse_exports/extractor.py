@@ -174,7 +174,7 @@ def is_eligible(line, mapper, cond):
     cond: {'workflow_id': '345'}
     """
     for cond_key, cond_val in cond.items():
-        if mapper[cond_key] is not cond_val:
+        if line[mapper[cond_key]] is not cond_val:
             return False
     return True
 
