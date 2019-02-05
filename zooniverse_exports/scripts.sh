@@ -3,15 +3,27 @@
 # Grumeti
 ####################################
 
+cd $HOME/snapshot_safari_misc
+SITE=GRU
+SEASON=GRU_S1
+PROJECT_ID=5115
+
+
+# Get Zooniverse Subject Data
+python3 -m zooniverse_exports.get_zooniverse_export \
+        --password_file ~/keys/passwords.ini \
+        --project_id $PROJECT_ID \
+        --output_file /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subjects.csv \
+        --export_type subjects \
+        --new_export 0
+
+
 # INFO:Workflow id: 4979    Workflow version: 249.2      -- counts: 2273
 # INFO:Workflow id: 4979    Workflow version: 259.4      -- counts: 1
 # INFO:Workflow id: 4979    Workflow version: 268.6      -- counts: 1
 # INFO:Workflow id: 4979    Workflow version: 274.12     -- counts: 634
 # INFO:Workflow id: 4979    Workflow version: 275.13     -- counts: 359746
 
-
-SITE=GRU
-SEASON=GRU_S1
 
 python3 -m zooniverse_exports.extract_classifications \
         --classification_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_classifications.csv \
@@ -28,7 +40,7 @@ cd $HOME/snapshot_safari_misc
 python3 -m zooniverse_exports.extract_legacy_serengeti \
 --classification_csv '/home/packerc/shared/zooniverse/Exports/SER/2019-01-27_serengeti_classifications.csv' \
 --output_path '/home/packerc/shared/zooniverse/Exports/SER/' \
---season_to_process 'S3'
+--season_to_process 'S2'
 
 # Aggregate Classifications
 

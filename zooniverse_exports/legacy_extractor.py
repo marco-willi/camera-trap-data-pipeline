@@ -290,7 +290,6 @@ def build_img_to_capture_map(path, flags):
 def process_season_classifications(path, img_to_capture, flags):
     """ Process season classifications """
     n_not_eligible = 0
-    n_retire_reason_blank_but_species = 0
     n_capture_id_not_found = 0
     n_annos_without_images = 0
     n_duplicate_subject_answers_by_same_user = 0
@@ -369,11 +368,6 @@ def process_season_classifications(path, img_to_capture, flags):
                 if c_id not in classifications:
                     classifications[c_id] = list()
                 classifications[c_id].append(record)
-                # checks
-                ret_blank = (classification_info['retirement_reason'] == 'blank')
-                species_not_empty = (answers['species'] is not '')
-                if ret_blank and species_not_empty:
-                    n_retire_reason_blank_but_species += 1
             except Exception:
                 logger.warning("Error - Skipping Record %s" % line_no)
                 logger.warning("Full line:\n %s" % line)
@@ -381,14 +375,12 @@ def process_season_classifications(path, img_to_capture, flags):
 
     logger.info("Removed {} non-eligible classifications".format(
          n_not_eligible))
-    logger.info("Capture Id not found {}".format(
+    logger.info("Capture Ids not found: {}".format(
         n_capture_id_not_found))
-    logger.info("Image not found in season.csv {}".format(
+    logger.info("Image not found in season.csv: {}".format(
         n_annos_without_images))
-    logger.info("Found {} classifications with blank and species annotation".format(
-        n_retire_reason_blank_but_species))
-    logger.info("Removed {} duplicate classifications - same user, subject, and species".format(
-        n_duplicate_subject_answers_by_same_user))
+    logger.info("Removed {} duplicate classifications - same user, subject, \
+     and species".format(n_duplicate_subject_answers_by_same_user))
 
     return classifications
 

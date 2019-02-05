@@ -47,6 +47,13 @@ python3 -m zooniverse_uploads.upload_manifest \
 --password_file ~/keys/passwords.ini
 
 
+# Retry Upload manifest
+python3 -m zooniverse_uploads.upload_manifest \
+--manifest /home/packerc/shared/zooniverse/Manifests/${SITE}/${SEASON}__batch_1__manifest.json \
+--project_id 5115 \
+--subject_set_id 72185 \
+--password_file ~/keys/passwords.ini
+
 ###################################
 # SER
 ###################################
@@ -56,7 +63,7 @@ SEASON=SER_S11
 
 # Create machine learning file
 python3 -m zooniverse_uploads.create_machine_learning_file \
---manifest /home/packerc/shared/zooniverse/Manifests/${SITE}/${SEASON}__batch_5__manifest.json
+--manifest /home/packerc/shared/zooniverse/Manifests/${SITE}/${SEASON}__batch_6__manifest.json
 
 # add machine scores to batch
 python3 -m zooniverse_uploads.add_predictions_to_manifest \
@@ -75,6 +82,25 @@ python3 -m zooniverse_uploads.upload_manifest \
 SITE=MTZ
 SEASON=MTZ_S1
 
+# Split manifest into batches
+python3 -m zooniverse_uploads.split_manifest_into_batches \
+--manifest /home/packerc/shared/zooniverse/Manifests/${SITE}/${SEASON}__complete__manifest.json \
+--max_batch_size 20000
+
+
+# Upload manifest
+python3 -m zooniverse_uploads.upload_manifest \
+--manifest /home/packerc/shared/zooniverse/Manifests/${SITE}/${SEASON}__batch_1__manifest.json \
+--project_id 5124 \
+--password_file ~/keys/passwords.ini
+
+
+# Re-Try Uploading manifest
+python3 -m zooniverse_uploads.upload_manifest \
+--manifest /home/packerc/shared/zooniverse/Manifests/${SITE}/${SEASON}__batch_1__manifest.json \
+--project_id 5124 \
+--subject_set_id 72374 \
+--password_file ~/keys/passwords.ini
 
 ###################################
 # KAR
@@ -82,3 +108,23 @@ SEASON=MTZ_S1
 
 SITE=KAR
 SEASON=KAR_S1
+
+
+###################################
+# PLN
+###################################
+
+SITE=PLN
+SEASON=PLN_S1
+
+# Split manifest into batches
+python3 -m zooniverse_uploads.split_manifest_into_batches \
+--manifest /home/packerc/shared/zooniverse/Manifests/${SITE}/${SEASON}__complete__manifest.json \
+--max_batch_size 20000
+
+
+# Upload manifest
+python3 -m zooniverse_uploads.upload_manifest \
+--manifest /home/packerc/shared/zooniverse/Manifests/${SITE}/${SEASON}__batch_1__manifest.json \
+--project_id 6190 \
+--password_file ~/keys/passwords.ini
