@@ -84,14 +84,21 @@ if __name__ == '__main__':
             }
             # gather all subject info to add
             subject_info_to_add = OrderedDict()
+            # add subject_id per default
             subject_info_to_add['subject_id'] = subject_id
+            # add location data if specified
+            if flags['SUBJECT_ADD_LOCATION_DATA']:
+                for location_key in locations_dict.keys():
+                    subject_info_to_add[location_key] = \
+                        subject_data_all[location_key]
+            # add the specified meta-data
             for field in flags['SUBJECT_METADATA_TO_ADD']:
                 try:
                     subject_info_to_add[field] = subject_data_all[field]
                 except:
                     subject_info_to_add[field] = ''
             subject_info_to_add = extractor.rename_dict_keys(
-                subject_info_to_add, flags['SUBJECT_INFO_MAPPER'])
+                subject_info_to_add, flags['SUBJECT_METADATA_NAME_MAPPER'])
             for field in flags['SUBJECT_DATA_TO_ADD']:
                 try:
                     subject_info_to_add[field] = subject_data_all[field]
