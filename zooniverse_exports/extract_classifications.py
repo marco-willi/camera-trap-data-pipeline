@@ -62,7 +62,7 @@ if __name__ == '__main__':
         version. Only the major version number is compared, e.g., \
         version 45.12 is identical to 45.45")
     parser.add_argument(
-        "--worfklow_version_min", type=str, default=None,
+        "--workflow_version_min", type=str, default=None,
         help="Extract only classifications with at least the speciefied \
         workflow version number \
         version. Only the major version number is compared, e.g., \
@@ -79,7 +79,7 @@ if __name__ == '__main__':
                                 args['classification_csv']))
 
     at_least_one_none = [
-        args['workflow_version'], args['worfklow_version_min']]
+        args['workflow_version'], args['workflow_version_min']]
     assert any([x is None for x in at_least_one_none]), \
         "One of {} must be None".format(at_least_one_none)
 
@@ -226,7 +226,7 @@ if __name__ == '__main__':
     question_stats = dict()
     user_stats = dict()
     not_logged_in_counter = 0
-    worfklow_stats = dict()
+    workflow_stats = dict()
     retirement_stats = Counter()
 
     for record in all_records:
@@ -247,9 +247,9 @@ if __name__ == '__main__':
         if ('workflow_id' in record) and ('workflow_version' in record):
             wid = record['workflow_id']
             wv = record['workflow_version']
-            if wid not in worfklow_stats:
-                worfklow_stats[wid] = Counter()
-            worfklow_stats[wid].update([wv])
+            if wid not in workflow_stats:
+                workflow_stats[wid] = Counter()
+            workflow_stats[wid].update([wv])
         # get user information
         if ('user_name' in record) and ('user_id' in record):
             uid = record['user_id']
@@ -279,7 +279,7 @@ if __name__ == '__main__':
                 answer, count, total, 100*count/total))
     # workflow stats
     logger.info("Workflow stats:")
-    for workflow_id, workflow_version_data in worfklow_stats.items():
+    for workflow_id, workflow_version_data in workflow_stats.items():
         for workflow_version, count in workflow_version_data.items():
             logger.info("Workflow id: {:7} Workflow version: {:10} -- counts: {}".format(
                   workflow_id, workflow_version, count))

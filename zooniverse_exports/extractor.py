@@ -202,27 +202,27 @@ def is_eligible_workflow(
         line: list of classification information
         mapper: dict mapping row_name to row_id
         workflow_id: str indicating the workflow
-        worfklow_version_min: str indicating the minimum workflow_version
-        worfklow_version: str indicating the worfklow_version
+        workflow_version_min: str indicating the minimum workflow_version
+        workflow_version: str indicating the workflow_version
     """
     # Return True if no workflow_id specified
     if workflow_id is None:
         return True
     # extract data from line
-    worfklow_id_line = line[mapper['workflow_id']]
-    worfklow_version_line = get_workflow_major_version(
+    workflow_id_line = line[mapper['workflow_id']]
+    workflow_version_line = get_workflow_major_version(
         line[mapper['workflow_version']])
     # check workflow id
-    if workflow_id != worfklow_id_line:
+    if workflow_id != workflow_id_line:
         return False
     # check workflow version
     if workflow_version is not None:
-        if worfklow_version_line != workflow_version:
+        if workflow_version_line != workflow_version:
             return False
     # check workflow version min
     if workflow_version_min is not None:
         workflow_version_min = get_workflow_major_version(workflow_version_min)
-        if int(worfklow_version_line) >= int(workflow_version_min):
+        if int(workflow_version_line) >= int(workflow_version_min):
             return True
         else:
             return False
