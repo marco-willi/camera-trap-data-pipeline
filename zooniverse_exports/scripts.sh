@@ -89,17 +89,17 @@ python3 -m zooniverse_exports.extract_subjects \
         --output_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subjects_extracted.csv
 
 # Aggregate Classifications
-python3 -m zooniverse_aggregations.aggregate_captures_on_species \
-        --output_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_classifications_aggregated.csv \
-        --classifications_extracted /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_classifications_extracted.csv \
-        --subject_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subjects.csv
-
 python3 -m zooniverse_aggregations.aggregate_classifications_plurality \
         --classifications_extracted /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_classifications_extracted.csv \
         --output_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_classifications_aggregated.csv \
         --export_consensus_only \
         --export_sample_size 300
 
+# Add subject into to Aggregations
+python3 -m zooniverse_exports.add_subject_info_to_csv \
+        --subject_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subjects_extracted.csv \
+        --input_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_classifications_aggregated.csv \
+        --output_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_classifications_aggregated_subject_info.csv
 
 ###################################
 # Snapshot Serengeti - Legacy

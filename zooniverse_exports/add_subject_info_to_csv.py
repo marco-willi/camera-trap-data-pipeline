@@ -1,18 +1,4 @@
-""" Add Subject info to export
-    - join subject-information via subject_id
-    - Raw Subject-Data Example:
-    subject_id,project_id,workflow_id,subject_set_id,metadata,locations,classifications_count,retired_at,retirement_reason,created_at,updated_at
-        17510222,5115,4979,18231,"{""#roll"":1,""#site"":""J04"",
-            ""Image 1"":""6562_6082_5649.JPG"",
-            ""Image 2"":""6116_9310_6586.JPG"",
-            ""Image 3"":""4600_9071_9361.JPG"",
-            ""license"":""SnapshotSafari"",""#capture"":6,
-            ""attribution"":""University of Minnesota Lion Center +
-                SnapshotSafari + Singita Grumeti""}",
-            "{""0"":""https://panoptes-uploads.zooniverse.org/production/subject_location/f26d4b0a-81f8-4203-bd90-c85d659a05bb.jpeg"",
-              ""1"":""https://panoptes-uploads.zooniverse.org/production/subject_location/16f9fa0f-95b1-4425-9d27-55878a33f39e.jpeg"",
-              ""2"":""https://panoptes-uploads.zooniverse.org/production/subject_location/7ed39f2d-70b4-4d5e-ae1a-29215832a47e.jpeg""}",
-              17,2018-11-13 08:17:58 UTC,consensus,2018-01-28 02:27:23 UTC,2018-01-28 02:27:23 UTC
+""" Add Extracted Subject info to a CSV with subject_id column
 """
 import csv
 import os
@@ -21,6 +7,10 @@ import argparse
 
 from logger import setup_logger, create_logfile_name
 
+# args = dict()
+# args['subject_csv'] = '/home/packerc/shared/zooniverse/Exports/CC/CC_S1_subjects_extracted.csv'
+# args['input_csv'] = '/home/packerc/shared/zooniverse/Exports/CC/CC_S1_classifications_aggregated.csv'
+# args['output_csv'] = '/home/packerc/shared/zooniverse/Exports/CC/CC_S1_classifications_aggregated_subject_info.csv'
 
 if __name__ == '__main__':
 
@@ -65,13 +55,18 @@ if __name__ == '__main__':
     with open(args['subject_csv'], "r") as ins:
         csv_reader = csv.reader(ins, delimiter=',', quotechar='"')
         header_subject = next(csv_reader)
-        row_name_to_id_mapper_sub = {x: i for i, x in enumerate(header_subject)}
+        row_name_to_id_mapper_sub = {
+            x: i for i, x in enumerate(header_subject)}
         for line_no, line in enumerate(csv_reader):
             subject_id = line[row_name_to_id_mapper_sub['subject_id']]
-            subject_info[subject_id] = line
+            subject_dict = {
+                k: line[v] for k, v in
+                row_name_to_id_mapper_sub.items()}
+            subject_info[subject_id] = subject_dict
 
     # Read Input CSV with subject_id column
     combined_data = list()
+    n_subjects_not_found = 0
     with open(args['input_csv'], "r") as ins:
         csv_reader = csv.reader(ins, delimiter=',', quotechar='"')
         header = next(csv_reader)
@@ -82,13 +77,26 @@ if __name__ == '__main__':
                 print("Processed {:,} records".format(line_no))
             subject_id = line[row_name_to_id_mapper['subject_id']]
             # get subject_info
-            subject_info_current = subject_info[subject_id]
-            # input info
-            combined_info = {
-                **subject_info_current,
-                **{k: line[v] for k, v in row_name_to_id_mapper.items()}
-                }
+            if subject_id in subject_info:
+                subject_info_current = subject_info[subject_id]
+                # input info
+                combined_info = {
+                    **subject_info_current,
+                    **{k: line[v] for k, v in row_name_to_id_mapper.items()}
+                    }
+            else:
+                n_subjects_not_found += 1
+                if n_subjects_not_found < 10:
+                    logger.debug(
+                        "subject_id {} not found in subject_csv".format(
+                            subject_id))
+                combined_info = {
+                    k: line[v] for
+                    k, v in row_name_to_id_mapper.items()}
             combined_data.append(combined_info)
+
+    logger.info("Subjects not found in subject_csv: {}".format(
+        n_subjects_not_found))
 
     # duplicate subject_id
     header_no_subject = [x for x in header if x is not 'subject_id']
@@ -102,7 +110,12 @@ if __name__ == '__main__':
         tot = len(combined_data)
         for line_no, record in enumerate(combined_data):
             # get subject info data
-            to_write = [record[x] for x in output_header]
+            to_write = list()
+            for x in output_header:
+                try:
+                    to_write.append(record[x])
+                except:
+                    to_write.append('')
             csv_writer.writerow(to_write)
             # print status
             if ((line_no % 10000) == 0) and (line_no > 0):
