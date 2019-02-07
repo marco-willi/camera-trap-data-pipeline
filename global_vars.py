@@ -80,15 +80,6 @@ extractor_flags['CLASSIFICATION_INFO_MAPPER'] = {
     'subject_ids': 'subject_id'
 }
 
-# add subject level information and map if specified
-# -if not available it will add an empty string in the output
-extractor_flags['SUBJECT_INFO_TO_ADD'] = [
-    '#season', '#site', '#roll', '#capture']
-
-extractor_flags['SUBJECT_INFO_MAPPER'] = {
-    '#season': 'season', '#site': 'site',
-    '#roll': 'roll', '#capture': 'capture'}
-
 # add retirement information if available
 extractor_flags['RETIREMENT_INFO_TO_ADD'] = [
     "retirement_reason",
