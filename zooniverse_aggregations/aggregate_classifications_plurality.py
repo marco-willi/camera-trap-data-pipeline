@@ -135,7 +135,7 @@ if __name__ == '__main__':
         n_subject_classifications = len(stat_all['classification_id'])
         n_subject_users = len(stat_all['user_name'])
         # order species by frequency of annotation
-        species_by_frequency = stat_all['question__species'].most_common()
+        species_by_frequency = stat_all[question_main_id].most_common()
         species_names = [x[0] for x in species_by_frequency]
         # calc stats for the top-species only
         species_stats = aggregator.stats_for_species(
@@ -182,6 +182,7 @@ if __name__ == '__main__':
             species_is_plurality_consensus = \
                 int(sp in subject_agg_data['top_species'])
             record = {
+                'subject_id': subject_id,
                 question_main_id: sp,
                 **species_dat,
                 **subject_agg_data['aggregation_info'],
