@@ -57,7 +57,8 @@ extractor_flags['ANSWER_TYPE_MAPPER'] = {
         'no animals present': 'blank',
         'nothing': 'blank',
         'nothinghere': 'blank',
-        'nothingthere': 'blank'
+        'nothingthere': 'blank',
+        'noanimalspresent': 'blank'
         }
     }
 
