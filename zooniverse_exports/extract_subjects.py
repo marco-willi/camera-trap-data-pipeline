@@ -118,8 +118,13 @@ if __name__ == '__main__':
         csv_writer.writerow(subject_data_header)
         tot = len(subject_info.keys())
         for line_no, subject_data in enumerate(subject_info.values()):
-            # get subject info data
-            to_write = [subject_data[x] for x in subject_data_header]
+            # Arrange subject data in a list and use '' for missing data
+            to_write = list()
+            for x in subject_data_header:
+                try:
+                    to_write.append(subject_data[x])
+                except:
+                    to_write.append('')
             csv_writer.writerow(to_write)
             # print status
             if ((line_no % 10000) == 0) and (line_no > 0):
