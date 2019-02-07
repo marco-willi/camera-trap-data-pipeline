@@ -123,10 +123,10 @@ if __name__ == '__main__':
                 if subject_id in subject_info:
                     for i, (img_name, url) in enumerate(locations_dict.items()):
                             subject_info[subject_id]['url{}'.format(i+1)] = url
+                    n_images_per_subject.append(i+1)
                 else:
                     logger.debug("Subject {} has no classifications".format(
-                        subject_id))
-                n_images_per_subject.append(i+1)
+                        subject_id))        
         max_images_per_subject = max(n_images_per_subject)
         url_keys = ['url{}'.format(i+1) for i in range(max_images_per_subject)]
         for subject_id, subject_data in subject_info.items():
