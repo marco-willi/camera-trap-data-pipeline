@@ -7,7 +7,66 @@ cd $HOME/snapshot_safari_misc
 SITE=GRU
 SEASON=GRU_S1
 PROJECT_ID=5115
+WORKFLOW_ID=4979
+WORFKLOW_VERSION_MIN=275
 
+###################################
+# Mountain Zebra
+####################################
+
+cd $HOME/snapshot_safari_misc
+SITE=MTZ
+SEASON=MTZ_S1
+PROJECT_ID=5124
+WORKFLOW_ID=
+WORFKLOW_VERSION_MIN=
+
+###################################
+# Pilanesberg
+####################################
+
+cd $HOME/snapshot_safari_misc
+SITE=PLN
+SEASON=PLN_S1
+PROJECT_ID=6190
+WORKFLOW_ID=
+WORFKLOW_VERSION_MIN=
+
+###################################
+# Cedar Creek
+####################################
+
+cd $HOME/snapshot_safari_misc
+SITE=CC
+SEASON=CC_S1
+PROJECT_ID=5880
+WORKFLOW_ID=5702
+WORFKLOW_VERSION_MIN=289
+
+
+###################################
+# Snapshot Serengeti
+####################################
+
+cd $HOME/snapshot_safari_misc
+SITE=SER
+SEASON=SER_S11
+PROJECT_ID=4996
+WORKFLOW_ID=4655
+WORFKLOW_VERSION_MIN=304
+
+
+###################################
+# SCRIPTS
+####################################
+
+# Get Zooniverse Classification Data
+python3 -m zooniverse_exports.get_zooniverse_export \
+        --password_file ~/keys/passwords.ini \
+        --project_id $PROJECT_ID \
+        --output_file /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_classifications.csv \
+        --export_type classifications \
+        --new_export 0
 
 # Get Zooniverse Subject Data
 python3 -m zooniverse_exports.get_zooniverse_export \
@@ -17,17 +76,29 @@ python3 -m zooniverse_exports.get_zooniverse_export \
         --export_type subjects \
         --new_export 0
 
-
-# INFO:Workflow id: 4979    Workflow version: 249.2      -- counts: 2273
-# INFO:Workflow id: 4979    Workflow version: 259.4      -- counts: 1
-# INFO:Workflow id: 4979    Workflow version: 268.6      -- counts: 1
-# INFO:Workflow id: 4979    Workflow version: 274.12     -- counts: 634
-# INFO:Workflow id: 4979    Workflow version: 275.13     -- counts: 359746
-
-
+# Extract Classification Data
 python3 -m zooniverse_exports.extract_classifications \
         --classification_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_classifications.csv \
-        --output_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_classifications_extracted.csv
+        --output_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_classifications_extracted.csv \
+        --workflow_id $WORKFLOW_ID \
+        --workflow_version_min $WORFKLOW_VERSION_MIN
+
+# Extract Subject Data
+python3 -m zooniverse_exports.extract_subjects \
+        --subject_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subjects.csv \
+        --output_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subjects_extracted.csv
+
+# Aggregate Classifications
+python3 -m zooniverse_aggregations.aggregate_captures_on_species \
+        --output_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_classifications_aggregated.csv \
+        --classifications_extracted /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_classifications_extracted.csv \
+        --subject_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subjects.csv
+
+python3 -m zooniverse_aggregations.aggregate_classifications_plurality \
+        --classifications_extracted /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_classifications_extracted.csv \
+        --output_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_classifications_aggregated.csv \
+        --export_consensus_only \
+        --export_sample_size 300
 
 
 ###################################
@@ -45,20 +116,9 @@ python3 -m zooniverse_exports.extract_legacy_serengeti \
 # Aggregate Classifications
 
 ###################################
-# Snapshot Serengeti
+# Other Scripts
 ####################################
 
-
-cd $HOME/snapshot_safari_misc
-python3 -m zooniverse_exports.extract_classifications \
-        -classification_csv /home/packerc/shared/machine_learning/will5448/data/zooniverse_exports/SER/classifications.csv \
-        -output_csv /home/packerc/shared/machine_learning/will5448/data/zooniverse_exports/SER/classifications_extracted.csv \
-        -workflow_id 4655 \
-        -workflow_version 304
-
-python3 -m zooniverse_exports.aggregate_extractions \
-          -classifications_extracted /home/packerc/shared/machine_learning/will5448/data/zooniverse_exports/SER/classifications_extracted.csv \
-          -output_csv /home/packerc/shared/machine_learning/will5448/data/zooniverse_exports/SER/classifications_aggregated.csv
 
 # Snapshot Serengeti
 cd /home/packerc/shared/machine_learning/will5448/code/aggregation-for-caesar

@@ -226,7 +226,7 @@ if __name__ == '__main__':
                 answer, count, total, 100*count/total))
 
     # Print Stats per Question - All Answers
-    for question, answer_data in question_stats_plurality.items():
+    for question, answer_data in question_stats.items():
         logger.info("Stats for: {} - All annotations per subject".format(question))
         total = sum([x for x in answer_data.values()])
         for answer, count in answer_data.most_common():
@@ -252,7 +252,7 @@ if __name__ == '__main__':
         for line_no, record in enumerate(subject_identificatons):
             # skip record if no plurality consensus species
             if args['export_consensus_only']:
-                if record['species_is_plurality_consensus'] == '0':
+                if record['species_is_plurality_consensus'] == 0:
                     continue
             # get subject info data
             to_write = [record[x] for x in output_header]
@@ -287,7 +287,7 @@ if __name__ == '__main__':
                 for line_no, line_id in enumerate(_ids_all):
                     record = subject_identificatons[line_id]
                     if args['export_consensus_only']:
-                        if record['species_is_plurality_consensus'] == '0':
+                        if record['species_is_plurality_consensus'] == 0:
                             continue
                     # get subject info data
                     to_write = [record[x] for x in output_header]
