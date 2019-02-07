@@ -206,7 +206,7 @@ add_subject_info_flags['SUBJECT_INFO_MAPPER'] = {
 subject_extractor_flags = dict()
 
 subject_extractor_flags['SUBJECT_METADATA_TO_ADD'] = [
-    'season', 'roll', 'site', 'capture']
+    '#season', '#roll', '#site', '#capture']
 
 subject_extractor_flags['SUBJECT_DATA_TO_ADD'] = [
     'retirement_reason', 'retired_at', 'created_at']
