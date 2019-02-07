@@ -28,7 +28,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("--input_csv", type=str, required=True)
     parser.add_argument("--subject_csv", type=str, required=True)
-    parser.add_argument("--output_csv", type=str, required=False)
+    parser.add_argument("--output_csv", type=str, required=False, default=None)
 
     args = vars(parser.parse_args())
 
@@ -43,6 +43,9 @@ if __name__ == '__main__':
     if not os.path.isfile(args['subject_csv']):
         raise FileNotFoundError("subject_csv: {} not found".format(
                                 args['subject_csv']))
+
+    if args['output_csv'] is None:
+        args['output_csv'] = args['input_csv']
 
     ######################################
     # Configuration

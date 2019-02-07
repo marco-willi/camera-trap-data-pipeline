@@ -35,7 +35,18 @@ if __name__ == '__main__':
 
     args = vars(parser.parse_args())
 
-    # logging
+    ######################################
+    # Check Input
+    ######################################
+
+    if not os.path.isfile(args['subject_csv']):
+        raise FileNotFoundError("subject_csv: {} not found".format(
+                                args['subject_csv']))
+
+    ######################################
+    # Configuration
+    ######################################
+
     log_file_name = create_logfile_name('extract_subjects')
     log_file_path = os.path.join(
         os.path.dirname(args['output_csv']), log_file_name)
