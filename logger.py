@@ -3,9 +3,11 @@ import logging
 import sys
 import getpass
 
+
 def create_logfile_name(_id):
     """ Create a logfile name based on an identifier """
     return '{}.log'.format(_id)
+
 
 def setup_logger(log_file=None):
     # log to file and console

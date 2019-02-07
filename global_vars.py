@@ -47,7 +47,8 @@ extractor_flags['QUESTION_NAME_MAPPER'] = {
     'arethereanyyoungpresent': 'young_present',
     'doyouseeanyhorns': 'horns_visible',
     'choice': 'species',
-    'doyouseeanyantlers': 'antlers_visible'
+    'doyouseeanyantlers': 'antlers_visible',
+    'howmanyanimalscanyouseethathavehorns': 'horns_count'
     }
 
 # Map specific answers of specific questions
@@ -160,3 +161,20 @@ legacy_extractor_flags['CLASSIFICATION_INFO_TO_ADD'] = [
     "retirement_reason", "season", "site", "roll",
     "filenames", "timestamps",
     'classification_id']
+
+
+
+
+aggregation_flags = dict()
+
+# Prefix each question in the output with the following prefix and delim
+# Example: 'question__young_present' instead of 'young_present'
+aggregation_flags['QUESTION_PREFIX'] = 'question'
+aggregation_flags['QUESTION_DELIMITER'] = '__'
+aggregation_flags['QUESTION_MAIN'] = 'species'
+aggregation_flags['QUESTION_MAIN_EMPTY'] = 'blank'
+aggregation_flags['QUESTION_COUNTS'] = ['count', 'horns_count']
+aggregation_flags['COUNTS_TO_ORDINAL_MAPPER'] = {'10-50': 11, '51+': 12, '': 0}
+aggregation_flags['SUBJECT_INFO_TO_ADD'] = [
+    'season', 'roll', 'site', 'capture', 'subject_id',
+    'retirement_reason', 'retired_at']

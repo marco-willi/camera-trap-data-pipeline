@@ -106,9 +106,9 @@ if __name__ == '__main__':
             if ((line_no % 10000) == 0) and (line_no > 0):
                 print("Processed {:,} classifications".format(line_no))
             # check eligibility of classification
-            eligible = extractor.is_eligible(
+            classification_is_eligible = extractor.is_eligible(
                 line, row_name_to_id_mapper, classification_condition)
-            if not eligible:
+            if not classification_is_eligible:
                 continue
             try:
                 # extract classification-level info
@@ -176,8 +176,6 @@ if __name__ == '__main__':
                 # get all annotations (list of annotations)
                 annotations_list = extractor.extract_key_from_json(
                     line, 'annotations', row_name_to_id_mapper)
-                # if classification_info['classification_id'] == '88928599':
-                #     break
                 # get all tasks of an annotation
                 classification_answers = list()
                 for task in annotations_list:
@@ -300,7 +298,7 @@ if __name__ == '__main__':
     question_header = extractor.build_question_header(
         question_answer_pairs, question_types)
 
-    # modify question column names
+    # modify question column names as specified
     question_header_print = list()
     for question in question_header:
         question_header_print.append(
@@ -317,7 +315,7 @@ if __name__ == '__main__':
     # Export
     ######################################
 
-    # build csv header
+    # build full csv header
     classification_header_cols = flags['CLASSIFICATION_INFO_TO_ADD']
     classification_header_cols = [
         flags['CLASSIFICATION_INFO_MAPPER'][x] if x

@@ -6,10 +6,12 @@ import time
 import datetime
 import textwrap
 import signal
+import logging
 
 from panoptes_client import Project, Panoptes, SubjectSet
 from panoptes_client.panoptes import PanoptesAPIException
 
+from logger import setup_logger, create_logfile_name
 from zooniverse_uploads import uploader
 from utils import (
     read_config_file, estimate_remaining_time,
@@ -93,10 +95,6 @@ if __name__ == "__main__":
 
     args = vars(parser.parse_args())
 
-    # Print arguments
-    for k, v in args.items():
-        print("Argument %s: %s" % (k, v))
-
     # Check Manifest file
     if not os.path.exists(args['manifest']):
         raise FileNotFoundError("manifest: %s not found" %
@@ -107,13 +105,24 @@ if __name__ == "__main__":
         raise ValueError("Only one of 'subject_set_name' and 'subject_set_id' \
                           should be specified")
 
+    # logging
+    log_file_name = create_logfile_name('upload_manifest')
+    log_file_path = os.path.join(
+        os.path.dirname(args['manifest']), log_file_name)
+    setup_logger(log_file_path)
+    logger = logging.getLogger(__name__)
+
+    for k, v in args.items():
+        logger.info("Argument {}: {}".format(k, v))
+
     file_name_parts = file_path_splitter(args['manifest'])
 
     # generate subject_set name if not specified
     if args['subject_set_name'] is None:
         sub_name = "%s_%s" % (file_name_parts['id'], file_name_parts['batch'])
         args['subject_set_name'] = sub_name
-        print("Automatically generated subject_set_name: %s" % sub_name)
+        logger.info("Automatically generated subject_set_name: {}".format(
+            sub_name))
 
     # define tracker file path
     tracker_file_path = file_path_generator(
@@ -125,7 +134,8 @@ if __name__ == "__main__":
         file_ext='txt'
     )
 
-    print("Defining upload tracker file at: %s" % tracker_file_path)
+    logger.info("Defining upload tracker file at: {}".format(
+        tracker_file_path))
 
     # read upload tracker file
     if not os.path.exists(tracker_file_path):
@@ -133,8 +143,8 @@ if __name__ == "__main__":
     tracker_data = uploader.read_tracker_file(tracker_file_path)
 
     n_in_tracker_file = len(tracker_data.keys())
-    print("Found %s already uploaded subjects in tracker file" %
-          n_in_tracker_file)
+    logger.info("Found {} already uploaded subjects in tracker file".format(
+                n_in_tracker_file))
 
     # define output_file
     if args['output_file'] is None:
@@ -146,14 +156,14 @@ if __name__ == "__main__":
             file_delim=file_name_parts['file_delim'],
             file_ext='json'
             )
-        print("Outputfile is %s" % args['output_file'])
+        logger.info("Outputfile is {}".format(args['output_file']))
 
     # import manifest
     with open(args['manifest'], 'r') as f:
         mani = json.load(f)
 
-    print("Imported Manfest file %s with %s records" %
-          (args['manifest'], len(mani.keys())), flush=True)
+    logger.info("Imported Manfest file {} with {} records".format(
+                args['manifest'], len(mani.keys())))
 
     # read Zooniverse credentials
     config = read_config_file(args['password_file'])
@@ -169,13 +179,13 @@ if __name__ == "__main__":
     if args['subject_set_id'] is not None:
         # Get an existing subject_set
         my_set = SubjectSet().find(args['subject_set_id'])
-        print("Subject set %s found, will upload into this set" %
-              args['subject_set_id'], flush=True)
+        logger.info("Subject set {} found, will upload into this set".format(
+                    args['subject_set_id']))
     else:
         my_set = uploader.create_subject_set(
             my_project, args['subject_set_name'])
-        print("Created new subject set with id %s, name %s" %
-              (my_set.id, my_set.display_name))
+        logger.info("Created new subject set with id {}, name {}".format(
+                     my_set.id, my_set.display_name))
 
     time_start = time.time()
     uploaded_subjects_count = 0
@@ -190,19 +200,19 @@ if __name__ == "__main__":
 
     # handle (Ctrl+C) keyboard interrupt
     def signal_handler(*args):
-        print('You pressed Ctrl+C! - attempting to clean up gracefully')
+        logger.info('You pressed Ctrl+C! - attempting to clean up gracefully')
         remaining_subjects_to_link = len(batch_data['subjects_to_link'])
         try:
-            print("Linking %s remaining uploaded subjects" %
-                  remaining_subjects_to_link)
+            logger.info("Linking {} remaining uploaded subjects".format(
+                        remaining_subjects_to_link))
             uploader.add_batch_to_subject_set(
                 my_set, batch_data['subjects_to_link'])
             uploader.update_tracker_file(
                 tracker_file_path, batch_data['capture_ids'],
                 batch_data['subject_ids'])
         except PanoptesAPIException as e:
-            print('Failed to link %s remaining subjects' %
-                  remaining_subjects_to_link)
+            logger.error('Failed to link {} remaining subjects'.format(
+                         remaining_subjects_to_link))
             uploader.handle_batch_failure(batch_data['subjects_to_link'])
         finally:
             raise SystemExit
@@ -231,12 +241,12 @@ if __name__ == "__main__":
             batch_data['capture_ids'].append(capture_id)
             batch_data['subject_ids'].append(subject.id)
             if args['debug_mode']:
-                print("finished saving %s - %s" %
-                      (capture_id, current_time_str()), flush=True)
+                logger.info("finished saving {} - {}".format(
+                            capture_id, current_time_str()))
 
         except PanoptesAPIException as e:
-            print('Error occurred for capture_id: %s' % capture_id)
-            print('Details of error: {}'.format(e))
+            logger.info('Error occurred for capture_id: %s' % capture_id)
+            logger.info('Details of error: {}'.format(e))
             uploader.handle_batch_failure(batch_data['subjects_to_link'])
             raise SystemExit
 
@@ -264,7 +274,7 @@ if __name__ == "__main__":
                    Estimated Time Remaining: %s" % \
                   (uploaded_subjects_count, n_tot,
                    round((uploaded_subjects_count/n_tot) * 100, 2), st, tr)
-            print(textwrap.shorten(msg, width=99), flush=True)
+            logger.info(textwrap.shorten(msg, width=99))
 
     # catch any left over batches in the file
     if len(batch_data['subjects_to_link']) > 0:
@@ -283,8 +293,9 @@ if __name__ == "__main__":
         data = mani[capture_id]
         add_subject_data_to_manifest(my_set, capture_id, subject_id, data)
 
-    print("Finished uploading subjects - total %s/%s successfully uploaded" %
-          (uploaded_subjects_count, n_tot))
+    logger.info(
+      "Finished uploading subjects - total {}/{} successfully uploaded".format(
+       uploaded_subjects_count, n_tot))
 
     # Export Manifest
     export_dict_to_json_with_newlines(mani, args['output_file'])

@@ -151,7 +151,8 @@ if __name__ == "__main__":
                 'compressed_images': []
             }
             manifest[capture_id] = {
-                'upload_metadata': upload_metadata, 'info': info,
+                'upload_metadata': upload_metadata,
+                'info': info,
                 'images': images}
         # Add image information
         image_disk_path = os.path.join(
