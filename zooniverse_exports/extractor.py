@@ -179,6 +179,57 @@ def is_eligible(line, mapper, cond):
     return True
 
 
+def get_workflow_major_version(workflow_version):
+    """ Get major version number of a workflow_version
+        Input: 743.34
+        Output: 743
+    """
+    if '.' in workflow_version:
+        return workflow_version.split('.')[0]
+    else:
+        return workflow_version
+
+
+def is_eligible_workflow(
+        line, mapper,
+        workflow_id=None,
+        workflow_version=None,
+        workflow_version_min=None):
+    """ Check whether classification is in an eligible workflow
+        For the workflow version, only the major version is checked, e.g.,
+        586.16, only 586 is checked for
+    Input:
+        line: list of classification information
+        mapper: dict mapping row_name to row_id
+        workflow_id: str indicating the workflow
+        worfklow_version_min: str indicating the minimum workflow_version
+        worfklow_version: str indicating the worfklow_version
+    """
+    # Return True if no workflow_id specified
+    if workflow_id is None:
+        return True
+    # extract data from line
+    worfklow_id_line = line[mapper['workflow_id']]
+    worfklow_version_line = get_workflow_major_version(
+        line[mapper['workflow_version']])
+    # check workflow id
+    if workflow_id != worfklow_id_line:
+        return False
+    # check workflow version
+    if workflow_version is not None:
+        if worfklow_version_line != workflow_version:
+            return False
+    # check workflow version min
+    if workflow_version_min is not None:
+        workflow_version_min = get_workflow_major_version(workflow_version_min)
+        if int(worfklow_version_line) >= int(workflow_version_min):
+            return True
+        else:
+            return False
+    raise ValueError(
+        "Unexpected Issue in 'is_eligible_workflow', input {}".format(line))
+
+
 # build question_answer pairs
 def analyze_question_types(all_records):
     """ Analyze annotations to determine question types

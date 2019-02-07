@@ -1,6 +1,17 @@
 """ Extract Zooniverse Classifications
     - Extract annotations from classifications
     - Export to csv file
+        Output Example Header:
+            user_name,user_id,created_at,subject_id,workflow_id,
+            workflow_version,
+            classification_id,retirement_reason,retired_at,question__count,
+            question__eating,question__interacting,question__moving,
+            question__resting,question__standing,question__young_present,
+            question__species,question__horns_visible
+        Output Example Record:
+            not-logged-in-4ee662baaa306798b359,,2018-02-06 17:09:43 UTC,
+            17530583,4979,275.13,88921948,consensus,2018-11-21T19:16:34.362Z,
+            4,0,1,0,0,1,1,wildebeest,
 """
 import csv
 from collections import Counter
@@ -42,10 +53,35 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("--classification_csv", type=str, required=True)
     parser.add_argument("--output_csv", type=str, required=True)
-    parser.add_argument("--workflow_id", type=str, default=None)
-    parser.add_argument("--workflow_version", type=str, default=None)
+    parser.add_argument(
+        "--workflow_id", type=str, default=None,
+        help="Extract only classifications from the specified workflow_id")
+    parser.add_argument(
+        "--workflow_version", type=str, default=None,
+        help="Extract only classifications from the specified workflow \
+        version. Only the major version number is compared, e.g., \
+        version 45.12 is identical to 45.45")
+    parser.add_argument(
+        "--worfklow_version_min", type=str, default=None,
+        help="Extract only classifications with at least the speciefied \
+        workflow version number \
+        version. Only the major version number is compared, e.g., \
+        version 45.12 is identical to 45.45")
 
     args = vars(parser.parse_args())
+
+    ######################################
+    # Check Input
+    ######################################
+
+    if not os.path.isfile(args['classification_csv']):
+        raise FileNotFoundError("classification_csv: {} not found".format(
+                                args['classification_csv']))
+
+    at_least_one_none = [
+        args['workflow_version'], args['worfklow_version_min']]
+    assert any([x is None for x in at_least_one_none]), \
+        "One of {} must be None".format(at_least_one_none)
 
     ######################################
     # Configuration
@@ -64,13 +100,6 @@ if __name__ == '__main__':
     # logging flags
     print_nested_dict('', flags)
 
-    classification_condition = dict()
-    if args['workflow_id'] is not None:
-        classification_condition['workflow_id'] = args['workflow_id']
-
-    if args['workflow_version'] is not None:
-        classification_condition['workflow_version'] = args['workflow_version']
-
     ######################################
     # Read and Process Classifications
     ######################################
@@ -87,11 +116,14 @@ if __name__ == '__main__':
         for line_no, line in enumerate(csv_reader):
             # print status
             if ((line_no % 10000) == 0) and (line_no > 0):
-                print("Processed {:,} classifications".format(line_no))
+                print("Extracted {:,} classifications".format(line_no))
             # check eligibility of classification
-            classification_is_eligible = extractor.is_eligible(
-                line, row_name_to_id_mapper, classification_condition)
-            if not classification_is_eligible:
+            is_eligible_workflow = extractor.is_eligible_workflow(
+                line, row_name_to_id_mapper,
+                args['workflow_id'],
+                args['workflow_version'],
+                args['workflow_version_min'])
+            if not is_eligible_workflow:
                 continue
             try:
                 # extract classification-level info
@@ -100,18 +132,6 @@ if __name__ == '__main__':
                 # map classification info header
                 classification_info = extractor.rename_dict_keys(
                     classification_info, flags['CLASSIFICATION_INFO_MAPPER'])
-                # extract subject-level data
-                subject_info_raw = extractor.extract_key_from_json(
-                    line, 'subject_data', row_name_to_id_mapper
-                    )[classification_info['subject_id']]
-                subject_info_to_add = dict()
-                for field in flags['SUBJECT_INFO_TO_ADD']:
-                    try:
-                        subject_info_to_add[field] = subject_info_raw[field]
-                    except:
-                        subject_info_to_add[field] = ''
-                subject_info_to_add = extractor.rename_dict_keys(
-                    subject_info_to_add, flags['SUBJECT_INFO_MAPPER'])
                 # extract Zooniverse subject metadata
                 subject_zooniverse_metadata = extractor.extract_key_from_json(
                     line, 'metadata', row_name_to_id_mapper
@@ -149,7 +169,11 @@ if __name__ == '__main__':
                     user_subject_dict[user_name].add(subject_id)
                 except:
                     pass
-                # add retirement info
+                # extract subject-level data / retirement info
+                subject_info_raw = extractor.extract_key_from_json(
+                    line, 'subject_data', row_name_to_id_mapper
+                    )[classification_info['subject_id']]
+                subject_info_to_add = dict()
                 for field in flags['RETIREMENT_INFO_TO_ADD']:
                     try:
                         ret_info = subject_info_raw['retired'][field]
@@ -186,7 +210,7 @@ if __name__ == '__main__':
                 logger.warning("Full line:\n %s" % line)
                 logger.warning(traceback.format_exc())
 
-    logger.info("Processed {:,} classifications".format(line_no))
+    logger.info("Extracted {:,} classifications".format(line_no))
     logger.info("Extracted {:,} tasks".format(len(all_records)))
     logger.info("Incomplete tasks: {:,}".format(n_incomplete_tasks))
     logger.info("Skipped due to 'seen_before' flag: {:,}".format(
@@ -203,6 +227,7 @@ if __name__ == '__main__':
     user_stats = dict()
     not_logged_in_counter = 0
     worfklow_stats = dict()
+    retirement_stats = Counter()
 
     for record in all_records:
         # get annotation information
@@ -215,6 +240,9 @@ if __name__ == '__main__':
                     question_stats[question].update([answers])
                 else:
                     question_stats[question].update(answers)
+        # get retirement stats
+        if 'retirement_reason' in record:
+            retirement_stats.update({record['retirement_reason']})
         # get workflow information
         if ('workflow_id' in record) and ('workflow_version' in record):
             wid = record['workflow_id']
@@ -266,6 +294,14 @@ if __name__ == '__main__':
         logger.info("Rank {:3} - User: {:20} - Classifications: {}".format(
             i+1, user, count))
 
+    # retirment reason stats
+    if len(retirement_stats.keys()) > 0:
+        logger.info("Retirement-Reason Stats:")
+        total = sum([x for x in retirement_stats.values()])
+        for answer, count in retirement_stats.most_common():
+            logger.info("Retirement-Reason: {:20} -- counts: {:10} / {} ({:.2f} %)".format(
+                answer, count, total, 100*count/total))
+
     ######################################
     # Unpack Classifications into
     # Annotations
@@ -305,15 +341,9 @@ if __name__ == '__main__':
         in flags['CLASSIFICATION_INFO_MAPPER'] else x for
         x in classification_header_cols]
 
-    subject_header_cols = flags['SUBJECT_INFO_TO_ADD']
-    subject_header_cols = [
-        flags['SUBJECT_INFO_MAPPER'][x] if x
-        in flags['SUBJECT_INFO_MAPPER'] else x for
-        x in subject_header_cols]
-
     retirement_header_cols = flags['RETIREMENT_INFO_TO_ADD']
 
-    header = subject_header_cols + classification_header_cols + \
+    header = classification_header_cols + \
         retirement_header_cols + question_header_print
 
     logger.info("Automatically generated output header: {}".format(
@@ -325,8 +355,6 @@ if __name__ == '__main__':
         csv_writer.writerow(header)
         tot = len(all_records)
         for line_no, record in enumerate(all_records):
-            # get subject info data
-            subject_data = [record[x] for x in subject_header_cols]
             # get retirement info data
             retirement_data = [record[x] for x in retirement_header_cols]
             # get classification info data
@@ -338,7 +366,7 @@ if __name__ == '__main__':
                 answers[x] if x in answers else '' for x
                 in question_header]
             csv_writer.writerow(
-                subject_data + class_data +
+                class_data +
                 retirement_data + answers_ordered)
         logger.info("Wrote {} records to {}".format(
             line_no, args['output_csv']))
