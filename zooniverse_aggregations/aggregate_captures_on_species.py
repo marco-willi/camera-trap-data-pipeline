@@ -49,6 +49,9 @@ if __name__ == '__main__':
     parser.add_argument(
         "--export_consensus_only", action="store_true",
         help="Export only species with plurality consensus")
+    parser.add_argument(
+        "--export_sample", action="store_true",
+        help="Export a csv with samples")
 
     args = vars(parser.parse_args())
 
@@ -126,7 +129,7 @@ if __name__ == '__main__':
                     n_images_per_subject.append(i+1)
                 else:
                     logger.debug("Subject {} has no classifications".format(
-                        subject_id))        
+                        subject_id))
         max_images_per_subject = max(n_images_per_subject)
         url_keys = ['url{}'.format(i+1) for i in range(max_images_per_subject)]
         for subject_id, subject_data in subject_info.items():
@@ -353,30 +356,31 @@ if __name__ == '__main__':
         logger.info("Wrote {} records to {}".format(
             line_no, args['output_csv']))
 
-    output_csv_path, output_csv_name = os.path.split(args['output_csv'])
-    output_csv_basename = output_csv_name.split('.csv')
-    output_csv_sample = os.path.join(
-        output_csv_path, output_csv_basename[0] + '_samples.csv')
+    if args['export_sample']:
+        output_csv_path, output_csv_name = os.path.split(args['output_csv'])
+        output_csv_basename = output_csv_name.split('.csv')
+        output_csv_sample = os.path.join(
+            output_csv_path, output_csv_basename[0] + '_samples.csv')
 
-    with open(output_csv_sample, 'w') as f:
-        csv_writer = csv.writer(f, delimiter=',')
-        logger.info("Writing output to {}".format(output_csv_sample))
-        csv_writer.writerow(output_header)
-        tot = len(subject_identificatons)
-        for line_no, record in enumerate(subject_identificatons):
-            # skip record if no plurality consensus species
-            if args['export_consensus_only']:
-                if record['species_is_plurality_consensus'] == '0':
-                    continue
-            # get subject info data
-            to_write = [record[x] for x in output_header]
-            if (line_no % 100) == 0:
-                csv_writer.writerow(to_write)
-            # print status
-            if ((line_no % 10000) == 0) and (line_no > 0):
-                print("Wrote {:,} identifications".format(line_no))
-        logger.info("Wrote {} records to {}".format(
-            line_no, output_csv_sample))
+        with open(output_csv_sample, 'w') as f:
+            csv_writer = csv.writer(f, delimiter=',')
+            logger.info("Writing output to {}".format(output_csv_sample))
+            csv_writer.writerow(output_header)
+            tot = len(subject_identificatons)
+            for line_no, record in enumerate(subject_identificatons):
+                # skip record if no plurality consensus species
+                if args['export_consensus_only']:
+                    if record['species_is_plurality_consensus'] == '0':
+                        continue
+                # get subject info data
+                to_write = [record[x] for x in output_header]
+                if (line_no % 100) == 0:
+                    csv_writer.writerow(to_write)
+                # print status
+                if ((line_no % 10000) == 0) and (line_no > 0):
+                    print("Wrote {:,} identifications".format(line_no))
+            logger.info("Wrote {} records to {}".format(
+                line_no, output_csv_sample))
 
 # # Output Consensus Only
 # with open(args['output_consensus_csv'], 'w') as f:

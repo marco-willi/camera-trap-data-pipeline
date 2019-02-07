@@ -179,3 +179,38 @@ aggregation_flags['COUNTS_TO_ORDINAL_MAPPER'] = {'10-50': 11, '51+': 12, '': 0}
 aggregation_flags['SUBJECT_INFO_TO_ADD'] = [
     'season', 'roll', 'site', 'capture', 'subject_id',
     'retirement_reason', 'retired_at']
+
+
+###################################################
+# Flags to define the bheavior of adding
+# Subject Info
+###################################################
+
+
+add_subject_info_flags = dict()
+
+add_subject_info_flags['SUBJECT_METADATA_TO_ADD'] = [
+    'season', 'roll', 'site', 'capture']
+
+add_subject_info_flags['SUBJECT_DATA_TO_ADD'] = [
+    'retirement_reason', 'retired_at', 'created_at']
+
+add_subject_info_flags['SUBJECT_INFO_MAPPER'] = {
+    '#season': 'season', '#site': 'site',
+    '#roll': 'roll', '#capture': 'capture'}
+
+###################################################
+# Subject Extractor
+###################################################
+
+subject_extractor_flags = dict()
+
+subject_extractor_flags['SUBJECT_METADATA_TO_ADD'] = [
+    'season', 'roll', 'site', 'capture']
+
+subject_extractor_flags['SUBJECT_DATA_TO_ADD'] = [
+    'retirement_reason', 'retired_at', 'created_at']
+
+subject_extractor_flags['SUBJECT_INFO_MAPPER'] = {
+    '#season': 'season', '#site': 'site',
+    '#roll': 'roll', '#capture': 'capture'}

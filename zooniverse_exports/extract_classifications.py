@@ -15,23 +15,6 @@ from zooniverse_exports import extractor
 from utils import print_nested_dict
 from global_vars import extractor_flags as flags
 
-
-# Test Case (same user with two nothing here annotations via two tasks)
-# 88862315,LimaZulu,1346129,7c2f3848c72dd5157328,4979,Snapshot Grumeti,274.12,2018-02-06 06:16:28 UTC,,,
-#"{""session"":""e0b035ea3fcf0d5c6cc3d46c927171337576535cf0bb0a9dcfb9b02a6f64e143"",""viewport"":{""width"":1525,""height"":764},""started_at"":""2018-02-06T06:10:22.276Z"",""user_agent"":""Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:58.0) Gecko/20100101 Firefox/58.0"",""utc_offset"":""21600"",""finished_at"":""2018-02-06T06:16:28.936Z"",""live_project"":true,""user_language"":""en"",""user_group_ids"":[],
-#""subject_dimensions"":[{""clientWidth"":852,""clientHeight"":657,""naturalWidth"":2592,
-#""naturalHeight"":2000}]}","[{""task"":""T0"",""value"":[{""choice"":""NOTHINGHERE"",
-#""answers"":{""HOWMANY"":""1"",""WHATBEHAVIORSDOYOUSEE"":[""RESTING""],
-#""ARETHEREANYYOUNGPRESENT"":""NO""},""filters"":{}}]},{""task"":""T1"",""task_label"":null,
-#""value"":[""No animals present""]}]","{""17517269"":
-#{""retired"":{""id"":12203995,""workflow_id"":4979,""classifications_count"":20,
-#""created_at"":""2018-02-06T06:16:28.977Z"",""updated_at"":""2018-07-02T03:49:05.066Z"",
-#""retired_at"":""2018-07-02T03:49:05.050Z"",""subject_id"":17517269,
-#""retirement_reason"":""classification_count""},
-#""#roll"":1,""#site"":""K04"",""Image 1"":""5920_9801_3423.JPG"",
-#""license"":""SnapshotSafari"",""#capture"":103,
-#""attribution"":""University of Minnesota Lion Center + SnapshotSafari + Singita Grumeti""}}"
-
 # # Cedar Creek
 # args = dict()
 # args['classification_csv'] = '/home/packerc/shared/zooniverse/Exports/CC/CC_S1_classifications.csv'
