@@ -15,22 +15,22 @@ from zooniverse_aggregations import aggregator
 from utils import print_nested_dict
 
 # args = dict()
-# args['classifications_extracted'] = '/home/packerc/shared/zooniverse/Exports/CC/CC_S1_classifications_extracted.csv'
+# args['classifications_extracted_csv'] = '/home/packerc/shared/zooniverse/Exports/CC/CC_S1_classifications_extracted.csv'
 # args['output_csv'] = '/home/packerc/shared/zooniverse/Exports/CC/CC_S1_classifications_aggregated.csv'
 # args['subject_csv'] = '/home/packerc/shared/zooniverse/Exports/CC/CC_S1_subjects.csv'
 #
 # args = dict()
-# args['classifications_extracted'] = '/home/packerc/shared/zooniverse/Exports/SER/SER_S1_classifications_extracted.csv'
+# args['classifications_extracted_csv'] = '/home/packerc/shared/zooniverse/Exports/SER/SER_S1_classifications_extracted.csv'
 # args['output_csv'] = '/home/packerc/shared/zooniverse/Exports/SER/SER_S1_classifications_aggregated_v2.csv'
 # args['subject_csv'] = None
 #
 # args = dict()
-# args['classifications_extracted'] = '/home/packerc/shared/zooniverse/Exports/GRU/GRU_S1_classifications_extracted.csv'
+# args['classifications_extracted_csv'] = '/home/packerc/shared/zooniverse/Exports/GRU/GRU_S1_classifications_extracted.csv'
 # args['output_csv'] = '/home/packerc/shared/zooniverse/Exports/GRU/GRU_S1_classifications_aggregated.csv'
 # args['subject_csv'] = '/home/packerc/shared/zooniverse/Exports/GRU/GRU_S1_subjects.csv'
 #
 # args = dict()
-# args['classifications_extracted'] = '/home/packerc/shared/zooniverse/Exports/MTZ/MTZ_S1_classifications_extracted.csv'
+# args['classifications_extracted_csv'] = '/home/packerc/shared/zooniverse/Exports/MTZ/MTZ_S1_classifications_extracted.csv'
 # args['output_csv'] = '/home/packerc/shared/zooniverse/Exports/MTZ/MTZ_S1_classifications_aggregated.csv'
 # args['subject_csv'] = '/home/packerc/shared/zooniverse/Exports/MTZ/MTZ_S1_subjects.csv'
 
@@ -91,7 +91,7 @@ if __name__ == '__main__':
 
     # Read Annotations and associate with subject id
     subject_annotations = dict()
-    with open(args['classifications_extracted'], "r") as ins:
+    with open(args['classifications_extracted_csv'], "r") as ins:
         csv_reader = csv.reader(ins, delimiter=',', quotechar='"')
         header = next(csv_reader)
         row_name_to_id_mapper = {x: i for i, x in enumerate(header)}

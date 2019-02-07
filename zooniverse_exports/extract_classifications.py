@@ -107,7 +107,9 @@ if __name__ == '__main__':
     all_records = list()
     n_incomplete_tasks = 0
     n_seen_before = 0
+    n_exceptions = 0
     n_duplicate_subject_by_same_user = 0
+    n_not_eligible_workflow = 0
     user_subject_dict = dict()
     with open(args['classification_csv'], "r") as ins:
         csv_reader = csv.reader(ins, delimiter=',', quotechar='"')
@@ -116,7 +118,7 @@ if __name__ == '__main__':
         for line_no, line in enumerate(csv_reader):
             # print status
             if ((line_no % 10000) == 0) and (line_no > 0):
-                print("Extracted {:,} classifications".format(line_no))
+                print("Processed {:,} classifications".format(line_no))
             # check eligibility of classification
             is_eligible_workflow = extractor.is_eligible_workflow(
                 line, row_name_to_id_mapper,
@@ -124,6 +126,7 @@ if __name__ == '__main__':
                 args['workflow_version'],
                 args['workflow_version_min'])
             if not is_eligible_workflow:
+                n_not_eligible_workflow += 1
                 continue
             try:
                 # extract classification-level info
@@ -210,13 +213,17 @@ if __name__ == '__main__':
                 logger.warning("Full line:\n %s" % line)
                 logger.warning(traceback.format_exc())
 
-    logger.info("Extracted {:,} classifications".format(line_no))
-    logger.info("Extracted {:,} tasks".format(len(all_records)))
+    logger.info("Processed {:,} classifications".format(line_no))
+    logger.info("Extracted {:,} identifications".format(len(all_records)))
     logger.info("Incomplete tasks: {:,}".format(n_incomplete_tasks))
     logger.info("Skipped due to 'seen_before' flag: {:,}".format(
         n_seen_before))
-    logger.info("Skipped {:,} subjects due to prev. annot. by user".format(
+    logger.info("Skipped {:,} classifications due to prev. annot. by user".format(
         n_duplicate_subject_by_same_user))
+    logger.info("Skipped {:,} classifications due to non-eligible workflow".format(
+        n_not_eligible_workflow))
+    logger.info("Skipped {:,} classifications due to unknown error".format(
+        n_exceptions))
 
     ######################################
     # Analyse Classifications
