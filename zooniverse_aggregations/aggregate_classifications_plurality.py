@@ -298,4 +298,4 @@ if __name__ == '__main__':
                         print("Wrote {:,} identifications".format(line_no))
                     n_written += 1
             logger.info("Wrote {} records to {}".format(
-                line_no, output_csv_sample))
+                n_written, output_csv_sample))
