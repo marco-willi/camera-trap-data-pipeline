@@ -40,9 +40,7 @@ Example:
 
 ## Extract Zooniverse Classifications (subject to changes)
 
-The following code extracts the relevant fields of a Zooniverse classification file. It creates a csv file with one line per annotation/species identification. Normally, you would
-want to specify the workflow_id and the workflow_version to extract only the workflow that was used
-during the 'live-phase' of the project. If neither workflow_id/workflow_version are specified every workflow is extracted (and can be separated later). The workflow_id can be found in the project builder when clicking on the workflow. The workflow_version is at the same place slightly further down (e.g. something like 745.34).
+The following code extracts the relevant fields of a Zooniverse classification csv. It creates a csv file with one line per species identification. Usually, the workflow_id and the workflow_version are specified to extract only the workflow that was used during the 'live-phase' of the project. If neither workflow_id/workflow_version/worfklow_version_min are specified every workflow is extracted. The workflow_id can be found in the project builder when clicking on the workflow. The workflow_version is at the same place slightly further down (e.g. something like 745.34). Be aware that only the 'major' version number is compared against, e.g., workflow_version '45.23' is identical to '45.56'. It is also possible to specify a minimum 'workflow_version_min' in which case all classifications with the same or higher number are extracted. A summary of all extracted workflows and other stats is printed after the extraction.
 
 Use a machine with enough memory - for example:
 
@@ -57,7 +55,7 @@ python3 -m zooniverse_exports.extract_classifications \
         --classification_csv /home/packerc/shared/zooniverse/Exports/RUA/RUA_S1_classifications.csv \
         --output_csv /home/packerc/shared/zooniverse/Exports/RUA/RUA_S1_classifications_extracted.csv \
         --workflow_id 4889 \
-        --workflow_version 797.34
+        --workflow_version_min 797
 ```
 
 
@@ -65,9 +63,6 @@ The resulting file may have the following column headers:
 
 | Columns   | Description |
 | --------- | ----------- |
-|season,site,roll,capture | internal descriptors/ids of the subject
-|capture_event_id| internal capture id (legacy format)
-|capture_id| internal capture id (new format)
 |user_name,user_id | user information (user_id null for anonymous users)
 |created_at | when the classification was created
 |subject_id | zooniverse unique id of the capture (a subject)
@@ -85,10 +80,9 @@ The resulting file may have the following column headers:
 
 One record may look like:
 ```
-XYZ,2012-12-11 07:40:53 UTC,ASG000aau3,495255,consensus,S3,K03,R12,
-IMAG0275.JPG;IMAG0276.JPG;IMAG0274.JPG,2011-11-14T15:10:37-06:00;2011-11-14T15:
-10:37-06:00;2011-11-14T15:10:37-06:00,50c6e3859177d033f6000330,
-SER_S3#K03#R12#114,114,wildebeest,11-50,0,0,0,1,0,0
+XYZ,,2018-02-06 17:09:43 UTC,
+17530583,4979,275.13,88921948,consensus,2018-11-21T19:16:34.362Z,
+4,0,1,0,0,1,1,wildebeest,
 ```
 
 

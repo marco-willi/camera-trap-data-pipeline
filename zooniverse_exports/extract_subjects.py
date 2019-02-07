@@ -63,8 +63,9 @@ if __name__ == '__main__':
                 line, 'locations', row_name_to_id_mapper_sub)
             # append 'url' to key-names: 0->url0
             location_keys = list(locations_dict.keys())
+            location_keys.sort()
             for i in range(0, len(location_keys)):
-                locations_dict['url{}'.format(i)] = \
+                locations_dict['zooniverse_url_{}'.format(i)] = \
                     locations_dict.pop('{}'.format(i))
             # extract metadata
             metadata_dict = extractor.extract_key_from_json(
