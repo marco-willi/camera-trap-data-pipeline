@@ -97,10 +97,12 @@ if __name__ == '__main__':
                     subject_info_to_add[field] = subject_data_all[field]
                 except:
                     subject_info_to_add[field] = ''
-            subject_data_header.add(list(subject_info_to_add.keys()))
+            subject_data_header = subject_data_header.union(
+                subject_info_to_add.keys())
             subject_info[subject_id] = subject_info_to_add
 
     subject_data_header = list(subject_data_header)
+    subject_data_header.sort()
 
     # Output all combined records
     with open(args['output_csv'], 'w') as f:
