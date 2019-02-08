@@ -13,9 +13,14 @@ A high-level overview of how the scripts are connected can be found here:
 
 Note that not all processes are implemented in this repository and some of it represents a roadmap.
 
+Global flags / mappings are defined here: [global_vars](global_vars.py)
+1. if a new question answer needs to be mapped to 'empty', e.g., 'no animal is here'
+2. if a new question needs to be renamed, e.g., 'howmanyanimalswithbighornsdoyousee' to 'big_horns_count'
+3. if different formats / namings are required, e.g., 'answer__' instead of 'question__'
+
 ## Example Scripts
 
-Here is a compilation of many sample scripts [Scripts](scripts.sh)
+Here is a compilation of many sample scripts [Scripts](scripts.sh). These need to be adjusted, for example:
 
 ## Pre-Requisites
 

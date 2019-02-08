@@ -59,7 +59,10 @@ if __name__ == '__main__':
         ])
         if capture_id not in season_dict:
             timestamp = image_record[header['timestamp']]
-            time_obj = datetime.strptime(timestamp, '%Y:%m:%d %H:%M:%S')
+            try:
+                time_obj = datetime.strptime(timestamp, '%Y:%m:%d %H:%M:%S')
+            except:
+                time_obj = datetime.strptime(timestamp, '%Y-%m-%d %H:%M:%S')
             date = time_obj.strftime("%Y-%m-%d")
             time = time_obj.strftime("%H:%M:%S")
             season_dict[capture_id] = {
