@@ -15,7 +15,7 @@ Note that not all processes are implemented in this repository and some of it re
 
 ## Example Scripts
 
-Here a compilation of many sample scripts [Scripts](scripts.sh)
+Here is a compilation of many sample scripts [Scripts](scripts.sh)
 
 ## Pre-Requisites
 
