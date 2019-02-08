@@ -10,7 +10,7 @@ from collections import Counter, defaultdict
 import logging
 
 from logger import setup_logger, create_logfile_name
-from global_vars import aggregation_flags as flags
+from global_vars import plurality_aggregation_flags as flags
 from zooniverse_aggregations import aggregator
 from utils import print_nested_dict
 
@@ -293,6 +293,6 @@ if __name__ == '__main__':
                 csv_writer.writerow(to_write)
                 n_written += 1
                 if n_written >= sample_size:
-                    break        
+                    break
             logger.info("Wrote {} records to {}".format(
                 n_written, output_csv_sample))

@@ -30,6 +30,15 @@ label_mappings = {
 
 
 ###################################################
+# GLobal Processing Flags
+###################################################
+
+global_processing_flags = dict()
+global_processing_flags['QUESTION_PREFIX'] = 'question'
+global_processing_flags['QUESTION_DELIMITER'] = '__'
+global_processing_flags['EMPTY_ANNOTATION'] = 'blank'
+
+###################################################
 # Flags to define the bheavior of the Extractor
 ###################################################
 
@@ -37,8 +46,8 @@ extractor_flags = dict()
 
 # Prefix each question in the output with the following prefix and delim
 # Example: 'question__young_present' instead of 'young_present'
-extractor_flags['QUESTION_PREFIX'] = 'question'
-extractor_flags['QUESTION_DELIMITER'] = '__'
+extractor_flags['QUESTION_PREFIX'] = global_processing_flags['QUESTION_PREFIX']
+extractor_flags['QUESTION_DELIMITER'] = global_processing_flags['QUESTION_DELIMITER']
 
 # map the following question names
 extractor_flags['QUESTION_NAME_MAPPER'] = {
@@ -54,11 +63,11 @@ extractor_flags['QUESTION_NAME_MAPPER'] = {
 # Map specific answers of specific questions
 extractor_flags['ANSWER_TYPE_MAPPER'] = {
     'species': {
-        'no animals present': 'blank',
-        'nothing': 'blank',
-        'nothinghere': 'blank',
-        'nothingthere': 'blank',
-        'noanimalspresent': 'blank'
+        'no animals present': global_processing_flags['EMPTY_ANNOTATION'],
+        'nothing': global_processing_flags['EMPTY_ANNOTATION'],
+        'nothinghere': global_processing_flags['EMPTY_ANNOTATION'],
+        'nothingthere': global_processing_flags['EMPTY_ANNOTATION'],
+        'noanimalspresent': global_processing_flags['EMPTY_ANNOTATION']
         }
     }
 
@@ -93,8 +102,8 @@ extractor_flags['RETIREMENT_INFO_TO_ADD'] = [
 
 legacy_extractor_flags = dict()
 
-legacy_extractor_flags['QUESTION_PREFIX'] = 'question'
-legacy_extractor_flags['QUESTION_DELIMITER'] = '__'
+legacy_extractor_flags['QUESTION_PREFIX'] = global_processing_flags['QUESTION_PREFIX']
+legacy_extractor_flags['QUESTION_DELIMITER'] = global_processing_flags['QUESTION_DELIMITER']
 
 legacy_extractor_flags['QUESTIONS'] = (
     'species', 'young_present', 'standing',
@@ -112,9 +121,9 @@ legacy_extractor_flags['CSV_HEADER_MAPPER'] = {
 # map different answers to the question columns
 legacy_extractor_flags['ANSWER_TYPE_MAPPER'] = {
     'species': {
-        'no animals present': 'blank',
-        'nothing': 'blank',
-        '': 'blank'
+        'no animals present': global_processing_flags['EMPTY_ANNOTATION'],
+        'nothing': global_processing_flags['EMPTY_ANNOTATION'],
+        '': global_processing_flags['EMPTY_ANNOTATION']
         },
     'young_present': {
         'false': 0,
@@ -155,28 +164,27 @@ legacy_extractor_flags['CLASSIFICATION_INFO_TO_ADD'] = [
     'classification_id']
 
 
+###################################################
+# Flags to define the bheavior of the
+# Plurality Aggregator
+###################################################
 
-
-aggregation_flags = dict()
+plurality_aggregation_flags = dict()
 
 # Prefix each question in the output with the following prefix and delim
 # Example: 'question__young_present' instead of 'young_present'
-aggregation_flags['QUESTION_PREFIX'] = 'question'
-aggregation_flags['QUESTION_DELIMITER'] = '__'
-aggregation_flags['QUESTION_MAIN'] = 'species'
-aggregation_flags['QUESTION_MAIN_EMPTY'] = 'blank'
-aggregation_flags['QUESTION_COUNTS'] = ['count', 'horns_count']
-aggregation_flags['COUNTS_TO_ORDINAL_MAPPER'] = {'10-50': 11, '51+': 12, '': 0}
-aggregation_flags['SUBJECT_INFO_TO_ADD'] = [
-    'season', 'roll', 'site', 'capture', 'subject_id',
-    'retirement_reason', 'retired_at']
-
+plurality_aggregation_flags['QUESTION_PREFIX'] = global_processing_flags['QUESTION_PREFIX']
+plurality_aggregation_flags['QUESTION_DELIMITER'] = global_processing_flags['QUESTION_DELIMITER']
+plurality_aggregation_flags['QUESTION_MAIN'] = 'species'
+plurality_aggregation_flags['QUESTION_MAIN_EMPTY'] = global_processing_flags['EMPTY_ANNOTATION']
+plurality_aggregation_flags['QUESTION_COUNTS'] = ['count', 'horns_count']
+plurality_aggregation_flags['COUNTS_TO_ORDINAL_MAPPER'] = {
+    '10-50': 11, '51+': 12, '': 0}
 
 ###################################################
 # Flags to define the bheavior of adding
 # Subject Info
 ###################################################
-
 
 add_subject_info_flags = dict()
 

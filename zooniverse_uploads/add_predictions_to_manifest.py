@@ -173,7 +173,7 @@ if __name__ == "__main__":
 
     # statistic
     logger.info("Added predictions to {} / {} captures".format(
-          (captures_with_preds, n_total)))
+          captures_with_preds, n_total))
 
     # Export Manifest
     export_dict_to_json_with_newlines(mani, args['output_file'])

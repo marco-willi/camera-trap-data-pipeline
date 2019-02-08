@@ -12,6 +12,10 @@ A high-level overview of how the scripts are connected can be found here:
 
 Note that not all processes are implemented in this repository and some of it represents a roadmap.
 
+## Example Scripts
+
+Here a compilation of many sample scripts [Scripts](scripts.sh)
+
 ## Pre-Requisites
 
 ### Prepare Zooniverse-Access (one-time only)

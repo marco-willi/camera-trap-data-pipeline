@@ -12,19 +12,11 @@ Some of the scripts used for different sites can be found here: [zooniverse_expo
 
 Download Zooniverse exports. Requires Zooniverse account credentials and
 collaborator status with the project. The project_id can be found in the project builder
-in the top left corner. To create a 'fresh' export it is easiest to go on Zooniverse, to the project page,
-click on 'Data Exports', and click on new 'Request new classification export'. After receiving an e-mail confirming the export was completed, execute the following script (do not download data via e-mail):
+in the top left corner. To create a 'fresh' export it is easiest to go on Zooniverse, to the project page, click on 'Data Exports', and request the appropriate export (see below). After receiving an e-mail confirming the export was completed, execute the following scripts (do not download data via e-mail).
 
-```
-python3 -m zooniverse_exports.get_zooniverse_export \
-        --password_file ~/keys/passwords.ini \
-        --project_id 5155 \
-        --output_file /home/packerc/shared/zooniverse/Exports/RUA/RUA_S1_classifications.csv \
-        --export_type classifications \
-        --new_export 0
-```
+### Zooniverse Classifications Export
 
-### Structure of Zooniverse Data
+Click on 'Request new classification export' to get the classifications. The structure of a classification is as follows:
 
 1. One classification contains 1:N tasks
 2. One task contains 1:N identifications (for survey task), or 1:N answers (for question tasks)
@@ -37,8 +29,30 @@ Example:
 3. One identification has multiple questions, e.g., species name and behavior
 4. One question may have multiple answres, e.g, different behaviors for the behavior question
 
+To extract the classification data use the following code:
+```
+python3 -m zooniverse_exports.get_zooniverse_export \
+        --password_file ~/keys/passwords.ini \
+        --project_id 5155 \
+        --output_file /home/packerc/shared/zooniverse/Exports/RUA/RUA_S1_classifications.csv \
+        --export_type classifications \
+        --new_export 0
+```
 
-## Extract Zooniverse Classifications (subject to changes)
+### Zooniverse Subject Export
+
+To get subject data go to Zooniverse and click 'Request new subject export'. To download the data use:
+```
+python3 -m zooniverse_exports.get_zooniverse_export \
+        --password_file ~/keys/passwords.ini \
+        --project_id 5155 \
+        --output_file /home/packerc/shared/zooniverse/Exports/RUA/RUA_S1_subjects.csv \
+        --export_type subjects \
+        --new_export 0
+```
+
+
+## Extract Zooniverse Classifications
 
 The following code extracts the relevant fields of a Zooniverse classification csv. It creates a csv file with one line per species identification. Usually, the workflow_id and the workflow_version are specified to extract only the workflow that was used during the 'live-phase' of the project. If neither workflow_id/workflow_version/worfklow_version_min are specified every workflow is extracted. The workflow_id can be found in the project builder when clicking on the workflow. The workflow_version is at the same place slightly further down (e.g. something like 745.34). Be aware that only the 'major' version number is compared against, e.g., workflow_version '45.23' is identical to '45.56'. It is also possible to specify a minimum 'workflow_version_min' in which case all classifications with the same or higher number are extracted. A summary of all extracted workflows and other stats is printed after the extraction.
 
@@ -83,6 +97,16 @@ One record may look like:
 XYZ,,2018-02-06 17:09:43 UTC,
 17530583,4979,275.13,88921948,consensus,2018-11-21T19:16:34.362Z,
 4,0,1,0,0,1,1,wildebeest,
+```
+
+## Extract Zooniverse Subject Data
+
+The following codes extract subject data from the subject exports that Zooniverse provides.
+
+```
+python3 -m zooniverse_exports.extract_subjects \
+        --subject_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subjects.csv \
+        --output_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subjects_extracted.csv
 ```
 
 
