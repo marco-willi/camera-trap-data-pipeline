@@ -10,7 +10,7 @@ from logger import setup_logger, create_logfile_name
 from utils import read_cleaned_season_file
 
 # args = dict()
-# args['season_csv'] = '/home/packerc/shared/season_captures/GRU/cleaned/GRU_S1_cleaned.csv'
+# args['season_captures_csv'] = '/home/packerc/shared/season_captures/GRU/cleaned/GRU_S1_cleaned.csv'
 # args['aggregated_csv'] = '/home/packerc/shared/zooniverse/Exports/GRU/GRU_S1_classifications_aggregated_samples_subject_info.csv'
 # args['output_csv'] = '/home/packerc/shared/zooniverse/Exports/GRU/GRU_S1_report.csv'
 # args['default_season_id'] = 'GRU_S1'
@@ -19,7 +19,7 @@ if __name__ == '__main__':
 
     # Parse command line arguments
     parser = argparse.ArgumentParser()
-    parser.add_argument("--season_csv", type=str, required=True)
+    parser.add_argument("--season_captures_csv", type=str, required=True)
     parser.add_argument("--aggregated_csv", type=str, required=True)
     parser.add_argument("--output_csv", type=str, required=True)
     parser.add_argument("--default_season_id", type=str, default='')
@@ -31,9 +31,9 @@ if __name__ == '__main__':
     # Check Input
     ######################################
 
-    if not os.path.isfile(args['season_csv']):
-        raise FileNotFoundError("season_csv: {} not found".format(
-                                args['season_csv']))
+    if not os.path.isfile(args['season_captures_csv']):
+        raise FileNotFoundError("season_captures_csv: {} not found".format(
+                                args['season_captures_csv']))
 
     if not os.path.isfile(args['aggregated_csv']):
         raise FileNotFoundError("aggregated_csv: {} not found".format(
@@ -46,7 +46,7 @@ if __name__ == '__main__':
     setup_logger(log_file_path)
     logger = logging.getLogger(__name__)
 
-    season_data, header = read_cleaned_season_file(args['season_csv'])
+    season_data, header = read_cleaned_season_file(args['season_captures_csv'])
 
     # Create per Capture Data
     season_dict = OrderedDict()
