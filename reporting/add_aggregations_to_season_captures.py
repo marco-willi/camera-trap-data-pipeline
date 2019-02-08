@@ -75,7 +75,7 @@ if __name__ == '__main__':
 
     # Import Aggregated Data
     aggregated_data = dict()
-    with open(args['aggregated_data'], "r") as ins:
+    with open(args['aggregated_csv'], "r") as ins:
         csv_reader = csv.reader(ins, delimiter=',', quotechar='"')
         header_input = next(csv_reader)
         row_name_to_id_mapper_input = {x: i for i, x in enumerate(header_input)}
