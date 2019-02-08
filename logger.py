@@ -1,6 +1,7 @@
 """ Logging """
 import logging
 import sys
+import os
 import getpass
 
 
@@ -24,3 +25,5 @@ def setup_logger(log_file=None):
                         handlers=handlers)
     # print user name
     logging.info("{} is running the script".format(getpass.getuser()))
+    if log_file is not None:
+        os.chmod(log_file, 0o660)
