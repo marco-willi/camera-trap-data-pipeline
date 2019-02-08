@@ -126,7 +126,7 @@ if __name__ == '__main__':
             else:
                 # Write records without any aggregation information
                 if not args['export_only_with_aggregations']:
-                    to_write = ['' for i in range(0, agg_data_header)]
+                    to_write = ['' for i in range(0, len(agg_data_header))]
                     csv_writer.writerow(season_info_to_write + to_write)
             # print status
             if ((line_no % 10000) == 0) and (line_no > 0):
