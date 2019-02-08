@@ -283,19 +283,16 @@ if __name__ == '__main__':
             logger.info("Writing output to {}".format(output_csv_sample))
             csv_writer.writerow(output_header)
             n_written = 0
-            while n_written < sample_size:
-                for line_no, line_id in enumerate(_ids_all):
-                    record = subject_identificatons[line_id]
-                    if args['export_consensus_only']:
-                        if record['species_is_plurality_consensus'] == 0:
-                            continue
-                    # get subject info data
-                    to_write = [record[x] for x in output_header]
-                    if (line_no % 100) == 0:
-                        csv_writer.writerow(to_write)
-                    # print status
-                    if ((line_no % 10000) == 0) and (line_no > 0):
-                        print("Wrote {:,} identifications".format(line_no))
-                    n_written += 1
+            for line_no, line_id in enumerate(_ids_all):
+                record = subject_identificatons[line_id]
+                if args['export_consensus_only']:
+                    if record['species_is_plurality_consensus'] == 0:
+                        continue
+                # get subject info data
+                to_write = [record[x] for x in output_header]
+                csv_writer.writerow(to_write)
+                n_written += 1
+                if n_written >= sample_size:
+                    break        
             logger.info("Wrote {} records to {}".format(
                 n_written, output_csv_sample))
