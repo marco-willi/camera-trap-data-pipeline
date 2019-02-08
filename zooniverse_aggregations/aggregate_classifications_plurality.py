@@ -263,6 +263,9 @@ if __name__ == '__main__':
         logger.info("Wrote {} records to {}".format(
             line_no, args['output_csv']))
 
+    # change permmissions to read/write for group
+    os.chmod(args['output_csv'], 0o660)
+
     if args['export_sample_size'] > 0:
         # Create a file name for a sampled export
         output_csv_path, output_csv_name = os.path.split(args['output_csv'])
@@ -296,3 +299,6 @@ if __name__ == '__main__':
                     break
             logger.info("Wrote {} records to {}".format(
                 n_written, output_csv_sample))
+
+        # change permmissions to read/write for group
+        os.chmod(output_csv_sample, 0o660)

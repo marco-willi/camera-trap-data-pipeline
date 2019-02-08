@@ -138,3 +138,6 @@ if __name__ == '__main__':
             n_lines_written, args['output_csv']))
         logger.info("Wrote {} records with aggregations to {}".format(
             n_lines_with_aggregations, args['output_csv']))
+
+    # change permmissions to read/write for group
+    os.chmod(args['output_csv'], 0o660)

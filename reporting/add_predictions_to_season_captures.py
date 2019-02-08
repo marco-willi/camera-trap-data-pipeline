@@ -120,3 +120,6 @@ if __name__ == '__main__':
                 print("Wrote {:,} captures".format(line_no))
         logger.info("Wrote {} records to {}".format(
             n_lines_written+1, args['output_csv']))
+
+    # change permmissions to read/write for group
+    os.chmod(args['output_csv'], 0o660)

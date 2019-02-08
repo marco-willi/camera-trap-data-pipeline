@@ -297,3 +297,6 @@ if __name__ == '__main__':
 
     legacy_extractor.export_cleaned_annotations(
         output_paths[s_id], classifications, header, flags)
+
+    # change permmissions to read/write for group
+    os.chmod(output_paths[s_id], 0o660)

@@ -90,3 +90,6 @@ if __name__ == '__main__':
             csv_writer.writerow(to_write)
         logger.info("Wrote {} records to {}".format(
             line_no, args['output_csv']))
+            
+    # change permmissions to read/write for group
+    os.chmod(args['output_csv'], 0o660)
