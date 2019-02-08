@@ -55,8 +55,7 @@ if __name__ == '__main__':
     with open(args['subject_csv'], "r") as ins:
         csv_reader = csv.reader(ins, delimiter=',', quotechar='"')
         header_subject = next(csv_reader)
-        row_name_to_id_mapper_sub = {
-            x: i for i, x in enumerate(header_subject)}
+        row_name_to_id_mapper_sub = {x: i for i, x in enumerate(header_subject)}
         for line_no, line in enumerate(csv_reader):
             subject_id = line[row_name_to_id_mapper_sub['subject_id']]
             subject_dict = {
@@ -121,4 +120,4 @@ if __name__ == '__main__':
             if ((line_no % 10000) == 0) and (line_no > 0):
                 print("Wrote {:,} records".format(line_no))
         logger.info("Wrote {} records to {}".format(
-            line_no, args['output_csv']))
+            line_no+1, args['output_csv']))
