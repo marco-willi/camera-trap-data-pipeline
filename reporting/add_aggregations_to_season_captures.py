@@ -104,6 +104,7 @@ if __name__ == '__main__':
         logger.info("Writing output to {}".format(args['output_csv']))
         csv_writer.writerow(header_combined)
         n_lines_written = 0
+        n_lines_with_aggregations = 0
         for line_no, (capture_id, season_data) in enumerate(season_dict.items()):
             # get subject info data
             season_info_to_write = list()
@@ -123,13 +124,17 @@ if __name__ == '__main__':
                             to_write.append('')
                     csv_writer.writerow(season_info_to_write + to_write)
                     n_lines_written += 1
+                    n_lines_with_aggregations += 1
             else:
                 # Write records without any aggregation information
                 if not args['export_only_with_aggregations']:
                     to_write = ['' for i in range(0, len(agg_data_header))]
                     csv_writer.writerow(season_info_to_write + to_write)
+                    n_lines_written += 1
             # print status
             if ((line_no % 10000) == 0) and (line_no > 0):
-                print("Wrote {:,} captures".format(line_no))
+                print("Processed {:,} captures".format(line_no))
         logger.info("Wrote {} records to {}".format(
-            n_lines_written+1, args['output_csv']))
+            n_lines_written, args['output_csv']))
+        logger.info("Wrote {} records with aggregations to {}".format(
+            n_lines_with_aggregations, args['output_csv']))

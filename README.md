@@ -4,6 +4,7 @@ This repository contains code for the following tasks:
 1. [Upload Data to Zooniverse](docs/zooniverse_uploads.md)
 2. [Download & Extract Data from Zooniverse](docs/zooniverse_exports.md)
 3. [Aggregate Data from Zooniverse](docs/zooniverse_aggregations.md)
+4. [Merge Data into Reports](docs/reporting.md) - in development
 
 ## Overview
 
