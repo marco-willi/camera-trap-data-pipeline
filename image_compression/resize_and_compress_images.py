@@ -50,10 +50,11 @@ def resize_and_compress_list_of_images(
         image_path_list,
         results_dict,
         process_id=None,
+        print_status=True,
         max_pixel_of_largest_side=None,
         save_quality=None):
     """ Compress a list of images """
-    if process_id is not None:
+    if (process_id is not None) and print_status:
         print("Starting process: {:2}".format(process_id))
     for image_path in image_path_list:
         try:
@@ -65,7 +66,7 @@ def resize_and_compress_list_of_images(
         except:
             print("Failed to compress: {}".format(image_path))
             results_dict[image_path] = ''
-    if process_id is not None:
+    if (process_id is not None) and print_status:
         print("Finished process: {:2}".format(process_id))
 
 
@@ -73,6 +74,7 @@ def process_images_list_multiprocess(
         image_source_list,
         image_process_function,
         n_processes=4,
+        print_status=True,
         **kwargs):
     """ Processes a list of images using multiprocessing
         Arguments:
@@ -98,7 +100,7 @@ def process_images_list_multiprocess(
         for i, (start_i, end_i) in enumerate(slices):
             pr = Process(target=image_process_function,
                          args=(image_source_list[start_i:end_i],
-                               results_dict, i),
+                               results_dict, i, print_status),
                          kwargs=kwargs)
             pr.start()
             processes_list.append(pr)

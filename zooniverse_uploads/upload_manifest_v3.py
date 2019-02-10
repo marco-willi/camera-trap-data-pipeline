@@ -283,6 +283,7 @@ if __name__ == "__main__":
                             images_to_upload,
                             resize_and_compress_list_of_images,
                             n_processes=args['n_processes'],
+                            print_status=False,
                             max_pixel_of_largest_side=args['max_pixel_of_largest_side'],
                             save_quality=args['save_quality'])
             metadata = data['upload_metadata']
