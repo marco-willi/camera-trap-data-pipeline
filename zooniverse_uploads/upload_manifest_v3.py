@@ -103,13 +103,11 @@ if __name__ == "__main__":
 
     parser.add_argument(
         "--save_quality", type=int, default=50,
-        choice=[15, 100],
         help="The save quality of the image after compressing the images if\
         '--dont_compress_images' is not specified.")
 
     parser.add_argument(
         "--n_processes", type=int, default=3,
-        choice=[1, 24],
         help="The number of processes to use in parallel if\
         '--dont_compress_images' is not specified.")
 
@@ -128,6 +126,13 @@ if __name__ == "__main__":
     if None not in (args['subject_set_name'], args['subject_set_id']):
         raise ValueError("Only one of 'subject_set_name' and 'subject_set_id' \
                           should be specified")
+
+    # Check Input
+    if not args['dont_compress_images']:
+        qual = args['save_quality']
+        if qual is not None:
+            assert (qual <= 100) and (qual > 15), \
+                "save_quality must be between 15 and 100"
 
     # logging
     log_file_name = create_logfile_name('upload_manifest')
