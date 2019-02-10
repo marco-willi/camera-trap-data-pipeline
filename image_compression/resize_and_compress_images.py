@@ -107,7 +107,12 @@ def process_images_list_multiprocess(
     except Exception:
         print(traceback.format_exc())
 
-    return results_dict
+    # convert result to a list
+    results_list = list()
+    for image_source in image_source_list:
+        results_list.append(results_dict[image_source])
+
+    return results_list
 
 #
 # if __name__ == '__main__':
