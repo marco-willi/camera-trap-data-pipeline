@@ -23,6 +23,7 @@ def setup_logger(log_file=None):
                         format='%(asctime)s - %(funcName)s - %(levelname)s:' +
                                '%(message)s',
                         handlers=handlers)
+    logging.getLogger("requests").setLevel(logging.WARNING)
     # print user name
     logging.info("{} is running the script".format(getpass.getuser()))
     if log_file is not None:
