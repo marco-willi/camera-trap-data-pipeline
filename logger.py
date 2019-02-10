@@ -19,13 +19,10 @@ def setup_logger(log_file=None):
     stdout_handler = logging.StreamHandler(sys.stdout)
     handlers.append(stdout_handler)
     # logger configuration
-    logging.basicConfig(level=logging.DEBUG,
+    logging.basicConfig(level=logging.INFO,
                         format='%(asctime)s - %(funcName)s - %(levelname)s:' +
                                '%(message)s',
                         handlers=handlers)
-    logging.getLogger("requests").setLevel(logging.WARNING)
-    logging.getLogger('panoptes_client').setLevel(logging.WARNING)
-    # print user name
     logging.info("{} is running the script".format(getpass.getuser()))
     if log_file is not None:
         os.chmod(log_file, 0o660)
