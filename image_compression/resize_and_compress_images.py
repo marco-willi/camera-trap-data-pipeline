@@ -39,11 +39,11 @@ def resize_and_compress_single_image(
         # resize if necessary
         if max_pixel_of_largest_side is not None:
             aspect_preserving_max_side_resize(img, max_pixel_of_largest_side)
-        with io.BytesIO() as output_bytes:
-            # Save to Bytes and Change quality (only for JPEG)
-            save_and_compress_image(img, output_bytes, save_quality)
-            img_bytes = output_bytes.getvalue()
-    return img_bytes
+        # Save to Bytes and Change quality (only for JPEG)
+        bytes_obj = io.BytesIO()
+        save_and_compress_image(img, bytes_obj, save_quality)
+        readable_bytes = io.BytesIO(bytes_obj.getvalue())
+    return readable_bytes
 
 
 def resize_and_compress_list_of_images(
