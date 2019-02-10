@@ -86,7 +86,12 @@ if __name__ == "__main__":
         for capture_id, mani_data in manifest.items():
             row_to_write = [capture_id]
             images_to_write = ['' for i in range(0, n_images)]
-            for i, image in enumerate(mani_data['images']['original_images']):
+            # handle legacy case
+            if isinstance(mani_data['images'], list):
+                images = mani_data['images']
+            else:
+                images = mani_data['images']['original_images']
+            for i, image in enumerate(images):
                 try:
                     images_to_write[i] = image
                 except:

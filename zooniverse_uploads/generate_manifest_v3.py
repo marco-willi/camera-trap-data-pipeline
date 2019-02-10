@@ -109,7 +109,8 @@ if __name__ == "__main__":
     omitted_images_counter = 0
     images_not_found_counter = 0
     valid_codes = ('0', '3')
-    for row in cleaned_captures:
+    n_records_total = len(cleaned_captures)
+    for row_no, row in enumerate(cleaned_captures):
         # Extract important fields
         season = row[name_to_id_mapper['season']]
         site = row[name_to_id_mapper['site']]
@@ -125,7 +126,7 @@ if __name__ == "__main__":
             continue
         # Skip if image is not on disk
         image_path_full = os.path.join(args['images_root_path'], image_path)
-        if not os.path.exists(image_path_full):
+        if not os.path.isfile(image_path_full):
             images_not_found_counter += 1
             continue
         # unique capture id
@@ -152,6 +153,10 @@ if __name__ == "__main__":
                 'images': []}
         # Add image information
         manifest[capture_id]['images'].append(image_path)
+
+        if (row_no % 10000) == 0:
+            logger.info("Processed {}/{} records".format(
+                row_no, n_records_total))
 
     logger.info("Omitted %s images due to invalid code in 'invalid' column" %
                 omitted_images_counter)
