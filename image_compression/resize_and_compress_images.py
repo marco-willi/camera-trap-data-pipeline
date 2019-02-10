@@ -56,11 +56,15 @@ def resize_and_compress_list_of_images(
     if process_id is not None:
         print("Starting process: {:2}".format(process_id))
     for image_path in image_path_list:
-        img_bytes = resize_and_compress_single_image(
-                        image_path,
-                        max_pixel_of_largest_side,
-                        save_quality)
-        results_dict[image_path] = img_bytes
+        try:
+            img_bytes = resize_and_compress_single_image(
+                            image_path,
+                            max_pixel_of_largest_side,
+                            save_quality)
+            results_dict[image_path] = img_bytes
+        except:
+            print("Failed to compress: {}".format(image_path))
+            results_dict[image_path] = ''
     if process_id is not None:
         print("Finished process: {:2}".format(process_id))
 
@@ -105,7 +109,7 @@ def process_images_list_multiprocess(
 
     return results_dict
 
-# 
+#
 # if __name__ == '__main__':
 #     image_root = 'D:\\Studium_GD\\Zooniverse\\Data\\snapshot_serengeti\\test_images\\'
 #     img_names = os.listdir(image_root)

@@ -112,6 +112,11 @@ if __name__ == "__main__":
         '--dont_compress_images' is not specified.")
 
     parser.add_argument(
+        "--image_root_path", type=str, default=None,
+        help="The root path of all images in the manifest. Used when reading \
+        them from disk.")
+
+    parser.add_argument(
         "--debug_mode", action='store_true',
         help="Activate debug mode which will print more status messages.")
 
@@ -121,6 +126,11 @@ if __name__ == "__main__":
     if not os.path.exists(args['manifest']):
         raise FileNotFoundError("manifest: %s not found" %
                                 args['manifest'])
+
+    if args['image_root_path'] is not None:
+        if not os.path.isdir(args['image_root_path']):
+            raise FileNotFoundError("image_root_path: %s not found" %
+                                    args['image_root_path'])
 
     # Check one of subject_set_id and subject_set_name exists
     if None not in (args['subject_set_name'], args['subject_set_id']):
@@ -261,6 +271,11 @@ if __name__ == "__main__":
             continue
         try:
             images_to_upload = data['images']['original_images']
+            # append root path if specified
+            if args['image_root_path'] is not None:
+                images_to_upload = [
+                    os.path.join(args['image_root_path'], x)
+                    for x in images_to_upload]
             # Compress images if specified
             if not args['dont_compress_images']:
                 images_to_upload = \
