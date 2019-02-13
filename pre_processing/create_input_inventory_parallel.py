@@ -2,14 +2,12 @@
 import os
 import argparse
 import logging
-import textwrap
 import time
-import csv
 import numpy as np
 import pandas as pd
 import copy
 from datetime import datetime
-from collections import OrderedDict, Counter, defaultdict
+from collections import OrderedDict
 import traceback
 from multiprocessing import Process, Manager
 from PIL import Image
@@ -18,14 +16,15 @@ from PIL.ExifTags import TAGS as exif_map
 from logger import setup_logger, create_logfile_name
 from pre_processing.utils import file_creation_date, image_check_stats
 from utils import slice_generator
+from global_vars import pre_processing_flags as flags
 
 
-args = dict()
-args['root_dir'] = '/home/packerc/shared/albums/ENO/ENO_S1'
-args['output_csv'] = '/home/packerc/shared/season_captures/ENO/ENO_S1_captures_raw.csv'
-args['output_csv'] = '/home/packerc/will5448/image_inventory_overview.csv'
-args['season_id'] = ''
-args['n_processes'] = 16
+# args = dict()
+# args['root_dir'] = '/home/packerc/shared/albums/ENO/ENO_S1'
+# args['output_csv'] = '/home/packerc/shared/season_captures/ENO/ENO_S1_captures_raw.csv'
+# args['output_csv'] = '/home/packerc/will5448/image_inventory_overview.csv'
+# args['season_id'] = ''
+# args['n_processes'] = 16
 
 if __name__ == '__main__':
 
@@ -39,73 +38,6 @@ if __name__ == '__main__':
 
     # image check paramters
     msg_width = 99
-
-    pre_processing_flags = dict()
-    pre_processing_flags['image_checks_basic'] = [
-        'all_black',
-        'all_white',
-        'corrupt_file',
-        'corrupt_exif',
-        'empty_exif']
-
-    pre_processing_flags['image_checks_time'] = [
-        'time_lapse',
-        'time_too_new',
-        'time_too_old',
-        'captures_with_too_many_images']
-
-    pre_processing_flags['image_checks'] = \
-        pre_processing_flags['image_checks_basic'] + \
-        pre_processing_flags['image_checks_time']
-
-    pre_processing_flags['image_check_parameters'] = {
-        'all_black': {'thresh': 50, 'percent': 0.62},
-        'all_white': {'thresh': 200, 'percent': 0.8},
-        'time_lapse_days': {'max_days': 30},
-        'time_too_new': {'max_year': 2018},
-        'time_too_old': {'min_year': 2012},
-        'captures_with_too_many_images': {'max_images': 3}
-    }
-    pre_processing_flags['exif_data_timestamps'] = \
-        ['DateTime', 'DateTimeOriginal']
-    pre_processing_flags['time_formats'] = {
-            'output_datetime_format': '%Y-%m-%d %H:%M:%S',
-            'output_date_format': '%Y-%m-%d',
-            'output_time_format': '%H:%M:%S',
-            'exif_input_datetime_format': '%Y:%m:%d %H:%M:%S'
-    }
-
-    flags = pre_processing_flags
-
-    #
-    # # if all values of a pixel (R,G,B) are below 'black_thresh' it is considered
-    # # a 'black' pixel
-    # black_thresh = 50
-    # # if more than 'black_percent' pixels are black the check fails
-    # black_percent= 0.62
-    # # if all values of a pixel (R,G,B) are above 'white_thresh' it is considered
-    # # a 'white' pixel
-    # white_thresh = 200
-    # # if more than 'white_percent' pixels are white the check fails
-    # white_percent= 0.8
-    # # all checks
-    # image_checks = [
-    #     'all_black',
-    #     'all_white',
-    #     'corrupt_file',
-    #     'corrupt_exif',
-    #     'empty_exif',
-    #     'time_lapse_days'
-    #     'time_too_new',
-    #     'time_too_old',
-    #     'captures_with_too_many_images']
-    # exif_data_timestamps = ['DateTime', 'DateTimeOriginal']
-    # exif_input_datetime_format = '%Y:%m:%d %H:%M:%S'
-    # output_datetime_format = '%Y-%m-%d %H:%M:%S'
-    # output_date_format = '%Y-%m-%d'
-    # output_time_format = '%H:%M:%S'
-
-
 
     # logging
     log_file_name = create_logfile_name('create_input_inventory')
@@ -139,7 +71,8 @@ if __name__ == '__main__':
             # Loop over image files
             for image_file_name in image_file_names:
                 image_path = os.path.join(roll_directory_path, image_file_name)
-                image_path_rel = os.path.join(roll_directory_path_rel,
+                image_path_rel = os.path.join(
+                    roll_directory_path_rel,
                     image_file_name)
                 image_inventory[image_path] = {
                     'season': args['season_id'],
@@ -150,11 +83,11 @@ if __name__ == '__main__':
                     'image_path_original_rel': image_path_rel,
                     'datetime': '',
                     'date': '',
-                    'time':'',
+                    'time': '',
                     'exif_data': dict(),
                     'file_creation_date': '',
                     'image_has_failed_checks': '',
-                    'exclude_image':'',
+                    'exclude_image': '',
                     'image_check': {k: 0 for k in flags['image_checks']}
                 }
 
@@ -177,7 +110,8 @@ if __name__ == '__main__':
             if exif is None:
                 current_checks['empty_exif'] = 1
             else:
-                exif_mapped = {exif_map[k]: v for k, v in exif.items()
+                exif_mapped = {
+                    exif_map[k]: v for k, v in exif.items()
                     if k in exif_map}
                 current_data['exif_data'].update(exif_mapped)
                 # Extract time-stamp from exif data
@@ -187,7 +121,7 @@ if __name__ == '__main__':
                         dt_object = datetime.strptime(
                             exif_date_str,
                             flags['time_formats']['exif_input_datetime_format'])
-                        exif_datetime= \
+                        exif_datetime = \
                             dt_object.strftime(
                                flags['time_formats']['output_datetime_format'])
                         exif_date = \
@@ -217,7 +151,8 @@ if __name__ == '__main__':
                 flags['image_check_parameters']['all_white']['thresh']
             # check other aspects of the image
             pixel_data = np.asarray(img)
-            n_pixels_total = np.multiply(pixel_data.shape[0], pixel_data.shape[1])
+            n_pixels_total = np.multiply(
+                pixel_data.shape[0], pixel_data.shape[1])
             # check for black pixels
             pixels_2D = np.sum(pixel_data < black_thresh, axis=(2))
             n_pixels_affected = np.sum(pixels_2D == 3)
@@ -243,14 +178,13 @@ if __name__ == '__main__':
                 print("Process {:2} - Processed {}/{} images".format(
                     i, img_no, n_images_total))
 
-
     # Loop over all images
     image_paths_all = list(image_inventory.keys())
     n_images_total = len(image_paths_all)
 
     # parallelize image checking into 'n_processes'
     manager = Manager()
-    results= manager.dict()
+    results = manager.dict()
     try:
         processes_list = list()
         n_processes = min(args['n_processes'], n_images_total)
@@ -293,7 +227,7 @@ if __name__ == '__main__':
     cols = df.columns.tolist()
     first_cols = [
         'season', 'site', 'roll', 'image_path_original_rel']
-    cols_rearranged =  first_cols + [x for x in cols if x not in first_cols]
+    cols_rearranged = first_cols + [x for x in cols if x not in first_cols]
     df = df[cols_rearranged]
 
     # sort rows

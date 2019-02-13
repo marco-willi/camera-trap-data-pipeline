@@ -20,10 +20,10 @@ import textwrap
 from logger import setup_logger, create_logfile_name
 
 
-args = dict()
-args['root_dir'] = '/home/packerc/shared/albums/ENO/ENO_S1'
-args['root_dir'] = '/home/packerc/shared/albums/KAR/KAR_S1'
-args['root_dir'] = '/home/packerc/shared/albums/EFA/EFA_S1'
+# args = dict()
+# args['root_dir'] = '/home/packerc/shared/albums/ENO/ENO_S1'
+# args['root_dir'] = '/home/packerc/shared/albums/KAR/KAR_S1'
+# args['root_dir'] = '/home/packerc/shared/albums/EFA/EFA_S1'
 
 def is_ok_site_code(site):
     """ Check if site code is correct, must be in the format 'A01':
@@ -42,6 +42,7 @@ def is_ok_site_code(site):
         return False
     return True
 
+
 def is_ok_roll_code(roll):
     """ Check if roll code is correct, must be in the format 'R1'
         - one uppercase R
@@ -53,6 +54,7 @@ def is_ok_roll_code(roll):
     if not roll_number.isnumeric():
         return False
     return True
+
 
 def is_ok_roll_directory_name(roll_dir):
     """ Check if roll directory is correct, must be in the format 'A01_R1'
@@ -69,6 +71,7 @@ def is_ok_roll_directory_name(roll_dir):
     if not is_ok_roll_code(roll):
         return False
     return True
+
 
 if __name__ == '__main__':
 
@@ -103,11 +106,11 @@ if __name__ == '__main__':
         if not is_ok_site_code(site_directory_name):
             logger.error(
                 textwrap.shorten(
-                "site directory {} has incorrect format, \
-                must be in the format 'A01', one upper case letter, followed\
-                by 2 numerics".format(
-                site_directory_name),
-                width=msg_width))
+                  "site directory {} has incorrect format, \
+                  must be in the format 'A01', one upper case letter, followed\
+                  by 2 numerics".format(
+                    site_directory_name),
+                  width=msg_width))
     # check each roll in a site directory
     for site_directory_name in site_directory_names:
         # get all roll directories in a site directory
@@ -122,12 +125,12 @@ if __name__ == '__main__':
             if not is_ok_roll_directory_name(roll_directory_name):
                 logger.error(
                     textwrap.shorten(
-                    "invalid roll directory: {} at {}, must be \
-                    in the format 'A01_R1': \
-                    [upper case letter][two numerics] and \
-                    [R][one or more numerics] separated by a '_'".format(
-                    roll_directory_name, roll_directory_path),
-                    width=msg_width))
+                      "invalid roll directory: {} at {}, must be \
+                      in the format 'A01_R1': \
+                      [upper case letter][two numerics] and \
+                      [R][one or more numerics] separated by a '_'".format(
+                        roll_directory_name, roll_directory_path),
+                      width=msg_width))
             else:
                 # split directory name into site and roll identifiers
                 (site, roll) = roll_directory_name.split('_')
@@ -135,10 +138,10 @@ if __name__ == '__main__':
                 if site != site_directory_name:
                     logger.error(
                         textwrap.shorten(
-                            "First part of roll directory {} is {}, is not \
-                            identical to site directory {}: \
-                            change either of them to matching names, \
-                            Example: C06/C06_R1".format(
+                          "First part of roll directory {} is {}, is not \
+                          identical to site directory {}: \
+                          change either of them to matching names, \
+                          Example: C06/C06_R1".format(
                             roll_directory_name, site, site_directory_name,
                             ), width=msg_width))
                 # check each file in a roll directory
@@ -147,10 +150,10 @@ if __name__ == '__main__':
                     # check file ending
                     if not image_file_name.lower().endswith('.jpg'):
                         image_path = os.path.join(
-                            roll_directory_path,image_file_name)
+                            roll_directory_path, image_file_name)
                         logger.error(
                             textwrap.shorten(
                                 "File {} at {} must end in .jpg.JPG, \
                                  remove is".format(
-                                image_file_name, roll
-                                ), width=msg_width))
+                                 image_file_name, roll
+                                 ), width=msg_width))

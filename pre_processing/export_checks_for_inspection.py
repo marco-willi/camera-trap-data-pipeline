@@ -5,11 +5,11 @@ import pandas as pd
 from datetime import datetime
 from collections import OrderedDict
 
-args = dict()
-
-args['input_grouped_inventory'] = '/home/packerc/will5448/image_inventory_grouped.csv'
-args['output_csv'] = '/home/packerc/will5448/image_inventory_to_inspect.csv'
-args['ignore_excluded_images'] = False
+# args = dict()
+#
+# args['input_grouped_inventory'] = '/home/packerc/will5448/image_inventory_grouped.csv'
+# args['output_csv'] = '/home/packerc/will5448/image_inventory_to_inspect.csv'
+# args['ignore_excluded_images'] = False
 
 
 
