@@ -184,7 +184,7 @@ if __name__ == '__main__':
                 time_checks['image_check__captures_with_too_many_images'] = 1
         image_data.update(time_checks)
 
-    image_check_stats2(inventory, logger)
+    image_check_stats(inventory, logger)
 
     # Convert to Pandas DataFrame for exporting
     df = pd.DataFrame.from_dict(inventory, orient='index')

@@ -205,8 +205,6 @@ if __name__ == '__main__':
     for image_path, image_data in image_inventory.items():
         image_inventory[image_path] = results[image_path]
 
-    image_check_stats(image_inventory, logger)
-
     # create csv
     image_inventory_flattened = dict()
     for image_path, image_data in image_inventory.items():
@@ -220,6 +218,8 @@ if __name__ == '__main__':
                     _dat_flatt[composite_key] = v
         image_inventory_flattened[image_path] = {
             **_dat_standard, **_dat_flatt}
+
+    image_check_stats(image_inventory_flattened, logger)
 
     # Convert to Pandas DataFrame for exporting
     df = pd.DataFrame.from_dict(image_inventory_flattened, orient='index')
