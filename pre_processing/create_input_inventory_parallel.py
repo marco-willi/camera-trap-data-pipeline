@@ -47,7 +47,8 @@ if __name__ == '__main__':
     logger = logging.getLogger(__name__)
 
     if args['season_id'] == '':
-        args['season_id'] = os.path.split(args['root_dir'])[1]
+        last_dir = os.path.basename(os.path.normpath(args['root_dir']))
+        args['season_id'] = last_dir
         logger.info("Updating 'season_id' with {}".format(
             args['season_id']))
 
