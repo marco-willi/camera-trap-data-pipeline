@@ -5,8 +5,6 @@ The following codes can be used to:
 1. Get Zooniverse Exports (download data through the Python API)
 2. Extract Zooniverse Classifications
 
-Some of the scripts used for different sites can be found here: [zooniverse_exports/scripts.sh](../zooniverse_exports/scripts.sh).
-
 
 ## Get Zooniverse Exports
 

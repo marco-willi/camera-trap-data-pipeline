@@ -1,10 +1,11 @@
 # snapshot_safari_misc
 This repository contains code for the following tasks:
 
-1. [Upload Data to Zooniverse](docs/zooniverse_uploads.md)
-2. [Download & Extract Data from Zooniverse](docs/zooniverse_exports.md)
-3. [Aggregate Data from Zooniverse](docs/zooniverse_aggregations.md)
-4. [Merge Data into Reports](docs/reporting.md) - in development
+1. [Pre-Process Camera-Trap Images](docs/pre-processing.md) - in development
+2. [Upload Data to Zooniverse](docs/zooniverse_uploads.md)
+3. [Download & Extract Data from Zooniverse](docs/zooniverse_exports.md)
+4. [Aggregate Data from Zooniverse](docs/zooniverse_aggregations.md)
+5. [Merge Data into Reports](docs/reporting.md) - in development
 
 ## Overview
 
@@ -18,9 +19,13 @@ Global flags / mappings are defined here: [global_vars](global_vars.py)
 2. if a new question needs to be renamed, e.g., 'howmanyanimalswithbighornsdoyousee' to 'big_horns_count'
 3. if different formats / namings are required, e.g., 'answer__' instead of 'question__'
 
-## Example Scripts
+## Executing the Scripts
 
-Here is a compilation of many sample scripts [Scripts](scripts.sh). These need to be adjusted, for example:
+The following ways can be used to execute the scripts
+- Copy & paste the commands to a text editor, adjust the parameters, and copy & paste them to the command line.
+- Define run-specific parameters as shown in the sample scripts below and just copy & paste the relevant scripts.
+
+Here is a compilation of many sample scripts [Scripts](scripts.sh).
 
 ## Pre-Requisites
 
@@ -74,7 +79,3 @@ pip install --upgrade --user panoptes-client
 pip install --upgrade --user pillow
 cd ~/snapshot_safari_misc
 ```
-
-### Execute Codes
-
-The easiest way to exectue the following codes is to copy & paste them to a text editor, change the parameters (e.g. paths) and then copy & paste that to the command line to execute them.
