@@ -2,45 +2,13 @@
 
 The following steps are required to upload new data to Zooniverse. The following codes show an example for processing RUA data. These are the steps:
 
-1. Compress Images (Zooniverse has a size limit)
-2. Generate Manifest (a file containing all info for the Zooniverse upload)
-3. Create Machine Lerning File for Model Input (Optional - create input for machine classifier)
-4. Generate new Predictions (Optional - run a machine classifier)
-5. Split/Batch Manifest (Optional - Zooniverse recommends not to use too large batches at once)
-6. Upload Manifest
+1. Generate Manifest (a file containing all info for the Zooniverse upload)
+2. Create Machine Lerning File for Model Input (Optional - create input for machine classifier)
+3. Generate new Predictions (Optional - run a machine classifier)
+4. Split/Batch Manifest (Optional - Zooniverse recommends not to use too large batches at once)
+5. Upload Manifest
 
 The optional steps can simply be skipped.
-
-
-## Compress Images
-
-The script [image_compression](image_compression/compress_images.pbs) compresses images and has to be ADAPTED in the following way (NOT EXECUTED). You can find the script in this directory: '~/snapshot_safari_misc/image_compression/compress_images.pbs'. Image compression is required due to size limits of individual
-images on Zooniverse.
-
-```
-module load python3
-
-cd $HOME/snapshot_safari_misc
-
-python3 -m image_compression.compress_images \
---captures_csv /home/packerc/shared/season_captures/RUA/cleaned/RUA_S1_cleaned.csv \
---output_image_dir /home/packerc/shared/zooniverse/ToUpload/RUA/RUA_S1_Compressed \
---root_image_path /home/packerc/shared/albums/RUA/
-```
-
-After adapting the file 'compress_images.pbs' we have to create the 'output_image_dir' as specified in the file. For the example shown above:
-
-```
-mkdir /home/packerc/shared/zooniverse/ToUpload/RUA/RUA_S1_Compressed
-```
-
-Then we submit the job by issuing this command:
-
-```
-ssh mesabi
-cd $HOME/snapshot_safari_misc/image_compression
-qsub compress_images.pbs
-```
 
 ## Generate Manifest
 
@@ -49,8 +17,8 @@ This generates a manifest from the captures csv. A manifest contains all the inf
 ```
 python3 -m zooniverse_uploads.generate_manifest \
 --captures_csv /home/packerc/shared/season_captures/RUA/cleaned/RUA_S1_cleaned.csv \
---compressed_image_dir /home/packerc/shared/zooniverse/ToUpload/RUA/RUA_S1_Compressed/ \
 --output_manifest_dir /home/packerc/shared/zooniverse/Manifests/RUA/ \
+--images_root_path /home/packerc/shared/albums/RUA/ \
 --manifest_id RUA_S1 \
 --attribution 'University of Minnesota Lion Center + SnapshotSafari + Ruaha Carnivore Project + Tanzania + Ruaha National Park' \
 --license 'SnapshotSafari + Ruaha Carnivore Project'
@@ -59,6 +27,30 @@ python3 -m zooniverse_uploads.generate_manifest \
 The default settings create the following file:
 ```
 RUA_S1__complete__manifest.json
+```
+
+The 'image_root_path' has to be specified if the 'captures_csv' contains relative paths to the images -- the manifest creation code checks for file existence.
+
+### Cleaned Captures File
+
+The 'captures_csv' input is a csv file with (at least) the following columns:
+
+| Column   | Description |
+| --------- | ----------- |
+|season | season identifier
+|site | site/camera identifier
+|roll | roll identifier (SD card of a camera)
+|capture | capture identifier
+|path | Absolute or relative path of the image
+|invalid| Code that has to be one of '0' or '3' in order for the image to be considered valid (else it is not included in the manifest)
+
+The fields can either be quoted by "" or not. It is expected that the input is ordered by: season, site, roll, capture, image (ordered by sequence in the capture).
+
+Example:
+```
+season,site,roll,capture,image,path,timestamp,oldtime,sr,imname,invalid,timez,J
+GRU_S1,J05,1,14,1,GRU_S1/J05/J05_R1/GRU_S1_J05_R1_IMAG0036.JPG,2017:06:06 03:56:50,2017:06:06 03:56:50,J05_R1,GRU_S1_J05_R1_IMAG0036.JPG,1,,
+GRU_S1,J06,1,17,1,GRU_S1/J06/J06_R1/GRU_S1_J06_R1_IMAG0043.JPG,2017:06:09 22:28:38,2017:06:09 22:28:38,J06_R1,GRU_S1_J06_R1_IMAG0043.JPG,1,,
 ```
 
 ## Create Machine Lerning File for Model Input (Optional)
@@ -187,8 +179,10 @@ Change the paths analogue to this example:
 python3 -m zooniverse_uploads.upload_manifest \
 --manifest /home/packerc/shared/zooniverse/Manifests/RUA/RUA_S1__complete__manifest.json \
 --project_id 5155 \
---password_file ~/keys/passwords.ini
+--password_file ~/keys/passwords.ini \
+--image_root_path /home/packerc/shared/albums/RUA/
 ```
+
 
 Note: to upload a specific batch instead use something analogue to:
 ```
@@ -205,6 +199,18 @@ qsub upload_manifest.pbs
 
 This code can run for a long time, i.e. multiple days.
 
+Note2: Per default the images are being compressed during the upload process. Use the following paramters to change that behavior:
+
+```
+--save_quality 50 \
+--n_processes 3 \
+--max_pixel_of_largest_side 1440
+```
+
+Or disable image compression with:
+```
+--dont_compress_images
+```
 
 ### In case of a failure
 
@@ -222,6 +228,7 @@ python3 -m zooniverse_uploads.upload_manifest \
 --manifest /home/packerc/shared/zooniverse/Manifests/RUA/RUA_S1__complete__manifest.json \
 --project_id 5155 \
 --subject_set_id 7845 \
+--image_root_path /home/packerc/shared/albums/RUA/ \
 --password_file ~/keys/passwords.ini
 ```
 

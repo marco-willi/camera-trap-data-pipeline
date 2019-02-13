@@ -39,10 +39,6 @@ if __name__ == "__main__":
         "--captures_csv", type=str, required=True,
         help="Path to the cleaned captures csv.")
     parser.add_argument(
-        "--compressed_image_dir", type=str, required=True,
-        help="Path to a directory with all images as referenced in the \
-              captures_csv")
-    parser.add_argument(
         "--output_manifest_dir", type=str, required=True,
         help="Output directory to write the manifest into.")
     parser.add_argument(
@@ -50,6 +46,10 @@ if __name__ == "__main__":
         help="A unique identifier for the manifest, e.g,\
               RUA_S1. Typically, this is used for a season of data and \
               describes the content of the captures_csv.")
+    parser.add_argument(
+        "--images_root_path", type=str, default='',
+        help="Root path of the column 'path' in the captures_csv. Used to \
+        check if images exist on disk.")
     parser.add_argument(
         "--attribution", type=str, required=True,
         help="Attribution text.")
@@ -67,13 +67,14 @@ if __name__ == "__main__":
         raise FileNotFoundError("output_manifest_dir: %s is not a directory" %
                                 args['output_manifest_dir'])
 
-    if not os.path.isdir(args['compressed_image_dir']):
-        raise FileNotFoundError("compressed_image_dir: %s is not a directory" %
-                                args['compressed_image_dir'])
-
     if not os.path.exists(args['captures_csv']):
         raise FileNotFoundError("captures_csv: %s not found" %
                                 args['captures_csv'])
+
+    if args['images_root_path'] != '':
+        if not os.path.isdir(args['images_root_path']):
+            raise FileNotFoundError("images_root_path: %s not found" %
+                                    args['images_root_path'])
 
     if any([x in args['manifest_id'] for x in ['.', '__']]):
         raise ValueError("manifest_id must not contain any of '.'/'__'")
@@ -103,22 +104,18 @@ if __name__ == "__main__":
     logger.info("Found %s images in %s" %
                 (len(cleaned_captures), args['captures_csv']))
 
-    # Find all processed images
-    images_on_disk = set(os.listdir(args['compressed_image_dir']))
-
     # Create the manifest
     manifest = OrderedDict()
     omitted_images_counter = 0
     images_not_found_counter = 0
     valid_codes = ('0', '3')
-    for row in cleaned_captures:
+    n_records_total = len(cleaned_captures)
+    for row_no, row in enumerate(cleaned_captures):
         # Extract important fields
         season = row[name_to_id_mapper['season']]
         site = row[name_to_id_mapper['site']]
         roll = row[name_to_id_mapper['roll']]
         capture = row[name_to_id_mapper['capture']]
-        image_no = row[name_to_id_mapper['image']]
-        image_name = row[name_to_id_mapper['imname']]
         image_path = row[name_to_id_mapper['path']]
         invalid = row[name_to_id_mapper['invalid']]
         # Skip image if not in valid codes
@@ -126,8 +123,10 @@ if __name__ == "__main__":
             omitted_images_counter += 1
             continue
         # Skip if image is not on disk
-        if image_name not in images_on_disk:
+        image_path_full = os.path.join(args['images_root_path'], image_path)
+        if not os.path.isfile(image_path_full):
             images_not_found_counter += 1
+            logger.warning("Image not found: {}".format(image_path_full))
             continue
         # unique capture id
         capture_id = '#'.join([season, site, roll, capture])
@@ -135,6 +134,7 @@ if __name__ == "__main__":
         if capture_id not in manifest:
             # generate metadata for uploading to Zooniverse
             upload_metadata = {
+                '#capture_id': capture_id,
                 '#site': site,
                 '#roll': roll,
                 '#season': season,
@@ -146,21 +146,16 @@ if __name__ == "__main__":
             info = {
                 'uploaded': False
             }
-            images = {
-                'original_images': [],
-                'compressed_images': []
-            }
             manifest[capture_id] = {
                 'upload_metadata': upload_metadata,
                 'info': info,
-                'images': images}
+                'images': []}
         # Add image information
-        image_disk_path = os.path.join(
-            args['compressed_image_dir'], image_name)
-        manifest[capture_id]['images']['compressed_images'].append(
-            image_disk_path)
-        manifest[capture_id]['images']['original_images'].append(
-            image_path)
+        manifest[capture_id]['images'].append(image_path)
+
+        if (row_no % 10000) == 0:
+            logger.info("Processed {}/{} records".format(
+                row_no, n_records_total))
 
     logger.info("Omitted %s images due to invalid code in 'invalid' column" %
                 omitted_images_counter)

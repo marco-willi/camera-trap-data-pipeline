@@ -30,6 +30,50 @@ label_mappings = {
 
 
 ###################################################
+# Pre-Processing Flags
+###################################################
+
+pre_processing_flags = dict()
+pre_processing_flags['general'] = {
+    'capture_delta_seconds': 5}
+pre_processing_flags['image_checks_basic'] = [
+    'all_black',
+    'all_white',
+    'corrupt_file',
+    'corrupt_exif',
+    'empty_exif']
+
+pre_processing_flags['image_checks_time'] = [
+    'time_lapse',
+    'time_too_new',
+    'time_too_old',
+    'captures_with_too_many_images']
+
+pre_processing_flags['image_checks'] = \
+    pre_processing_flags['image_checks_basic'] + \
+    pre_processing_flags['image_checks_time']
+
+pre_processing_flags['image_check_parameters'] = {
+    'all_black': {'thresh': 50, 'percent': 0.62},
+    'all_white': {'thresh': 200, 'percent': 0.8},
+    'time_lapse_days': {'max_days': 30},
+    'time_too_new': {'max_year': 2018},
+    'time_too_old': {'min_year': 2012},
+    'captures_with_too_many_images': {'max_images': 3}
+}
+pre_processing_flags['exif_data_timestamps'] = \
+        ['DateTime', 'DateTimeOriginal']
+pre_processing_flags['time_formats'] = {
+        'output_datetime_format': '%Y-%m-%d %H:%M:%S',
+        'output_date_format': '%Y-%m-%d',
+        'output_time_format': '%H:%M:%S',
+        'exif_input_datetime_format': '%Y:%m:%d %H:%M:%S'
+}
+
+flags = pre_processing_flags
+
+
+###################################################
 # GLobal Processing Flags
 ###################################################
 

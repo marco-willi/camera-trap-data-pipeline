@@ -13,6 +13,9 @@ from panoptes_client.panoptes import PanoptesAPIException
 
 from logger import setup_logger, create_logfile_name
 from zooniverse_uploads import uploader
+from image_compression.resize_and_compress_images import (
+    process_images_list_multiprocess,
+    resize_and_compress_list_of_images)
 from utils import (
     read_config_file, estimate_remaining_time,
     current_time_str, export_dict_to_json_with_newlines,
@@ -90,6 +93,30 @@ if __name__ == "__main__":
               password: 1234")
 
     parser.add_argument(
+        "--dont_compress_images", action='store_true',
+        help="Don't compress images (default IS to compress)")
+
+    parser.add_argument(
+        "--max_pixel_of_largest_side", type=int, default=1440,
+        help="The largest side of the image after compressing the images if\
+        '--dont_compress_images' is not specified.")
+
+    parser.add_argument(
+        "--save_quality", type=int, default=50,
+        help="The save quality of the image after compressing the images if\
+        '--dont_compress_images' is not specified.")
+
+    parser.add_argument(
+        "--n_processes", type=int, default=3,
+        help="The number of processes to use in parallel if\
+        '--dont_compress_images' is not specified.")
+
+    parser.add_argument(
+        "--image_root_path", type=str, default=None,
+        help="The root path of all images in the manifest. Used when reading \
+        them from disk.")
+
+    parser.add_argument(
         "--debug_mode", action='store_true',
         help="Activate debug mode which will print more status messages.")
 
@@ -100,10 +127,22 @@ if __name__ == "__main__":
         raise FileNotFoundError("manifest: %s not found" %
                                 args['manifest'])
 
+    if args['image_root_path'] is not None:
+        if not os.path.isdir(args['image_root_path']):
+            raise FileNotFoundError("image_root_path: %s not found" %
+                                    args['image_root_path'])
+
     # Check one of subject_set_id and subject_set_name exists
     if None not in (args['subject_set_name'], args['subject_set_id']):
         raise ValueError("Only one of 'subject_set_name' and 'subject_set_id' \
                           should be specified")
+
+    # Check Input
+    if not args['dont_compress_images']:
+        qual = args['save_quality']
+        if qual is not None:
+            assert (qual <= 100) and (qual > 15), \
+                "save_quality must be between 15 and 100"
 
     # logging
     log_file_name = create_logfile_name('upload_manifest')
@@ -231,10 +270,32 @@ if __name__ == "__main__":
             uploaded_subjects_count += 1
             continue
         try:
-            images_to_upload = data['images']['compressed_images']
+            if isinstance(data['images'], dict):
+                images_to_upload = data['images']['original_images']
+            elif isinstance(data['images'], list):
+                images_to_upload = data['images']
+            else:
+                logger.warning("no images found for capture_id: {}".format(
+                    capture_id))
+            # append root path if specified
+            if args['image_root_path'] is not None:
+                images_to_upload = [
+                    os.path.join(args['image_root_path'], x)
+                    for x in images_to_upload]
+            # Compress images if specified
+            if not args['dont_compress_images']:
+                images_to_upload = \
+                    process_images_list_multiprocess(
+                            images_to_upload,
+                            resize_and_compress_list_of_images,
+                            n_processes=args['n_processes'],
+                            print_status=False,
+                            max_pixel_of_largest_side=args['max_pixel_of_largest_side'],
+                            save_quality=args['save_quality'])
             metadata = data['upload_metadata']
             metadata['#original_images'] = data['images']['original_images']
-            metadata['capture_id'] = uploader.anonymize_id(capture_id)
+            metadata['capture_id_anonymized'] = \
+                uploader.anonymize_id(capture_id)
             subject = uploader.create_subject(
                 my_project, images_to_upload, metadata)
             batch_data['subjects_to_link'].append(subject)

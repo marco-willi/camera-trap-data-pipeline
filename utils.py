@@ -208,8 +208,8 @@ def file_path_splitter(path, file_delim="__", file_ext='json'):
 def read_cleaned_season_file(path, quotechar='"'):
     """ Check the input file """
     cleaned_captures = list()
-    required_header_cols = ('season', 'site', 'roll', 'capture', 'image',
-                            'imname', 'path', 'invalid')
+    required_header_cols = ('season', 'site', 'roll', 'capture',
+                            'path', 'invalid')
     with open(path, newline='') as csvfile:
         csv_reader = csv.reader(csvfile, delimiter=',', quotechar=quotechar)
         header = next(csv_reader)
