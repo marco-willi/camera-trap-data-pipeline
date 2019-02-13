@@ -95,7 +95,7 @@ if __name__ == '__main__':
         n_images_total = len(image_paths_batch)
         for img_no, image_path in enumerate(image_paths_batch):
             current_data = copy.deepcopy(image_inventory[image_path])
-            current_checks = current_data['image_checks']
+            current_checks = current_data['image_check']
             # try to open the image
             try:
                 img = Image.open(image_path)
@@ -169,7 +169,7 @@ if __name__ == '__main__':
                 current_checks['all_white'] = 1
             # add flag indicating at least one failed check
             current_data['image_has_failed_checks'] = \
-                max([v for v in current_data['image_checks'].values()])
+                max([v for v in current_data['image_check'].values()])
             # add (preliminary) flag for images to exclude
             current_data['exclude_image'] = \
                 current_data['image_has_failed_checks']
