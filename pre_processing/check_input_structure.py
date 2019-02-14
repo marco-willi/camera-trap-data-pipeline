@@ -25,22 +25,23 @@ from logger import setup_logger, create_logfile_name
 # args['root_dir'] = '/home/packerc/shared/albums/KAR/KAR_S1'
 # args['root_dir'] = '/home/packerc/shared/albums/EFA/EFA_S1'
 
+
 def is_ok_site_code(site):
-    """ Check if site code is correct, must be in the format 'A01':
-        - one uppercase letter
-        - followed by two numerics
-    """
-    row_code = site[0:1]
-    col_code = site[1:]
-    if not row_code.isalpha():
-        return False
-    if not row_code.isupper():
-        return False
-    if not col_code.isnumeric():
-        return False
-    if not len(col_code) == 2:
+    """ Check if site code is correct, must be alphanumerics only """
+    if not site.isalnum():
         return False
     return True
+    # row_code = site[0:1]
+    # col_code = site[1:]
+    # if not row_code.isalpha():
+    #     return False
+    # if not row_code.isupper():
+    #     return False
+    # if not col_code.isnumeric():
+    #     return False
+    # if not len(col_code) == 2:
+    #     return False
+    # return True
 
 
 def is_ok_roll_code(roll):

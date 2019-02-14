@@ -115,7 +115,9 @@ if __name__ == '__main__':
                     exif_map[k]: v for k, v in exif.items()
                     if k in exif_map}
                 current_data['exif_data'].update(exif_mapped)
-                # Extract time-stamp from exif data
+                # Extract time-stamp from exif data -- try different fiels
+                # and take the first one that works as defined in
+                # flags['exif_data_timestamps']
                 for exif_data_field in flags['exif_data_timestamps']:
                     if exif_data_field in current_data['exif_data']:
                         exif_date_str = current_data['exif_data'][exif_data_field]

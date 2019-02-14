@@ -8,7 +8,7 @@ from datetime import datetime
 from collections import OrderedDict
 import logging
 
-from pre_processing.utils import image_check_stats2
+from pre_processing.utils import image_check_stats
 from global_vars import pre_processing_flags as flags
 from logger import create_logfile_name, setup_logger
 
