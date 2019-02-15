@@ -1,11 +1,11 @@
 """ Check Input Data
     - expected input, one root directory with:
         - site_folder:
-            A01
+            23
             B01
             - site_roll_folder:
-                A01_R1
-                A01_R2
+                23_R1
+                23_R2
                 - image files:
                     *.JPG
                     *.JPG
@@ -31,23 +31,12 @@ def is_ok_site_code(site):
     if not site.isalnum():
         return False
     return True
-    # row_code = site[0:1]
-    # col_code = site[1:]
-    # if not row_code.isalpha():
-    #     return False
-    # if not row_code.isupper():
-    #     return False
-    # if not col_code.isnumeric():
-    #     return False
-    # if not len(col_code) == 2:
-    #     return False
-    # return True
 
 
 def is_ok_roll_code(roll):
     """ Check if roll code is correct, must be in the format 'R1'
         - one uppercase R
-        - followed by one numeric
+        - followed by numerics
     """
     if not roll.startswith('R'):
         return False
@@ -108,8 +97,7 @@ if __name__ == '__main__':
             logger.error(
                 textwrap.shorten(
                   "site directory {} has incorrect format, \
-                  must be in the format 'A01', one upper case letter, followed\
-                  by 2 numerics".format(
+                  must only consist of alphanumeric characters".format(
                     site_directory_name),
                   width=msg_width))
     # check each roll in a site directory
@@ -127,8 +115,8 @@ if __name__ == '__main__':
                 logger.error(
                     textwrap.shorten(
                       "invalid roll directory: {} at {}, must be \
-                      in the format 'A01_R1': \
-                      [upper case letter][two numerics] and \
+                      in the format '[site_code]_R1': \
+                      [site_code] and \
                       [R][one or more numerics] separated by a '_'".format(
                         roll_directory_name, roll_directory_path),
                       width=msg_width))

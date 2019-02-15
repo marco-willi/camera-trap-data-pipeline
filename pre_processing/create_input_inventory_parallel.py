@@ -22,7 +22,7 @@ from global_vars import pre_processing_flags as flags
 # args = dict()
 # args['root_dir'] = '/home/packerc/shared/albums/ENO/ENO_S1'
 # args['output_csv'] = '/home/packerc/shared/season_captures/ENO/ENO_S1_captures_raw.csv'
-# args['output_csv'] = '/home/packerc/will5448/image_inventory_overview.csv'
+# #args['output_csv'] = '/home/packerc/will5448/image_inventory_overview.csv'
 # args['season_id'] = ''
 # args['n_processes'] = 16
 
@@ -43,7 +43,7 @@ if __name__ == '__main__':
     log_file_name = create_logfile_name('create_input_inventory')
     log_file_path = os.path.join(
         os.path.dirname(args['output_csv']), log_file_name)
-    setup_logger(log_file_name)
+    setup_logger(log_file_path)
     logger = logging.getLogger(__name__)
 
     if args['season_id'] == '':

@@ -56,7 +56,7 @@ if __name__ == '__main__':
     log_file_name = create_logfile_name('group_inventory_into_captures')
     log_file_path = os.path.join(
         os.path.dirname(args['output_csv']), log_file_name)
-    setup_logger(log_file_name)
+    setup_logger(log_file_path)
     logger = logging.getLogger(__name__)
 
     inventory = OrderedDict()

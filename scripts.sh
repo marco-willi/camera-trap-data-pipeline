@@ -19,8 +19,8 @@ cd $HOME/snapshot_safari_misc
 SITE=MTZ
 SEASON=MTZ_S1
 PROJECT_ID=5124
-WORKFLOW_ID=
-WORFKLOW_VERSION_MIN=
+WORKFLOW_ID=8814
+WORFKLOW_VERSION_MIN=247
 
 ###################################
 # Pilanesberg
@@ -58,14 +58,24 @@ WORFKLOW_VERSION_MIN=304
 
 
 ###################################
+# ENO
+####################################
+
+cd $HOME/snapshot_safari_misc
+SITE=ENO
+SEASON=ENO_S1
+PROJECT_ID=
+WORKFLOW_ID=
+WORFKLOW_VERSION_MIN=
+
+
+###################################
 # SCRIPTS
 ####################################
 
-# compress images
-python3 -m image_compression.compress_images \
---captures_csv /home/packerc/shared/season_captures/${SITE}/cleaned/${SEASON}_cleaned.csv \
---output_image_dir /home/packerc/shared/zooniverse/ToUpload/${SITE}/${SEASON}_Compressed \
---root_image_path /home/packerc/shared/albums/${SITE}/
+# Data processing
+python3 -m pre_processing.check_input_structure \
+--root_dir /home/packerc/shared/albums/${SITE}/${SEASON}/
 
 # generate manifest
 python3 -m zooniverse_uploads.generate_manifest \
@@ -155,6 +165,13 @@ python3 -m reporting.add_aggregations_to_season_captures \
 --aggregated_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_classifications_aggregated_subject_info.csv \
 --output_csv /home/packerc/shared/zooniverse/Reports/${SITE}/${SEASON}_report_zooniverse.csv \
 --default_season_id ${SEASON}
+
+
+# python3 -m reporting.add_aggregations_to_season_captures \
+# --season_captures_csv '/home/isbell/shared/Snapshot Cedar Creek Images/CC_S01_cleaned_captures.csv' \
+# --aggregated_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_classifications_aggregated_subject_info.csv \
+# --output_csv /home/packerc/shared/zooniverse/Reports/${SITE}/${SEASON}_report_zooniverse.csv \
+# --default_season_id ${SEASON}
 
 # Prepare Reporting of Machine-Learning Predictions
 python3 -m reporting.manifest_predictions_to_csv \
