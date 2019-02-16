@@ -64,6 +64,8 @@ if __name__ == '__main__':
     # Group images into site and roll
     site_roll_inventory = dict()
     for image_path_original, image_data in inventory.items():
+        if image_data['datetime'] == '':
+            continue
         season = image_data['season']
         site = image_data['site']
         roll = image_data['roll']
