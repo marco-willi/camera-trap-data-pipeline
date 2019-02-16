@@ -16,7 +16,7 @@ from PIL.ExifTags import TAGS as exif_map
 from logger import setup_logger, create_logfile_name
 from pre_processing.utils import (
     file_creation_date, image_check_stats, p_pixels_above_threshold,
-    p_pixels_below_threshold, plot_site_roll_timelines)
+    p_pixels_below_threshold)
 from utils import slice_generator
 from global_vars import pre_processing_flags as flags
 
@@ -87,12 +87,9 @@ if __name__ == '__main__':
                     'datetime': '',
                     'date': '',
                     'time': '',
-                    'exif_data': dict(),
                     'file_creation_date': '',
-                    'image_has_failed_checks': '',
-                    'exclude_image': '',
-                    'image_check': {k: 0 for k in flags['image_checks']}
-                }
+                    **{'image_check__{}'.format(k):
+                        0 for k in flags['image_checks']}}
 
     def process_image_batch(i, image_paths_batch, image_inventory, results):
         n_images_total = len(image_paths_batch)
@@ -103,26 +100,25 @@ if __name__ == '__main__':
             try:
                 img = Image.open(image_path)
             except:
-                current_checks['corrupt_file'] = 1
+                current_data['image_check__corrupt_file'] = 1
             # read EXIF data
             try:
                 exif = img._getexif()
             except:
-                current_checks['corrupt_exif'] = 1
+                current_data['image_check__corrupt_exif'] = 1
             # check EXIF data
             if exif is None:
-                current_checks['empty_exif'] = 1
+                current_data['image_check__empty_exif'] = 1
             else:
                 exif_mapped = {
                     exif_map[k]: v for k, v in exif.items()
                     if k in exif_map}
-                current_data['exif_data'].update(exif_mapped)
                 # Extract time-stamp from exif data -- try different fiels
                 # and take the first one that works as defined in
                 # flags['exif_data_timestamps']
                 for exif_data_field in flags['exif_data_timestamps']:
-                    if exif_data_field in current_data['exif_data']:
-                        exif_date_str = current_data['exif_data'][exif_data_field]
+                    if exif_data_field in exif_mapped:
+                        exif_date_str = exif_mapped[exif_data_field]
                         dt_object = datetime.strptime(
                             exif_date_str,
                             flags['time_formats']['exif_input_datetime_format'])
@@ -163,6 +159,10 @@ if __name__ == '__main__':
                 current_checks['all_black'] = 1
             if is_white:
                 current_checks['all_white'] = 1
+            # flatten exif data
+            current_data.update(
+                {'exif_data__{}'.format(k):
+                    v for k, v in exif_mapped.items()})
             results[image_path] = current_data
             if (img_no % 100) == 0:
                 print("Process {:2} - Processed {}/{} images".format(
@@ -194,24 +194,10 @@ if __name__ == '__main__':
     for image_path, image_data in image_inventory.items():
         image_inventory[image_path] = results[image_path]
 
-    # create csv
-    image_inventory_flattened = dict()
-    for image_path, image_data in image_inventory.items():
-        _dat_standard = \
-            {k: v for k, v in image_data.items() if not isinstance(v, dict)}
-        _dat_flatt = dict()
-        for image_key, image_value in image_data.items():
-            if isinstance(image_value, dict):
-                for k, v in image_value.items():
-                    composite_key = '{}__{}'.format(image_key, k)
-                    _dat_flatt[composite_key] = v
-        image_inventory_flattened[image_path] = {
-            **_dat_standard, **_dat_flatt}
-
-    image_check_stats(image_inventory_flattened, logger)
+    image_check_stats(image_inventory, logger)
 
     # Convert to Pandas DataFrame for exporting
-    df = pd.DataFrame.from_dict(image_inventory_flattened, orient='index')
+    df = pd.DataFrame.from_dict(image_inventory, orient='index')
 
     # re-arrange columns
     cols = df.columns.tolist()
