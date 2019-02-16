@@ -95,7 +95,6 @@ if __name__ == '__main__':
         n_images_total = len(image_paths_batch)
         for img_no, image_path in enumerate(image_paths_batch):
             current_data = copy.deepcopy(image_inventory[image_path])
-            current_checks = current_data['image_check']
             # try to open the image
             try:
                 img = Image.open(image_path)
@@ -156,9 +155,9 @@ if __name__ == '__main__':
             is_black = (p_pixels_black > black_percent)
             is_white = (p_pixels_white > white_percent)
             if is_black:
-                current_checks['all_black'] = 1
+                current_data['image_check__all_black'] = 1
             if is_white:
-                current_checks['all_white'] = 1
+                current_data['image_check__all_white'] = 1
             # flatten exif data
             current_data.update(
                 {'exif_data__{}'.format(k):
