@@ -73,7 +73,10 @@ if __name__ == '__main__':
             'manual_override_action': '',
             'manual_override_reason': ''
             }
-        update_time_checks(image_data, flags)
+        try:
+            update_time_checks(image_data, flags)
+        except:
+            pass
         at_least_one_basic_check = \
             any([float(image_data[x]) == 1 for x in basic_checks if x in check_columns])
         at_least_one_time_check = \
