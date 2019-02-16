@@ -41,6 +41,12 @@ if __name__ == '__main__':
     # image check paramters
     msg_width = 99
 
+    # check existence of root dir
+    if not os.path.isdir(args['root_dir']):
+        raise FileNotFoundError(
+            "root_dir {} does not exist -- must be a directory".format(
+                args['root_dir']))
+
     # logging
     log_file_name = create_logfile_name('create_input_inventory')
     log_file_path = os.path.join(
@@ -100,6 +106,7 @@ if __name__ == '__main__':
                 img = Image.open(image_path)
             except:
                 current_data['image_check__corrupt_file'] = 1
+                continue
             # read EXIF data
             try:
                 exif = img._getexif()

@@ -42,9 +42,6 @@ def image_check_stats(image_inventory, logger):
             if check_result == 1:
                 logger.info("Check {} Failed for image {}".format(
                     check, image_path))
-        # total number with exclusion reasons
-        image_check_stats['exclude_image'].update({
-            image_data['exclude_image']})
         # site roll stats
         season = image_data['season']
         site = image_data['site']
@@ -143,3 +140,37 @@ def read_image_inventory(path, unique_id='image_path_original'):
         inventory_with_index_as_col[data[unique_id]] = data
     return inventory_with_index_as_col
 
+
+def update_time_checks(image_data, flags):
+    checks = flags['image_check_parameters']
+    # perform time checks
+    time_checks = {
+        'image_check__{}'.format(x): 0
+        for x in flags['image_checks_time']}
+    # check for timelapse
+    if 'image_check__time_lapse' in time_checks:
+        max_days = \
+            checks['time_lapse_days']['max_days']
+        if float(image_data['days_to_last_image_taken']) > max_days:
+            time_checks['image_check__time_lapse'] = 1
+    # check for too_old / too new
+    date_format = flags['time_formats']['output_date_format']
+    date_obj = datetime.strptime(image_data['date'], date_format)
+    year_num = int(date_obj.strftime('%Y'))
+    if 'image_check__time_too_old' in time_checks:
+        min_year = \
+            checks['time_too_old']['min_year']
+        if not year_num >= min_year:
+            time_checks['image_check__time_too_old'] = 1
+    if 'image_check__time_too_new' in time_checks:
+        max_year = \
+            checks['time_too_new']['max_year']
+        if not year_num <= max_year:
+            time_checks['image_check__time_too_new'] = 1
+    # check for captures with too many images
+    if 'image_check__captures_with_too_many_images' in time_checks:
+        max_imgs = \
+            checks['captures_with_too_many_images']['max_images']
+        if int(image_data['image_rank_in_capture']) > int(max_imgs):
+            time_checks['image_check__captures_with_too_many_images'] = 1
+    image_data.update(time_checks)

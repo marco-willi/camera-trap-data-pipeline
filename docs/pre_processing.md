@@ -42,7 +42,7 @@ python3 -m pre_processing.check_input_structure \
 --log_dir /home/packerc/shared/season_captures/ENO/captures/
 ```
 
-A log file will be created in 'log-dir'.
+A log file will be created in 'log-dir' if 'log-dir' is specified.
 
 
 ## Create Input Inventory
@@ -62,12 +62,14 @@ python3 -m pre_processing.create_input_inventory_parallel \
 --n_processes 16
 ```
 
-## Group Images into Captures -- in developemnt
+The idea is to directly run the next code.
+
+## Group Images into Captures
 
 The following script groups the images into capture events.
 
 ```
 python3 -m pre_processing.group_inventory_into_captures \
---input_inventory /home/packerc/shared/season_captures/ENO/ENO_S1_captures_raw.csv \
---output_csv /home/packerc/shared/season_captures/ENO/ENO_S1_captures_grouped.csv
+--input_inventory /home/packerc/shared/season_captures/ENO/captures/ENO_S1_captures_raw.csv \
+--output_csv /home/packerc/shared/season_captures/ENO/captures/ENO_S1_captures_grouped.csv
 ```
