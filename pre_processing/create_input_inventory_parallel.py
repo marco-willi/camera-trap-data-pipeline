@@ -17,7 +17,7 @@ from logger import setup_logger, create_logfile_name
 from pre_processing.utils import (
     file_creation_date, image_check_stats, p_pixels_above_threshold,
     p_pixels_below_threshold)
-from utils import slice_generator
+from utils import slice_generator, estimate_remaining_time
 from global_vars import pre_processing_flags as flags
 
 
@@ -99,6 +99,7 @@ if __name__ == '__main__':
 
     def process_image_batch(i, image_paths_batch, image_inventory, results):
         n_images_total = len(image_paths_batch)
+        start_time = time.time()
         for img_no, image_path in enumerate(image_paths_batch):
             current_data = copy.deepcopy(image_inventory[image_path])
             # try to open the image
@@ -178,8 +179,10 @@ if __name__ == '__main__':
                         v for k, v in exif_mapped.items()})
             results[image_path] = current_data
             if (img_no % 100) == 0:
-                print("Process {:2} - Processed {}/{} images".format(
-                    i, img_no, n_images_total))
+                est_t = estimate_remaining_time(
+                    start_time, n_images_total, img_no)
+                print("Process {:2} - Processed {}/{} images - ETA: {}".format(
+                      i, img_no, n_images_total, est_t)
 
     # Loop over all images
     image_paths_all = list(image_inventory.keys())
