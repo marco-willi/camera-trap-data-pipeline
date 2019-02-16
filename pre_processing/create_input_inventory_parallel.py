@@ -182,7 +182,8 @@ if __name__ == '__main__':
                 est_t = estimate_remaining_time(
                     start_time, n_images_total, img_no)
                 print("Process {:2} - Processed {}/{} images - ETA: {}".format(
-                      i, img_no, n_images_total, est_t)
+                      i, img_no, n_images_total, est_t))
+        print("Process {:2} - Finished".format(i))
 
     # Loop over all images
     image_paths_all = list(image_inventory.keys())
