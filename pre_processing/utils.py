@@ -90,10 +90,10 @@ def plot_site_roll_timelines(
         date_col='datetime',
         date_format='%Y-%m-%d %H:%M:%S'):
     """ Plot timelines for site_roll combination """
+    df = df[df.date_time != '']
     date_time_obj = \
         [datetime.strptime(x, date_format) for x in df[date_col].values]
     df['date_time'] = date_time_obj
-    df = df[df.date_time != '']
     roll_site_group = \
         df.groupby(by=['site', 'roll', 'date_time']).size().unstack(
                 level=[0, 1], fill_value=0)
