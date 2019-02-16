@@ -106,12 +106,12 @@ if __name__ == '__main__':
                 img = Image.open(image_path)
             except:
                 current_data['image_check__corrupt_file'] = 1
-                continue
             # read EXIF data
             try:
                 exif = img._getexif()
             except:
                 current_data['image_check__corrupt_exif'] = 1
+                exif = None
             # check EXIF data
             if exif is None:
                 current_data['image_check__empty_exif'] = 1
@@ -156,20 +156,27 @@ if __name__ == '__main__':
                 flags['image_check_parameters']['all_black']['thresh']
             white_thresh = \
                 flags['image_check_parameters']['all_white']['thresh']
-            pixel_data = np.asarray(img)
-            p_pixels_white = p_pixels_above_threshold(pixel_data, white_thresh)
-            p_pixels_black = p_pixels_below_threshold(pixel_data, black_thresh)
-            is_black = (p_pixels_black > black_percent)
-            is_white = (p_pixels_white > white_percent)
-            if is_black:
-                current_data['image_check__all_black'] = 1
-            if is_white:
-                current_data['image_check__all_white'] = 1
+            try:
+                pixel_data = np.asarray(img)
+                p_pixels_white = p_pixels_above_threshold(
+                    pixel_data, white_thresh)
+                p_pixels_black = p_pixels_below_threshold(
+                    pixel_data, black_thresh)
+                is_black = (p_pixels_black > black_percent)
+                is_white = (p_pixels_white > white_percent)
+                if is_black:
+                    current_data['image_check__all_black'] = 1
+                if is_white:
+                    current_data['image_check__all_white'] = 1
+            except:
+                pass
             # flatten exif data
-            current_data.update(
-                {'exif_data__{}'.format(k):
-                    v for k, v in exif_mapped.items()})
+            if exif is not None:
+                current_data.update(
+                    {'exif_data__{}'.format(k):
+                        v for k, v in exif_mapped.items()})
             results[image_path] = current_data
+            img = None
             if (img_no % 100) == 0:
                 print("Process {:2} - Processed {}/{} images".format(
                     i, img_no, n_images_total))
