@@ -73,3 +73,16 @@ python3 -m pre_processing.group_inventory_into_captures \
 --input_inventory /home/packerc/shared/season_captures/ENO/captures/ENO_S1_captures_raw.csv \
 --output_csv /home/packerc/shared/season_captures/ENO/captures/ENO_S1_captures_grouped.csv
 ```
+
+## Export Potential Issues -- in development
+
+The following script updates the grouped_inventory, and creates a csv with all images that have a potential issue. Optinally, a timeseries plot can be generated for the number of captures over time for each roll to find suspicious patterns.
+
+```
+python3 -m pre_processing.export_checks_for_inspection \
+--inventory_grouped /home/packerc/shared/season_captures/ENO/captures/ENO_S1_captures_grouped.csv \
+--issues_csv /home/packerc/shared/season_captures/ENO/captures/ENO_S1_potential_issues.csv \
+--no_older_than_year 2017 \
+--no_newer_than_year 2019 \
+--plot_timelines
+```

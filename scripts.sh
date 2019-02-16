@@ -76,13 +76,27 @@ WORFKLOW_VERSION_MIN=
 # Data processing
 python3 -m pre_processing.check_input_structure \
 --root_dir /home/packerc/shared/albums/${SITE}/${SEASON}/ \
---log_dir /home/packerc/shared/season_captures/${SITE}/${SEASON}/
+--log_dir /home/packerc/shared/season_captures/${SITE}/captures/
 
 # Create Image Inventory
 python3 -m pre_processing.create_input_inventory_parallel \
 --root_dir /home/packerc/shared/albums/${SITE}/${SEASON}/ \
---output_csv /home/packerc/shared/season_captures/${SITE}/${SEASON}/_captures_raw.csv \
+--output_csv /home/packerc/shared/season_captures/${SITE}/captures/${SEASON}_captures_raw.csv \
 --n_processes 16
+
+# Group Images into Captures
+python3 -m pre_processing.group_inventory_into_captures \
+--input_inventory /home/packerc/shared/season_captures/${SITE}/captures/${SEASON}_captures_raw.csv \
+--output_csv /home/packerc/shared/season_captures/${SITE}/captures/${SEASON}_captures_grouped.csv
+
+
+# Find potential issues
+python3 -m pre_processing.export_checks_for_inspection \
+--inventory_grouped /home/packerc/shared/season_captures/${SITE}/captures/${SEASON}_captures_grouped.csv \
+--issues_csv /home/packerc/shared/season_captures/${SITE}/captures/${SEASON}_potential_issues.csv \
+--no_older_than_year 2017 \
+--no_newer_than_year 2019 \
+--plot_timelines
 
 
 # generate manifest

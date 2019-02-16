@@ -8,6 +8,8 @@ import csv
 
 from collections import defaultdict, Counter, OrderedDict
 
+plt.switch_backend('agg')
+
 
 def file_creation_date(path_to_file):
     """
@@ -88,20 +90,15 @@ def plot_site_roll_timelines(
         date_col='datetime',
         date_format='%Y-%m-%d %H:%M:%S'):
     """ Plot timelines for site_roll combination """
-
     date_time_obj = \
         [datetime.strptime(x, date_format) for x in df[date_col].values]
-
     df['date_time'] = date_time_obj
-
     roll_site_group = \
         df.groupby(by=['site', 'roll', 'date_time']).size().unstack(
                 level=[0, 1], fill_value=0)
-
     # Aggregate per Day - count number of instances
     roll_site_group.index = roll_site_group.index.to_period('D')
     roll_site_group = roll_site_group.groupby(roll_site_group.index).sum()
-
     # Plot
     n_subplots = roll_site_group.shape[1]
     fig, ax = plt.subplots(figsize=(8, n_subplots*2), sharex=True)
@@ -109,6 +106,7 @@ def plot_site_roll_timelines(
     plt.tight_layout()
     roll_site_group.plot(subplots=True, ax=ax)
     fig.savefig(output_path)
+    os.chmod(output_path, 0o660)
 
 
 def read_image_inventory_old(path, unique_id='image_path_original'):
