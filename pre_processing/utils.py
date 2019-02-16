@@ -90,7 +90,7 @@ def plot_site_roll_timelines(
         date_col='datetime',
         date_format='%Y-%m-%d %H:%M:%S'):
     """ Plot timelines for site_roll combination """
-    df = df[df.date_time != '']
+    df = df[df[date_col] != '']
     date_time_obj = \
         [datetime.strptime(x, date_format) for x in df[date_col].values]
     df['date_time'] = date_time_obj
