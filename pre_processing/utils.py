@@ -3,8 +3,9 @@ import platform
 from datetime import datetime
 import numpy as np
 import matplotlib.pyplot as plt
+import csv
 
-from collections import defaultdict, Counter
+from collections import defaultdict, Counter, OrderedDict
 
 
 def file_creation_date(path_to_file):
@@ -111,5 +112,22 @@ def plot_site_roll_timelines(
     roll_site_group.plot(subplots=True, ax=ax)
     fig.savefig(output_path)
 
+
+def read_image_inventory(path, unique_id='image_path_original'):
+    """ Import image inventory into dictionary """
+    inventory = OrderedDict()
+    with open(path, "r") as ins:
+        csv_reader = csv.reader(ins, delimiter=',', quotechar='"')
+        header = next(csv_reader)
+        row_name_to_id_mapper = {x: i for i, x in enumerate(header)}
+        for line_no, line in enumerate(csv_reader):
+            # print status
+            if ((line_no % 10000) == 0) and (line_no > 0):
+                print("Read {:,} images".format(line_no))
+            image_path_original = \
+                line[row_name_to_id_mapper[unique_id]]
+            inventory[image_path_original] = {
+                k: line[v] for k, v in row_name_to_id_mapper.items()}
+    return inventory
 
 

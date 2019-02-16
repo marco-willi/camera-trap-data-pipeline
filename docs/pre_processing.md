@@ -38,7 +38,7 @@ The check can be performed using the following script:
 ```
 python3 -m pre_processing.check_input_structure \
 --root_dir /home/packerc/shared/albums/ENO/ENO_S1/ \
---log_dir /home/packerc/shared/season_captures/ENO/
+--log_dir /home/packerc/shared/season_captures/ENO/captures/
 ```
 
 
@@ -55,7 +55,7 @@ Then run the code:
 ```
 python3 -m pre_processing.create_input_inventory_parallel \
 --root_dir /home/packerc/shared/albums/ENO/ENO_S1/ \
---output_csv /home/packerc/shared/season_captures/ENO/ENO_S1_captures_raw.csv \
+--output_csv /home/packerc/shared/season_captures/ENO/captures/ENO_S1_captures_raw.csv \
 --n_processes 16
 ```
 

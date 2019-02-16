@@ -1,14 +1,12 @@
 """ Group Input into Captures """
-import csv
 import numpy as np
 import pandas as pd
 import os
 import argparse
 from datetime import datetime
-from collections import OrderedDict
 import logging
 
-from pre_processing.utils import image_check_stats
+from pre_processing.utils import image_check_stats, read_image_inventory
 from global_vars import pre_processing_flags as flags
 from logger import create_logfile_name, setup_logger
 
@@ -59,19 +57,9 @@ if __name__ == '__main__':
     setup_logger(log_file_path)
     logger = logging.getLogger(__name__)
 
-    inventory = OrderedDict()
-    with open(args['input_inventory'], "r") as ins:
-        csv_reader = csv.reader(ins, delimiter=',', quotechar='"')
-        header = next(csv_reader)
-        row_name_to_id_mapper = {x: i for i, x in enumerate(header)}
-        for line_no, line in enumerate(csv_reader):
-            # print status
-            if ((line_no % 10000) == 0) and (line_no > 0):
-                print("Read {:,} images".format(line_no))
-            image_path_original = \
-                line[row_name_to_id_mapper['image_path_original']]
-            inventory[image_path_original] = {
-                k: line[v] for k, v in row_name_to_id_mapper.items()}
+    inventory = read_image_inventory(
+        args['input_inventory'],
+        unique_id='image_path_original')
 
     # Group images into site and roll
     site_roll_inventory = dict()
