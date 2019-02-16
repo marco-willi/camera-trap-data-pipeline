@@ -75,16 +75,16 @@ if __name__ == '__main__':
             }
         update_time_checks(image_data, flags)
         at_least_one_basic_check = \
-            any([int(image_data[x]) == 1 for x in basic_checks if x in check_columns])
+            any([float(image_data[x]) == 1 for x in basic_checks if x in check_columns])
         at_least_one_time_check = \
-            any([int(image_data[x]) == 1 for x in time_checks if x in check_columns])
+            any([float(image_data[x]) == 1 for x in time_checks if x in check_columns])
         # generate check-string
         time_checks_list = \
             [x.replace('image_check__', '') for x
-             in time_checks if x in check_columns and int(image_data[x]) == 1]
+             in time_checks if x in check_columns and float(image_data[x]) == 1]
         basic_checks_list = \
             [x.replace('image_check__', '') for x
-             in basic_checks if x in check_columns and int(image_data[x]) == 1]
+             in basic_checks if x in check_columns and float(image_data[x]) == 1]
         all_check_string = '#'.join(basic_checks_list + time_checks_list)
         if at_least_one_basic_check:
             automatic_status['recommended_action'] = 'delete'
