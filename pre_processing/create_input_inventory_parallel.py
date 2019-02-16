@@ -14,7 +14,9 @@ from PIL import Image
 from PIL.ExifTags import TAGS as exif_map
 
 from logger import setup_logger, create_logfile_name
-from pre_processing.utils import file_creation_date, image_check_stats
+from pre_processing.utils import (
+    file_creation_date, image_check_stats, p_pixels_above_threshold,
+    p_pixels_below_threshold, plot_site_roll_timelines)
 from utils import slice_generator
 from global_vars import pre_processing_flags as flags
 
@@ -152,22 +154,13 @@ if __name__ == '__main__':
                 flags['image_check_parameters']['all_black']['thresh']
             white_thresh = \
                 flags['image_check_parameters']['all_white']['thresh']
-            # check other aspects of the image
             pixel_data = np.asarray(img)
-            n_pixels_total = np.multiply(
-                pixel_data.shape[0], pixel_data.shape[1])
-            # check for black pixels
-            pixels_2D = np.sum(pixel_data < black_thresh, axis=(2))
-            n_pixels_affected = np.sum(pixels_2D == 3)
-            p_pixels_affected = n_pixels_affected / n_pixels_total
-            is_black = (p_pixels_affected > black_percent)
+            p_pixels_white = p_pixels_above_threshold(pixel_data, white_thresh)
+            p_pixels_black = p_pixels_below_threshold(pixel_data, black_thresh)
+            is_black = (p_pixels_black > black_percent)
+            is_white = (p_pixels_white > white_percent)
             if is_black:
                 current_checks['all_black'] = 1
-            # check for white images
-            pixels_2D = np.sum(pixel_data > white_thresh, axis=(2))
-            n_pixels_affected = np.sum(pixels_2D == 3)
-            p_pixels_affected = n_pixels_affected / n_pixels_total
-            is_white = (p_pixels_affected > white_percent)
             if is_white:
                 current_checks['all_white'] = 1
             # add flag indicating at least one failed check
