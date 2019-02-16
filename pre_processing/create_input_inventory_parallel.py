@@ -105,6 +105,7 @@ if __name__ == '__main__':
             try:
                 img = Image.open(image_path)
             except:
+                img = None
                 current_data['image_check__corrupt_file'] = 1
             # read EXIF data
             try:
@@ -176,7 +177,6 @@ if __name__ == '__main__':
                     {'exif_data__{}'.format(k):
                         v for k, v in exif_mapped.items()})
             results[image_path] = current_data
-            img = None
             if (img_no % 100) == 0:
                 print("Process {:2} - Processed {}/{} images".format(
                     i, img_no, n_images_total))
