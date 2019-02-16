@@ -54,7 +54,7 @@ def image_check_stats(image_inventory, logger):
     for check, check_results in image_check_stats.items():
         n_tot = sum([x for x in check_results.values()])
         for check_result, count in check_results.items():
-            if int(check_result) == 1:
+            if float(check_result) == 1:
                 logger.info(
                     "Failed {:35}: -- count: {:6}/{:6} ({:.2f}%)".format(
                      check, count, n_tot, 100*(count / n_tot)))
@@ -169,6 +169,6 @@ def update_time_checks(image_data, flags):
     if 'image_check__captures_with_too_many_images' in time_checks:
         max_imgs = \
             checks['captures_with_too_many_images']['max_images']
-        if int(image_data['image_rank_in_capture']) > int(max_imgs):
+        if float(image_data['image_rank_in_capture']) > float(max_imgs):
             time_checks['image_check__captures_with_too_many_images'] = 1
     image_data.update(time_checks)
