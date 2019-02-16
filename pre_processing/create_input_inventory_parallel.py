@@ -163,12 +163,6 @@ if __name__ == '__main__':
                 current_checks['all_black'] = 1
             if is_white:
                 current_checks['all_white'] = 1
-            # add flag indicating at least one failed check
-            current_data['image_has_failed_checks'] = \
-                max([v for v in current_data['image_check'].values()])
-            # add (preliminary) flag for images to exclude
-            current_data['exclude_image'] = \
-                current_data['image_has_failed_checks']
             results[image_path] = current_data
             if (img_no % 100) == 0:
                 print("Process {:2} - Processed {}/{} images".format(

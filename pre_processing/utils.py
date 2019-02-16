@@ -2,6 +2,7 @@ import os
 import platform
 from datetime import datetime
 import numpy as np
+import pandas as pd
 import matplotlib.pyplot as plt
 import csv
 
@@ -40,7 +41,7 @@ def image_check_stats(image_inventory, logger):
             # if check not passed log
             if check_result == 1:
                 logger.info("Check {} Failed for image {}".format(
-                    check, image_data['image_path_original']))
+                    check, image_path))
         # total number with exclusion reasons
         image_check_stats['exclude_image'].update({
             image_data['exclude_image']})
@@ -113,7 +114,7 @@ def plot_site_roll_timelines(
     fig.savefig(output_path)
 
 
-def read_image_inventory(path, unique_id='image_path_original'):
+def read_image_inventory_old(path, unique_id='image_path_original'):
     """ Import image inventory into dictionary """
     inventory = OrderedDict()
     with open(path, "r") as ins:
@@ -130,4 +131,15 @@ def read_image_inventory(path, unique_id='image_path_original'):
                 k: line[v] for k, v in row_name_to_id_mapper.items()}
     return inventory
 
+
+def read_image_inventory(path, unique_id='image_path_original'):
+    df = pd.read_csv(path, dtype='str')
+    #header = df.columns
+    #values_to_fill = {x: ('' if 'exif_data__' in x else '0') for x in header}
+    df.fillna('', inplace=True)
+    inventory = df.to_dict('index', into=OrderedDict)
+    inventory_with_index_as_col = OrderedDict()
+    for _id, data in inventory.items():
+        inventory_with_index_as_col[data[unique_id]] = data
+    return inventory_with_index_as_col
 

@@ -4,7 +4,8 @@ The following codes can be used to:
 
 1. Process and check camera trap images
 2. Inspect potential issues to resolve/waive them
-3. Obtain an inventory of the processed camera trap images
+3. Obtain a cleaned inventory of the processed camera trap images
+4. Re-name all images
 
 
 ## Check Import/Directory Structure
@@ -23,7 +24,7 @@ Definitions:
 - Roll: An SD card of a specific location (data from a camera check).
 
 The naming has to adhere to these standards:
-- site_directory: alphanumeric followed by two digits, e.g., A01
+- site_directory: alphanumeric
 - roll_directory: site name, followed by 'RX', e.g., A01_R1 (first roll of A01)
 - Images: arbitrary names
 
@@ -40,6 +41,8 @@ python3 -m pre_processing.check_input_structure \
 --root_dir /home/packerc/shared/albums/ENO/ENO_S1/ \
 --log_dir /home/packerc/shared/season_captures/ENO/captures/
 ```
+
+A log file will be created in 'log-dir'.
 
 
 ## Create Input Inventory
