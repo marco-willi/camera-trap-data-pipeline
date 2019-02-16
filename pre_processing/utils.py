@@ -1,5 +1,8 @@
 import os
 import platform
+from datetime import datetime
+import numpy as np
+import matplotlib.pyplot as plt
 
 from collections import defaultdict, Counter
 
@@ -60,3 +63,53 @@ def image_check_stats(image_inventory, logger):
             "Season/Site/Roll: {:35} -- counts: {:10} / {} ({:.2f} %)".format(
              season_site_roll, count, total, 100*count/total))
     logger.info("Found total {} images".format(n_tot))
+
+
+def p_pixels_above_threshold(pixel_data, pixel_threshold):
+    """ Calculate share of pixels above threshold """
+    n_pixels_total = np.multiply(pixel_data.shape[0], pixel_data.shape[1])
+    pixels_2D = np.sum(pixel_data > pixel_threshold, axis=(2))
+    n_pixels_above_threshold = np.sum(pixels_2D == 3)
+    p_pixels_above_threshold = n_pixels_above_threshold / n_pixels_total
+    return p_pixels_above_threshold
+
+
+def p_pixels_below_threshold(pixel_data, pixel_threshold):
+    """ Calculate share of pixels below threshold """
+    n_pixels_total = np.multiply(pixel_data.shape[0], pixel_data.shape[1])
+    pixels_2D = np.sum(pixel_data < pixel_threshold, axis=(2))
+    n_pixels_below_threshold = np.sum(pixels_2D == 3)
+    p_pixels_below_threshold = n_pixels_below_threshold / n_pixels_total
+    return p_pixels_below_threshold
+
+
+def plot_site_roll_timelines(
+        df,
+        output_path,
+        date_col='datetime',
+        date_format='%Y-%m-%d %H:%M:%S'):
+    """ Plot timelines for site_roll combination """
+
+    date_time_obj = \
+        [datetime.strptime(x, date_format) for x in df[date_col].values]
+
+    df['date_time'] = date_time_obj
+
+    roll_site_group = \
+        df.groupby(by=['site', 'roll', 'date_time']).size().unstack(
+                level=[0, 1], fill_value=0)
+
+    # Aggregate per Day - count number of instances
+    roll_site_group.index = roll_site_group.index.to_period('D')
+    roll_site_group = roll_site_group.groupby(roll_site_group.index).sum()
+
+    # Plot
+    n_subplots = roll_site_group.shape[1]
+    fig, ax = plt.subplots(figsize=(8, n_subplots*2), sharex=True)
+    plt.subplots_adjust(bottom=0.5, top=1.5, hspace=1)
+    plt.tight_layout()
+    roll_site_group.plot(subplots=True, ax=ax)
+    fig.savefig(output_path)
+
+
+

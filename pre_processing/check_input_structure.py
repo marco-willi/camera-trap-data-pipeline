@@ -67,21 +67,39 @@ if __name__ == '__main__':
 
     # Parse command line arguments
     parser = argparse.ArgumentParser()
-    parser.add_argument("--root_dir", type=str, required=True)
+    parser.add_argument(
+        "--root_dir", type=str, required=True,
+        help="Root directory of the organized camera-trap data -- \
+        contains the site folders.")
+    parser.add_argument(
+        "--log_dir", type=str, default=None,
+        help="Output directory for storing a log-file.")
     args = vars(parser.parse_args())
 
-    # logging
-    log_file_name = create_logfile_name('check_directory_structure')
-    log_file_path = os.path.join(
-        os.path.dirname(args['root_dir']), log_file_name)
-    setup_logger()
-    logger = logging.getLogger(__name__)
-
-    msg_width = 250
     # check existence of root dir
     if not os.path.isdir(args['root_dir']):
         raise FileNotFoundError(
-            "root_dir {} does not exist".format(args['root_dir']))
+            "root_dir {} does not exist -- must be a directory".format(
+                args['root_dir']))
+
+    # check existence of log dir
+    if not args['log_dir'] is None:
+        if not os.path.isdir(args['log_dir']):
+            raise FileNotFoundError(
+                "log_dir {} does not exist -- must be a directory".format(
+                    args['log_dir']))
+
+    # logging
+    if not args['log_dir'] is None:
+        log_file_name = create_logfile_name('check_directory_structure')
+        log_file_path = os.path.join(
+            os.path.dirname(args['log_dir']), log_file_name)
+        setup_logger(log_file_path)
+    else:
+        setup_logger()
+    logger = logging.getLogger(__name__)
+
+    msg_width = 250
 
     site_directory_names = os.listdir(args['root_dir'])
 

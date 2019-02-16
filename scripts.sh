@@ -75,7 +75,15 @@ WORFKLOW_VERSION_MIN=
 
 # Data processing
 python3 -m pre_processing.check_input_structure \
---root_dir /home/packerc/shared/albums/${SITE}/${SEASON}/
+--root_dir /home/packerc/shared/albums/${SITE}/${SEASON}/ \
+--log_dir /home/packerc/shared/season_captures/${SITE}/${SEASON}/
+
+# Create Image Inventory
+python3 -m pre_processing.create_input_inventory_parallel \
+--root_dir /home/packerc/shared/albums/${SITE}/${SEASON}/ \
+--output_csv /home/packerc/shared/season_captures/${SITE}/${SEASON}/_captures_raw.csv \
+--n_processes 16
+
 
 # generate manifest
 python3 -m zooniverse_uploads.generate_manifest \

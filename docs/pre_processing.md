@@ -37,7 +37,8 @@ root_directory/
 The check can be performed using the following script:
 ```
 python3 -m pre_processing.check_input_structure \
---root_dir /home/packerc/shared/albums/ENO/ENO_S1/
+--root_dir /home/packerc/shared/albums/ENO/ENO_S1/ \
+--log_dir /home/packerc/shared/season_captures/ENO/
 ```
 
 
