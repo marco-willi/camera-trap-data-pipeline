@@ -9,7 +9,7 @@ import logging
 from logger import setup_logger, create_logfile_name
 from utils import (
     export_dict_to_json_with_newlines,
-    read_cleaned_season_file, file_path_generator)
+    read_cleaned_season_file, file_path_generator, set_file_permission)
 
 
 # For Testing
@@ -167,4 +167,4 @@ if __name__ == "__main__":
     export_dict_to_json_with_newlines(manifest, manifest_path)
 
     # change permmissions to read/write for group
-    os.chmod(manifest_path, 0o660)
+    set_file_permission(manifest_path)

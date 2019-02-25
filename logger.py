@@ -1,8 +1,9 @@
 """ Logging """
 import logging
 import sys
-import os
 import getpass
+
+from utils import set_file_permission
 
 
 def create_logfile_name(_id):
@@ -25,4 +26,4 @@ def setup_logger(log_file=None):
                         handlers=handlers)
     logging.info("{} is running the script".format(getpass.getuser()))
     if log_file is not None:
-        os.chmod(log_file, 0o660)
+        set_file_permission(log_file)

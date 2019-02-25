@@ -11,7 +11,7 @@ import logging
 from logger import setup_logger, create_logfile_name
 from utils import (
     slice_generator, export_dict_to_json_with_newlines,
-    file_path_splitter, file_path_generator)
+    file_path_splitter, file_path_generator, set_file_permission)
 
 
 if __name__ == "__main__":
@@ -112,4 +112,4 @@ if __name__ == "__main__":
         export_dict_to_json_with_newlines(batch_manifest, batch_path)
 
         # change permmissions to read/write for group
-        os.chmod(batch_path, 0o660)
+        set_file_permission(batch_path)

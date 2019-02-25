@@ -19,7 +19,7 @@ from image_compression.resize_and_compress_images import (
 from utils import (
     read_config_file, estimate_remaining_time,
     current_time_str, export_dict_to_json_with_newlines,
-    file_path_splitter, file_path_generator)
+    file_path_splitter, file_path_generator, set_file_permission)
 
 # # For Testing
 # args = dict()
@@ -179,6 +179,7 @@ if __name__ == "__main__":
     # read upload tracker file
     if not os.path.exists(tracker_file_path):
         uploader.create_tracker_file(tracker_file_path)
+        set_file_permission(tracker_file_path)
     tracker_data = uploader.read_tracker_file(tracker_file_path)
 
     n_in_tracker_file = len(tracker_data.keys())
@@ -362,7 +363,7 @@ if __name__ == "__main__":
     export_dict_to_json_with_newlines(mani, args['output_file'])
 
     # change permmissions to read/write for group
-    os.chmod(args['output_file'], 0o660)
+    set_file_permission(args['output_file'])
 
     # delete the tracker file
     os.remove(tracker_file_path)

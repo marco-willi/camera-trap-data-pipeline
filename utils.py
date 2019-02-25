@@ -239,3 +239,11 @@ def print_nested_dict(key, dic):
             print_nested_dict(key, _sub_data)
     else:
         logger.info("Key: {:20} - Value: {:20}".format(key, dic))
+
+
+def set_file_permission(path):
+    """ set permission of a file to r/w for group """
+    try:
+        os.chmod(path, 0o660)
+    except PermissionError:
+        pass
