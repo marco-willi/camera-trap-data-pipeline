@@ -211,10 +211,30 @@ python3 -m reporting.add_predictions_to_season_captures \
 # Snapshot Serengeti - Legacy
 ####################################
 
-# Extract Classifications
-cd $HOME/snapshot_safari_misc
+qsub -I -l walltime=10:00:00,nodes=1:ppn=4,mem=16gb
+module load python3
 
+cd $HOME/snapshot_safari_misc
+SITE=SER
+SEASON=SER_S1
+SEASON_STRING='S1'
+
+# Extract Classifications
 python3 -m zooniverse_exports.extract_legacy_serengeti \
 --classification_csv '/home/packerc/shared/zooniverse/Exports/SER/2019-01-27_serengeti_classifications.csv' \
 --output_path '/home/packerc/shared/zooniverse/Exports/SER/' \
---season_to_process 'S2'
+--season_to_process ${SEASON_STRING}
+
+
+# Aggregate Classifications
+python3 -m zooniverse_aggregations.aggregate_classifications_plurality \
+--classifications_extracted /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_classifications_extracted.csv \
+--output_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_classifications_aggregated.csv \
+--export_consensus_only \
+--export_sample_size 300
+
+
+# Extract Subjects from Classifications
+python3 -m zooniverse_exports.extract_subjects_legacy \
+--classifications_extracted /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_classifications_extracted.csv \
+--output_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subjects_extracted.csv

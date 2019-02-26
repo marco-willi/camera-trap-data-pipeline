@@ -31,21 +31,16 @@ The general aggregation logic is as follows:
 |species_is_plurality_consensus | Flag indicating a plurality consensus for this species (normally only species with a 1 are relevant)
 
 
-## Get Zooniverse Subject Data
+## Aggregate Classifications (plurality algorithm)
 
-This is an example to download subject data from Zooniverse. This data can be used to extract useful meta-data for reports.
+This is an example to aggregate classifications using the plurality algorithm.
 
 ```
-cd $HOME/snapshot_safari_misc
-SITE=GRU
-SEASON=GRU_S1
-PROJECT_ID=5115
-
-# Get Zooniverse Subject Data
-python3 -m zooniverse_exports.get_zooniverse_export \
-        --password_file ~/keys/passwords.ini \
-        --project_id $PROJECT_ID \
-        --output_file /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subjects.csv \
-        --export_type subjects \
-        --new_export 0
+python3 -m zooniverse_aggregations.aggregate_classifications_plurality \
+--classifications_extracted /home/packerc/shared/zooniverse/Exports/RUA/RUA_S1_classifications_extracted.csv \
+--output_csv /home/packerc/shared/zooniverse/Exports/RUA/RUA_S1_classifications_aggregated.csv \
+--export_consensus_only \
+--export_sample_size 300
 ```      
+
+This generates two exports: one containing all data and one with 300 samples for testing. The option '--export_consensus_only' removes all species classifications that did not reach consensus (i.e. the majority of volunteers agreed on a different species).

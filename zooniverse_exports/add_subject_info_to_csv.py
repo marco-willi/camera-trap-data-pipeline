@@ -98,7 +98,7 @@ if __name__ == '__main__':
         n_subjects_not_found))
 
     # duplicate subject_id
-    header_no_subject = [x for x in header if x is not 'subject_id']
+    header_no_subject = [x for x in header if x != 'subject_id']
     output_header = header_subject + header_no_subject
 
     # Output all combined records
