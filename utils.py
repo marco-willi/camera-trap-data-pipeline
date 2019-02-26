@@ -238,7 +238,7 @@ def print_nested_dict(key, dic):
         for _sub_data in dic:
             print_nested_dict(key, _sub_data)
     else:
-        logger.info("Key: {:40} - Value: {:20}".format(key, dic))
+        logger.info("Key: {:40} - Value: {:<15}".format(key, dic))
 
 
 def set_file_permission(path):
