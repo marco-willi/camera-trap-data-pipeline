@@ -11,7 +11,8 @@ import argparse
 from collections import OrderedDict
 
 from logger import setup_logger, create_logfile_name
-from utils import set_file_permission, build_img_path_legacy
+from utils import set_file_permission
+from zooniverse_exports.legacy_extractor import build_img_path
 
 from global_vars import add_subject_info_flags_legacy as flags
 
@@ -83,7 +84,7 @@ if __name__ == '__main__':
                     season = record['season']
                     site = record['site']
                     filenames = [
-                        build_img_path_legacy(season, site, roll, x)
+                        build_img_path(season, site, roll, x)
                         for x in filenames]
                     record['filenames'] = ';'.join(filenames)
                 except:

@@ -13,6 +13,8 @@ import traceback
 import textwrap
 import logging
 
+from utils import correct_image_name
+
 logger = logging.getLogger(__name__)
 
 
@@ -234,6 +236,13 @@ def fix_roll_id(roll):
         return roll.upper()
     else:
         return 'R{}'.format(roll).upper()
+
+
+def build_img_path(season, site, roll, img):
+    """ build path """
+    roll_key = '_'.join([site, fix_roll_id(roll)])
+    img_path = os.path.join(season, site, roll_key, img)
+    return correct_image_name(img_path)
 
 
 def build_season_id(season):
