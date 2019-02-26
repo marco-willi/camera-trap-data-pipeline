@@ -210,7 +210,8 @@ legacy_extractor_flags['CLASSIFICATION_INFO_TO_ADD'] = [
 # Subject info to add from the legacy classifications export
 add_subject_info_flags_legacy = [
     'season', 'roll', 'site', 'capture',
-    'retirement_reason', 'retired_at', 'created_at']
+    'retirement_reason', 'retired_at', 'created_at', 'filenames',
+    'timestamps', 'capture_id']
 
 ###################################################
 # Flags to define the bheavior of the
