@@ -238,3 +238,10 @@ python3 -m zooniverse_aggregations.aggregate_classifications_plurality \
 python3 -m zooniverse_exports.extract_subjects_legacy \
 --classifications_extracted /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_classifications_extracted.csv \
 --output_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subjects_extracted.csv
+
+
+# Add subject data to Aggregations
+python3 -m zooniverse_exports.add_subject_info_to_csv \
+--subject_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subjects_extracted.csv \
+--input_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_classifications_aggregated.csv \
+--output_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_classifications_aggregated_subject_info.csv

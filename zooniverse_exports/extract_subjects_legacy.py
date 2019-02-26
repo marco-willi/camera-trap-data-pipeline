@@ -15,14 +15,14 @@ from utils import set_file_permission
 from global_vars import add_subject_info_flags_legacy as flags
 
 # args = dict()
-# args['extracted_classifications'] = '/home/packerc/shared/zooniverse/Exports/SER/SER_S1_classifications_extracted.csv'
+# args['classifications_extracted'] = '/home/packerc/shared/zooniverse/Exports/SER/SER_S1_classifications_extracted.csv'
 # args['output_csv'] = '/home/packerc/shared/zooniverse/Exports/SER/SER_S1_subjects_extracted.csv'
 
 if __name__ == '__main__':
 
     # Parse command line arguments
     parser = argparse.ArgumentParser()
-    parser.add_argument("--extracted_classifications", type=str, required=True)
+    parser.add_argument("--classifications_extracted", type=str, required=True)
     parser.add_argument("--output_csv", type=str, required=True)
 
     args = vars(parser.parse_args())
@@ -31,10 +31,10 @@ if __name__ == '__main__':
     # Check Input
     ######################################
 
-    if not os.path.isfile(args['extracted_classifications']):
+    if not os.path.isfile(args['classifications_extracted']):
         raise FileNotFoundError(
-            "extracted_classifications: {} not found".format(
-             args['extracted_classifications']))
+            "classifications_extracted: {} not found".format(
+             args['classifications_extracted']))
 
     flags.sort()
 
@@ -49,11 +49,11 @@ if __name__ == '__main__':
     # Read Classifications
     ######################################
 
-    extracted_classifications = pd.read_csv(
-        args['extracted_classifications'], dtype='str')
-    extracted_classifications.fillna('', inplace=True)
-    header = extracted_classifications.columns
-    class_dict = extracted_classifications.to_dict('index', into=OrderedDict)
+    classifications_extracted = pd.read_csv(
+        args['classifications_extracted'], dtype='str')
+    classifications_extracted.fillna('', inplace=True)
+    header = classifications_extracted.columns
+    class_dict = classifications_extracted.to_dict('index', into=OrderedDict)
 
     ######################################
     # Create subject data
