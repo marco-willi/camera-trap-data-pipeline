@@ -62,6 +62,8 @@ if __name__ == '__main__':
             record = {k: line[v] for k, v in row_name_to_id_mapper.items()}
             class_dict[subject_id] = record
 
+    logger.info("Read {} classifications".format(len(class_dict.keys())))
+
     ######################################
     # Create subject data
     ######################################
@@ -76,20 +78,19 @@ if __name__ == '__main__':
                 record[flag] = cl[flag]
             except:
                 record[flag] = ''
-            # correct image paths
-            if "filenames" in record:
-                try:
-                    filenames = record['filenames'].split(';')
-                    roll = record['roll']
-                    season = record['season']
-                    site = record['site']
-                    filenames = [
-                        build_img_path(season, site, roll, x)
-                        for x in filenames]
-                    record['filenames'] = ';'.join(filenames)
-                except:
-                    pass
-
+        # correct image paths
+        if "filenames" in record:
+            try:
+                filenames = record['filenames'].split(';')
+                roll = record['roll']
+                season = record['season']
+                site = record['site']
+                filenames = [
+                    build_img_path(season, site, roll, x)
+                    for x in filenames]
+                record['filenames'] = ';'.join(filenames)
+            except:
+                pass
         record['subject_id'] = subject_id
         subjects[subject_id] = record
 
