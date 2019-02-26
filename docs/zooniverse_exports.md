@@ -190,3 +190,32 @@ The data has the following columns:
 user_name,created_at,subject_id,capture_event_id,retire_reason,season,site,roll,filenames,timestamps,classification_id,capture_id,question__species,question__count,question__young_present,question__standing,question__resting,question__moving,question__eating,question__interacting
 XYZ,2012-12-11 06:27:56 UTC,ASG0004fwr,221374,consensus,S2,E04,R3,IMAG1524.JPG;IMAG1523.JPG;IMAG1522.JPG,2011-07-14T17:27:04-05:00;2011-07-14T17:27:04-05:00;2011-07-14T17:27:04-05:00,50c6d26c9177d0340a0001c5,SER_S2#E04#R3#570,zebra,3,0,0,0,1,1,0
 ```
+
+### Extract Subject Data from Classifications
+
+This will produce a file containing one record per subject that can be merged with aggregated data in a later step.
+
+```
+python3 -m zooniverse_exports.extract_subjects_legacy \
+--classifications_extracted /home/packerc/shared/zooniverse/Exports/SER/SER_S1_classifications_extracted.csv \
+--output_csv /home/packerc/shared/zooniverse/Exports/SER/SER_S1_subjects_extracted.csv
+```
+
+
+| Columns   | Description |
+| --------- | ----------- |
+|capture,roll,season,site | internal ids of the capture
+|capture_id| capture-id
+|subject_id | zooniverse unique id of the capture (a subject)
+|created_at | timestamp when the subject was created on Zooniverse
+|filenames | filenames of the images making up the capture, separated by ';'
+|timestamps | timestamps of the images making up the capture, separated by ';'
+|retirement_reason| Zooniverse generated retirement reason
+|retired_at| Zooniverse generated retirement date
+
+
+Example:
+```
+capture,capture_id,created_at,filenames,retired_at,retirement_reason,roll,season,site,timestamps,subject_id
+1,SER_S1#B04#1#1,2013-01-02 19:45:15 UTC,S1/B04/B04_R1/S1_B04_R1_PICT0001.JPG,,consensus,R1,S1,B04,2010-07-18T16:26:14-05:00,ASG0002kjh
+```

@@ -65,7 +65,7 @@ def resize_and_compress_list_of_images(
             results_dict[image_path] = img_bytes
         except:
             print("Failed to compress: {}".format(image_path))
-            results_dict[image_path] = ''
+            results_dict[image_path] = None
     if (process_id is not None) and print_status:
         print("Finished process: {:2}".format(process_id))
 
@@ -93,7 +93,7 @@ def process_images_list_multiprocess(
     manager = Manager()
     results_dict = manager.dict()
     for image_source in image_source_list:
-        results_dict[image_source] = ''
+        results_dict[image_source] = None
     try:
         processes_list = list()
         slices = slice_generator(n_records, n_processes)

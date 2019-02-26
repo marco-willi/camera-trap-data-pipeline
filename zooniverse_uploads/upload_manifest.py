@@ -293,6 +293,9 @@ if __name__ == "__main__":
                             print_status=False,
                             max_pixel_of_largest_side=args['max_pixel_of_largest_side'],
                             save_quality=args['save_quality'])
+                # remove images that failed to process
+                images_to_upload = [
+                    x for x in images_to_upload if x is not None]
             metadata = data['upload_metadata']
             metadata['#original_images'] = data['images']['original_images']
             metadata['capture_id_anonymized'] = \

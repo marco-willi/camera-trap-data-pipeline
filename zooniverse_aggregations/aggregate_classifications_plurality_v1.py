@@ -5,7 +5,7 @@ import csv
 import os
 import argparse
 import random
-from statistics import median_high, StatisticsError
+from statistics import median_high
 from collections import Counter, defaultdict
 import logging
 
@@ -33,37 +33,9 @@ from utils import print_nested_dict
 # args['classifications_extracted_csv'] = '/home/packerc/shared/zooniverse/Exports/MTZ/MTZ_S1_classifications_extracted.csv'
 # args['output_csv'] = '/home/packerc/shared/zooniverse/Exports/MTZ/MTZ_S1_classifications_aggregated.csv'
 # args['subject_csv'] = '/home/packerc/shared/zooniverse/Exports/MTZ/MTZ_S1_subjects.csv'
-# args['export_consensus_only'] = False
-
-
-def aggregate_species(
-        species_names, species_stats,
-        questions, question_type_map):
-    """ Aggregate species stats """
-    species_aggs = {x: dict() for x in species_names}
-    for species, stats in species_stats.items():
-        if species not in species_names:
-            continue
-        for question in questions:
-            question_type = question_type_map[question]
-            if question_type == 'count':
-                agg = aggregator.count_aggregator_median(
-                    stats[question], flags)
-            elif question_type == 'prop':
-                agg = aggregator.proportion_affirmative(stats[question])
-            elif question_type == 'main':
-                continue
-            species_aggs[species][question] = agg
-        # add overall species stats
-        species_aggs[species]['n_users_identified_this_species'] = \
-            len(stats['classification_id'])
-        n_user_id = species_aggs[species]['n_users_identified_this_species']
-        p_user_id = '{:.2f}'.format(n_user_id / n_subject_classifications)
-        species_aggs[species]['p_users_identified_this_species'] = p_user_id
-    return species_aggs
-
 
 if __name__ == '__main__':
+
     # Parse command line arguments
     parser = argparse.ArgumentParser()
     parser.add_argument(
@@ -151,79 +123,64 @@ if __name__ == '__main__':
             print("Aggregated {:,} subjects".format(num))
         # initialize Counter objects
         stat_all = defaultdict(Counter)
-        stat_species_only = defaultdict(Counter)
         # extract and add annotations to stats counters
         for annotation in subject_data:
             anno_dict = {annotation_id_to_name_mapper[i]: x for
                          i, x in enumerate(annotation)}
             for k, v in anno_dict.items():
                 stat_all[k].update({v})
-            # store species only answers
-            main_answer = anno_dict[question_main_id]
-            if main_answer != flags['QUESTION_MAIN_EMPTY']:
-                for k, v in anno_dict.items():
-                    stat_species_only[k].update({v})
-        # median number of species identifications per user
-        # if nobody ids a species, set this to 0
-        try:
-            n_species_ids_per_user_median = int(
-                median_high(stat_species_only['user_name'].values()))
-        except StatisticsError:
-            n_species_ids_per_user_median = 0
-        # Calculate some statistics
+        # extract some stats
+        n_species_ids_per_user_median = int(
+            median_high(stat_all['user_name'].values()))
         n_subject_classifications = len(stat_all['classification_id'])
         n_subject_users = len(stat_all['user_name'])
-        n_users_id_species = len(stat_species_only['user_name'])
-        n_users_id_empty = n_subject_users - n_users_id_species
-        p_users_id_species = n_users_id_species / n_subject_users
-        # order species by frequency of identifications
+        # order species by frequency of annotation
         species_by_frequency = stat_all[question_main_id].most_common()
-        species_names_by_frequency = [x[0] for x in species_by_frequency]
-        # calc stats for all species
+        species_names = [x[0] for x in species_by_frequency]
+        # calc stats for the top-species only
         species_stats = aggregator.stats_for_species(
-                species_names_by_frequency, subject_data,
+                species_names, subject_data,
                 annotation_id_to_name_mapper,
                 species_field=question_main_id
                 )
-        # Determine top / consensus species based on the median number of
-        # different species identified by the volunteers
-        consensus_species = [species_names_by_frequency[i] for i in
-                             range(n_species_ids_per_user_median)]
-        # define empty capture if more volunteers saw nothing
-        # than saw something
-        if n_users_id_empty > n_users_id_species:
-            species_aggs = aggregate_species(
-                    species_names_by_frequency, species_stats,
-                    questions, question_type_map)
-            consensus_species.insert(0, flags['QUESTION_MAIN_EMPTY'])
-        else:
-            species_names_no_empty = [
-                x for x in species_names_by_frequency
-                if x != flags['QUESTION_MAIN_EMPTY']]
-            species_aggs = aggregate_species(
-                    species_names_no_empty, species_stats,
-                    questions, question_type_map)
-        # collect information to be added to the export
-        agg_info = {
-            'n_species_ids_per_user_median': n_species_ids_per_user_median,
-            'n_users_classified_this_subject': n_subject_users,
-            'n_users_saw_a_species': n_users_id_species,
-            'n_users_saw_no_species': n_users_id_empty,
-            'p_users_saw_a_species': '{:.2f}'.format(p_users_id_species)
-             }
-        record = {
-            'species_aggregations': species_aggs,
-            'aggregation_info': agg_info,
-            'consensus_species': consensus_species}
+        # Aggregate stats for each species
+        species_aggs = {x: dict() for x in species_names}
+        for species, stats in species_stats.items():
+            for question in questions:
+                question_type = question_type_map[question]
+                if question_type == 'count':
+                    agg = aggregator.count_aggregator_median(
+                        stats[question], flags)
+                elif question_type == 'prop':
+                    agg = aggregator.proportion_affirmative(stats[question])
+                elif question_type == 'main':
+                    continue
+                species_aggs[species][question] = agg
+            # add overall species stats
+            species_aggs[species]['n_users_identified_this_species'] = \
+                len(stats['classification_id'])
+            n_user_id = species_aggs[species]['n_users_identified_this_species']
+            p_user_id = '{:.2f}'.format(n_user_id / n_subject_classifications)
+            species_aggs[species]['p_users_identified_this_species'] = p_user_id
+        # Determine top / consensus species
+        top_species = [
+            species_names[i] for i in
+            range(n_species_ids_per_user_median)]
+        # add info to dict
+        agg_info = {'n_species_ids_per_user_median': n_species_ids_per_user_median,
+                    'n_users_classified_this_subject': n_subject_users}
+        record = {'species_aggregations': species_aggs,
+                  'aggregation_info': agg_info,
+                  'top_species': top_species}
         subject_species_aggregations[subject_id] = record
 
-    # Create one record per identification
+    # Create a record per identification
     subject_identificatons = list()
     for subject_id, subject_agg_data in subject_species_aggregations.items():
         # export each species
         for sp, species_dat in subject_agg_data['species_aggregations'].items():
             species_is_plurality_consensus = \
-                int(sp in subject_agg_data['consensus_species'])
+                int(sp in subject_agg_data['top_species'])
             record = {
                 'subject_id': subject_id,
                 question_main_id: sp,
