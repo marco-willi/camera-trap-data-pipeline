@@ -5,6 +5,7 @@
 """
 import os
 import pandas as pd
+import csv
 import logging
 import argparse
 from collections import OrderedDict
@@ -49,11 +50,16 @@ if __name__ == '__main__':
     # Read Classifications
     ######################################
 
-    classifications_extracted = pd.read_csv(
-        args['classifications_extracted'], dtype='str')
-    classifications_extracted.fillna('', inplace=True)
-    header = classifications_extracted.columns
-    class_dict = classifications_extracted.to_dict('index', into=OrderedDict)
+    # Read Subject CSV
+    class_dict = OrderedDict()
+    with open(args['classifications_extracted'], "r") as ins:
+        csv_reader = csv.reader(ins, delimiter=',', quotechar='"')
+        header = next(csv_reader)
+        row_name_to_id_mapper = {x: i for i, x in enumerate(header)}
+        for line_no, line in enumerate(csv_reader):
+            subject_id = line[row_name_to_id_mapper['subject_id']]
+            record = {k: line[v] for k, v in row_name_to_id_mapper.items()}
+            class_dict[subject_id] = record
 
     ######################################
     # Create subject data
