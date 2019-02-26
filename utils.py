@@ -70,6 +70,13 @@ def open_file_with_rw_permissions(file):
     return fdesc
 
 
+def build_img_path_legacy(season, site, roll, img):
+    """ build path """
+    roll_key = '_'.join([site, 'R{}'.format(roll)])
+    img_path = os.path.join(season, site, roll_key, img)
+    return correct_image_name(img_path)
+
+
 def correct_image_name(name):
     """ change image name
     OLD: S1/G12/G12_R1/PICT3981.JPG

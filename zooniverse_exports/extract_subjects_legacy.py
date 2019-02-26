@@ -10,7 +10,7 @@ import argparse
 from collections import OrderedDict
 
 from logger import setup_logger, create_logfile_name
-from utils import set_file_permission
+from utils import set_file_permission, build_img_path_legacy
 
 from global_vars import add_subject_info_flags_legacy as flags
 
@@ -69,6 +69,20 @@ if __name__ == '__main__':
                 record[flag] = cl[flag]
             except:
                 record[flag] = ''
+            # correct image paths
+            if "filenames" in record:
+                try:
+                    filenames = record['filenames'].split(';')
+                    roll = record['roll']
+                    season = record['season']
+                    site = record['site']
+                    filenames = [
+                        build_img_path_legacy(season, site, roll, x)
+                        for x in filenames]
+                    record['filenames'] = ';'.join(filenames)
+                except:
+                    pass
+
         record['subject_id'] = subject_id
         subjects[subject_id] = record
 
