@@ -245,3 +245,11 @@ python3 -m zooniverse_exports.add_subject_info_to_csv \
 --subject_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subjects_extracted.csv \
 --input_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_classifications_aggregated.csv \
 --output_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_classifications_aggregated_subject_info.csv
+
+
+# Reporting of Zooniverse exports
+python3 -m reporting.add_aggregations_to_season_captures \
+--season_captures_csv /home/packerc/shared/season_captures/${SITE}/cleaned/${SEASON}_cleaned.csv \
+--aggregated_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_classifications_aggregated_subject_info.csv \
+--output_csv /home/packerc/shared/zooniverse/Reports/${SITE}/${SEASON}_report_zooniverse.csv \
+--default_season_id ${SEASON}

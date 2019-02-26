@@ -252,8 +252,9 @@ def build_capture_id(line, row_name_to_id_mapper):
     season = build_season_id(season)
     site = line[row_name_to_id_mapper[' Site']]
     roll = fix_roll_id(line[row_name_to_id_mapper[' Roll']])
+    roll_without_R = roll[1:]
     capture = line[row_name_to_id_mapper[' Capture']]
-    capture_id = '#'.join([season, site, roll, capture])
+    capture_id = '#'.join([season, site, roll_without_R, capture])
     return capture_id
 
 
@@ -383,12 +384,6 @@ def process_season_classifications(path, img_to_capture, flags):
      and species".format(n_duplicate_subject_answers_by_same_user))
 
     return classifications
-
-
-
-
-
-
 
 
 def consolidate_all_classifications(classifications, flags):

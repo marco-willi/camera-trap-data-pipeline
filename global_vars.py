@@ -150,8 +150,8 @@ legacy_extractor_flags['QUESTION_PREFIX'] = global_processing_flags['QUESTION_PR
 legacy_extractor_flags['QUESTION_DELIMITER'] = global_processing_flags['QUESTION_DELIMITER']
 
 legacy_extractor_flags['QUESTIONS'] = (
-    'species', 'young_present', 'standing',
-    'resting', 'moving', 'eating', 'interacting')
+    'species', 'count', 'standing',
+    'resting', 'moving', 'eating', 'interacting', 'young_present')
 
 # map column names of the input csv for clarity and consistency
 legacy_extractor_flags['CSV_HEADER_MAPPER'] = {
