@@ -228,7 +228,7 @@ plurality_aggregation_flags['QUESTION_MAIN'] = 'species'
 plurality_aggregation_flags['QUESTION_MAIN_EMPTY'] = global_processing_flags['EMPTY_ANNOTATION']
 plurality_aggregation_flags['QUESTION_COUNTS'] = ['count', 'horns_count']
 plurality_aggregation_flags['COUNTS_TO_ORDINAL_MAPPER'] = {
-    '10-50': 11, '51+': 12, '': 0}
+    '11-50': 11, '51+': 12, '': 0}
 
 ###################################################
 # Flags to define the bheavior of adding

@@ -20,8 +20,8 @@ def create_question_type_map(questions, flags):
 def count_aggregator_median(count_stats, flags):
     """ Special count aggregator
     Input:
-        - count_stats: {'10-50': 3, '1': 5, '2': 3}
-        - counts_mapper: {'10-50': 11, '51+': 12}
+        - count_stats: {'11-50': 3, '1': 5, '2': 3}
+        - counts_mapper: {'11-50': 11, '51+': 12}
     Output:
         - '2'
     """
