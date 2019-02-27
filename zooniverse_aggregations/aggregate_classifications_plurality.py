@@ -166,8 +166,6 @@ if __name__ == '__main__':
         # print status
         if ((num % 10000) == 0) and (num > 0):
             print("Aggregated {:,} subjects".format(num))
-        if subject_id == 'ASG00007pi':
-            break
         # initialize Counter objects
         stat_all = defaultdict(Counter)
         stat_species_only = defaultdict(Counter)
