@@ -5,6 +5,7 @@ import csv
 import os
 import argparse
 import random
+import math
 from statistics import median_high, StatisticsError
 from collections import Counter, defaultdict
 import logging
@@ -21,8 +22,8 @@ from utils import print_nested_dict
 #
 # args = dict()
 # args['classifications_extracted_csv'] = '/home/packerc/shared/zooniverse/Exports/SER/SER_S1_classifications_extracted.csv'
-# args['output_csv'] = '/home/packerc/shared/zooniverse/Exports/SER/SER_S1_classifications_aggregated_v2.csv'
-# args['subject_csv'] = None
+# args['output_csv'] = '/home/packerc/shared/zooniverse/Exports/SER/SER_S1_classifications_aggregated.csv'
+# args['export_consensus_only'] = False
 #
 # args = dict()
 # args['classifications_extracted_csv'] = '/home/packerc/shared/zooniverse/Exports/GRU/GRU_S1_classifications_extracted.csv'
@@ -61,6 +62,22 @@ def aggregate_species(
         p_user_id = '{:.2f}'.format(n_user_id / n_subject_classifications)
         species_aggs[species]['p_users_identified_this_species'] = p_user_id
     return species_aggs
+
+
+def calculate_pielou(votes_list):
+    """ Calculate pielous evenness index
+    votes_list: list with the number of votes for each species
+    """
+    if len(votes_list) < 2:
+        return 0
+    # denominator
+    lnS = math.log(len(votes_list))
+    # numerator
+    sumlist = sum(votes_list)
+    plist = [float(n)/sumlist for n in votes_list]
+    plnplist = [n * math.log(n) for n in plist]
+    sumplnp = -sum(plnplist)
+    return sumplnp/lnS
 
 
 if __name__ == '__main__':
@@ -127,7 +144,7 @@ if __name__ == '__main__':
         for line_no, line in enumerate(csv_reader):
             # print status
             if ((line_no % 10000) == 0) and (line_no > 0):
-                print("Processed {:,} annotations".format(line_no))
+                print("Imported {:,} annotations".format(line_no))
             # store data into subject dict
             subject_id = line[row_name_to_id_mapper['subject_id']]
             if subject_id not in subject_annotations:
@@ -149,6 +166,8 @@ if __name__ == '__main__':
         # print status
         if ((num % 10000) == 0) and (num > 0):
             print("Aggregated {:,} subjects".format(num))
+        if subject_id == 'ASG00007pi':
+            break
         # initialize Counter objects
         stat_all = defaultdict(Counter)
         stat_species_only = defaultdict(Counter)
@@ -185,17 +204,15 @@ if __name__ == '__main__':
                 annotation_id_to_name_mapper,
                 species_field=question_main_id
                 )
-        # Determine top / consensus species based on the median number of
-        # different species identified by the volunteers
-        consensus_species = [species_names_by_frequency[i] for i in
-                             range(n_species_ids_per_user_median)]
         # define empty capture if more volunteers saw nothing
         # than saw something
-        if n_users_id_empty > n_users_id_species:
+        is_empty = n_users_id_empty > n_users_id_species
+        if is_empty:
             species_aggs = aggregate_species(
                     species_names_by_frequency, species_stats,
                     questions, question_type_map)
-            consensus_species.insert(0, flags['QUESTION_MAIN_EMPTY'])
+            consensus_species = [flags['QUESTION_MAIN_EMPTY']]
+            pielou = 0
         else:
             species_names_no_empty = [
                 x for x in species_names_by_frequency
@@ -203,13 +220,22 @@ if __name__ == '__main__':
             species_aggs = aggregate_species(
                     species_names_no_empty, species_stats,
                     questions, question_type_map)
+            # calculate pielou
+            pielou = calculate_pielou(
+                [x['n_users_identified_this_species']
+                 for x in species_aggs.values()])
+            # Determine top / consensus species based on the median number of
+            # different species identified by the volunteers
+            consensus_species = [species_names_by_frequency[i] for i in
+                                 range(n_species_ids_per_user_median)]
         # collect information to be added to the export
         agg_info = {
             'n_species_ids_per_user_median': n_species_ids_per_user_median,
             'n_users_classified_this_subject': n_subject_users,
             'n_users_saw_a_species': n_users_id_species,
             'n_users_saw_no_species': n_users_id_empty,
-            'p_users_saw_a_species': '{:.2f}'.format(p_users_id_species)
+            'p_users_saw_a_species': '{:.2f}'.format(p_users_id_species),
+            'pielous_evenness_index': pielou
              }
         record = {
             'species_aggregations': species_aggs,
