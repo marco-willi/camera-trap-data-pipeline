@@ -194,6 +194,8 @@ if __name__ == '__main__':
         n_users_id_empty = n_subject_users - n_users_id_species
         p_users_id_species = n_users_id_species / n_subject_users
         # order species by frequency of identifications
+        # ties are ordered arbitrarily
+        # (according to which species was detected first)
         species_by_frequency = stat_all[question_main_id].most_common()
         species_names_by_frequency = [x[0] for x in species_by_frequency]
         # calc stats for all species
@@ -224,7 +226,7 @@ if __name__ == '__main__':
                  for x in species_aggs.values()])
             # Determine top / consensus species based on the median number of
             # different species identified by the volunteers
-            consensus_species = [species_names_by_frequency[i] for i in
+            consensus_species = [species_names_no_empty[i] for i in
                                  range(n_species_ids_per_user_median)]
         # collect information to be added to the export
         agg_info = {
