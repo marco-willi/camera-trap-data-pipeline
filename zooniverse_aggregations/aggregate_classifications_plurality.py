@@ -13,7 +13,7 @@ import logging
 from logger import setup_logger, create_logfile_name
 from global_vars import plurality_aggregation_flags as flags
 from zooniverse_aggregations import aggregator
-from utils import print_nested_dict
+from utils import print_nested_dict, set_file_permission
 
 # args = dict()
 # args['classifications_extracted_csv'] = '/home/packerc/shared/zooniverse/Exports/CC/CC_S1_classifications_extracted.csv'
@@ -39,7 +39,7 @@ from utils import print_nested_dict
 
 def aggregate_species(
         species_names, species_stats,
-        questions, question_type_map):
+        questions, question_type_map, n_users_total):
     """ Aggregate species stats """
     species_aggs = {x: dict() for x in species_names}
     for species, stats in species_stats.items():
@@ -59,7 +59,7 @@ def aggregate_species(
         species_aggs[species]['n_users_identified_this_species'] = \
             len(stats['classification_id'])
         n_user_id = species_aggs[species]['n_users_identified_this_species']
-        p_user_id = '{:.2f}'.format(n_user_id / n_subject_classifications)
+        p_user_id = '{:.2f}'.format(n_user_id / n_users_total)
         species_aggs[species]['p_users_identified_this_species'] = p_user_id
     return species_aggs
 
@@ -210,7 +210,8 @@ if __name__ == '__main__':
         if is_empty:
             species_aggs = aggregate_species(
                     species_names_by_frequency, species_stats,
-                    questions, question_type_map)
+                    questions, question_type_map,
+                    n_subject_classifications)
             consensus_species = [flags['QUESTION_MAIN_EMPTY']]
             pielou = 0
         else:
@@ -219,7 +220,8 @@ if __name__ == '__main__':
                 if x != flags['QUESTION_MAIN_EMPTY']]
             species_aggs = aggregate_species(
                     species_names_no_empty, species_stats,
-                    questions, question_type_map)
+                    questions, question_type_map,
+                    n_users_id_species)
             # calculate pielou
             pielou = calculate_pielou(
                 [x['n_users_identified_this_species']
@@ -228,6 +230,8 @@ if __name__ == '__main__':
             # different species identified by the volunteers
             consensus_species = [species_names_no_empty[i] for i in
                                  range(n_species_ids_per_user_median)]
+        if subject_id == 'ASG0002giq':
+            break
         # collect information to be added to the export
         agg_info = {
             'n_species_ids_per_user_median': n_species_ids_per_user_median,
@@ -235,7 +239,7 @@ if __name__ == '__main__':
             'n_users_saw_a_species': n_users_id_species,
             'n_users_saw_no_species': n_users_id_empty,
             'p_users_saw_a_species': '{:.2f}'.format(p_users_id_species),
-            'pielous_evenness_index': pielou
+            'pielous_evenness_index': '{:.2f}'.format(pielou)
              }
         record = {
             'species_aggregations': species_aggs,
@@ -333,7 +337,7 @@ if __name__ == '__main__':
             line_no, args['output_csv']))
 
     # change permmissions to read/write for group
-    os.chmod(args['output_csv'], 0o660)
+    set_file_permission(args['output_csv'])
 
     if args['export_sample_size'] > 0:
         # Create a file name for a sampled export
@@ -370,4 +374,4 @@ if __name__ == '__main__':
                 n_written, output_csv_sample))
 
         # change permmissions to read/write for group
-        os.chmod(output_csv_sample, 0o660)
+        set_file_permission(output_csv_sample)
