@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 import csv
 
 from collections import defaultdict, Counter, OrderedDict
+from utils import set_file_permission
 
 plt.switch_backend('agg')
 
@@ -138,6 +139,36 @@ def read_image_inventory(path, unique_id='image_path_original'):
     for _id, data in inventory.items():
         inventory_with_index_as_col[data[unique_id]] = data
     return inventory_with_index_as_col
+
+
+def export_inventory_to_csv(inventory, output_path):
+    """ Export Inventory to CSV
+        inventory: dict
+        output_path: path to a file that is being created
+    """
+    df = pd.DataFrame.from_dict(inventory, orient='index')
+
+    # re-arrange columns
+    cols = df.columns.tolist()
+
+    # fixed column order
+    first_cols = [
+        'season', 'site', 'roll', 'image_rank_in_roll',
+        'capture', 'image_rank_in_capture']
+
+    first_cols = [x for x in first_cols if x in cols]
+
+    cols_rearranged = first_cols + [x for x in cols if x not in first_cols]
+    df = df[cols_rearranged]
+
+    # sort rows
+    df.sort_values(by=first_cols, inplace=True)
+
+    # export
+    df.to_csv(output_path, index=False)
+
+    # change permmissions to read/write for group
+    set_file_permission(output_path)
 
 
 def update_time_checks(image_data, flags):

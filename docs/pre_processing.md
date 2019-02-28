@@ -47,7 +47,7 @@ A log file will be created in 'log-dir' if 'log-dir' is specified.
 
 ## Create Input Inventory
 
-The following script generates a inventory of all camera trap images and performs some basic checks. The code is parallelized to speed up the checks -- use the following options to make the most of the parallelization:
+The following script generates an inventory of all camera trap images and performs some basic checks. The code is parallelized to speed up the checks -- use the following options to make the most of the parallelization:
 
 ```
 ssh lab

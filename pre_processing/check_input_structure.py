@@ -128,7 +128,6 @@ if __name__ == '__main__':
         for roll_directory_name in roll_directory_names:
             roll_directory_path = os.path.join(
                 current_dir_full_path, roll_directory_name)
-            # must contain one '_'
             if not is_ok_roll_directory_name(roll_directory_name):
                 logger.error(
                     textwrap.shorten(
@@ -164,3 +163,5 @@ if __name__ == '__main__':
                                  remove is".format(
                                  image_file_name, roll
                                  ), width=msg_width))
+
+    logger.info("Finished checking input structure")

@@ -6,7 +6,8 @@ import argparse
 from datetime import datetime
 import logging
 
-from pre_processing.utils import image_check_stats, read_image_inventory
+from pre_processing.utils import (
+    image_check_stats, read_image_inventory, export_inventory_to_csv)
 from global_vars import pre_processing_flags as flags
 from logger import create_logfile_name, setup_logger
 
@@ -38,32 +39,10 @@ def create_new_image_name(image_data):
     return ''.join([new_name, ending])
 
 
-if __name__ == '__main__':
-
-    # Parse command line arguments
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--input_inventory", type=str, required=True)
-    parser.add_argument("--output_csv", type=str, required=True)
-    parser.add_argument("--n_processes", type=int, default=4)
-    args = vars(parser.parse_args())
-
-    # image check paramters
-    msg_width = 99
-
-    # logging
-    log_file_name = create_logfile_name('group_inventory_into_captures')
-    log_file_path = os.path.join(
-        os.path.dirname(args['output_csv']), log_file_name)
-    setup_logger(log_file_path)
-    logger = logging.getLogger(__name__)
-
-    inventory = read_image_inventory(
-        args['input_inventory'],
-        unique_id='image_path_original')
-
+def group_images_into_site_and_roll(inventory):
     # Group images into site and roll
     site_roll_inventory = dict()
-    for image_path_original, image_data in inventory.items():
+    for image_id, image_data in inventory.items():
         if image_data['datetime'] == '':
             continue
         season = image_data['season']
@@ -72,16 +51,24 @@ if __name__ == '__main__':
         season_site_roll_key = '#'.join([season, site, roll])
         if season_site_roll_key not in site_roll_inventory:
             site_roll_inventory[season_site_roll_key] = dict()
-        site_roll_inventory[season_site_roll_key][image_path_original] = image_data
+        site_roll_inventory[season_site_roll_key][image_id] = image_data
+    return site_roll_inventory
+
+
+# Group images into site and roll
+def group_images_into_captures(inventory, flags):
+    """ Group images into capture events """
+
+    site_roll_inventory = group_images_into_site_and_roll(inventory)
 
     image_to_capture = dict()
     for season_site_roll_key, site_roll_data in site_roll_inventory.items():
         # get all images from the current site and roll
         times = list()
         paths = list()
-        for image_path_original, image_data in site_roll_data.items():
+        for image_id, image_data in site_roll_data.items():
             times.append(image_data['datetime'])
-            paths.append(image_path_original)
+            paths.append(image_id)
         # Define the order of the images by 1) time and 2) by name
         datetimes = [
             datetime.strptime(
@@ -93,7 +80,6 @@ if __name__ == '__main__':
             for x in datetimes]
         ordered_indexes = np.lexsort((paths, times_seconds))
         # Re-order by the newly defined order
-        times_ordered = [times[i] for i in ordered_indexes]
         paths_ordered = [paths[i] for i in ordered_indexes]
         times_seconds_ordered = [times_seconds[i] for i in ordered_indexes]
         # Group images into captures if max_delta of subsequent images
@@ -130,7 +116,11 @@ if __name__ == '__main__':
                 'image_rank_in_roll': image_rank_in_roll_ordered[i],
                 'days_to_last_image_taken': delta_times_days_ordered[i],
             }
+    return image_to_capture
 
+
+def update_inventory_with_capture_data(inventory, image_to_capture):
+    """ update inventory with capture data """
     # merge capture info with inventory
     # and determine new image names
     for image_path_original, image_capture_data in image_to_capture.items():
@@ -143,24 +133,33 @@ if __name__ == '__main__':
         inventory[image_path_original]['image_name_new'] = \
             create_new_image_name(image_data)
 
+
+if __name__ == '__main__':
+
+    # Parse command line arguments
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--input_inventory", type=str, required=True)
+    parser.add_argument("--output_csv", type=str, required=True)
+    args = vars(parser.parse_args())
+
+    # image check paramters
+    msg_width = 99
+
+    # logging
+    log_file_name = create_logfile_name('group_inventory_into_captures')
+    log_file_path = os.path.join(
+        os.path.dirname(args['output_csv']), log_file_name)
+    setup_logger(log_file_path)
+    logger = logging.getLogger(__name__)
+
+    inventory = read_image_inventory(
+        args['input_inventory'],
+        unique_id='image_path_original')
+
+    image_to_capture = group_images_into_captures(inventory, flags)
+
+    update_inventory_with_capture_data(inventory, image_to_capture)
+
     image_check_stats(inventory, logger)
 
-    # Convert to Pandas DataFrame for exporting
-    df = pd.DataFrame.from_dict(inventory, orient='index')
-
-    # re-arrange columns
-    cols = df.columns.tolist()
-    first_cols = [
-        'season', 'site', 'roll', 'image_rank_in_roll',
-        'capture', 'image_rank_in_capture']
-    cols_rearranged = first_cols + [x for x in cols if x not in first_cols]
-    df = df[cols_rearranged]
-
-    # sort rows
-    df.sort_values(by=first_cols, inplace=True)
-
-    # export
-    df.to_csv(args['output_csv'], index=False)
-
-    # change permmissions to read/write for group
-    os.chmod(args['output_csv'], 0o660)
+    export_inventory_to_csv(inventory, args['output_csv'])

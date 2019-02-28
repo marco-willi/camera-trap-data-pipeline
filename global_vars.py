@@ -54,7 +54,7 @@ pre_processing_flags['image_checks'] = \
     pre_processing_flags['image_checks_time']
 
 pre_processing_flags['image_check_parameters'] = {
-    'all_black': {'thresh': 50, 'percent': 0.62},
+    'all_black': {'thresh': 50, 'percent': 0.8},
     'all_white': {'thresh': 200, 'percent': 0.8},
     'time_lapse_days': {'max_days': 30},
     'time_too_new': {'max_year': 2018},

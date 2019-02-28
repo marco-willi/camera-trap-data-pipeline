@@ -70,7 +70,19 @@ WORFKLOW_VERSION_MIN=
 
 
 ###################################
-# SCRIPTS
+# APN
+####################################
+
+cd $HOME/snapshot_safari_misc
+SITE=APN
+SEASON=APN_S2
+PROJECT_ID=
+WORKFLOW_ID=
+WORFKLOW_VERSION_MIN=
+
+
+###################################
+# Pre-Processing
 ####################################
 
 # Data processing
@@ -98,6 +110,9 @@ python3 -m pre_processing.export_checks_for_inspection \
 --no_newer_than_year 2019 \
 --plot_timelines
 
+###################################
+# Zooniverse Uploads
+####################################
 
 # generate manifest
 python3 -m zooniverse_uploads.generate_manifest \
@@ -134,6 +149,10 @@ python3 -m zooniverse_uploads.upload_manifest \
 --subject_set_id $SUBJECT_SET_ID \
 --password_file ~/keys/passwords.ini
 
+###################################
+# Zooniverse Downloads
+####################################
+
 # Get Zooniverse Classification Data
 python3 -m zooniverse_exports.get_zooniverse_export \
 --password_file ~/keys/passwords.ini \
@@ -162,6 +181,11 @@ python3 -m zooniverse_exports.extract_subjects \
 --subject_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subjects.csv \
 --output_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subjects_extracted.csv
 
+
+###################################
+# Zooniverse Aggregations
+####################################
+
 # Aggregate Classifications
 python3 -m zooniverse_aggregations.aggregate_classifications_plurality \
 --classifications_extracted /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_classifications_extracted.csv \
@@ -180,6 +204,11 @@ python3 -m zooniverse_exports.add_subject_info_to_csv \
 --subject_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subjects_extracted.csv \
 --input_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_classifications_aggregated_samples.csv \
 --output_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_classifications_aggregated_samples_subject_info.csv
+
+
+###################################
+# Reporting
+####################################
 
 # Reporting of Zooniverse exports
 python3 -m reporting.add_aggregations_to_season_captures \
@@ -246,10 +275,8 @@ python3 -m zooniverse_exports.add_subject_info_to_csv \
 --input_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_classifications_aggregated.csv \
 --output_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_classifications_aggregated_subject_info.csv
 
-
-# Reporting of Zooniverse exports
-python3 -m reporting.add_aggregations_to_season_captures \
---season_captures_csv /home/packerc/shared/season_captures/${SITE}/cleaned/${SEASON}_cleaned.csv \
---aggregated_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_classifications_aggregated_subject_info.csv \
---output_csv /home/packerc/shared/zooniverse/Reports/${SITE}/${SEASON}_report_zooniverse.csv \
---default_season_id ${SEASON}
+# Add subject data to Aggregations (samples)
+python3 -m zooniverse_exports.add_subject_info_to_csv \
+--subject_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subjects_extracted.csv \
+--input_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_classifications_aggregated_samples.csv \
+--output_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_classifications_aggregated_subject_info_samples.csv
