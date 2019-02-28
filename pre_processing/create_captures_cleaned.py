@@ -60,13 +60,12 @@ if __name__ == '__main__':
         image_data['capture_id'] = '#'.join(
             [image_data['season'], image_data['site'],
              image_data['roll'], image_data['capture']])
-        image_data_new = {k: v for k, v in image_data if k in cols_to_export}
-        captures_cleaned[image_name_new] = image_data_new
+        # image_data_new = {k: v for k, v in image_data if k in cols_to_export}
+        captures_cleaned[image_name_new] = {k: v for k, v in image_data.items()}
 
     image_check_stats(captures, logger)
 
     export_inventory_to_csv(
             captures_cleaned,
             args['captures_cleaned'],
-            first_cols=['capture_id', 'season', 'site', 'roll', 'capture',
-                        'image_rank_in_capture'])
+            first_cols=cols_to_export)
