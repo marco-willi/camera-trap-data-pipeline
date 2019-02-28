@@ -95,13 +95,13 @@ if __name__ == '__main__':
         elif at_least_one_time_check:
             automatic_status['action_to_take'] = 'inspect'
         automatic_status['action_to_take_reason'] = all_check_string
+        # populate action columns
+        automatic_status['action_from_image'] = image_data['image_name_new']
+        automatic_status['action_to_image'] = image_data['image_name_new']
         image_data.update(automatic_status)
         # export problematic cases only
         if at_least_one_basic_check or at_least_one_time_check:
             inventory_with_issues[image_path_original] = image_data
-        # populate action columns
-        automatic_status['action_from_image'] = image_data['image_name_new']
-        automatic_status['action_to_image'] = image_data['image_name_new']
 
     # Export cases with issues
     logger.info("Images with potential issues")
