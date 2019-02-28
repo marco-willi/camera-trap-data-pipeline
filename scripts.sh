@@ -73,12 +73,23 @@ WORFKLOW_VERSION_MIN=
 # APN
 ####################################
 
+
 cd $HOME/snapshot_safari_misc
 SITE=APN
 SEASON=APN_S2
 PROJECT_ID=
 WORKFLOW_ID=
 WORFKLOW_VERSION_MIN=
+
+
+###################################
+# Python Prep
+####################################
+
+qsub -I -l walltime=6:00:00,nodes=1:ppn=4,mem=16gb
+module load python3
+cd $HOME/snapshot_safari_misc
+git pull
 
 
 ###################################
@@ -91,23 +102,26 @@ python3 -m pre_processing.check_input_structure \
 --log_dir /home/packerc/shared/season_captures/${SITE}/captures/
 
 # Create Image Inventory
-python3 -m pre_processing.create_input_inventory_parallel \
+python3 -m pre_processing.create_image_inventory \
 --root_dir /home/packerc/shared/albums/${SITE}/${SEASON}/ \
---output_csv /home/packerc/shared/season_captures/${SITE}/captures/${SEASON}_captures_raw.csv \
+--output_csv /home/packerc/shared/season_captures/${SITE}/captures/${SEASON}_inventory.csv \
 --n_processes 16
 
 # Group Images into Captures
 python3 -m pre_processing.group_inventory_into_captures \
---input_inventory /home/packerc/shared/season_captures/${SITE}/captures/${SEASON}_captures_raw.csv \
---output_csv /home/packerc/shared/season_captures/${SITE}/captures/${SEASON}_captures_grouped.csv
+--inventory /home/packerc/shared/season_captures/${SITE}/captures/${SEASON}_inventory.csv \
+--output_csv /home/packerc/shared/season_captures/${SITE}/captures/${SEASON}_captures.csv \
+--no_older_than_year 2018 \
+--no_newer_than_year 2019
 
+# rename all images in inventory
+python3 -m pre_processing.rename_images \
+--inventory /home/packerc/shared/season_captures/${SITE}/captures/${SEASON}_captures.csv
 
-# Find potential issues
-python3 -m pre_processing.export_checks_for_inspection \
---inventory_grouped /home/packerc/shared/season_captures/${SITE}/captures/${SEASON}_captures_grouped.csv \
+# generate action list
+python3 -m pre_processing.create_action_list \
+--inventory /home/packerc/shared/season_captures/${SITE}/captures/${SEASON}_captures.csv \
 --issues_csv /home/packerc/shared/season_captures/${SITE}/captures/${SEASON}_potential_issues.csv \
---no_older_than_year 2017 \
---no_newer_than_year 2019 \
 --plot_timelines
 
 ###################################

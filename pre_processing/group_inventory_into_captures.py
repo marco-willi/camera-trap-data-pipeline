@@ -1,13 +1,13 @@
 """ Group Input into Captures """
 import numpy as np
-import pandas as pd
 import os
 import argparse
 from datetime import datetime
 import logging
 
 from pre_processing.utils import (
-    image_check_stats, read_image_inventory, export_inventory_to_csv)
+    image_check_stats, read_image_inventory,
+    export_inventory_to_csv, update_time_checks)
 from global_vars import pre_processing_flags as flags
 from logger import create_logfile_name, setup_logger
 
@@ -134,12 +134,23 @@ def update_inventory_with_capture_data(inventory, image_to_capture):
             create_new_image_name(image_data)
 
 
+def update_time_checks_inventory(inventory, flags):
+    """ Update time check flags in inventory """
+    for image_id, image_data in inventory.items():
+        try:
+            update_time_checks(image_data, flags)
+        except:
+            pass
+
+
 if __name__ == '__main__':
 
     # Parse command line arguments
     parser = argparse.ArgumentParser()
-    parser.add_argument("--input_inventory", type=str, required=True)
+    parser.add_argument("--image_inventory", type=str, required=True)
     parser.add_argument("--output_csv", type=str, required=True)
+    parser.add_argument("--no_older_than_year", type=int, default=1970)
+    parser.add_argument("--no_newer_than_year", type=int, default=9999)
     args = vars(parser.parse_args())
 
     # image check paramters
@@ -152,13 +163,20 @@ if __name__ == '__main__':
     setup_logger(log_file_path)
     logger = logging.getLogger(__name__)
 
+    # update time checks
+    time_checks = flags['image_check_parameters']
+    time_checks['time_too_old']['min_year'] = args['no_older_than_year']
+    time_checks['time_too_new']['max_year'] = args['no_newer_than_year']
+
     inventory = read_image_inventory(
-        args['input_inventory'],
+        args['image_inventory'],
         unique_id='image_path_original')
 
     image_to_capture = group_images_into_captures(inventory, flags)
 
     update_inventory_with_capture_data(inventory, image_to_capture)
+
+    update_time_checks_inventory(inventory, flags)
 
     image_check_stats(inventory, logger)
 

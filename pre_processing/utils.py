@@ -108,7 +108,7 @@ def plot_site_roll_timelines(
     plt.tight_layout()
     roll_site_group.plot(subplots=True, ax=ax)
     fig.savefig(output_path)
-    os.chmod(output_path, 0o660)
+    set_file_permission(output_path)
 
 
 def read_image_inventory_old(path, unique_id='image_path_original'):
@@ -141,7 +141,12 @@ def read_image_inventory(path, unique_id='image_path_original'):
     return inventory_with_index_as_col
 
 
-def export_inventory_to_csv(inventory, output_path):
+def export_inventory_to_csv(
+        inventory,
+        output_path,
+        first_cols=['season', 'site', 'roll', 'image_rank_in_roll',
+                    'capture', 'image_rank_in_capture'],
+        return_df=False):
     """ Export Inventory to CSV
         inventory: dict
         output_path: path to a file that is being created
@@ -150,11 +155,6 @@ def export_inventory_to_csv(inventory, output_path):
 
     # re-arrange columns
     cols = df.columns.tolist()
-
-    # fixed column order
-    first_cols = [
-        'season', 'site', 'roll', 'image_rank_in_roll',
-        'capture', 'image_rank_in_capture']
 
     first_cols = [x for x in first_cols if x in cols]
 
@@ -169,6 +169,9 @@ def export_inventory_to_csv(inventory, output_path):
 
     # change permmissions to read/write for group
     set_file_permission(output_path)
+
+    if return_df:
+        return df
 
 
 def update_time_checks(image_data, flags):
