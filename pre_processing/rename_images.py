@@ -13,16 +13,20 @@ def rename_files(source_paths, dest_paths, logger):
     for i, (src, dst) in enumerate(zip(source_paths, dest_paths)):
         try:
             os.rename(src, dst)
+            logger.debug("renamed {} to {}".format(src, dst))
         except:
-            logger.warning("Failed to rename {} to {}".format(src, dst))
+            msg_fail = "Failed to rename {} to {}".format(src, dst)
             if not os.isfile(src):
-                logger.warning("Source: {} does not exist".format(src))
+                msg_source = "Source: {} does not exist".format(src)
             if os.isfile(dst):
-                logger.warning("Dest: {} already exists".format(dst))
+                logger.warning("{} - {} - dest: {} already exists".format(
+                    msg_fail, msg_source, dst))
             else:
-                logger.warning("Dest: {} does not exist".format(dst))
-        if (i % 1000) == 0:
-            print("Renamed {:10}/{} files".format(i+1, n_total))
+                logger.warning("{} - {} - dest: {} does not exist".format(
+                    msg_fail, msg_source, dst))
+        if (i % 1001) == 0:
+            logger.info("Renamed {:10}/{} files".format(i+1, n_total))
+    logger.info("Finished, renamed {:10}/{} files".format(i+1, n_total))
 
 
 def rename_images_in_inventory(inventory, logger):

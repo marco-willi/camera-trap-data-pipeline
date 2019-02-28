@@ -18,7 +18,7 @@ from global_vars import pre_processing_flags as flags
 
 # args = dict()
 #
-# args['inventory_grouped'] = '/home/packerc/shared/season_captures/ENO/captures/ENO_S1_captures_grouped.csv'
+# args['captures'] = '/home/packerc/shared/season_captures/ENO/captures/ENO_S1_captures_grouped.csv'
 # args['action_list_csv'] = '/home/packerc/shared/season_captures/ENO/captures/ENO_S1_images_with_issues.csv'
 # args['no_older_than_year'] = 2017
 # args['no_newer_than_year'] = 2019
@@ -29,17 +29,17 @@ if __name__ == '__main__':
 
     # Parse command line arguments
     parser = argparse.ArgumentParser()
-    parser.add_argument("--inventory_grouped", type=str, required=True)
+    parser.add_argument("--captures", type=str, required=True)
     parser.add_argument("--action_list_csv", type=str, required=True)
     parser.add_argument("--log_dir", type=str, default=None)
     parser.add_argument("--plot_timelines", action='store_true')
     args = vars(parser.parse_args())
 
     # check existence of root dir
-    if not os.path.isfile(args['inventory_grouped']):
+    if not os.path.isfile(args['captures']):
         raise FileNotFoundError(
-            "inventory_grouped {} does not exist -- must be a file".format(
-                args['inventory_grouped']))
+            "captures {} does not exist -- must be a file".format(
+                args['captures']))
 
     # Logging
     if args['log_dir'] is not None:
@@ -54,7 +54,7 @@ if __name__ == '__main__':
 
     # read grouped data
     inventory = read_image_inventory(
-        args['inventory_grouped'],
+        args['captures'],
         unique_id='image_path_original')
 
     header = list(inventory[list(inventory.keys())[0]].keys())
@@ -127,7 +127,7 @@ if __name__ == '__main__':
         df = pd.DataFrame.from_dict(inventory, orient='index')
         plot_file_name = 'site_roll_timelines.pdf'
         plot_file_path = os.path.join(
-            os.path.dirname(args['inventory_grouped']), plot_file_name)
+            os.path.dirname(args['captures']), plot_file_name)
         plot_site_roll_timelines(
             df=df,
             output_path=plot_file_path,

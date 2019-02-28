@@ -26,6 +26,13 @@ def create_new_image_path(image_data):
     return os.path.join(image_dir, new_name)
 
 
+def create_new_image_path_rel(image_data):
+    """ Create new image path """
+    image_dir = os.path.dirname(image_data['image_path_original_rel'])
+    new_name = create_new_image_name(image_data)
+    return os.path.join(image_dir, new_name)
+
+
 def create_new_image_name(image_data):
     """ Create a new image new based on image_data:
         - PLN_S1_A01_R1_IMAG0001.JPG
@@ -137,6 +144,8 @@ def update_inventory_with_capture_data(inventory, image_to_capture):
             create_new_image_path(image_data)
         inventory[image_path_original]['image_name_new'] = \
             create_new_image_name(image_data)
+        inventory[image_path_original]['image_path_new_rel'] = \
+            create_new_image_path_rel(image_data)
 
 
 def update_time_checks_inventory(inventory, flags):
