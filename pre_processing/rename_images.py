@@ -7,9 +7,10 @@ from pre_processing.utils import (read_image_inventory)
 from logger import create_log_file, setup_logger
 
 
-def rename_files(source_path, dest_path, logger):
+def rename_files(source_paths, dest_paths, logger):
     """ Rename Files """
-    for src, dst in zip(source_path, dest_path):
+    n_total = len(source_paths)
+    for i, (src, dst) in enumerate(zip(source_paths, dest_paths)):
         try:
             os.rename(src, dst)
         except:
@@ -20,6 +21,8 @@ def rename_files(source_path, dest_path, logger):
                 logger.warning("Dest: {} already exists".format(dst))
             else:
                 logger.warning("Dest: {} does not exist".format(dst))
+        if (i % 1000) == 0:
+            print("Renamed {:10}/{} files".format(i+1, n_total))
 
 
 def rename_images_in_inventory(inventory, logger):
