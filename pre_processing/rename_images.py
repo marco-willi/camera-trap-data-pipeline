@@ -16,9 +16,9 @@ def rename_files(source_paths, dest_paths, logger):
             logger.debug("renamed {} to {}".format(src, dst))
         except:
             msg_fail = "Failed to rename {} to {}".format(src, dst)
-            if not os.isfile(src):
+            if not os.path.isfile(src):
                 msg_source = "Source: {} does not exist".format(src)
-            if os.isfile(dst):
+            if os.path.isfile(dst):
                 logger.warning("{} - {} - dest: {} already exists".format(
                     msg_fail, msg_source, dst))
             else:
