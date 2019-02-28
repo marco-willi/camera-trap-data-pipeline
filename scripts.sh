@@ -139,20 +139,26 @@ python3 -m pre_processing.create_action_list \
 # generate actions
 python3 -m pre_processing.generate_actions \
 --captures /home/packerc/shared/season_captures/${SITE}/captures/${SEASON}_captures.csv \
---action_list_csv /home/packerc/shared/season_captures/${SITE}/captures/${SEASON}_action_list.csv \
---actions_to_perform_csv /home/packerc/shared/season_captures/${SITE}/captures/${SEASON}_actions_to_perform.csv
+--action_list /home/packerc/shared/season_captures/${SITE}/captures/${SEASON}_action_list.csv \
+--actions_to_perform_csv /home/packerc/shared/season_captures/${SITE}/captures/${SEASON}_actions_to_perform.csv \
 --log_dir /home/packerc/shared/season_captures/${SITE}/log_files/
 
 # apply actions
 python3 -m pre_processing.apply_actions \
 --captures /home/packerc/shared/season_captures/${SITE}/captures/${SEASON}_captures.csv \
---actions_to_perform /home/packerc/shared/season_captures/${SITE}/captures/${SEASON}_actions_to_perform.csv
+--actions_to_perform /home/packerc/shared/season_captures/${SITE}/captures/${SEASON}_actions_to_perform.csv \
 --log_dir /home/packerc/shared/season_captures/${SITE}/log_files/
 
-# Group Images into Captures (OPTIONAL)
+# Genrate Captures Cleaned
+python3 -m pre_processing.create_captures_cleaned \
+--captures /home/packerc/shared/season_captures/${SITE}/captures/${SEASON}_captures.csv \
+--captures_cleaned /home/packerc/shared/season_captures/${SITE}/cleaned/${SEASON}_captures_cleaned.csv \
+--log_dir /home/packerc/shared/season_captures/${SITE}/log_files/
+
+# Update Captures Cleaned
 python3 -m pre_processing.group_inventory_into_captures \
---inventory /home/packerc/shared/season_captures/${SITE}/captures/${SEASON}_inventory.csv \
---output_csv /home/packerc/shared/season_captures/${SITE}/captures/${SEASON}_captures.csv \
+--inventory /home/packerc/shared/season_captures/${SITE}/captures/${SEASON}_captures_cleaned.csv \
+--output_csv /home/packerc/shared/season_captures/${SITE}/captures/${SEASON}_captures_cleaned2.csv \
 --log_dir /home/packerc/shared/season_captures/${SITE}/log_files/ \
 --no_older_than_year 2017 \
 --no_newer_than_year 2019
