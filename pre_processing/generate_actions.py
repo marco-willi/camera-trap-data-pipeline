@@ -288,5 +288,5 @@ if __name__ == '__main__':
 
     # Export actions list
     df = pd.DataFrame.from_dict(actions_inventory, orient='index')
-    df.to_csv(args['actions_to_perform'], index=False)
-    set_file_permission(args['actions_to_perform'])
+    df.to_csv(args['actions_to_perform_csv'], index=False)
+    set_file_permission(args['actions_to_perform_csv'])
