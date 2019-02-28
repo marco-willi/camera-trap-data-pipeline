@@ -147,7 +147,7 @@ if __name__ == '__main__':
 
     # Parse command line arguments
     parser = argparse.ArgumentParser()
-    parser.add_argument("--image_inventory", type=str, required=True)
+    parser.add_argument("--inventory", type=str, required=True)
     parser.add_argument("--output_csv", type=str, required=True)
     parser.add_argument("--no_older_than_year", type=int, default=1970)
     parser.add_argument("--no_newer_than_year", type=int, default=9999)
@@ -169,7 +169,7 @@ if __name__ == '__main__':
     time_checks['time_too_new']['max_year'] = args['no_newer_than_year']
 
     inventory = read_image_inventory(
-        args['image_inventory'],
+        args['inventory'],
         unique_id='image_path_original')
 
     image_to_capture = group_images_into_captures(inventory, flags)
