@@ -63,7 +63,7 @@ if __name__ == '__main__':
         # image_data_new = {k: v for k, v in image_data if k in cols_to_export}
         captures_cleaned[image_name_new] = {k: v for k, v in image_data.items()}
 
-    image_check_stats(captures, logger)
+    image_check_stats(captures_cleaned, logger)
 
     export_inventory_to_csv(
             captures_cleaned,
