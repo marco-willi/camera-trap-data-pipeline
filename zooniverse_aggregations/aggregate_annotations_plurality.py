@@ -10,6 +10,8 @@ from statistics import median_high, StatisticsError
 from collections import Counter, defaultdict
 import logging
 
+from sklearn.model_selection import train_test_split
+
 from logger import setup_logger, create_logfile_name
 from global_vars import plurality_aggregation_flags as flags
 from zooniverse_aggregations import aggregator
@@ -230,8 +232,6 @@ if __name__ == '__main__':
             # different species identified by the volunteers
             consensus_species = [species_names_no_empty[i] for i in
                                  range(n_species_ids_per_user_median)]
-        if subject_id == 'ASG0002giq':
-            break
         # collect information to be added to the export
         agg_info = {
             'n_species_ids_per_user_median': n_species_ids_per_user_median,
@@ -333,7 +333,7 @@ if __name__ == '__main__':
             # print status
             if ((line_no % 10000) == 0) and (line_no > 0):
                 print("Wrote {:,} identifications".format(line_no))
-        logger.info("Wrote {} records to {}".format(
+        logger.info("Wrote {} aggregations to {}".format(
             line_no, args['output_csv']))
 
     # change permmissions to read/write for group
@@ -346,31 +346,40 @@ if __name__ == '__main__':
         output_csv_sample = os.path.join(
             output_csv_path, output_csv_basename[0] + '_samples.csv')
         # randomly shuffle records
-        n_total = len(subject_identificatons)
-        _ids_all = [i for i in range(0, n_total)]
-        random.seed(123)
-        random.shuffle(_ids_all)
+        # n_total = len(subject_identificatons)
+        # _ids_all = [i for i in range(0, n_total)]
+        # random.seed(123)
+        # random.shuffle(_ids_all)
 
-        sample_size = min(args['export_sample_size'], n_total)
-        _ids_sampled = random.sample(_ids_all, sample_size)
+        # generate list with main answers for stratified sampling
+        if args['export_consensus_only']:
+            main_answers = \
+                [x[question_main_id] for x in subject_identificatons
+                 if x['species_is_plurality_consensus'] == 1]
+        else:
+            main_answers = \
+                [x[question_main_id] for x in subject_identificatons]
+
+        n_total = len(main_answers)
+        _ids_all = [i for i in range(0, n_total)]
+        _, _ids_sampled = train_test_split(
+            _ids_all, test_size=300, stratify=main_answers, random_state=123)
+
+        # sample_size = min(args['export_sample_size'], n_total)
+        # _ids_sampled = random.sample(_ids_all, sample_size)
 
         with open(output_csv_sample, 'w') as f:
             csv_writer = csv.writer(f, delimiter=',')
             logger.info("Writing output to {}".format(output_csv_sample))
             csv_writer.writerow(output_header)
             n_written = 0
-            for line_no, line_id in enumerate(_ids_all):
+            for line_no, line_id in enumerate(_ids_sampled):
                 record = subject_identificatons[line_id]
-                if args['export_consensus_only']:
-                    if record['species_is_plurality_consensus'] == 0:
-                        continue
                 # get subject info data
                 to_write = [record[x] for x in output_header]
                 csv_writer.writerow(to_write)
                 n_written += 1
-                if n_written >= sample_size:
-                    break
-            logger.info("Wrote {} records to {}".format(
+            logger.info("Wrote {} aggregations to {}".format(
                 n_written, output_csv_sample))
 
         # change permmissions to read/write for group

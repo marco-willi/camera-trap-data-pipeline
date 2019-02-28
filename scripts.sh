@@ -224,9 +224,9 @@ python3 -m zooniverse_exports.get_zooniverse_export \
 --new_export 0
 
 # Extract Classification Data
-python3 -m zooniverse_exports.extract_classifications \
+python3 -m zooniverse_exports.extract_annotations \
 --classification_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_classifications.csv \
---output_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_classifications_extracted.csv \
+--output_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_annotations.csv \
 --workflow_id $WORKFLOW_ID \
 --workflow_version_min $WORFKLOW_VERSION_MIN
 
@@ -241,23 +241,23 @@ python3 -m zooniverse_exports.extract_subjects \
 ####################################
 
 # Aggregate Classifications
-python3 -m zooniverse_aggregations.aggregate_classifications_plurality \
---classifications_extracted /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_classifications_extracted.csv \
---output_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_classifications_aggregated.csv \
+python3 -m zooniverse_aggregations.aggregate_annotations_plurality \
+--classifications_extracted /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_annotations.csv \
+--output_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_annotations_aggregated.csv \
 --export_consensus_only \
 --export_sample_size 300
 
 # Add subject data to Aggregations
 python3 -m zooniverse_exports.add_subject_info_to_csv \
 --subject_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subjects_extracted.csv \
---input_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_classifications_aggregated.csv \
---output_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_classifications_aggregated_subject_info.csv
+--input_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_annotations_aggregated.csv \
+--output_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_annotations_aggregated_subject_info.csv
 
 # OPTIONAL - Add subject data to Aggregations Samples
 python3 -m zooniverse_exports.add_subject_info_to_csv \
 --subject_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subjects_extracted.csv \
---input_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_classifications_aggregated_samples.csv \
---output_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_classifications_aggregated_samples_subject_info.csv
+--input_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_annotations_aggregated_samples.csv \
+--output_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_annotations_aggregated_samples_subject_info.csv
 
 
 ###################################
@@ -267,7 +267,7 @@ python3 -m zooniverse_exports.add_subject_info_to_csv \
 # Reporting of Zooniverse exports
 python3 -m reporting.add_aggregations_to_season_captures \
 --season_captures_csv /home/packerc/shared/season_captures/${SITE}/cleaned/${SEASON}_cleaned.csv \
---aggregated_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_classifications_aggregated_subject_info.csv \
+--aggregated_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_annotations_aggregated_subject_info.csv \
 --output_csv /home/packerc/shared/zooniverse/Reports/${SITE}/${SEASON}_report_zooniverse.csv \
 --default_season_id ${SEASON}
 
@@ -302,35 +302,35 @@ SITE=SER
 SEASON=SER_S1
 SEASON_STRING='S1'
 
-# Extract Classifications
+# Extract Annotations
 python3 -m zooniverse_exports.extract_legacy_serengeti \
 --classification_csv '/home/packerc/shared/zooniverse/Exports/SER/2019-01-27_serengeti_classifications.csv' \
 --output_path '/home/packerc/shared/zooniverse/Exports/SER/' \
 --season_to_process ${SEASON_STRING}
 
 
-# Aggregate Classifications
-python3 -m zooniverse_aggregations.aggregate_classifications_plurality \
---classifications_extracted /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_classifications_extracted.csv \
---output_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_classifications_aggregated.csv \
+# Aggregate Annotations
+python3 -m zooniverse_aggregations.aggregate_annotations_plurality \
+--classifications_extracted /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_annotations.csv \
+--output_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_annotations_aggregated.csv \
 --export_consensus_only \
 --export_sample_size 300
 
 
 # Extract Subjects from Classifications
 python3 -m zooniverse_exports.extract_subjects_legacy \
---classifications_extracted /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_classifications_extracted.csv \
+--classifications_extracted /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_annotations_extracted.csv \
 --output_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subjects_extracted.csv
 
 
 # Add subject data to Aggregations
 python3 -m zooniverse_exports.add_subject_info_to_csv \
 --subject_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subjects_extracted.csv \
---input_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_classifications_aggregated.csv \
---output_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_classifications_aggregated_subject_info.csv
+--input_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_annotations_aggregated.csv \
+--output_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_annotations_aggregated_subject_info.csv
 
 # Add subject data to Aggregations (samples)
 python3 -m zooniverse_exports.add_subject_info_to_csv \
 --subject_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subjects_extracted.csv \
---input_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_classifications_aggregated_samples.csv \
---output_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_classifications_aggregated_subject_info_samples.csv
+--input_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_annotations_aggregated_samples.csv \
+--output_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_annotations_aggregated_subject_info_samples.csv

@@ -23,7 +23,7 @@ import textwrap
 
 from logger import setup_logger, create_logfile_name
 from zooniverse_exports import extractor
-from utils import print_nested_dict
+from utils import print_nested_dict, set_file_permission
 from global_vars import extractor_flags as flags
 
 # # Cedar Creek
@@ -375,8 +375,8 @@ if __name__ == '__main__':
             csv_writer.writerow(
                 class_data +
                 retirement_data + answers_ordered)
-        logger.info("Wrote {} records to {}".format(
+        logger.info("Wrote {} annotations to {}".format(
             line_no, args['output_csv']))
 
     # change permmissions to read/write for group
-    os.chmod(args['output_csv'], 0o660)
+    set_file_permission(args['output_csv'])

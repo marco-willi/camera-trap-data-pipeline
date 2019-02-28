@@ -50,9 +50,9 @@ python3 -m zooniverse_exports.get_zooniverse_export \
 ```
 
 
-## Extract Zooniverse Classifications
+## Extract Zooniverse Annotations from Classifications
 
-The following code extracts the relevant fields of a Zooniverse classification csv. It creates a csv file with one line per species identification. Usually, the workflow_id and the workflow_version are specified to extract only the workflow that was used during the 'live-phase' of the project. If neither workflow_id/workflow_version/worfklow_version_min are specified every workflow is extracted. The workflow_id can be found in the project builder when clicking on the workflow. The workflow_version is at the same place slightly further down (e.g. something like 745.34). Be aware that only the 'major' version number is compared against, e.g., workflow_version '45.23' is identical to '45.56'. It is also possible to specify a minimum 'workflow_version_min' in which case all classifications with the same or higher number are extracted. A summary of all extracted workflows and other stats is printed after the extraction.
+The following code extracts the relevant fields of a Zooniverse classification csv. It creates a csv file with one line per species identification/annotation. Usually, the workflow_id and the workflow_version are specified to extract only the workflow that was used during the 'live-phase' of the project. If neither workflow_id/workflow_version/worfklow_version_min are specified every workflow is extracted. The workflow_id can be found in the project builder when clicking on the workflow. The workflow_version is at the same place slightly further down (e.g. something like 745.34). Be aware that only the 'major' version number is compared against, e.g., workflow_version '45.23' is identical to '45.56'. It is also possible to specify a minimum 'workflow_version_min' in which case all classifications with the same or higher number are extracted. A summary of all extracted workflows and other stats is printed after the extraction.
 
 Use a machine with enough memory - for example:
 
@@ -63,9 +63,9 @@ qsub -I -l walltime=2:00:00,nodes=1:ppn=4,mem=16gb
 
 ```
 cd $HOME/snapshot_safari_misc
-python3 -m zooniverse_exports.extract_classifications \
+python3 -m zooniverse_exports.extract_annotations \
         --classification_csv /home/packerc/shared/zooniverse/Exports/RUA/RUA_S1_classifications.csv \
-        --output_csv /home/packerc/shared/zooniverse/Exports/RUA/RUA_S1_classifications_extracted.csv \
+        --output_csv /home/packerc/shared/zooniverse/Exports/RUA/RUA_S1_annotations_extracted.csv \
         --workflow_id 4889 \
         --workflow_version_min 797
 ```
