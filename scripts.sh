@@ -121,7 +121,7 @@ python3 -m pre_processing.group_inventory_into_captures \
 # generate action list
 python3 -m pre_processing.create_action_list \
 --inventory /home/packerc/shared/season_captures/${SITE}/captures/${SEASON}_captures.csv \
---issues_csv /home/packerc/shared/season_captures/${SITE}/captures/${SEASON}_potential_issues.csv \
+--action_list_csv /home/packerc/shared/season_captures/${SITE}/captures/${SEASON}_action_list.csv \
 --plot_timelines
 
 ###################################

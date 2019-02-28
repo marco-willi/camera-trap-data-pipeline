@@ -70,8 +70,7 @@ if __name__ == '__main__':
         'action_to_take',
         'action_to_take_reason',
         'datetime_current',
-        'datetime_new',
-        'failed_automatic_checks']
+        'datetime_new']
 
     # create check columns
     inventory_with_issues = OrderedDict()
@@ -93,15 +92,16 @@ if __name__ == '__main__':
         all_check_string = '#'.join(basic_checks_list + time_checks_list)
         if at_least_one_basic_check:
             automatic_status['action_to_take'] = 'delete'
-            automatic_status['action_to_take_reason'] = 'failed_basic_check'
         elif at_least_one_time_check:
             automatic_status['action_to_take'] = 'inspect'
-            automatic_status['action_to_take_reason'] = 'failed_time_check'
-        automatic_status['failed_automatic_checks'] = all_check_string
+        automatic_status['action_to_take_reason'] = all_check_string
         image_data.update(automatic_status)
         # export problematic cases only
         if at_least_one_basic_check or at_least_one_time_check:
             inventory_with_issues[image_path_original] = image_data
+        # populate action columns
+        automatic_status['action_from_image'] = image_data['image_name_new']
+        automatic_status['action_to_image'] = image_data['image_name_new']
 
     # Export cases with issues
     logger.info("Images with potential issues")
@@ -109,7 +109,7 @@ if __name__ == '__main__':
 
     first_cols = ['season', 'site', 'roll', 'image_rank_in_roll',
                   'capture', 'image_rank_in_capture',
-                  'image_path_original_rel']
+                  'image_name_new']
     first_cols += action_cols
 
     export_inventory_to_csv(
