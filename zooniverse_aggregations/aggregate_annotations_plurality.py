@@ -9,8 +9,6 @@ from statistics import median_high, StatisticsError
 from collections import Counter, defaultdict
 import logging
 
-from sklearn.model_selection import train_test_split
-
 from logger import setup_logger, create_logfile_name
 from global_vars import plurality_aggregation_flags as flags
 from zooniverse_aggregations import aggregator
@@ -18,26 +16,33 @@ from utils import (
     print_nested_dict, set_file_permission, balanced_sample_best_effort)
 
 # args = dict()
-# args['classifications_extracted_csv'] = '/home/packerc/shared/zooniverse/Exports/CC/CC_S1_classifications_extracted.csv'
+# args['annotations'] = '/home/packerc/shared/zooniverse/Exports/CC/CC_S1_classifications_extracted.csv'
 # args['output_csv'] = '/home/packerc/shared/zooniverse/Exports/CC/CC_S1_classifications_aggregated.csv'
 # args['subject_csv'] = '/home/packerc/shared/zooniverse/Exports/CC/CC_S1_subjects.csv'
 #
 # args = dict()
-# args['classifications_extracted_csv'] = '/home/packerc/shared/zooniverse/Exports/SER/SER_S1_classifications_extracted.csv'
+# args['annotations'] = '/home/packerc/shared/zooniverse/Exports/SER/SER_S1_classifications_extracted.csv'
 # args['output_csv'] = '/home/packerc/shared/zooniverse/Exports/SER/SER_S1_classifications_aggregated.csv'
 # args['export_consensus_only'] = False
 #
 # args = dict()
-# args['classifications_extracted_csv'] = '/home/packerc/shared/zooniverse/Exports/GRU/GRU_S1_classifications_extracted.csv'
+# args['annotations'] = '/home/packerc/shared/zooniverse/Exports/GRU/GRU_S1_classifications_extracted.csv'
 # args['output_csv'] = '/home/packerc/shared/zooniverse/Exports/GRU/GRU_S1_classifications_aggregated.csv'
 # args['subject_csv'] = '/home/packerc/shared/zooniverse/Exports/GRU/GRU_S1_subjects.csv'
 #
 # args = dict()
-# args['classifications_extracted_csv'] = '/home/packerc/shared/zooniverse/Exports/MTZ/MTZ_S1_classifications_extracted.csv'
+# args['annotations'] = '/home/packerc/shared/zooniverse/Exports/MTZ/MTZ_S1_classifications_extracted.csv'
 # args['output_csv'] = '/home/packerc/shared/zooniverse/Exports/MTZ/MTZ_S1_classifications_aggregated.csv'
 # args['subject_csv'] = '/home/packerc/shared/zooniverse/Exports/MTZ/MTZ_S1_subjects.csv'
 # args['export_consensus_only'] = False
 
+
+# args = dict()
+# args['annotations'] = '/home/packerc/shared/zooniverse/Exports/PLN/PLN_S1_annotations.csv'
+# args['output_csv'] = '/home/packerc/shared/zooniverse/Exports/PLN/PLN_S1_annotations_aggregated.csv'
+# args['subject_csv'] = '/home/packerc/shared/zooniverse/Exports/PLN/PLN_S1_subjects.csv'
+# args['export_consensus_only'] = True
+# args['export_sample_size'] = 300
 
 def aggregate_species(
         species_names, species_stats,
@@ -86,11 +91,11 @@ if __name__ == '__main__':
     # Parse command line arguments
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "--classifications_extracted_csv", type=str, required=True,
-        help="Path to extracted classifications")
+        "--annotations", type=str, required=True,
+        help="Path to extracted annotations")
     parser.add_argument(
         "--output_csv", type=str, required=True,
-        help="Path to file to store aggregated classifications.")
+        help="Path to file to store aggregated annotations.")
     parser.add_argument(
         "--export_consensus_only", action="store_true",
         help="Export only species with plurality consensus")
@@ -104,10 +109,10 @@ if __name__ == '__main__':
     # Check Input
     ######################################
 
-    if not os.path.isfile(args['classifications_extracted_csv']):
+    if not os.path.isfile(args['annotations']):
         raise FileNotFoundError(
-            "classifications_extracted_csv: {} not found".format(
-             args['classifications_extracted_csv']))
+            "annotations: {} not found".format(
+             args['annotations']))
 
     ######################################
     # Configuration
@@ -138,7 +143,7 @@ if __name__ == '__main__':
 
     # Read Annotations and associate with subject id
     subject_annotations = dict()
-    with open(args['classifications_extracted_csv'], "r") as ins:
+    with open(args['annotations'], "r") as ins:
         csv_reader = csv.reader(ins, delimiter=',', quotechar='"')
         header = next(csv_reader)
         row_name_to_id_mapper = {x: i for i, x in enumerate(header)}
@@ -356,13 +361,18 @@ if __name__ == '__main__':
             main_answers = \
                 [x[question_main_id] for x in subject_identificatons
                  if x['species_is_plurality_consensus'] == 1]
+            _ids_all = [i for i, x in enumerate(subject_identificatons)
+                        if x['species_is_plurality_consensus'] == 1]
         else:
             main_answers = \
                 [x[question_main_id] for x in subject_identificatons]
+            _ids_all = [i for i in range(0, len(subject_identificatons))]
 
         _ids_sampled = \
             balanced_sample_best_effort(
                 main_answers, args['export_sample_size'])
+
+        _ids_sampled_mapped = [_ids_all[i] for i in _ids_sampled]
 
         # sample_size = min(args['export_sample_size'], n_total)
         # _ids_sampled = random.sample(_ids_all, sample_size)
@@ -372,7 +382,7 @@ if __name__ == '__main__':
             logger.info("Writing output to {}".format(output_csv_sample))
             csv_writer.writerow(output_header)
             n_written = 0
-            for line_no, line_id in enumerate(_ids_sampled):
+            for line_no, line_id in enumerate(_ids_sampled_mapped):
                 record = subject_identificatons[line_id]
                 # get subject info data
                 to_write = [record[x] for x in output_header]

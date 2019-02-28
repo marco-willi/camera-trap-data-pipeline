@@ -7,6 +7,7 @@ import datetime
 import json
 import random
 import math
+import numpy as np
 from hashlib import md5
 import logging
 import configparser
@@ -258,14 +259,14 @@ def balanced_sample_best_effort(y, n_samples):
     freq = class_samples.most_common()
     n_tot = sum(class_samples.values())
     n_samples = min(n_samples, n_tot)
-    #n_samples_per_step = math.ceil(n_samples / len(class_samples))
-    n_samples_per_step = 5
-
+    n_samples_per_step = math.ceil(n_samples / len(class_samples))
+    # n_samples_per_step = math.ceil(
+    #     np.quantile(list(class_samples.values()), 0.01))
+    n_samples_per_step = 1
     maps = {k: [] for k in class_samples.keys()}
     sampled = {k: [] for k in class_samples.keys()}
     for _id, yy in enumerate(y):
         maps[yy].append(_id)
-
     n_sampled = 0
     while n_sampled < n_samples:
         for k, f in reversed(freq):
@@ -275,7 +276,6 @@ def balanced_sample_best_effort(y, n_samples):
                 maps[k].pop(random.randrange(len(maps[k])))
                 for _ in range(n_to_sample)]
             n_sampled += n_to_sample
-
     sampled_ids = [sampled[k] for k, f in reversed(freq)]
     sampled_list = list()
     for i, x in enumerate(sampled_ids):
@@ -283,5 +283,4 @@ def balanced_sample_best_effort(y, n_samples):
         if i >= n_samples:
             break
     sampled_list = sampled_list[0:n_samples]
-    random.shuffle(sampled_list)
     return sampled_list
