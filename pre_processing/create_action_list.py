@@ -13,7 +13,7 @@ from pre_processing.utils import (
     plot_site_roll_timelines, read_image_inventory,
     image_check_stats,
     export_inventory_to_csv)
-from logger import create_logfile_name, setup_logger
+from logger import create_log_file, setup_logger
 from global_vars import pre_processing_flags as flags
 
 # args = dict()
@@ -31,6 +31,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("--inventory_grouped", type=str, required=True)
     parser.add_argument("--action_list_csv", type=str, required=True)
+    parser.add_argument("--log_dir", type=str, default=None)
     parser.add_argument("--plot_timelines", action='store_true')
     args = vars(parser.parse_args())
 
@@ -40,11 +41,15 @@ if __name__ == '__main__':
             "inventory_grouped {} does not exist -- must be a file".format(
                 args['inventory_grouped']))
 
-    log_file_name = create_logfile_name('create_action_list')
-    log_file_path = os.path.join(
-        os.path.dirname(args['action_list_csv']), log_file_name)
+    # Logging
+    if args['log_dir'] is not None:
+        log_file_dir = args['log_dir']
+    else:
+        log_file_dir = os.path.dirname(args['action_list_csv'])
+    log_file_path = create_log_file(
+        log_file_dir,
+        'create_action_list')
     setup_logger(log_file_path)
-    # setup_logger()
     logger = logging.getLogger(__name__)
 
     # read grouped data

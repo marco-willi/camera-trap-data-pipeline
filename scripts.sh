@@ -81,6 +81,14 @@ PROJECT_ID=
 WORKFLOW_ID=
 WORFKLOW_VERSION_MIN=
 
+# TEST
+cd $HOME/snapshot_safari_misc
+SITE=APN
+SEASON=APN_S2_TEST_canBeDeleted
+PROJECT_ID=
+WORKFLOW_ID=
+WORFKLOW_VERSION_MIN=
+
 
 ###################################
 # Python Prep
@@ -96,27 +104,30 @@ git pull
 # Pre-Processing
 ####################################
 
-# Data processing
+# Check Input Structure
 python3 -m pre_processing.check_input_structure \
 --root_dir /home/packerc/shared/albums/${SITE}/${SEASON}/ \
---log_dir /home/packerc/shared/season_captures/${SITE}/captures/
+--log_dir /home/packerc/shared/season_captures/${SITE}/log_files/
 
 # Create Image Inventory
 python3 -m pre_processing.create_image_inventory \
 --root_dir /home/packerc/shared/albums/${SITE}/${SEASON}/ \
 --output_csv /home/packerc/shared/season_captures/${SITE}/captures/${SEASON}_inventory.csv \
+--log_dir /home/packerc/shared/season_captures/${SITE}/log_files/ \
 --n_processes 16
 
 # Group Images into Captures
 python3 -m pre_processing.group_inventory_into_captures \
 --inventory /home/packerc/shared/season_captures/${SITE}/captures/${SEASON}_inventory.csv \
 --output_csv /home/packerc/shared/season_captures/${SITE}/captures/${SEASON}_captures.csv \
+--log_dir /home/packerc/shared/season_captures/${SITE}/log_files/ \
 --no_older_than_year 2017 \
 --no_newer_than_year 2019
 
-# rename all images in inventory
-# python3 -m pre_processing.rename_images \
-# --inventory /home/packerc/shared/season_captures/${SITE}/captures/${SEASON}_captures.csv
+# rename all images
+python3 -m pre_processing.rename_images \
+--inventory /home/packerc/shared/season_captures/${SITE}/captures/${SEASON}_captures.csv \
+--log_dir /home/packerc/shared/season_captures/${SITE}/log_files/
 
 # generate action list
 python3 -m pre_processing.create_action_list \
