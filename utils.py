@@ -258,7 +258,8 @@ def balanced_sample_best_effort(y, n_samples):
     freq = class_samples.most_common()
     n_tot = sum(class_samples.values())
     n_samples = min(n_samples, n_tot)
-    n_samples_per_step = math.ceil(n_samples / len(class_samples))
+    #n_samples_per_step = math.ceil(n_samples / len(class_samples))
+    n_samples_per_step = 5
 
     maps = {k: [] for k in class_samples.keys()}
     sampled = {k: [] for k in class_samples.keys()}
