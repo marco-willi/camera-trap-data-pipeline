@@ -258,7 +258,7 @@ def balanced_sample_best_effort(y, n_samples):
     freq = class_samples.most_common()
     n_tot = sum(class_samples.values())
     n_samples = min(n_samples, n_tot)
-    n_balanced = math.ceil(n_samples / len(class_samples))
+    n_samples_per_step = math.ceil(n_samples / len(class_samples))
 
     maps = {k: [] for k in class_samples.keys()}
     sampled = {k: [] for k in class_samples.keys()}
@@ -269,17 +269,18 @@ def balanced_sample_best_effort(y, n_samples):
     while n_sampled < n_samples:
         for k, f in reversed(freq):
             n_in_group = len(maps[k])
-            n_to_sample = min(n_in_group, n_balanced)
+            n_to_sample = min(n_in_group, n_samples_per_step)
             sampled[k] += [
                 maps[k].pop(random.randrange(len(maps[k])))
                 for _ in range(n_to_sample)]
             n_sampled += n_to_sample
 
     sampled_ids = [sampled[k] for k, f in reversed(freq)]
-    sampled = list()
+    sampled_list = list()
     for i, x in enumerate(sampled_ids):
-        sampled += x
+        sampled_list += x
         if i >= n_samples:
             break
-    sampled = sampled[0:n_samples]
-    return sampled
+    sampled_list = sampled_list[0:n_samples]
+    random.shuffle(sampled_list)
+    return sampled_list
