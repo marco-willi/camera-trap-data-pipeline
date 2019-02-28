@@ -111,12 +111,12 @@ python3 -m pre_processing.create_image_inventory \
 python3 -m pre_processing.group_inventory_into_captures \
 --inventory /home/packerc/shared/season_captures/${SITE}/captures/${SEASON}_inventory.csv \
 --output_csv /home/packerc/shared/season_captures/${SITE}/captures/${SEASON}_captures.csv \
---no_older_than_year 2018 \
+--no_older_than_year 2017 \
 --no_newer_than_year 2019
 
 # rename all images in inventory
-python3 -m pre_processing.rename_images \
---inventory /home/packerc/shared/season_captures/${SITE}/captures/${SEASON}_captures.csv
+# python3 -m pre_processing.rename_images \
+# --inventory /home/packerc/shared/season_captures/${SITE}/captures/${SEASON}_captures.csv
 
 # generate action list
 python3 -m pre_processing.create_action_list \
