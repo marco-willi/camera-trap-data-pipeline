@@ -136,8 +136,11 @@ def read_image_inventory(path, unique_id='image_path_original'):
     df.fillna('', inplace=True)
     inventory = df.to_dict('index', into=OrderedDict)
     inventory_with_index_as_col = OrderedDict()
-    for _id, data in inventory.items():
-        inventory_with_index_as_col[data[unique_id]] = data
+    for i, (_id, data) in enumerate(inventory.items()):
+        if unique_id is not None:
+            inventory_with_index_as_col[data[unique_id]] = data
+        else:
+            inventory_with_index_as_col[i] = data
     return inventory_with_index_as_col
 
 

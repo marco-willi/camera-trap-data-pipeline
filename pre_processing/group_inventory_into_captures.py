@@ -9,7 +9,7 @@ from pre_processing.utils import (
     image_check_stats, read_image_inventory,
     export_inventory_to_csv, update_time_checks)
 from global_vars import pre_processing_flags as flags
-from logger import create_logfile_name, setup_logger
+from logger import create_log_file, setup_logger
 
 # args = dict()
 #
@@ -43,8 +43,8 @@ def group_images_into_site_and_roll(inventory):
     # Group images into site and roll
     site_roll_inventory = dict()
     for image_id, image_data in inventory.items():
-        if image_data['datetime'] == '':
-            continue
+        # if image_data['datetime'] == '':
+        #     continue
         season = image_data['season']
         site = image_data['site']
         roll = image_data['roll']
@@ -67,7 +67,12 @@ def group_images_into_captures(inventory, flags):
         times = list()
         paths = list()
         for image_id, image_data in site_roll_data.items():
-            times.append(image_data['datetime'])
+            # if exif time not available take file creation time
+            if image_data['datetime'] == '':
+                img_time = image_data['file_creation_date']
+            else:
+                img_time = image_data['datetime']
+            times.append(img_time)
             paths.append(image_id)
         # Define the order of the images by 1) time and 2) by name
         datetimes = [
@@ -151,15 +156,20 @@ if __name__ == '__main__':
     parser.add_argument("--output_csv", type=str, required=True)
     parser.add_argument("--no_older_than_year", type=int, default=1970)
     parser.add_argument("--no_newer_than_year", type=int, default=9999)
+    parser.add_argument("--log_dir", type=str, default=None)
     args = vars(parser.parse_args())
 
     # image check paramters
     msg_width = 99
 
-    # logging
-    log_file_name = create_logfile_name('group_inventory_into_captures')
-    log_file_path = os.path.join(
-        os.path.dirname(args['output_csv']), log_file_name)
+    # Logging
+    if args['log_dir'] is not None:
+        log_file_dir = args['log_dir']
+    else:
+        log_file_dir = os.path.dirname(args['output_csv'])
+    log_file_path = create_log_file(
+        log_file_dir,
+        'group_inventory_into_captures')
     setup_logger(log_file_path)
     logger = logging.getLogger(__name__)
 

@@ -12,7 +12,7 @@ from multiprocessing import Process, Manager
 from PIL import Image
 from PIL.ExifTags import TAGS as exif_map
 
-from logger import setup_logger, create_logfile_name
+from logger import setup_logger, create_log_file
 from pre_processing.utils import (
     file_creation_date, image_check_stats, p_pixels_above_threshold,
     p_pixels_below_threshold, export_inventory_to_csv)
@@ -37,6 +37,7 @@ if __name__ == '__main__':
         help="identifier that is exported to the inventory")
     parser.add_argument("--output_csv", type=str, required=True)
     parser.add_argument("--n_processes", type=int, default=4)
+    parser.add_argument("--log_dir", type=str, default=None)
     args = vars(parser.parse_args())
 
     # image check paramters
@@ -48,10 +49,14 @@ if __name__ == '__main__':
             "root_dir {} does not exist -- must be a directory".format(
                 args['root_dir']))
 
-    # logging
-    log_file_name = create_logfile_name('create_image_inventory')
-    log_file_path = os.path.join(
-        os.path.dirname(args['output_csv']), log_file_name)
+    # Logging
+    if args['log_dir'] is not None:
+        log_file_dir = args['log_dir']
+    else:
+        log_file_dir = os.path.dirname(args['output_csv'])
+    log_file_path = create_log_file(
+        log_file_dir,
+        'create_image_inventory')
     setup_logger(log_file_path)
     logger = logging.getLogger(__name__)
 

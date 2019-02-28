@@ -17,7 +17,7 @@ import argparse
 import logging
 import textwrap
 
-from logger import setup_logger, create_logfile_name
+from logger import setup_logger, create_log_file
 
 
 # args = dict()
@@ -91,9 +91,9 @@ if __name__ == '__main__':
 
     # logging
     if not args['log_dir'] is None:
-        log_file_name = create_logfile_name('check_directory_structure')
-        log_file_path = os.path.join(
-            os.path.dirname(args['log_dir']), log_file_name)
+        log_file_path = create_log_file(
+            args['log_dir'],
+            'check_directory_structure')
         setup_logger(log_file_path)
     else:
         setup_logger()
