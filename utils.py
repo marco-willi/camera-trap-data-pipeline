@@ -5,9 +5,12 @@ import csv
 import time
 import datetime
 import json
+import random
+import math
 from hashlib import md5
 import logging
 import configparser
+from collections import Counter
 
 
 logger = logging.getLogger(__name__)
@@ -247,3 +250,36 @@ def set_file_permission(path):
         os.chmod(path, 0o660)
     except PermissionError:
         pass
+
+
+def balanced_sample_best_effort(y, n_samples):
+    """ Sample as balanced as possible """
+    class_samples = Counter(y)
+    freq = class_samples.most_common()
+    n_tot = sum(class_samples.values())
+    n_samples = min(n_samples, n_tot)
+    n_balanced = math.ceil(n_samples / len(class_samples))
+
+    maps = {k: [] for k in class_samples.keys()}
+    sampled = {k: [] for k in class_samples.keys()}
+    for _id, yy in enumerate(y):
+        maps[yy].append(_id)
+
+    n_sampled = 0
+    while n_sampled < n_samples:
+        for k, f in reversed(freq):
+            n_in_group = len(maps[k])
+            n_to_sample = min(n_in_group, n_balanced)
+            sampled[k] += [
+                maps[k].pop(random.randrange(len(maps[k])))
+                for _ in range(n_to_sample)]
+            n_sampled += n_to_sample
+
+    sampled_ids = [sampled[k] for k, f in reversed(freq)]
+    sampled = list()
+    for i, x in enumerate(sampled_ids):
+        sampled += x
+        if i >= n_samples:
+            break
+    sampled = sampled[0:n_samples]
+    return sampled

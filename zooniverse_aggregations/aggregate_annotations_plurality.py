@@ -4,7 +4,6 @@
 import csv
 import os
 import argparse
-import random
 import math
 from statistics import median_high, StatisticsError
 from collections import Counter, defaultdict
@@ -15,7 +14,8 @@ from sklearn.model_selection import train_test_split
 from logger import setup_logger, create_logfile_name
 from global_vars import plurality_aggregation_flags as flags
 from zooniverse_aggregations import aggregator
-from utils import print_nested_dict, set_file_permission
+from utils import (
+    print_nested_dict, set_file_permission, balanced_sample_best_effort)
 
 # args = dict()
 # args['classifications_extracted_csv'] = '/home/packerc/shared/zooniverse/Exports/CC/CC_S1_classifications_extracted.csv'
@@ -360,10 +360,9 @@ if __name__ == '__main__':
             main_answers = \
                 [x[question_main_id] for x in subject_identificatons]
 
-        n_total = len(main_answers)
-        _ids_all = [i for i in range(0, n_total)]
-        _, _ids_sampled = train_test_split(
-            _ids_all, test_size=300, stratify=main_answers, random_state=123)
+        _ids_sampled = \
+            balanced_sample_best_effort(
+                main_answers, args['export_sample_size'])
 
         # sample_size = min(args['export_sample_size'], n_total)
         # _ids_sampled = random.sample(_ids_all, sample_size)
