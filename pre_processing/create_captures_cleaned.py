@@ -5,7 +5,8 @@ import logging
 from collections import OrderedDict
 
 from logger import setup_logger, create_log_file
-from pre_processing.utils import read_image_inventory, export_inventory_to_csv
+from pre_processing.utils import (
+    read_image_inventory, export_inventory_to_csv, image_check_stats)
 
 if __name__ == '__main__':
 
@@ -62,7 +63,7 @@ if __name__ == '__main__':
         image_data_new = {k: v for k, v in image_data if k in cols_to_export}
         captures_cleaned[image_name_new] = image_data_new
 
-    image_check_stats(inventory, logger)
+    image_check_stats(captures, logger)
 
     export_inventory_to_csv(
             captures_cleaned,
