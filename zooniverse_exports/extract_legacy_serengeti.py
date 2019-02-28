@@ -292,7 +292,7 @@ if __name__ == '__main__':
     output_paths = {
         k: os.path.join(
             args['output_path'],
-            'SER_{}_classifications_extracted.csv'.format(k))
+            'SER_{}_annotations.csv'.format(k))
         for k in all_seasons.keys()}
 
     legacy_extractor.export_cleaned_annotations(
