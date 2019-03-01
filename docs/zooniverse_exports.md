@@ -110,7 +110,7 @@ python3 -m zooniverse_exports.extract_subjects \
 ```
 
 
-## Processing Snapshot Serengeti S1-S10 data (legacy format) - (in development)
+## Processing Snapshot Serengeti S1-S10 data (legacy format)
 
 Data for Snapshot Serengeti (S1-S10) has been collected via an old Zooniverse platform (Oruboros) and has a different format than the newer Snapshot Safari data. Therefore, a separate processing script was implemented to generate csv files.
 
