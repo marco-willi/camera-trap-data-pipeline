@@ -24,7 +24,7 @@ if __name__ == '__main__':
 
     # Parse command line arguments
     parser = argparse.ArgumentParser()
-    parser.add_argument("--classifications_extracted", type=str, required=True)
+    parser.add_argument("--annotations", type=str, required=True)
     parser.add_argument("--output_csv", type=str, required=True)
 
     args = vars(parser.parse_args())

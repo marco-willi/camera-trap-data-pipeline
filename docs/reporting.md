@@ -5,14 +5,39 @@ The following codes can be used to:
 1. Merge season captures with Zooniverse aggregations
 2. Merge season captures with Machine Learning predictions
 
-
-## Merge Season Captures with Zooniverse Aggregations
+The following codes show an example for Grumeti:
 
 ```
+cd $HOME/snapshot_safari_misc
+SITE=GRU
+SEASON=GRU_S1
+```
+
+## Merge Season Captures with Aggregated Annotations
+
+The following reports can be generated:
+```
 python3 -m reporting.add_aggregations_to_season_captures \
-        --season_captures_csv /home/packerc/shared/season_captures/GRU/cleaned/GRU_S1_cleaned.csv \
-        --aggregated_csv /home/packerc/shared/zooniverse/Exports/GRU/GRU_S1_classifications_aggregated_subject_info.csv \
-        --output_csv /home/packerc/shared/zooniverse/Reports/GRU/GRU_S1_report_zooniverse.csv
+--season_captures_csv /home/packerc/shared/season_captures/${SITE}/cleaned/${SEASON}_cleaned.csv \
+--aggregated_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_annotations_aggregated_subject_info.csv \
+--output_csv /home/packerc/shared/zooniverse/Reports/${SITE}/${SEASON}_report_all.csv \
+--default_season_id ${SEASON}
+
+# Reporting of Zooniverse exports - only captures with annotations
+python3 -m reporting.add_aggregations_to_season_captures \
+--season_captures_csv /home/packerc/shared/season_captures/${SITE}/cleaned/${SEASON}_cleaned.csv \
+--aggregated_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_annotations_aggregated_subject_info.csv \
+--output_csv /home/packerc/shared/zooniverse/Reports/${SITE}/${SEASON}_report.csv \
+--default_season_id ${SEASON} \
+--export_only_with_aggregations
+
+# Reporting of Zooniverse exports - only captures with annotations and samples
+python3 -m reporting.add_aggregations_to_season_captures \
+--season_captures_csv /home/packerc/shared/season_captures/${SITE}/cleaned/${SEASON}_cleaned.csv \
+--aggregated_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_annotations_aggregated_samples_subject_info.csv \
+--output_csv /home/packerc/shared/zooniverse/Reports/${SITE}/${SEASON}_report_samples.csv \
+--default_season_id ${SEASON} \
+--export_only_with_aggregations
 ```
 
 ## Output Fields
@@ -24,14 +49,19 @@ The following file contains one record per capture event and species detection. 
 |capture_id, season, roll, site, capture | internal identifiers of the capture
 |capture_date_local | local date (YYYY-MM-DD) of the capture
 |capture_time_local | local time (HH:MM:SS) of the capture
-|subject_id | Zooniverse subject_id (per capture)
+|subject_id | Zooniverse subject_id (unique per capture)
 |retirement_reason | Zooniverse retirement reason
-|retired_at | Zooniverse date when retired
+|created_at | Zooniverse date when the capture was uploaded
+|retired_at | Zooniverse date when the capture was retired
 |zooniverse_url_*| Zooniverse image links of the capture (if uploaded)
-|question__* | Aggregated question answers
+|question__* | Aggregated question answers, fractions, labels or counts
 |n_users_identified_this_species | Number of users that identified 'question__species'
 |p_users_identified_this_species | Proportion of users that identified 'question__species'
-|n_species_ids_per_user_median | Median number of different species identified among users for this capture
+|n_species_ids_per_user_median | Median number of different species identified among users who identified at least one species for this capture
+|n_users_saw_a_species| Number of users who saw/id'd at least one species.
+|n_users_saw_no_species| Number of users who saw/id'd no species.
+|p_users_saw_a_species| Proportion of users who saw/id'd a species.
+|pielous_evenness_index| The Pielou Evenness Index or 0 for unanimous vote
 |n_users_classified_this_subject | Number of users that classified this subject
 |species_is_plurality_consensus | Flag indicating a plurality consensus for this species (normally only species with a 1 are relevant)
 

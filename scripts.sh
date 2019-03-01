@@ -268,9 +268,24 @@ python3 -m zooniverse_exports.add_subject_info_to_csv \
 python3 -m reporting.add_aggregations_to_season_captures \
 --season_captures_csv /home/packerc/shared/season_captures/${SITE}/cleaned/${SEASON}_cleaned.csv \
 --aggregated_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_annotations_aggregated_subject_info.csv \
---output_csv /home/packerc/shared/zooniverse/Reports/${SITE}/${SEASON}_report_zooniverse.csv \
+--output_csv /home/packerc/shared/zooniverse/Reports/${SITE}/${SEASON}_report_all.csv \
 --default_season_id ${SEASON}
 
+# Reporting of Zooniverse exports - only captures with annotations
+python3 -m reporting.add_aggregations_to_season_captures \
+--season_captures_csv /home/packerc/shared/season_captures/${SITE}/cleaned/${SEASON}_cleaned.csv \
+--aggregated_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_annotations_aggregated_subject_info.csv \
+--output_csv /home/packerc/shared/zooniverse/Reports/${SITE}/${SEASON}_report.csv \
+--default_season_id ${SEASON} \
+--export_only_with_aggregations
+
+# Reporting of Zooniverse exports - only captures with annotations and samples
+python3 -m reporting.add_aggregations_to_season_captures \
+--season_captures_csv /home/packerc/shared/season_captures/${SITE}/cleaned/${SEASON}_cleaned.csv \
+--aggregated_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_annotations_aggregated_samples_subject_info.csv \
+--output_csv /home/packerc/shared/zooniverse/Reports/${SITE}/${SEASON}_report_samples.csv \
+--default_season_id ${SEASON} \
+--export_only_with_aggregations
 
 # python3 -m reporting.add_aggregations_to_season_captures \
 # --season_captures_csv '/home/isbell/shared/Snapshot Cedar Creek Images/CC_S01_cleaned_captures.csv' \
@@ -299,8 +314,8 @@ module load python3
 
 cd $HOME/snapshot_safari_misc
 SITE=SER
-SEASON=SER_S1
-SEASON_STRING='S1'
+SEASON=SER_S5
+SEASON_STRING='S5'
 
 # Extract Annotations
 python3 -m zooniverse_exports.extract_legacy_serengeti \
@@ -311,7 +326,7 @@ python3 -m zooniverse_exports.extract_legacy_serengeti \
 
 # Aggregate Annotations
 python3 -m zooniverse_aggregations.aggregate_annotations_plurality \
---classifications_extracted /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_annotations.csv \
+--annotations /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_annotations.csv \
 --output_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_annotations_aggregated.csv \
 --export_consensus_only \
 --export_sample_size 300
@@ -319,7 +334,7 @@ python3 -m zooniverse_aggregations.aggregate_annotations_plurality \
 
 # Extract Subjects from Classifications
 python3 -m zooniverse_exports.extract_subjects_legacy \
---classifications_extracted /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_annotations_extracted.csv \
+--annotations /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_annotations.csv \
 --output_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subjects_extracted.csv
 
 
