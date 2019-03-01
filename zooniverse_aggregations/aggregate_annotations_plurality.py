@@ -138,7 +138,7 @@ if __name__ == '__main__':
         flags['QUESTION_DELIMITER'])
 
     ######################################
-    # Import Classifications
+    # Import Annotations
     ######################################
 
     # Read Annotations and associate with subject id
@@ -165,7 +165,7 @@ if __name__ == '__main__':
         questions, flags)
 
     ######################################
-    # Aggregate Classifications
+    # Aggregate Annotations
     ######################################
 
     subject_species_aggregations = dict()

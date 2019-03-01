@@ -326,8 +326,8 @@ module load python3
 
 cd $HOME/snapshot_safari_misc
 SITE=SER
-SEASON=SER_S8
-SEASON_STRING='S8'
+SEASON=SER_S10
+SEASON_STRING='10'
 
 # Extract Annotations
 python3 -m zooniverse_exports.extract_legacy_serengeti \

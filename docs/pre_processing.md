@@ -162,7 +162,7 @@ python3 -m pre_processing.create_captures_cleaned \
 --log_dir /home/packerc/shared/season_captures/${SITE}/log_files/
 ```
 
-## Re-check cleaned captures (OPTIONAL)
+## Re-check cleaned captures (OPTIONAL) -- (Experimental Feature!)
 
 The following code can be used to re-check the cleaned captures file. This should only be necessary if timechanges were applied because this may lead to new errors. If new errors are shown (printed to the console/logfile) generate a new actions list and proceed from there. If no errors are shown, the generated file can be deleted.
 
