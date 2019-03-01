@@ -17,7 +17,7 @@ from zooniverse_exports.legacy_extractor import build_img_path
 from global_vars import add_subject_info_flags_legacy as flags
 
 # args = dict()
-# args['classifications_extracted'] = '/home/packerc/shared/zooniverse/Exports/SER/SER_S1_classifications_extracted.csv'
+# args['annotations'] = '/home/packerc/shared/zooniverse/Exports/SER/SER_S1_annotations.csv'
 # args['output_csv'] = '/home/packerc/shared/zooniverse/Exports/SER/SER_S1_subjects_extracted.csv'
 
 if __name__ == '__main__':
@@ -33,10 +33,10 @@ if __name__ == '__main__':
     # Check Input
     ######################################
 
-    if not os.path.isfile(args['classifications_extracted']):
+    if not os.path.isfile(args['annotations']):
         raise FileNotFoundError(
-            "classifications_extracted: {} not found".format(
-             args['classifications_extracted']))
+            "annotations: {} not found".format(
+             args['annotations']))
 
     flags.sort()
 
@@ -53,7 +53,7 @@ if __name__ == '__main__':
 
     # Read Subject CSV
     class_dict = OrderedDict()
-    with open(args['classifications_extracted'], "r") as ins:
+    with open(args['annotations'], "r") as ins:
         csv_reader = csv.reader(ins, delimiter=',', quotechar='"')
         header = next(csv_reader)
         row_name_to_id_mapper = {x: i for i, x in enumerate(header)}
