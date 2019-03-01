@@ -1,11 +1,10 @@
 """ Get Zooniverse Data using the Panoptes Client """
 import argparse
 import csv
-import os
 
 from panoptes_client import Project, Panoptes
 
-from utils import read_config_file
+from utils import read_config_file, set_file_permission
 
 
 if __name__ == '__main__':
@@ -63,4 +62,4 @@ if __name__ == '__main__':
     print("Finished Writing File %s - Wrote %s records" %
           (args['output_file'], i))
 
-    os.chmod(args['output_file'], 0o660)
+    set_file_permission(args['output_file'])

@@ -30,8 +30,8 @@ cd $HOME/snapshot_safari_misc
 SITE=PLN
 SEASON=PLN_S1
 PROJECT_ID=6190
-WORKFLOW_ID=
-WORFKLOW_VERSION_MIN=
+WORKFLOW_ID=7764
+WORFKLOW_VERSION_MIN=311.5
 
 ###################################
 # Cedar Creek
@@ -242,7 +242,7 @@ python3 -m zooniverse_exports.extract_subjects \
 
 # Aggregate Classifications
 python3 -m zooniverse_aggregations.aggregate_annotations_plurality \
---classifications_extracted /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_annotations.csv \
+--annotations /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_annotations.csv \
 --output_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_annotations_aggregated.csv \
 --export_consensus_only \
 --export_sample_size 300
