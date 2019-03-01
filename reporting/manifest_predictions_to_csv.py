@@ -7,6 +7,7 @@ import argparse
 from collections import OrderedDict
 
 from logger import setup_logger, create_logfile_name
+from utils import set_file_permission
 
 # args = dict()
 # args['manifest'] = '/home/packerc/shared/zooniverse/Manifests/GRU/GRU_S1__complete__manifest.json'
@@ -90,6 +91,6 @@ if __name__ == '__main__':
             csv_writer.writerow(to_write)
         logger.info("Wrote {} records to {}".format(
             line_no, args['output_csv']))
-            
+
     # change permmissions to read/write for group
-    os.chmod(args['output_csv'], 0o660)
+    set_file_permission(args['output_csv'])

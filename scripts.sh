@@ -23,6 +23,18 @@ WORKFLOW_ID=8814
 WORFKLOW_VERSION_MIN=247
 
 ###################################
+# Karoo
+####################################
+
+cd $HOME/snapshot_safari_misc
+SITE=KAR
+SEASON=KAR_S1
+PROJECT_ID=7679
+WORKFLOW_ID=8789
+WORFKLOW_VERSION_MIN=237.7
+
+
+###################################
 # Pilanesberg
 ####################################
 
@@ -76,15 +88,15 @@ WORFKLOW_VERSION_MIN=
 
 cd $HOME/snapshot_safari_misc
 SITE=APN
-SEASON=APN_S2
-PROJECT_ID=
-WORKFLOW_ID=
-WORFKLOW_VERSION_MIN=
+SEASON=APN_S1
+PROJECT_ID=5561
+WORKFLOW_ID=5719
+WORFKLOW_VERSION_MIN=159.9
 
-# TEST
+
 cd $HOME/snapshot_safari_misc
 SITE=APN
-SEASON=APN_S2_TEST_canBeDeleted
+SEASON=APN_S2
 PROJECT_ID=
 WORKFLOW_ID=
 WORFKLOW_VERSION_MIN=
@@ -314,8 +326,8 @@ module load python3
 
 cd $HOME/snapshot_safari_misc
 SITE=SER
-SEASON=SER_S5
-SEASON_STRING='S5'
+SEASON=SER_S8
+SEASON_STRING='S8'
 
 # Extract Annotations
 python3 -m zooniverse_exports.extract_legacy_serengeti \

@@ -7,7 +7,6 @@ import datetime
 import json
 import random
 import math
-import numpy as np
 from hashlib import md5
 import logging
 import configparser

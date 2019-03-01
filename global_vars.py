@@ -91,7 +91,8 @@ extractor_flags = dict()
 # Prefix each question in the output with the following prefix and delim
 # Example: 'question__young_present' instead of 'young_present'
 extractor_flags['QUESTION_PREFIX'] = global_processing_flags['QUESTION_PREFIX']
-extractor_flags['QUESTION_DELIMITER'] = global_processing_flags['QUESTION_DELIMITER']
+extractor_flags['QUESTION_DELIMITER'] = \
+    global_processing_flags['QUESTION_DELIMITER']
 
 # map the following question names
 extractor_flags['QUESTION_NAME_MAPPER'] = {
