@@ -24,7 +24,7 @@ def rename_files(source_paths, dest_paths, logger):
             else:
                 logger.warning("{} - {} - dest: {} does not exist".format(
                     msg_fail, msg_source, dst))
-        if (i % 1001) == 0:
+        if ((i+1) % 1000) == 0:
             logger.info("Renamed {:10}/{} files".format(i+1, n_total))
     logger.info("Finished, renamed {:10}/{} files".format(i+1, n_total))
 
