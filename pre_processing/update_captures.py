@@ -37,7 +37,7 @@ if __name__ == '__main__':
         log_file_dir = os.path.dirname(args['captures_cleaned'])
     log_file_path = create_log_file(
         log_file_dir,
-        'create_captures_cleaned')
+        'update_captures')
     setup_logger(log_file_path)
     logger = logging.getLogger(__name__)
 

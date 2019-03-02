@@ -104,8 +104,15 @@ if __name__ == '__main__':
         automatic_status['action_from_image'] = image_data['image_name']
         automatic_status['action_to_image'] = image_data['image_name']
         image_data.update(automatic_status)
+        # check if image was in previous action lists and was flagged as ok
+        try:
+            previous_action_is_ok = \
+                (image_data['action_taken'] in ('ok', 'invalid'))
+        except:
+            previous_action_is_ok = False
         # export problematic cases only
-        if at_least_one_basic_check or at_least_one_time_check:
+        has_issue = (at_least_one_basic_check or at_least_one_time_check)
+        if has_issue and not previous_action_is_ok:
             inventory_with_issues[image_path_original] = image_data
 
     # Export cases with issues
