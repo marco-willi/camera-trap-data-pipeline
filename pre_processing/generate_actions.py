@@ -50,13 +50,15 @@ if __name__ == '__main__':
     setup_logger(log_file_path)
     logger = logging.getLogger(__name__)
 
+    # Parameters
+    msg_width = 150
+    valid_actions = ('delete', 'ok', 'invalidate', 'timechange')
+
     # read files
     captures = read_image_inventory(
         args['captures'], unique_id='image_name_new')
     action_list = read_image_inventory(
         args['action_list'], unique_id=None)
-    msg_width = 150
-    valid_actions = ('delete', 'ok', 'invalidate', 'timechange')
 
     def check_site_specified_if_roll_action(action):
         """ Check that site is specified if roll is """
@@ -153,7 +155,12 @@ if __name__ == '__main__':
             raise ImportError(msg)
 
     def get_action_scope(action):
-        """ Determine the scope of the action """
+        """ Determine the scope of the action, one of:
+            - 'site': action on whole site
+            - 'site_roll': action on a roll
+            - 'single_image': action on a single image
+            - 'image_range': action on a range of images
+        """
         if action['action_site'] != '':
             if action['action_roll'] != '':
                 return 'site_roll'
@@ -196,8 +203,12 @@ if __name__ == '__main__':
             actions[image] = current_action
         return actions
 
-    def find_all_images_for_start_end_image(first_image, last_image, inventory):
-        """ Generate list of all images in a range """
+    def find_all_images_for_start_end_image(
+            first_image, last_image, inventory):
+        """ Generate list of all images in a range
+            first_image: name of first image in the range
+            last_image: name of last image in the range
+        """
         images_list = list()
         fetch_images = False
         for image_name_new, image_data in inventory.items():
@@ -267,20 +278,27 @@ if __name__ == '__main__':
                 captures)
         else:
             logger.error("action_scope {} not recognized".format(action_scope))
-            raise ValueError("action_scope {} not recognized".format(action_scope))
+            raise ValueError(
+                "action_scope {} not recognized".format(action_scope))
         # generate actions for all images
         actions_dict = generate_actions_for_images(action, images)
         for img, img_action in actions_dict.items():
+            # handle case where multiple actions have been selected for the
+            # same image, prioritize delete > timechange > others
             if img in actions_inventory:
+                existing_action = actions_dict[img]['action_to_take']
                 logger.warning(
                     textwrap.shorten(
                         "image {} has more than one action, \
-                         found action {}, additional action {}".format(
+                         found action {}, additional action {} \
+                         prioritizing deletion > timechange > others".format(
                          img,
-                         actions_dict[img]['action_to_take'],
+                         existing_action,
                          img_action['action_to_take']
                         ), width=msg_width))
-                if actions_dict[img]['action_to_take'] == 'delete':
+                if img_action['action_to_take'] == 'delete':
+                    actions_dict[img].update(img_action)
+                elif existing_action in ('delete', 'timechange'):
                     continue
                 else:
                     actions_dict[img].update(img_action)

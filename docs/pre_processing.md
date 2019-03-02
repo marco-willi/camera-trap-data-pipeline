@@ -20,6 +20,14 @@ SITE=APN
 SEASON=APN_S2
 ```
 
+It is recommended to create the following directories:
+```
+captures
+cleaned
+log_files
+```
+
+
 ## Check Import/Directory Structure
 
 The camera trap images to be imported need to be organized according to the following directory structure:
@@ -129,7 +137,7 @@ python3 -m pre_processing.create_action_list \
 
 ## Generate Actions
 
-This code unpacks the defined actions, performs some checks and generates a list with action items.
+This code unpacks the defined actions, performs some checks and generates a list with action items. One row per action / image.
 
 ```
 python3 -m pre_processing.generate_actions \
@@ -142,7 +150,7 @@ This file can be checked to ensure if everything is correct.
 
 ## Apply Actions
 
-This code applies the actions.
+This code applies the actions. It updates the captures file and deletes specific images if requested.
 
 ```
 python3 -m pre_processing.apply_actions \

@@ -18,12 +18,13 @@ def delete_image(captures, image_name_new, logger):
     """ delete image """
     image_path = captures[image_name_new]['image_path_new']
     os.remove(image_path)
-    logger.info("Deleted file: {}".format(image_path))
+    logger.info("Deleted image: {}".format(image_path))
 
 
 def change_time(captures, image_name_new, flags, shift_by_seconds):
     """ Shift time by seconds """
     image_data = captures[image_name_new]
+    old_time = image_data['datetime']
     new_time = add_seconds_to_time(
         image_data['datetime'],
         shift_by_seconds, flags['time_formats']['output_datetime_format'])
@@ -33,7 +34,8 @@ def change_time(captures, image_name_new, flags, shift_by_seconds):
         flags['time_formats']['output_date_format'])
     image_data['time'] = new_time.strftime(
         flags['time_formats']['output_time_format'])
-    logging.info("Changed date/time for image {}".format(image_name_new))
+    logging.info("Changed date/time for image {} from {} to {}".format(
+        image_name_new, old_time, image_data['datetime']))
 
 
 def add_seconds_to_time(date_time, seconds_to_add, format):

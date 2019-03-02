@@ -117,6 +117,13 @@ if __name__ == '__main__':
                   'image_name_new']
     first_cols += action_cols
 
+    # add a dummy record if no issues found
+    if len(inventory_with_issues.keys()) == 0:
+        random_record = inventory[list(inventory.keys())[0]]
+        empty_record = {k: '' for k in random_record.keys()}
+        inventory_with_issues['dummy'] = empty_record
+        logger.info("No issues found - creating empty action list")
+
     export_inventory_to_csv(
         inventory_with_issues,
         args['action_list_csv'],
@@ -133,12 +140,3 @@ if __name__ == '__main__':
             output_path=plot_file_path,
             date_col='datetime',
             date_format=flags['time_formats']['output_datetime_format'])
-
-# # create CSV to invalidate specific rolls
-# header_to_invalidate = [
-#     'site', 'season',
-#     'from_image', 'to_image',
-#     'from_date_time', 'to_date_time',
-#     'invalidate_images',
-#     'delete_images',
-#     'comment']

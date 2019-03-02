@@ -121,7 +121,7 @@ def read_image_inventory_old(path, unique_id='image_path_original'):
         for line_no, line in enumerate(csv_reader):
             # print status
             if ((line_no % 10000) == 0) and (line_no > 0):
-                print("Read {:,} images".format(line_no))
+                print("Read {:,} records".format(line_no))
             image_path_original = \
                 line[row_name_to_id_mapper[unique_id]]
             inventory[image_path_original] = {

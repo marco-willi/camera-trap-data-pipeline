@@ -138,15 +138,17 @@ def update_inventory_with_capture_data(inventory, image_to_capture):
     for image_path_original, image_capture_data in image_to_capture.items():
         # add capture information
         inventory[image_path_original].update(image_capture_data)
-        # create new paths if not already exists
-        if 'image_path_new' not in inventory[image_path_original]:
-            image_data = inventory[image_path_original]
-            inventory[image_path_original]['image_path_new'] = \
-                create_new_image_path(image_data)
-            inventory[image_path_original]['image_name_new'] = \
-                create_new_image_name(image_data)
-            inventory[image_path_original]['image_path_new_rel'] = \
-                create_new_image_path_rel(image_data)
+
+
+def update_inventory_with_image_names(inventory):
+    """ Create new image names """
+    for image_data in image_to_capture.values():
+        image_data['image_path_new'] = \
+            create_new_image_path(image_data)
+        image_data['image_name_new'] = \
+            create_new_image_name(image_data)
+        image_data['image_path_new_rel'] = \
+            create_new_image_path_rel(image_data)
 
 
 def update_time_checks_inventory(inventory, flags):
@@ -195,6 +197,8 @@ if __name__ == '__main__':
     image_to_capture = group_images_into_captures(inventory, flags)
 
     update_inventory_with_capture_data(inventory, image_to_capture)
+
+    update_inventory_with_image_names(inventory)
 
     update_time_checks_inventory(inventory, flags)
 
