@@ -115,7 +115,13 @@ if __name__ == '__main__':
     first_cols = ['season', 'site', 'roll', 'image_rank_in_roll',
                   'capture', 'image_rank_in_capture',
                   'image_name']
+    info_cols = [
+     'days_to_last_image_taken', 'days_to_next_image_taken',
+     'datetime', 'date', 'time',	'file_creation_date',
+     'image_path', 'image_path_rel']
+
     first_cols += action_cols
+    first_cols += info_cols
 
     # add a dummy record if no issues found
     if len(inventory_with_issues.keys()) == 0:
@@ -124,8 +130,14 @@ if __name__ == '__main__':
         inventory_with_issues['dummy'] = empty_record
         logger.info("No issues found - creating empty action list")
 
+    # keep only relevant columns
+    inventory_with_issues_short = OrderedDict()
+    for image, image_data in inventory_with_issues.items():
+        inventory_with_issues_short[image] = {
+            k: image_data[k] for k in first_cols}
+
     export_inventory_to_csv(
-        inventory_with_issues,
+        inventory_with_issues_short,
         args['action_list_csv'],
         first_cols=first_cols)
 
