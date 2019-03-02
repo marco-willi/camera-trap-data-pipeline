@@ -22,9 +22,9 @@ SEASON=APN_S2
 
 It is recommended to create the following directories:
 ```
-captures
-cleaned
-log_files
+season_captures/${SITE}/captures
+season_captures/${SITE}/cleaned
+season_captures/${SITE}/log_files
 ```
 
 
@@ -64,7 +64,7 @@ python3 -m pre_processing.check_input_structure \
 
 ## Create Image Inventory
 
-The following script generates an inventory of all camera trap images and performs some basic checks. The code is parallelized to speed up the checks -- use the following options to make the most of the parallelization:
+The following script generates an inventory of all camera trap images and performs some basic checks. The code is parallelized to speed up the checks -- use the following options to make the most of the parallelization (it still takes roughly 1 hour per 60k images).
 
 ```
 ssh lab
@@ -120,6 +120,8 @@ python3 -m pre_processing.create_action_list \
 --plot_timelines
 ```
 
+The option '--plot_timelines' creates a pdf in the '--action_list_csv' directory with timelines for each roll showing the number of photos per day. This can be used to identify potential issues.
+
 ### Define Actions
 
 1. Download the file 'action_list.csv'
@@ -129,20 +131,21 @@ python3 -m pre_processing.create_action_list \
 action_to_take | meaning
 ------------ | -------------
 delete | the selected images will be deleted
-timechange | the time of the selected images will be changed
+timechange | the time of the selected images will be changed (see below)
 ok | do nothing
 invalid | do nothing, but keep invalid flag
 
 4. To add new actions simply create a new row in the csv.
-WARNING: be careful not to change the datetime columns when opening the file in Excel, the format should be (YYYY-MM-DD HH:MM:SS)
+
+WARNING: be careful in using the correct datetime format for the columns 'datetime_current' and 'datetime_new' (YYYY-MM-DD HH:MM:SS) when specifying timechanges. Opening the file in Excel may change this format.
 
 5. The following options allow for selecting images for actions:
 
 column(s) to specify | meaning
 ------------ | -------------
-'action_site' | perform an action on an entire site
-'action_site'/'action_roll' | perform an action on an entire roll
-'action_from_image' / 'action_to_image' | perform an action on a range of images
+action_site | perform an action on an entire site
+action_site / action_roll | perform an action on an entire roll
+action_from_image / action_to_image | perform an action on a range of images (or one if identical)
 
 6. For each row specify: 'action_to_take' and 'action_to_take_reason'
 7. For 'timechange' in 'action_to_take' specify 'datetime_current' and 'datetime_new'. This will apply the difference between these two dates to all selected images.
