@@ -14,16 +14,16 @@ from global_vars import pre_processing_flags as flags
 # args['log_dir'] = '/home/packerc/shared/season_captures/APN/log_files/'
 
 
-def delete_image(captures, image_name_new, logger):
+def delete_image(captures, image_name, logger):
     """ delete image """
-    image_path = captures[image_name_new]['image_path_new']
+    image_path = captures[image_name]['image_path']
     os.remove(image_path)
     logger.info("Deleted image: {}".format(image_path))
 
 
-def change_time(captures, image_name_new, flags, shift_by_seconds):
+def change_time(captures, image_name, flags, shift_by_seconds):
     """ Shift time by seconds """
-    image_data = captures[image_name_new]
+    image_data = captures[image_name]
     old_time = image_data['datetime']
     new_time = add_seconds_to_time(
         image_data['datetime'],
@@ -35,7 +35,7 @@ def change_time(captures, image_name_new, flags, shift_by_seconds):
     image_data['time'] = new_time.strftime(
         flags['time_formats']['output_time_format'])
     logging.info("Changed date/time for image {} from {} to {}".format(
-        image_name_new, old_time, image_data['datetime']))
+        image_name, old_time, image_data['datetime']))
 
 
 def add_seconds_to_time(date_time, seconds_to_add, format):
@@ -76,21 +76,21 @@ if __name__ == '__main__':
     logger = logging.getLogger(__name__)
 
     actions = read_image_inventory(
-        args['actions_to_perform'], unique_id='image_name_new')
+        args['actions_to_perform'], unique_id='image_name')
     captures = read_image_inventory(
-        args['captures'], unique_id='image_name_new')
+        args['captures'], unique_id='image_name')
 
-    for image_name_new, action in actions.items():
+    for image_name, action in actions.items():
         if action['action_to_take'] == 'delete':
-            delete_image(captures, image_name_new, logger)
+            delete_image(captures, image_name, logger)
         elif action['action_to_take'] == 'timechange':
             change_time(
                 captures,
-                image_name_new, flags,
+                image_name, flags,
                 action['action_shift_time_by_seconds'])
-        captures[image_name_new]['action_taken'] = \
+        captures[image_name]['action_taken'] = \
             action['action_to_take']
-        captures[image_name_new]['action_reason'] = \
+        captures[image_name]['action_reason'] = \
             action['action_to_take_reason']
 
     export_inventory_to_csv(captures, args['captures'])

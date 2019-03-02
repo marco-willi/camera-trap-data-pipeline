@@ -101,8 +101,8 @@ if __name__ == '__main__':
             automatic_status['action_to_take'] = 'inspect'
         automatic_status['action_to_take_reason'] = all_check_string
         # populate action columns
-        automatic_status['action_from_image'] = image_data['image_name_new']
-        automatic_status['action_to_image'] = image_data['image_name_new']
+        automatic_status['action_from_image'] = image_data['image_name']
+        automatic_status['action_to_image'] = image_data['image_name']
         image_data.update(automatic_status)
         # export problematic cases only
         if at_least_one_basic_check or at_least_one_time_check:
@@ -114,7 +114,7 @@ if __name__ == '__main__':
 
     first_cols = ['season', 'site', 'roll', 'image_rank_in_roll',
                   'capture', 'image_rank_in_capture',
-                  'image_name_new']
+                  'image_name']
     first_cols += action_cols
 
     # add a dummy record if no issues found

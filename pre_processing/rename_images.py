@@ -35,7 +35,7 @@ def rename_images_in_inventory(inventory, logger):
     dest_paths = list()
     for data in inventory.values():
         source_paths.append(data['image_path_original'])
-        dest_paths.append(data['image_path_new'])
+        dest_paths.append(data['image_path'])
     rename_files(source_paths, dest_paths, logger)
 
 

@@ -43,25 +43,23 @@ if __name__ == '__main__':
     # read grouped data
     captures = read_image_inventory(
         args['captures'],
-        unique_id='image_name_new')
+        unique_id='image_name')
 
     # select relevant columns
     captures_cleaned = OrderedDict()
     cols_to_export = [
         'capture_id', 'season', 'site', 'roll', 'capture',
-        'image_rank_in_capture', 'path', 'path_rel',
+        'image_rank_in_capture', 'image_path', 'image_path_rel',
         'invalid', 'date', 'time']
-    for image_name_new, image_data in captures.items():
+    for image_name, image_data in captures.items():
         if not include_image(image_data):
             continue
         image_data['invalid'] = image_data['action_taken']
-        image_data['path'] = image_data['image_path_new']
-        image_data['path_rel'] = image_data['image_path_new_rel']
         image_data['capture_id'] = '#'.join(
             [image_data['season'], image_data['site'],
              image_data['roll'], image_data['capture']])
         # image_data_new = {k: v for k, v in image_data if k in cols_to_export}
-        captures_cleaned[image_name_new] = {k: v for k, v in image_data.items()}
+        captures_cleaned[image_name] = {k: v for k, v in image_data.items()}
 
     image_check_stats(captures_cleaned, logger)
 

@@ -143,11 +143,11 @@ def update_inventory_with_capture_data(inventory, image_to_capture):
 def update_inventory_with_image_names(inventory):
     """ Create new image names """
     for image_data in image_to_capture.values():
-        image_data['image_path_new'] = \
+        image_data['image_path'] = \
             create_new_image_path(image_data)
-        image_data['image_name_new'] = \
+        image_data['image_name'] = \
             create_new_image_name(image_data)
-        image_data['image_path_new_rel'] = \
+        image_data['image_path_rel'] = \
             create_new_image_path_rel(image_data)
 
 

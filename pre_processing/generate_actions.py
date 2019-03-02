@@ -56,7 +56,7 @@ if __name__ == '__main__':
 
     # read files
     captures = read_image_inventory(
-        args['captures'], unique_id='image_name_new')
+        args['captures'], unique_id='image_name')
     action_list = read_image_inventory(
         args['action_list'], unique_id=None)
 
@@ -190,7 +190,7 @@ if __name__ == '__main__':
         actions = OrderedDict()
         for image in image_list:
             current_action = {
-                'image_name_new': image,
+                'image_name': image,
                 'action_to_take_reason': action['action_to_take_reason'],
                 'action_to_take': action['action_to_take'],
                 'action_shift_time_by_seconds': 0
@@ -211,32 +211,32 @@ if __name__ == '__main__':
         """
         images_list = list()
         fetch_images = False
-        for image_name_new, image_data in inventory.items():
-            if image_name_new == first_image:
+        for image_name, image_data in inventory.items():
+            if image_name == first_image:
                 fetch_images = True
             if fetch_images:
-                images_list.append(image_name_new)
-            if image_name_new == last_image:
+                images_list.append(image_name)
+            if image_name == last_image:
                 fetch_images = False
         return images_list
 
     def find_images_for_site_roll(site, roll, inventory):
         """ Find a list of images for a site or a roll """
         images_list = list()
-        for image_name_new, image_data in inventory.items():
+        for image_name, image_data in inventory.items():
             site_match = (image_data['site'] == site)
             roll_match = (image_data['roll'] == roll)
             if site_match and roll_match:
-                images_list.append(image_name_new)
+                images_list.append(image_name)
         return images_list
 
     def find_images_for_site(site, inventory):
         """ Find a list of images for a site """
         images_list = list()
-        for image_name_new, image_data in inventory.items():
+        for image_name, image_data in inventory.items():
             site_match = (image_data['site'] == site)
             if site_match:
-                images_list.append(image_name_new)
+                images_list.append(image_name)
         return images_list
 
     actions_inventory = OrderedDict()
