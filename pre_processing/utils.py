@@ -91,12 +91,12 @@ def plot_site_roll_timelines(
         date_col='datetime',
         date_format='%Y-%m-%d %H:%M:%S'):
     """ Plot timelines for site_roll combination """
-    df = df[df[date_col] != '']
+    df_copy = df.loc[df[date_col] != ''].copy()
     date_time_obj = \
         [datetime.strptime(x, date_format) for x in df[date_col].values]
-    df['date_time'] = date_time_obj
+    df_copy['date_time'] = date_time_obj
     roll_site_group = \
-        df.groupby(by=['site', 'roll', 'date_time']).size().unstack(
+        df_copy.groupby(by=['site', 'roll', 'date_time']).size().unstack(
                 level=[0, 1], fill_value=0)
     # Aggregate per Day - count number of instances
     roll_site_group.index = roll_site_group.index.to_period('D')
