@@ -131,8 +131,6 @@ def read_image_inventory_old(path, unique_id='image_path_original'):
 
 def read_image_inventory(path, unique_id='image_path_original'):
     df = pd.read_csv(path, dtype='str')
-    #header = df.columns
-    #values_to_fill = {x: ('' if 'exif_data__' in x else '0') for x in header}
     df.fillna('', inplace=True)
     inventory = df.to_dict('index', into=OrderedDict)
     inventory_with_index_as_col = OrderedDict()

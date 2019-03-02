@@ -147,6 +147,18 @@ action_site | perform an action on an entire site
 action_site / action_roll | perform an action on an entire roll
 action_from_image / action_to_image | perform an action on a range of images (or one if identical)
 
+Examples:
+
+action_site	| action_roll | action_from_image |	action_to_image	| action_to_take |action_to_take_reason | datetime_current |	datetime_new
+:---|:---|:--- | :---| :---| :---|:---|:---
+ A01| | |		|delete	|camera_produced_unrecognizable_images	||
+  A01| 2| |		|timechange	|camera clock off by minus one day	| 2000-01-01 00:00:00| 2000-01-02 00:00:00		
+ | |ENO_S1__B02_R1_IMAG1012.JPG	| ENO_S1__B02_R1_IMAG1012.JPG	|delete	|all_white		||
+ | |ENO_S1__B02_R1_IMAG0054.JPG	| ENO_S1__B02_R1_IMAG0054.JPG	|delete	|all_black||
+ | |ENO_S1__B02_R1_IMAG0990.JPG	|ENO_S1__B02_R1_IMAG0999.JPG	|delete	|human	||
+
+
+
 6. For each row specify: 'action_to_take' and 'action_to_take_reason'
 7. For 'timechange' in 'action_to_take' specify 'datetime_current' and 'datetime_new'. This will apply the difference between these two dates to all selected images.
 8. All rows with 'action_to_take' equal 'inspect' must be resolved and replaced with values as specified above.
