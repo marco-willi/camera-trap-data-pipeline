@@ -14,13 +14,6 @@ from global_vars import pre_processing_flags as flags
 # args['log_dir'] = '/home/packerc/shared/season_captures/APN/log_files/'
 
 
-def delete_image(captures, image_name, logger):
-    """ delete image """
-    image_path = captures[image_name]['image_path']
-    os.remove(image_path)
-    logger.info("Deleted image: {}".format(image_path))
-
-
 def change_time(captures, image_name, flags, shift_by_seconds):
     """ Shift time by seconds """
     image_data = captures[image_name]
@@ -81,13 +74,19 @@ if __name__ == '__main__':
         args['captures'], unique_id='image_name')
 
     for image_name, action in actions.items():
+        reason = action['action_to_take_reason']
         if action['action_to_take'] == 'delete':
-            delete_image(captures, image_name, logger)
+            image_path = captures[image_name]['image_path']
+            os.remove(image_path)
+            logger.info("Reason: {:20} Action: deleted image: {}".format(
+                reason, image_path))
         elif action['action_to_take'] == 'timechange':
             change_time(
                 captures,
                 image_name, flags,
                 action['action_shift_time_by_seconds'])
+            logger.info("Reason: {:20} Action: timechange for: {}".format(
+                reason, image_name))
         captures[image_name]['action_taken'] = \
             action['action_to_take']
         captures[image_name]['action_reason'] = \
