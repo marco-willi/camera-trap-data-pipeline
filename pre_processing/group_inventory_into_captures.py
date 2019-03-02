@@ -11,12 +11,13 @@ from pre_processing.utils import (
 from global_vars import pre_processing_flags as flags
 from logger import create_log_file, setup_logger
 
+
 # args = dict()
-#
-# args['input_inventory'] = '/home/packerc/will5448/image_inventory_overview.csv'
-# args['output_csv'] = '/home/packerc/will5448/image_inventory_grouped.csv'
-# args['ignore_excluded_images'] = False
-# args['check_dir'] = '/home/packerc/will5448/processing_checks'
+# args['inventory'] = '/home/packerc/shared/season_captures/ENO/captures/ENO_S1_TEST_CANBEDELETED_inventory.csv'
+# args['output_csv'] = 'home/packerc/shared/season_captures/ENO/captures/ENO_S1_TEST_CANBEDELETED_captures.csv'
+# args['log_dir'] = '/home/packerc/shared/season_captures/ENO/log_files/'
+# args['no_older_than_year'] = 2017
+# args['no_newer_than_year'] = 2019
 
 
 def create_new_image_path(image_data):
@@ -65,9 +66,7 @@ def group_images_into_site_and_roll(inventory):
 # Group images into site and roll
 def group_images_into_captures(inventory, flags):
     """ Group images into capture events """
-
     site_roll_inventory = group_images_into_site_and_roll(inventory)
-
     image_to_capture = dict()
     for season_site_roll_key, site_roll_data in site_roll_inventory.items():
         # get all images from the current site and roll
@@ -142,7 +141,7 @@ def update_inventory_with_capture_data(inventory, image_to_capture):
 
 def update_inventory_with_image_names(inventory):
     """ Create new image names """
-    for image_data in image_to_capture.values():
+    for image_data in inventory.values():
         image_data['image_path'] = \
             create_new_image_path(image_data)
         image_data['image_name'] = \
