@@ -93,16 +93,22 @@ def group_images_into_captures(inventory, flags):
         # Re-order by the newly defined order
         paths_ordered = [paths[i] for i in ordered_indexes]
         times_seconds_ordered = [times_seconds[i] for i in ordered_indexes]
-        # Group images into captures if max_delta of subsequent images
-        # is below the max_delta_captures
-        delta_times_seconds_ordered = [
+        # Calculate time deltas between subsequent images
+        # (next and previous) in seconds and days
+        delta_seconds_last_ordered = [
             abs(times_seconds_ordered[i-1] - times_seconds_ordered[i])
             for i in range(1, len(times_seconds_ordered))]
-        # create delta in days
-        delta_times_days_ordered = [
+        delta_seconds_next_ordered = [
+            abs(times_seconds_ordered[i+1] - times_seconds_ordered[i])
+            for i in range(0, len(times_seconds_ordered)-1)]
+        delta_days_next_ordered = [
             '{:.2f}'.format((x / (60*60*24)))
-            for x in delta_times_seconds_ordered]
-        delta_times_days_ordered.insert(0, 0)
+            for x in delta_seconds_next_ordered]
+        delta_days_next_ordered.insert(0, 0)
+        delta_days_prev_ordered = [
+            '{:.2f}'.format((x / (60*60*24)))
+            for x in delta_seconds_last_ordered]
+        delta_days_prev_ordered.append(0)
         # initialize captures and ranks
         capture_ids_ordered = [1]
         image_rank_in_capture_ordered = [1]
@@ -111,7 +117,7 @@ def group_images_into_captures(inventory, flags):
         current_rank_in_capture = 1
         # loop over all deltas
         # (starting with the delta between first and second)
-        for i, delta in enumerate(delta_times_seconds_ordered):
+        for i, delta in enumerate(delta_seconds_last_ordered):
             if delta <= flags['general']['capture_delta_seconds']:
                 current_rank_in_capture += 1
             else:
@@ -125,7 +131,8 @@ def group_images_into_captures(inventory, flags):
                 'capture': capture_ids_ordered[i],
                 'image_rank_in_capture': image_rank_in_capture_ordered[i],
                 'image_rank_in_roll': image_rank_in_roll_ordered[i],
-                'days_to_last_image_taken': delta_times_days_ordered[i],
+                'days_to_last_image_taken': delta_days_next_ordered[i],
+                'days_to_prev_image_taken': delta_days_prev_ordered[i]
             }
     return image_to_capture
 

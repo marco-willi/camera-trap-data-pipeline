@@ -187,7 +187,7 @@ def update_time_checks(image_data, flags):
     if 'image_check__time_lapse' in time_checks:
         max_days = \
             checks['time_lapse_days']['max_days']
-        if float(image_data['days_to_last_image_taken']) > max_days:
+        if float(image_data['days_to_next_image_taken']) > max_days:
             time_checks['image_check__time_lapse'] = 1
     # check for too_old / too new
     date_format = flags['time_formats']['output_date_format']

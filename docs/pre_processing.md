@@ -123,13 +123,27 @@ python3 -m pre_processing.create_action_list \
 ### Define Actions
 
 1. Download the file 'action_list.csv'
-2. The column 'action_to_take' is pre-populated with an action that is being applied to 'action_from_image'
-3. The following 'action_to_take' values are allowed ('delete', 'timechange', 'ok', 'invalid')
-4. To add new actions simply create a new row in the csv. WARNING: be careful not to change the datetime columns when adding the file in Excel, the format should be (YYYY-MM-DD HH:MM:SS)
+2. The file is pre-populated with suggested actions that are being applied to the 'action_from_image'.
+3. The following 'action_to_take' values are allowed:
+
+action_to_take | meaning
+------------ | -------------
+delete | the selected images will be deleted
+timechange | the time of the selected images will be changed
+ok | do nothing
+invalid | do nothing, but keep invalid flag
+
+4. To add new actions simply create a new row in the csv.
+WARNING: be careful not to change the datetime columns when opening the file in Excel, the format should be (YYYY-MM-DD HH:MM:SS)
+
 5. The following options allow for selecting images for actions:
-- specify 'action_site' to perform an action on an entire site
-- specify 'action_site'/'action_roll' to perform an action on an entire roll
-- specify 'action_from_image' and 'action_to_image' to perform an action on a range of images
+
+column(s) to specify | meaning
+------------ | -------------
+'action_site' | perform an action on an entire site
+'action_site'/'action_roll' | perform an action on an entire roll
+'action_from_image' / 'action_to_image' | perform an action on a range of images
+
 6. For each row specify: 'action_to_take' and 'action_to_take_reason'
 7. For 'timechange' in 'action_to_take' specify 'datetime_current' and 'datetime_new'. This will apply the difference between these two dates to all selected images.
 8. Upload the modified csv and proceed.
