@@ -174,26 +174,31 @@ python3 -m pre_processing.apply_actions \
 --log_dir /home/packerc/shared/season_captures/${SITE}/log_files/
 ```
 
-## Genrate Captures Cleaned
+## Generate Updated Captures
 
-This code generates a cleaned captures file with excluded deleted images and a few more columns.
+This code generates an updated captures file after applying actions. Deleted images are excluded and a few more columns added.
 
 ```
-python3 -m pre_processing.create_captures_cleaned \
+python3 -m pre_processing.update_captures \
 --captures /home/packerc/shared/season_captures/${SITE}/captures/${SEASON}_captures.csv \
---captures_cleaned /home/packerc/shared/season_captures/${SITE}/cleaned/${SEASON}_captures_cleaned.csv \
+--captures_updated /home/packerc/shared/season_captures/${SITE}/captures/${SEASON}_captures_updated.csv \
 --log_dir /home/packerc/shared/season_captures/${SITE}/log_files/
 ```
 
-## Re-check cleaned captures (OPTIONAL) -- (Experimental Feature!)
+## Finalize (create cleaned captures) or Iterate (go back to creating action list)
 
-The following code can be used to re-check the cleaned captures file. This should only be necessary if timechanges were applied because this may lead to new errors. If new errors are shown (printed to the console/logfile) generate a new actions list and proceed from there. If no errors are shown, the generated file can be deleted.
+If the previous code showed no further issues in the printed output, the generated file is the finalized cleaned captures file and can be moved like this:
+```
+cp /home/packerc/shared/season_captures/${SITE}/captures/${SEASON}_captures_updated.csv /home/packerc/shared/season_captures/${SITE}/cleaned/${SEASON}_captures_cleaned.csv
+```
+
+If there are further issues, we generate a new action list and start over with:
 
 ```
-python3 -m pre_processing.group_inventory_into_captures \
---inventory /home/packerc/shared/season_captures/${SITE}/captures/${SEASON}_captures_cleaned.csv \
---output_csv /home/packerc/shared/season_captures/${SITE}/captures/${SEASON}_captures_iterated.csv \
---log_dir /home/packerc/shared/season_captures/${SITE}/log_files/ \
---no_older_than_year 2017 \
---no_newer_than_year 2019
+python3 -m pre_processing.create_action_list \
+--captures /home/packerc/shared/season_captures/${SITE}/captures/${SEASON}_captures_updated.csv \
+--action_list_csv /home/packerc/shared/season_captures/${SITE}/captures/${SEASON}_action_list2.csv \
+--log_dir /home/packerc/shared/season_captures/${SITE}/log_files/
 ```
+
+This code can be run in any case to check if further actions need to be taken if the output of the previous code (update_captures) was not clear.
