@@ -95,20 +95,24 @@ def group_images_into_captures(inventory, flags):
         times_seconds_ordered = [times_seconds[i] for i in ordered_indexes]
         # Calculate time deltas between subsequent images
         # (next and previous) in seconds and days
-        delta_seconds_last_ordered = [
-            abs(times_seconds_ordered[i-1] - times_seconds_ordered[i])
-            for i in range(1, len(times_seconds_ordered))]
+        #
+        # calculate times to last image
         delta_seconds_next_ordered = [
-            abs(times_seconds_ordered[i+1] - times_seconds_ordered[i])
+            (times_seconds_ordered[i+1] - times_seconds_ordered[i])
             for i in range(0, len(times_seconds_ordered)-1)]
         delta_days_next_ordered = [
             '{:.2f}'.format((x / (60*60*24)))
             for x in delta_seconds_next_ordered]
-        delta_days_next_ordered.insert(0, 0)
+        delta_days_next_ordered.append(0)
+        # calculate times to next image
+        delta_seconds_last_ordered = [
+            abs(times_seconds_ordered[i] - times_seconds_ordered[i-1])
+            for i in range(1, len(times_seconds_ordered))]
         delta_days_last_ordered = [
             '{:.2f}'.format((x / (60*60*24)))
             for x in delta_seconds_last_ordered]
-        delta_days_last_ordered.append(0)
+        delta_days_last_ordered.insert(0, 0)
+
         # initialize captures and ranks
         capture_ids_ordered = [1]
         image_rank_in_capture_ordered = [1]
