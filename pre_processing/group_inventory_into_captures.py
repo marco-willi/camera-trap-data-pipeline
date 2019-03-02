@@ -105,10 +105,10 @@ def group_images_into_captures(inventory, flags):
             '{:.2f}'.format((x / (60*60*24)))
             for x in delta_seconds_next_ordered]
         delta_days_next_ordered.insert(0, 0)
-        delta_days_prev_ordered = [
+        delta_days_last_ordered = [
             '{:.2f}'.format((x / (60*60*24)))
             for x in delta_seconds_last_ordered]
-        delta_days_prev_ordered.append(0)
+        delta_days_last_ordered.append(0)
         # initialize captures and ranks
         capture_ids_ordered = [1]
         image_rank_in_capture_ordered = [1]
@@ -131,8 +131,8 @@ def group_images_into_captures(inventory, flags):
                 'capture': capture_ids_ordered[i],
                 'image_rank_in_capture': image_rank_in_capture_ordered[i],
                 'image_rank_in_roll': image_rank_in_roll_ordered[i],
-                'days_to_last_image_taken': delta_days_next_ordered[i],
-                'days_to_prev_image_taken': delta_days_prev_ordered[i]
+                'days_to_last_image_taken': delta_days_last_ordered[i],
+                'days_to_next_image_taken': delta_days_next_ordered[i]
             }
     return image_to_capture
 

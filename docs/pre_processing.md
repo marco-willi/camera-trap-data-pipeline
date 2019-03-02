@@ -146,6 +146,7 @@ column(s) to specify | meaning
 
 6. For each row specify: 'action_to_take' and 'action_to_take_reason'
 7. For 'timechange' in 'action_to_take' specify 'datetime_current' and 'datetime_new'. This will apply the difference between these two dates to all selected images.
+8. All rows with 'action_to_take' equal 'inspect' must be resolved and replaced with values as specified above.
 8. Upload the modified csv and proceed.
 
 
