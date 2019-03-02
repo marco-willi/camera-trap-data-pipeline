@@ -64,7 +64,7 @@ def image_check_stats(image_inventory, logger):
         logger.info(
             "Season/Site/Roll: {:35} -- counts: {:10} / {} ({:.2f} %)".format(
              season_site_roll, count, total, 100*count/total))
-    logger.info("Found total {} images".format(n_tot))
+    logger.info("Found total {} images".format(len(image_inventory.keys())))
 
 
 def p_pixels_above_threshold(pixel_data, pixel_threshold):
