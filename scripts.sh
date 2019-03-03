@@ -358,6 +358,10 @@ python3 -m zooniverse_exports.extract_subjects_legacy \
 --annotations /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_annotations.csv \
 --output_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subjects_extracted.csv
 
+# Re-Create Season Captures
+python3 -m zooniverse_exports.recreate_legacy_season_captures \
+--subjects_extracted /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subjects_extracted.csv \
+--output_csv /home/packerc/shared/season_captures/${SITE}/cleaned/${SEASON}_cleaned.csv
 
 # Add subject data to Aggregations
 python3 -m zooniverse_exports.add_subject_info_to_csv \
@@ -372,10 +376,19 @@ python3 -m zooniverse_exports.add_subject_info_to_csv \
 --output_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_annotations_aggregated_subject_info_samples.csv
 
 
-# Re-Create Season Captures
-python3 -m zooniverse_exports.recreate_legacy_season_captures \
---subjects_extracted /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subjects_extracted.csv \
---output_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_cleaned.csv
+###################################
+# Reporting
+####################################
+
+# Reporting of Zooniverse exports
+for season in 1 2 3 4 5 6 7 8 9 10; do
+  SEASON=SER_S${season}
+  python3 -m reporting.add_aggregations_to_season_captures \
+  --season_captures_csv /home/packerc/shared/season_captures/${SITE}/cleaned/${SEASON}_cleaned.csv \
+  --aggregated_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_annotations_aggregated_subject_info.csv \
+  --output_csv /home/packerc/shared/zooniverse/Reports/${SITE}/${SEASON}_report_all.csv \
+  --default_season_id ${SEASON}
+done
 
 
 
@@ -386,6 +399,11 @@ for season in 1 2 3 4 5 6 7 8 9 10; do
   python3 -m zooniverse_exports.extract_subjects_legacy \
   --annotations /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_annotations.csv \
   --output_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subjects_extracted.csv
+
+  # Re-Create Season Captures
+  python3 -m zooniverse_exports.recreate_legacy_season_captures \
+  --subjects_extracted /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subjects_extracted.csv \
+  --output_csv /home/packerc/shared/season_captures/${SITE}/cleaned/${SEASON}_cleaned.csv
 
   # Add subject data to Aggregations
   python3 -m zooniverse_exports.add_subject_info_to_csv \

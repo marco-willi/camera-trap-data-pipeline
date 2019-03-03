@@ -12,20 +12,20 @@ This repository contains code for the following tasks:
 A high-level overview of how the scripts are connected can be found here:
 [Process Overview](docs/data_processing_overview.pdf)
 
-Note that not all processes are implemented in this repository and some of it represents a roadmap.
+## Configuration
 
-Global flags / mappings are defined here: [global_vars](global_vars.py)
+Global flags / parameters are defined here: [global_vars](global_vars.py)
+
+These need to be adjusted, for example:
 1. if a new question answer needs to be mapped to 'empty', e.g., 'no animal is here'
 2. if a new question needs to be renamed, e.g., 'howmanyanimalswithbighornsdoyousee' to 'big_horns_count'
 3. if different formats / namings are required, e.g., 'answer__' instead of 'question__'
 
 ## Executing the Scripts
 
-The following ways can be used to execute the scripts
-- Copy & paste the commands to a text editor, adjust the parameters, and copy & paste them to the command line.
-- Define run-specific parameters as shown in the sample scripts below and just copy & paste the relevant scripts.
+The recommended way is to use parameters and then run the scripts as shown here: [Scripts](scripts.sh)
 
-Here is a compilation of many sample scripts [Scripts](scripts.sh).
+Alternatively, copy & paste the commands to a text editor, adjust the parameters, and copy & paste them to the command line.
 
 ## Pre-Requisites
 
