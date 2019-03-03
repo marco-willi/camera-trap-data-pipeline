@@ -335,8 +335,8 @@ module load python3
 
 cd $HOME/snapshot_safari_misc
 SITE=SER
-SEASON=SER_S10
-SEASON_STRING='10'
+SEASON=SER_S1
+SEASON_STRING='1'
 
 # Extract Annotations
 python3 -m zooniverse_exports.extract_legacy_serengeti \
@@ -370,3 +370,25 @@ python3 -m zooniverse_exports.add_subject_info_to_csv \
 --subject_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subjects_extracted.csv \
 --input_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_annotations_aggregated_samples.csv \
 --output_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_annotations_aggregated_subject_info_samples.csv
+
+
+# Loop over all seasons
+for season in 1 2 3 4 5 6 7 8 9 10; do
+  SEASON=SER_S${season}
+  # Extract Subjects from Classifications
+  python3 -m zooniverse_exports.extract_subjects_legacy \
+  --annotations /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_annotations.csv \
+  --output_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subjects_extracted.csv
+
+  # Add subject data to Aggregations
+  python3 -m zooniverse_exports.add_subject_info_to_csv \
+  --subject_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subjects_extracted.csv \
+  --input_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_annotations_aggregated.csv \
+  --output_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_annotations_aggregated_subject_info.csv
+
+  # Add subject data to Aggregations (samples)
+  python3 -m zooniverse_exports.add_subject_info_to_csv \
+  --subject_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subjects_extracted.csv \
+  --input_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_annotations_aggregated_samples.csv \
+  --output_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_annotations_aggregated_subject_info_samples.csv
+done

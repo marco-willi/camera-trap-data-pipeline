@@ -104,6 +104,15 @@ if __name__ == '__main__':
     df.sort_values(
         by=['season', 'site', 'roll', 'capture', 'subject_id'], inplace=True)
 
+    # re-arrange columns
+    cols = df.columns.tolist()
+    first_cols = [
+        'capture_id', 'season', 'site', 'roll',
+        'capture', 'subject_id']
+    first_cols = [x for x in first_cols if x in cols]
+    cols_rearranged = first_cols + [x for x in cols if x not in first_cols]
+    df = df[cols_rearranged]
+
     # export
     df.to_csv(args['output_csv'], index=False)
 
