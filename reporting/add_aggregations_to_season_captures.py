@@ -7,7 +7,8 @@ from datetime import datetime
 from collections import OrderedDict
 
 from logger import setup_logger, create_logfile_name
-from utils import read_cleaned_season_file
+from utils import read_cleaned_season_file, set_file_permission
+from global_vars import plurality_aggregation_flags as flags
 
 # args = dict()
 # args['season_captures_csv'] = '/home/packerc/shared/season_captures/GRU/cleaned/GRU_S1_cleaned.csv'
@@ -24,6 +25,7 @@ if __name__ == '__main__':
     parser.add_argument("--output_csv", type=str, required=True)
     parser.add_argument("--default_season_id", type=str, default='')
     parser.add_argument("--export_only_with_aggregations", action="store_true")
+    parser.add_argument("--export_only_species", action="store_true")
 
     args = vars(parser.parse_args())
 
@@ -47,6 +49,13 @@ if __name__ == '__main__':
     logger = logging.getLogger(__name__)
 
     season_data, header = read_cleaned_season_file(args['season_captures_csv'])
+
+    # determine empty/blank answer
+    question_main_id = flags['QUESTION_DELIMITER'].join(
+        [flags['QUESTION_PREFIX'], flags['QUESTION_MAIN']])
+    question_column_prefix = '{}{}'.format(
+        flags['QUESTION_PREFIX'],
+        flags['QUESTION_DELIMITER'])
 
     # Create per Capture Data
     season_dict = OrderedDict()
@@ -125,8 +134,12 @@ if __name__ == '__main__':
                     season_info_to_write.append(season_data[x])
                 except:
                     season_info_to_write.append('')
-            # write one line for each aggregation
-            if capture_id in aggregated_data:
+            capture_has_answers = (capture_id in aggregated_data)
+            export_captures_without_answers = (
+                args['export_only_species'] or
+                args['export_only_with_aggregations'])
+            if capture_has_answers:
+                # write one line for each aggregation
                 for agg_data_dict in aggregated_data[capture_id]:
                     to_write = list()
                     for x in agg_data_header:
@@ -134,15 +147,17 @@ if __name__ == '__main__':
                             to_write.append(agg_data_dict[x])
                         except:
                             to_write.append('')
+                    if args['export_only_species']:
+                        main_answer = agg_data_dict[question_main_id]
+                        if main_answer == flags['QUESTION_MAIN_EMPTY']:
+                            continue
                     csv_writer.writerow(season_info_to_write + to_write)
                     n_lines_written += 1
                     n_lines_with_aggregations += 1
-            else:
-                # Write records without any aggregation information
-                if not args['export_only_with_aggregations']:
-                    to_write = ['' for i in range(0, len(agg_data_header))]
-                    csv_writer.writerow(season_info_to_write + to_write)
-                    n_lines_written += 1
+            elif not export_captures_without_answers:
+                to_write = ['' for i in range(0, len(agg_data_header))]
+                csv_writer.writerow(season_info_to_write + to_write)
+                n_lines_written += 1
             # print status
             if ((line_no % 10000) == 0) and (line_no > 0):
                 print("Processed {:,} captures".format(line_no))
@@ -152,4 +167,4 @@ if __name__ == '__main__':
             n_lines_with_aggregations, args['output_csv']))
 
     # change permmissions to read/write for group
-    os.chmod(args['output_csv'], 0o660)
+    set_file_permission(args['output_csv'])

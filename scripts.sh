@@ -391,7 +391,6 @@ for season in 1 2 3 4 5 6 7 8 9 10; do
 done
 
 
-
 # Loop over all seasons
 for season in 1 2 3 4 5 6 7 8 9 10; do
   SEASON=SER_S${season}
