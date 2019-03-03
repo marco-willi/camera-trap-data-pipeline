@@ -372,6 +372,13 @@ python3 -m zooniverse_exports.add_subject_info_to_csv \
 --output_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_annotations_aggregated_subject_info_samples.csv
 
 
+# Re-Create Season Captures
+python3 -m zooniverse_exports.recreate_legacy_season_captures \
+--subjects_extracted /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subjects_extracted.csv \
+--output_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_cleaned.csv
+
+
+
 # Loop over all seasons
 for season in 1 2 3 4 5 6 7 8 9 10; do
   SEASON=SER_S${season}

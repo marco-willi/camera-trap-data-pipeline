@@ -174,8 +174,8 @@ The data has the following columns:
 |capture_event_id | old capture_event_id as uploaded to zooniverse
 |retirement_reason | string defining the retirement reason as defined by Zooniverse
 |season,site,roll,capture | internal id for season, site, roll and capture
-|filenames | image names, separated by ; if multiple
-|timestamps | image timestamps, separated by ; if multiple
+|filenames | image names, separated by ; if multiple (some are missing)
+|timestamps | image timestamps, separated by ; if multiple (some are missing)
 |classification_id | unique id per classification
 |capture_id | new-style capture_id
 |question__species | task-answer
@@ -206,12 +206,12 @@ python3 -m zooniverse_exports.extract_subjects_legacy \
 
 | Columns   | Description |
 | --------- | ----------- |
-|capture,roll,season,site | internal ids of the capture
+|capture,roll,season,site | internal ids of the capture (some are missing)
 |capture_id| capture-id
 |subject_id | zooniverse unique id of the capture (a subject)
 |created_at | timestamp when the subject was created on Zooniverse
-|filenames | filenames of the images making up the capture, separated by ';'
-|timestamps | timestamps of the images making up the capture, separated by ';'
+|filenames | filenames of the images making up the capture, separated by ';' (some are missing)
+|timestamps | timestamps of the images making up the capture, separated by ';' (some are missing)
 |retirement_reason| Zooniverse generated retirement reason
 |retired_at| Zooniverse generated retirement date
 
@@ -220,6 +220,33 @@ Example:
 ```
 capture,capture_id,created_at,filenames,retired_at,retirement_reason,roll,season,site,timestamps,subject_id
 1,SER_S1#B04#1#1,2013-01-02 19:45:15 UTC,S1/B04/B04_R1/S1_B04_R1_PICT0001.JPG,,consensus,R1,S1,B04,2010-07-18T16:26:14-05:00,ASG0002kjh
+```
+
+### Re-Create Season Captures
+
+For processing with later codes the following code re-creates season capture files according to the new process. This file has one row per image ans is normally the end-product of pre-processing camera trap images.
+
+```
+python3 -m zooniverse_exports.recreate_legacy_season_captures \
+--subjects_extracted /home/packerc/shared/zooniverse/Exports/SER/S1_subjects_extracted.csv \
+--output_csv /home/packerc/shared/zooniverse/Exports/SER/S1_cleaned.csv
+```
+
+| Columns   | Description |
+| --------- | ----------- |
+|capture,roll,season,site | internal ids of the capture (some are missing)
+|capture_id| capture-id
+|image| rank of the image in the capture (1=first image)
+|path| relative path of the image
+|timestamp| date time of when the image was taken (YYYY-MM-DD HH:MM:SS)
+
+
+Examples:
+```
+capture_id,season,site,roll,capture,image,path,timestamp
+SER_S1#B04#1#1,S1,B04,R1,1,1,S1/B04/B04_R1/S1_B04_R1_PICT0001.JPG,2010-07-18 16:26:14
+SER_S1#B04#1#2,S1,B04,R1,2,1,S1/B04/B04_R1/S1_B04_R1_PICT0002.JPG,2010-07-18 16:26:30
+SER_S1#B04#1#3,S1,B04,R1,3,1,S1/B04/B04_R1/S1_B04_R1_PICT0003.JPG,2010-07-20 06:14:06
 ```
 
 ### Aggregations
