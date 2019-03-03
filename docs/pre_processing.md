@@ -8,7 +8,7 @@ The following codes can be used to:
 4. Re-name all images
 
 
-The following examples was run with the following paramters.
+The following examples were run with the following settings:
 
 ```
 ssh lab
@@ -28,7 +28,7 @@ season_captures/${SITE}/log_files
 ```
 
 
-## Check Import/Directory Structure
+## Check Import (directory) Structure
 
 The camera trap images to be imported need to be organized according to the following directory structure:
 
@@ -41,11 +41,11 @@ root_directory/
 
 Definitions:
 - Site: A specific camera/location.
-- Roll: An SD card of a specific location (data from a camera check).
+- Roll: An SD card of a specific site (data from a camera check).
 
 The naming has to adhere to these standards:
 - site_directory: alphanumeric
-- roll_directory: site name, followed by 'RX', e.g., A01_R1 (first roll of A01)
+- roll_directory: site name + _ + 'RX' where 'X' is a numeric. Example: A01_R1 (first roll of A01).
 - Images: arbitrary names
 
 ```
@@ -61,6 +61,8 @@ python3 -m pre_processing.check_input_structure \
 --root_dir /home/packerc/shared/albums/${SITE}/${SEASON}/ \
 --log_dir /home/packerc/shared/season_captures/${SITE}/log_files/
 ```
+
+The script will print/log messages if something is invalid but not alter anything.
 
 ## Create Image Inventory
 

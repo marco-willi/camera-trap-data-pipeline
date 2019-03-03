@@ -80,6 +80,15 @@ PROJECT_ID=
 WORKFLOW_ID=
 WORFKLOW_VERSION_MIN=
 
+# TEST
+cd $HOME/snapshot_safari_misc
+SITE=ENO
+SEASON=ENO_S1_TEST_CANBEDELETED
+PROJECT_ID=
+WORKFLOW_ID=
+WORFKLOW_VERSION_MIN=
+
+
 
 ###################################
 # APN
@@ -161,19 +170,19 @@ python3 -m pre_processing.apply_actions \
 --actions_to_perform /home/packerc/shared/season_captures/${SITE}/captures/${SEASON}_actions_to_perform.csv \
 --log_dir /home/packerc/shared/season_captures/${SITE}/log_files/
 
-# Genrate Captures Cleaned
-python3 -m pre_processing.create_captures_cleaned \
+# Update Captures
+python3 -m pre_processing.update_captures \
 --captures /home/packerc/shared/season_captures/${SITE}/captures/${SEASON}_captures.csv \
---captures_cleaned /home/packerc/shared/season_captures/${SITE}/cleaned/${SEASON}_captures_cleaned.csv \
+--captures_updated /home/packerc/shared/season_captures/${SITE}/captures/${SEASON}_captures_updated.csv \
 --log_dir /home/packerc/shared/season_captures/${SITE}/log_files/
 
-# Update Captures Cleaned
-python3 -m pre_processing.group_inventory_into_captures \
---inventory /home/packerc/shared/season_captures/${SITE}/captures/${SEASON}_captures_cleaned.csv \
---output_csv /home/packerc/shared/season_captures/${SITE}/captures/${SEASON}_captures_cleaned2.csv \
---log_dir /home/packerc/shared/season_captures/${SITE}/log_files/ \
---no_older_than_year 2017 \
---no_newer_than_year 2019
+cp /home/packerc/shared/season_captures/${SITE}/captures/${SEASON}_captures_updated.csv /home/packerc/shared/season_captures/${SITE}/cleaned/${SEASON}_captures_cleaned.csv
+
+# generate action list - (OPTIONAL)
+python3 -m pre_processing.create_action_list \
+--captures /home/packerc/shared/season_captures/${SITE}/captures/${SEASON}_captures_updated.csv \
+--action_list_csv /home/packerc/shared/season_captures/${SITE}/captures/${SEASON}_action_list2.csv \
+--log_dir /home/packerc/shared/season_captures/${SITE}/log_files/
 
 
 ###################################

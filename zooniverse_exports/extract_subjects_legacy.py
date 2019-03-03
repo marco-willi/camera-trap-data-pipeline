@@ -87,7 +87,7 @@ if __name__ == '__main__':
                 site = record['site']
                 filenames = [
                     build_img_path(season, site, roll, x)
-                    for x in filenames]
+                    for x in filenames if x != '']
                 record['filenames'] = ';'.join(filenames)
             except:
                 pass
