@@ -167,12 +167,9 @@ RUA_S1__batch_2__manifest.json
 
 ## Upload Manifest
 
-This code uploads a manifest to Zooniverse. Note that the Zooniverse credentials have to be available in '~/keys/passwords.ini' and that it is better to use the .qsub version of this code due to the (very!) long potential run-time. Make sure that your account has enough allowance on how many subjects can be uploaded to Zooniverse.
+This code uploads a manifest to Zooniverse. Note that Zooniverse credentials have to be available in '~/keys/passwords.ini' and that it is better to use the .qsub version of this code due to the (very!) long potential run-time (especially for manifests with > 50k subjects). Make sure that your account has enough allowance on how many subjects can be uploaded to Zooniverse.
 
-Adapt the following file:
-```
-$HOME/snapshot_safari_misc/zooniverse_uploads/upload_manifest.pbs
-```
+### Run in Terminal
 
 Change the paths analogue to this example:
 ```
@@ -183,10 +180,16 @@ python3 -m zooniverse_uploads.upload_manifest \
 --image_root_path /home/packerc/shared/albums/RUA/
 ```
 
-
-Note: to upload a specific batch instead use something analogue to:
+To upload a specific batch instead use something analogue to:
 ```
 --manifest /home/packerc/shared/zooniverse/Manifests/RUA/RUA_S1__batch_1__manifest.json \
+```
+
+### Run via qsub
+
+Adapt the command in the following file instead:
+```
+$HOME/snapshot_safari_misc/zooniverse_uploads/upload_manifest.pbs
 ```
 
 To submit the job use the following command:
@@ -197,9 +200,9 @@ cd $HOME/snapshot_safari_misc/zooniverse_uploads/
 qsub upload_manifest.pbs
 ```
 
-This code can run for a long time, i.e. multiple days.
+### Image Compression
 
-Note2: Per default the images are being compressed during the upload process. Use the following paramters to change that behavior:
+Per default the images are being compressed during the upload process. Use the following paramters to change that behavior:
 
 ```
 --save_quality 50 \
@@ -216,12 +219,6 @@ Or disable image compression with:
 
 If the upload fails (which can happen if the connection to Zooniverse crashes) you can add the missing subjects to the already (partially) uploaded set by specifying the SUBJECT_SET_ID of the already created set. DO NOT specify the parameter '-subject_set_name', instead use '-subject_set_id' and use the id on the 'Subject Sets' page after clicking on the name of the set of your project on Zooniverse.
 
-
-Adapt the following file:
-```
-$HOME/snapshot_safari_misc/zooniverse_uploads/upload_manifest.pbs
-```
-
 Change the paths analogue to this example:
 ```
 python3 -m zooniverse_uploads.upload_manifest \
@@ -232,15 +229,11 @@ python3 -m zooniverse_uploads.upload_manifest \
 --password_file ~/keys/passwords.ini
 ```
 
-To submit the job use the following command:
-
-```
-ssh lab
-cd $HOME/snapshot_safari_misc/zooniverse_uploads/
-qsub upload_manifest.pbs
-```
-
 ### Notes
 
 1. It is possible to add subjects to a subject-set that is linked to a workflow and is itself in an active project volunteers are currently working on.
-2. It can happen that the upload_manifest.pbs script crashes frequently and early. So far, such phases have been temporary hence the advise: "keep trying!".
+2. It can happen that the script crashes frequently and early. So far, such phases have been temporary hence the advise: "keep trying!". Typically, the error message for connetion issues looks similar to:
+```
+INFO:Error occurred for capture_id: PLN_S1#D05#2#3345
+INFO:Details of error: Received HTTP status code 504 from API
+```

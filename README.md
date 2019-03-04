@@ -2,10 +2,12 @@
 This repository contains code for the following tasks:
 
 1. [Pre-Processing Camera-Trap Images](docs/pre_processing.md) - in development
-2. [Upload Data to Zooniverse](docs/zooniverse_uploads.md)
+2. [Upload Data to Zooniverse](docs/zooniverse_uploads.md) - allows for adding machine learning scores
 3. [Download & Extract Data from Zooniverse](docs/zooniverse_exports.md)
 4. [Aggregate Data from Zooniverse](docs/zooniverse_aggregations.md)
 5. [Merge Data into Reports](docs/reporting.md) - in development
+
+Most codes produce log-files containing important information about how the data was processed.
 
 ## Overview
 
