@@ -70,11 +70,6 @@ if __name__ == "__main__":
         help="Zooniverse project id")
 
     parser.add_argument(
-        "--subject_set_name", type=str, default=None,
-        help="Zooniverse subject set name. Default is to automatically derive\
-              it from the manifest name.")
-
-    parser.add_argument(
         "--subject_set_id", type=str, default=None,
         help="Zooniverse subject set id. Specify if you want to add subjects\
               to an existing set (useful if upload crashed)")
@@ -132,11 +127,6 @@ if __name__ == "__main__":
             raise FileNotFoundError("image_root_path: %s not found" %
                                     args['image_root_path'])
 
-    # Check one of subject_set_id and subject_set_name exists
-    if None not in (args['subject_set_name'], args['subject_set_id']):
-        raise ValueError("Only one of 'subject_set_name' and 'subject_set_id' \
-                          should be specified")
-
     # Check Input
     if not args['dont_compress_images']:
         qual = args['save_quality']
@@ -156,12 +146,11 @@ if __name__ == "__main__":
 
     file_name_parts = file_path_splitter(args['manifest'])
 
-    # generate subject_set name if not specified
-    if args['subject_set_name'] is None:
-        sub_name = "%s_%s" % (file_name_parts['id'], file_name_parts['batch'])
-        args['subject_set_name'] = sub_name
-        logger.info("Automatically generated subject_set_name: {}".format(
-            sub_name))
+    # generate subject_set name
+    sub_name = "%s_%s" % (file_name_parts['id'], file_name_parts['batch'])
+    args['subject_set_name'] = sub_name
+    logger.info("Automatically generated subject_set_name: {}".format(
+        sub_name))
 
     # define tracker file path
     tracker_file_path = file_path_generator(
@@ -221,6 +210,18 @@ if __name__ == "__main__":
         my_set = SubjectSet().find(args['subject_set_id'])
         logger.info("Subject set {} found, will upload into this set".format(
                     args['subject_set_id']))
+        # check subject_set name is identical to what is expected from the
+        # manifest name, if not abort
+        if not my_set.display_name == args['subject_set_name']:
+            msg = "Found subject-set with id {} and name {} on Zooniverse -- \
+            but tried to continue uploading from manifest with \
+            id {} -- this discrepancy is unexpected, threfore, \
+            upload is aborted - did you choose the wrong manifest?".format(
+                my_set.id, my_set.display_name, args['subject_set_name'])
+            logger.error(textwrap.shorten(msg, width=150))
+            raise ValueError("Subject-set name {} not identical to {}".format(
+                my_set.display_name, args['subject_set_name']
+            ))
     else:
         my_set = uploader.create_subject_set(
             my_project, args['subject_set_name'])
