@@ -114,7 +114,11 @@ if __name__ == '__main__':
                 finished_batch = True
             except KeyboardInterrupt:
                 finished_batch = True
+            except TimeoutError:
+                print("Timeout error... sleep for 60s")
+                time.sleep(60)
             except:
+                print("Unkown error ocurred... try again..")
                 pass
         df_out = pd.DataFrame.from_dict(urls, orient='index')
         cols = df_out.columns.tolist()

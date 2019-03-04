@@ -164,7 +164,8 @@ Available seasons:
 
 ### Output
 
-The output is on level annotation. There is no unique identifier for an annotation.
+The output is on level annotation. There is no hard unique identifier for an annotation. Logically, an annotation is defined by subject_id, user_name and question_species (the main question). However, duplicates exist which the extraction process merges or discards.
+
 The data has the following columns:
 
 | Columns   | Description |
