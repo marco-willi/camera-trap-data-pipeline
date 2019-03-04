@@ -3,7 +3,8 @@
 The following codes can be used to:
 
 1. Get Zooniverse Exports (download data through the Python API)
-2. Extract Zooniverse Classifications
+2. Extract Annotations from Zooniverse Classifications
+3. Handle Legacy (S1-S10 Serengeti) Data
 
 
 ## Get Zooniverse Exports
@@ -27,7 +28,7 @@ Example:
 3. One identification has multiple questions, e.g., species name and behavior
 4. One question may have multiple answres, e.g, different behaviors for the behavior question
 
-We refer to an identification/answer by a volunteer as a annotation.
+We refer to an identification/answer by a volunteer as an annotation.
 
 To extract the classification data use the following code:
 ```
@@ -222,9 +223,9 @@ capture,capture_id,created_at,filenames,retired_at,retirement_reason,roll,season
 1,SER_S1#B04#1#1,2013-01-02 19:45:15 UTC,S1/B04/B04_R1/S1_B04_R1_PICT0001.JPG,,consensus,R1,S1,B04,2010-07-18T16:26:14-05:00,ASG0002kjh
 ```
 
-# Get Subject URLs from Zooniverse API (warning - takes a long time)
+### Get Subject URLs from Zooniverse API (warning - takes a long time)
 
-The following code gets Zooniverse URLs for subjects by querying the Oroboros API. The code can run a very long time (many hours per season). Resumes on failures by re-reading from file from disk.
+The following code gets Zooniverse URLs for subjects by querying the Oruboros API. The code can run a very long time (many hours per season). Resumes on failures by re-reading from file from disk.
 
 ```
 python3 -m zooniverse_exports.get_legacy_subject_urls \
@@ -243,7 +244,7 @@ ASG0002fg4,http://www.snapshotserengeti.org/subjects/standard/50c212248a607540b9
 
 ### Re-Create Season Captures
 
-For processing with later codes the following code re-creates season capture files according to the new process. This file has one row per image ans is normally the end-product of pre-processing camera trap images.
+For processing with later codes the following code re-creates season capture files according to the new process. This file has one row per image and is normally the end-product of pre-processing camera trap images.
 
 ```
 python3 -m zooniverse_exports.recreate_legacy_season_captures \

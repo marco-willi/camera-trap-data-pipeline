@@ -4,7 +4,6 @@
 import aiohttp
 import asyncio
 from aiohttp.client_exceptions import ContentTypeError
-from contextlib import closing
 import time
 import os
 import pandas as pd
@@ -14,24 +13,20 @@ import argparse
 
 from utils import (
     slice_generator,
-    read_config_file, estimate_remaining_time, set_file_permission)
+    estimate_remaining_time, set_file_permission)
 
 
 def get_oroboros_api_data(subject_ids, quality='standard', batch_size=1000):
     api_path = 'https://api.zooniverse.org/projects/serengeti/subjects/'
     res_dict = dict()
-    time_start = time.time()
     n_total = len(subject_ids)
-    n_remaining = n_total
-    n_finished = 0
     url_list = [api_path + x for x in subject_ids]
-    n_blocks = int(n_total/ batch_size)
+    n_blocks = int(n_total / batch_size)
     slices = slice_generator(n_total, n_blocks)
     # loop over chunks
     for i, (start_i, end_i) in enumerate(slices):
         print("    Starting with sub-batch {}".format(i))
         batch_urls = url_list[start_i: end_i]
-        n_batch = len(batch_urls)
         tasks = []
         res = []
         for url in batch_urls:
@@ -43,7 +38,7 @@ def get_oroboros_api_data(subject_ids, quality='standard', batch_size=1000):
         n_batch_success = len(data)
         print("    Sub-Batch {} finished {:5}/{:5}".format(
             i, n_batch_success, len(batch_urls)))
-        data_dict = {k:v for k, v in data}
+        data_dict = {k: v for k, v in data}
         # add data
         res_dict = {**res_dict, **data_dict}
     return res_dict
@@ -58,10 +53,12 @@ async def fetch(session, url):
         except Exception:
             print(traceback.format_exc())
 
+
 async def fetch_page(url, res):
     async with aiohttp.ClientSession() as session:
         page = await fetch(session, url)
         res.append(page)
+
 
 def extract_image_urls(page, quality):
     """ extract relevant info from pages """
@@ -73,22 +70,6 @@ def extract_image_urls(page, quality):
     if len(url_list) > 3:
         url_list = url_list[0:3]
     return _id, url_list
-
-
-# for season in range(1, 11):
-#     input_path = '/home/packerc/shared/zooniverse/Exports/SER/SER_S{}_subjects_extracted.csv'.format(season)
-#     output_path = '/home/packerc/shared/zooniverse/Exports/SER/SER_S{}_subjects_urls.csv'.format(season)
-#     df = pd.read_csv(input_path,na_values=str)
-#     subject_ids = df['subject_id']
-#     api_path = 'https://api.zooniverse.org/projects/serengeti/subjects/'
-#     urls = get_oroboros_api_data(subject_ids, quality='large', batch_size=50)
-#     df_out = pd.DataFrame.from_dict(urls, orient='index')
-#     cols = df_out.columns.tolist()
-#     df_out.columns = ['zooniverse_url_0', 'zooniverse_url_1', 'zooniverse_url_2']
-#     df_out.sort_index(inplace=True)
-#     df_out.index.name = 'subject_id'
-#     df_out.to_csv(output_path, index=True)
-#     set_file_permission(output_path)
 
 # args = dict()
 # args['subjects_extracted'] = '/home/packerc/shared/zooniverse/Exports/SER/SER_S1_subjects_extracted.csv'
