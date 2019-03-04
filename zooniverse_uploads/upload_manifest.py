@@ -297,6 +297,12 @@ if __name__ == "__main__":
                 # remove images that failed to process
                 images_to_upload = [
                     x for x in images_to_upload if x is not None]
+                # skip subject if no images present
+                if len(images_to_upload) == 0:
+                    logger.warning(
+                        "capture_id {} has no valid images - skipping".format(
+                         capture_id))
+                    continue
             metadata = data['upload_metadata']
             metadata['#original_images'] = data['images']['original_images']
             metadata['capture_id_anonymized'] = \
