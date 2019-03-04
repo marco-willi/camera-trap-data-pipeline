@@ -222,6 +222,25 @@ capture,capture_id,created_at,filenames,retired_at,retirement_reason,roll,season
 1,SER_S1#B04#1#1,2013-01-02 19:45:15 UTC,S1/B04/B04_R1/S1_B04_R1_PICT0001.JPG,,consensus,R1,S1,B04,2010-07-18T16:26:14-05:00,ASG0002kjh
 ```
 
+# Get Subject URLs from Zooniverse API (warning - takes a long time)
+
+The following code gets Zooniverse URLs for subjects by querying the Oroboros API. The code can run a very long time (many hours per season). Resumes on failures by re-reading from file from disk.
+
+```
+python3 -m zooniverse_exports.get_legacy_subject_urls \
+--subjects_extracted /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subjects_extracted.csv \
+--subjects_urls /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subject_urls.csv
+```
+
+Example:
+```
+subject_id,zooniverse_url_0,zooniverse_url_1,zooniverse_url_2
+ASG0002fg3,http://www.snapshotserengeti.org/subjects/standard/50c212248a607540b901bab3_0.jpg,http://www.snapshotserengeti.org/subjects/standard/50c212248a6
+07540b901bab3_1.jpg,http://www.snapshotserengeti.org/subjects/standard/50c212248a607540b901bab3_2.jpg
+ASG0002fg4,http://www.snapshotserengeti.org/subjects/standard/50c212248a607540b901bab4_0.jpg,http://www.snapshotserengeti.org/subjects/standard/50c212248a6
+07540b901bab4_1.jpg,http://www.snapshotserengeti.org/subjects/standard/50c212248a607540b901bab4_2.jpg
+```
+
 ### Re-Create Season Captures
 
 For processing with later codes the following code re-creates season capture files according to the new process. This file has one row per image ans is normally the end-product of pre-processing camera trap images.

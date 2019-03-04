@@ -17,6 +17,15 @@ SEASON=GRU_S1
 
 The following reports can be generated:
 ```
+# Reporting of Zooniverse exports - only captures with species
+python3 -m reporting.add_aggregations_to_season_captures \
+--season_captures_csv /home/packerc/shared/season_captures/${SITE}/cleaned/${SEASON}_cleaned.csv \
+--aggregated_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_annotations_aggregated_subject_info.csv \
+--output_csv /home/packerc/shared/zooniverse/Reports/${SITE}/${SEASON}_report_species.csv \
+--default_season_id ${SEASON} \
+--export_only_species
+
+# Reporting of Zooniverse exports - all captures from the season file
 python3 -m reporting.add_aggregations_to_season_captures \
 --season_captures_csv /home/packerc/shared/season_captures/${SITE}/cleaned/${SEASON}_cleaned.csv \
 --aggregated_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_annotations_aggregated_subject_info.csv \
