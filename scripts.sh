@@ -380,12 +380,16 @@ python3 -m zooniverse_aggregations.aggregate_annotations_plurality \
 python3 -m zooniverse_exports.extract_subjects_legacy \
 --annotations /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_annotations.csv \
 --output_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subjects_extracted.csv \
---log_dir /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}/
+--log_dir /home/packerc/shared/zooniverse/Exports/${SITE}/
 
 # Get Subject URLs from Zooniverse API (warning - takes a long time)
 python3 -m zooniverse_exports.get_legacy_subject_urls \
 --subjects_extracted /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subjects_extracted.csv \
 --subjects_urls /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subject_urls.csv
+
+python3 -m zooniverse_exports.get_legacy_ouroboros_data \
+--subjects_extracted /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subjects_extracted.csv \
+--subjects_ouroboros /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subjects_ouroboros.json
 
 # Re-Create Season Captures
 python3 -m zooniverse_exports.recreate_legacy_season_captures \
@@ -439,24 +443,24 @@ python3 -m zooniverse_exports.extract_legacy_serengeti \
 --output_path '/home/packerc/shared/zooniverse/Exports/SER/' \
 --season_to_process '10'
 
+# Aggregate Annotations
+python3 -m zooniverse_aggregations.aggregate_annotations_plurality \
+--annotations /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_annotations.csv \
+--output_csv /home/packerc/shared/zooniverse/Aggregations/${SITE}/${SEASON}_annotations_aggregated.csv \
+--log_dir /home/packerc/shared/zooniverse/Aggregations/${SITE}/ \
+--export_consensus_only \
+--export_sample_size 300
+
 # Loop over all seasons
 for season in 1 2 3 4 5 6 7 8 9 10; do
   SITE=SER
   SEASON=SER_S${season}
 
-  # Aggregate Annotations
-  python3 -m zooniverse_aggregations.aggregate_annotations_plurality \
-  --annotations /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_annotations.csv \
-  --output_csv /home/packerc/shared/zooniverse/Aggregations/${SITE}/${SEASON}_annotations_aggregated.csv \
-  --log_dir /home/packerc/shared/zooniverse/Aggregations/${SITE}/ \
-  --export_consensus_only \
-  --export_sample_size 300
-
   # Extract Subjects from Classifications
   python3 -m zooniverse_exports.extract_subjects_legacy \
   --annotations /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_annotations.csv \
   --output_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subjects_extracted.csv \
-  --log_dir /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}/
+  --log_dir /home/packerc/shared/zooniverse/Exports/${SITE}
 
   # Re-Create Season Captures
   python3 -m zooniverse_exports.recreate_legacy_season_captures \

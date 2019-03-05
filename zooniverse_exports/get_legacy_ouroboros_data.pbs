@@ -1,0 +1,20 @@
+#!/bin/bash -l
+#PBS -l walltime=12:00:00,nodes=1:ppn=4
+#PBS -j oe
+#PBS -q lab-long
+#PBS -N get_legacy_ouroboros
+#PBS -o ${HOME}/get_legacy_urls_${PBS_JOBID}.log
+#PBS -e ${HOME}/get_legacy_urls_error_${PBS_JOBID}.log
+
+module load python3
+
+cd $HOME/snapshot_safari_misc
+SITE=SER
+
+# Loop over all seasons
+for season in 1 2 3 4 5 6 7 8 9 10; do
+  SEASON=SER_S${season}
+  python3 -m zooniverse_exports.get_legacy_ouroboros_data \
+  --subjects_extracted /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subjects_extracted.csv \
+  --subjects_ouroboros /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subjects_ouroboros.json
+done
