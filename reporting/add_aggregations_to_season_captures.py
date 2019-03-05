@@ -131,9 +131,9 @@ if __name__ == '__main__':
             if not is_identical:
                 msg = textwrap.shorten(
                     "Subject_ids with identical capture_id found -- \
-                     capture_id {} - subject_ids {} - {}").format(
+                     capture_id {} - subject_ids {} - {}".format(
                      capture_id, known_subject_id, subject_id
-                     )
+                     ), width=99)
                 logger.warning(msg)
             duplicate_subject_ids.add(subject_id)
         logger.info("Found {} subjects with identical capture ids".format(
