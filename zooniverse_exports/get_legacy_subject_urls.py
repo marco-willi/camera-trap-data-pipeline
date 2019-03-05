@@ -73,7 +73,7 @@ def extract_image_urls(page, quality):
 
 # args = dict()
 # args['subjects_extracted'] = '/home/packerc/shared/zooniverse/Exports/SER/SER_S1_subjects_extracted.csv'
-# args['subjects_urls'] = '/home/packerc/shared/zooniverse/Exports/SER/SER_S1_subjects_urls.csv'
+# args['subjects_urls'] = '/home/packerc/shared/zooniverse/Exports/SER/SER_S1_subject_urls.csv'
 
 if __name__ == '__main__':
     # Parse command line arguments
@@ -93,7 +93,8 @@ if __name__ == '__main__':
         df_out = pd.read_csv(output_path, na_values=str, index_col='subject_id')
         df_out.fillna('', inplace=True)
         # remove already processed
-        df.drop(df_out.index, axis=0, inplace=True)
+        # df.drop(df_out.index, axis=0, inplace=True)
+        df = df[~df.index.isin(df_out.index)]
         print("Remaining records to process: {}".format(df.shape[0]))
         output_file_exists = True
     else:

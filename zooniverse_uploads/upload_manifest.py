@@ -352,9 +352,9 @@ if __name__ == "__main__":
                 n_remaining,
                 max(0, uploaded_subjects_count-n_remaining))
             st = datetime.datetime.fromtimestamp(ts).strftime('%H:%M:%S')
-            msg = "Saved %s/%s (%s %%) - Current Time: %s - \
-                   Estimated Time Remaining: %s" % \
-                  (uploaded_subjects_count, n_tot,
+            msg = "Saved {:5}/{:5} ({:4} %) - Current Time: {} - \
+                   Estimated Time Remaining: {}".format(
+                   uploaded_subjects_count, n_tot,
                    round((uploaded_subjects_count/n_tot) * 100, 2), st, tr)
             logger.info(textwrap.shorten(msg, width=99))
 
