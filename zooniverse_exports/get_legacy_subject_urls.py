@@ -99,7 +99,7 @@ if __name__ == '__main__':
         output_file_exists = False
     # read in batches
     time_start = time.time()
-    n_total = df.size
+    n_total = df.shape[0]
     n_finished = 0
     n_blocks = int(n_total / 5000)
     slices = slice_generator(n_total, n_blocks)
