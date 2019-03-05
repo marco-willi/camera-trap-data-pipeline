@@ -84,15 +84,16 @@ if __name__ == '__main__':
     # read subject data, fetch urls via oroboros API and save to disk
     input_path = args['subjects_extracted']
     output_path = args['subjects_urls']
-    df = pd.read_csv(input_path, na_values=str)
+    df = pd.read_csv(input_path, na_values=str, index_col='subject_id')
     subject_ids = df['subject_id']
     api_path = 'https://api.zooniverse.org/projects/serengeti/subjects/'
     # read from disk if already exists
     if os.path.isfile(output_path):
         print("reading file {}".format(output_path))
-        df_out = pd.read_csv(output_path, na_values=str)
+        df_out = pd.read_csv(output_path, na_values=str, index_col='subject_id')
+        df_out.fillna('', inplace=True)
         # remove already processed
-        df.drop(df.index[df_out.index], inplace=True)
+        df.drop(df_out.index, axis=0, inplace=True)
         print("Remaining records to process: {}".format(df.shape[0]))
         output_file_exists = True
     else:
