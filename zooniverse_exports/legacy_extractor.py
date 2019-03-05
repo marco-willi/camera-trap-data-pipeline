@@ -363,15 +363,20 @@ def process_season_classifications(path, img_to_capture, flags):
                 # check whether there is a previous classification from
                 # the same user on the same subject
                 if classification_id not in user_subject_class[user_sub_key]:
-                    msg = "Removed annnotation due \
-                           to subject_id {} already classified by \
-                           user {} in a prev classification_id: {} \
-                           current classification id: {}".format(
-                           subject_id,
-                           user,
-                           user_subject_class[user_sub_key],
-                           classification_id)
-                    logger.debug(textwrap.shorten(msg, width=99))
+                    if n_duplicate_subject_classifications < 10:
+                        msg = "Removed annnotation due \
+                               to subject_id {} already classified by \
+                               user {} in a prev classification_id: {} \
+                               current classification id: {}".format(
+                               subject_id,
+                               user,
+                               user_subject_class[user_sub_key],
+                               classification_id)
+                        logger.info(textwrap.shorten(msg, width=150))
+                    elif n_duplicate_subject_classifications == 10:
+                        logger.info(textwrap.shorten(
+                            "not printing any more annotation removal due to \
+                             identical user/subjec", width=99))
                     n_duplicate_subject_classifications += 1
                     continue
                 record = {**classification_info, **answers}
