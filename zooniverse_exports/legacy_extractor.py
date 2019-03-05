@@ -341,10 +341,11 @@ def process_season_classifications(path, img_to_capture, flags):
                     elif n_capture_id_not_found == 10:
                         logger.info("Not printing more not found img_key msgs...")
                     n_capture_id_not_found += 1
-                    capture_id = ''
-                    capture = ''
-                    if len(image_name) == 0:
-                        n_annos_without_images += 1
+                    continue
+                    # capture_id = ''
+                    # capture = ''
+                if len(image_name) == 0:
+                    n_annos_without_images += 1
                 classification_info['capture_id'] = capture_id
                 classification_info['capture'] = capture
                 # get answers
@@ -383,13 +384,13 @@ def process_season_classifications(path, img_to_capture, flags):
                 logger.warning("Full line:\n %s" % line)
                 logger.warning(traceback.format_exc())
 
-    logger.info("Removed {} non-eligible classifications".format(
+    logger.info("Removed {} non-eligible annotations".format(
          n_not_eligible))
-    logger.info("Capture Ids not found: {}".format(
+    logger.info("Capture Ids not found - Removed: {} annotations".format(
         n_capture_id_not_found))
-    logger.info("Image not found in season.csv: {}".format(
+    logger.info("Images not found in season.csv: {}".format(
         n_annos_without_images))
-    logger.info("Removed {} duplicate classifications - same user, subject, \
+    logger.info("Removed {} duplicate annotations - same user, subject, \
      and species".format(n_duplicate_subject_answers_by_same_user))
 
     return classifications
