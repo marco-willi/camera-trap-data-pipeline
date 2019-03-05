@@ -93,7 +93,7 @@ if __name__ == '__main__':
         df_out = pd.read_csv(output_path, na_values=str)
         # remove already processed
         df.drop(df.index[df_out.index], inplace=True)
-        print("Remaining records to process: {}".format(df.size))
+        print("Remaining records to process: {}".format(df.shape[0]))
         output_file_exists = True
     else:
         output_file_exists = False
