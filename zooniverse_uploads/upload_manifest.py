@@ -348,7 +348,9 @@ if __name__ == "__main__":
             # print progress information
             ts = time.time()
             tr = estimate_remaining_time(
-                time_start, n_remaining, uploaded_subjects_count)
+                time_start,
+                n_remaining,
+                max(0, uploaded_subjects_count-n_remaining))
             st = datetime.datetime.fromtimestamp(ts).strftime('%H:%M:%S')
             msg = "Saved %s/%s (%s %%) - Current Time: %s - \
                    Estimated Time Remaining: %s" % \
