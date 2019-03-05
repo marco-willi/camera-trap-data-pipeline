@@ -302,8 +302,8 @@ def process_season_classifications(path, img_to_capture, flags):
     n_not_eligible = 0
     n_capture_id_not_found = 0
     n_annos_without_images = 0
-    n_duplicate_subject_answers_by_same_user = 0
-    user_subject_species_dict = dict()
+    n_duplicate_subject_classifications = 0
+    user_subject_class = dict()
     classifications = OrderedDict()
     with open(path, "r") as ins:
         csv_reader = csv.reader(ins, delimiter=',', quotechar='"')
@@ -352,27 +352,28 @@ def process_season_classifications(path, img_to_capture, flags):
                 answers = extract_questions(line, row_name_to_id_mapper, flags)
                 # map answers
                 map_answers(answers, row_name_to_id_mapper, flags)
-                # check if subject was already classiifed by the same user
-                # with the same species identification if so, skip it
+                # check if subject was already classified by the same user
+                # during a different classification, if so skip
                 user = classification_info['user_name']
                 subject_id = classification_info['subject_id']
-                species_annotation = answers['species']
-                _subject_species_key = '#'.join(
-                    [subject_id, species_annotation])
-                if user not in user_subject_species_dict:
-                    user_subject_species_dict[user] = set()
-                if _subject_species_key in user_subject_species_dict[user]:
-                    msg = "Removed annnotations due \
+                classification_id = classification_info['classification_id']
+                user_sub_key = '#'.join([user, subject_id])
+                if user_sub_key not in user_subject_class:
+                    user_subject_class[user_sub_key] = classification_id
+                # check whether there is a previous classification from
+                # the same user on the same subject
+                if classification_id not in user_subject_class[user_sub_key]:
+                    msg = "Removed annnotation due \
                            to subject_id {} already classified by \
-                           user {} with species {}".format(
+                           user {} in a prev classification_id: {} \
+                           current classification id: {}".format(
                            subject_id,
                            user,
-                           answers['species'])
+                           user_subject_class[user_sub_key],
+                           classification_id)
                     logger.debug(textwrap.shorten(msg, width=99))
-                    n_duplicate_subject_answers_by_same_user += 1
+                    n_duplicate_subject_classifications += 1
                     continue
-                user_subject_species_dict[user].add(_subject_species_key)
-
                 record = {**classification_info, **answers}
                 # store in classifiations dict
                 c_id = classification_info['classification_id']
@@ -384,14 +385,18 @@ def process_season_classifications(path, img_to_capture, flags):
                 logger.warning("Full line:\n %s" % line)
                 logger.warning(traceback.format_exc())
 
-    logger.info("Removed {} non-eligible annotations".format(
-         n_not_eligible))
-    logger.info("Capture Ids not found - Removed: {} annotations".format(
-        n_capture_id_not_found))
-    logger.info("Images not found in season.csv: {}".format(
-        n_annos_without_images))
-    logger.info("Removed {} duplicate annotations - same user, subject, \
-     and species".format(n_duplicate_subject_answers_by_same_user))
+    msg = "Removed {} non-eligible annotations".format(n_not_eligible)
+    logger.info(textwrap.shorten(msg, width=150))
+    msg = "Capture Ids not found - Removed: {} annotations".format(
+        n_capture_id_not_found)
+    logger.info(textwrap.shorten(msg, width=150))
+    msg = "Images not found in season.csv: {}".format(
+        n_annos_without_images)
+    logger.info(textwrap.shorten(msg, width=150))
+    msg = "Removed {} duplicate annotations - same user, subject, \
+     but different classification id".format(
+     n_duplicate_subject_classifications)
+    logger.info(textwrap.shorten(msg, width=150))
 
     return classifications
 
