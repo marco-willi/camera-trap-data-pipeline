@@ -85,7 +85,7 @@ if __name__ == '__main__':
     input_path = args['subjects_extracted']
     output_path = args['subjects_urls']
     df = pd.read_csv(input_path, na_values=str, index_col='subject_id')
-    subject_ids = df['subject_id']
+    subject_ids = df.index
     api_path = 'https://api.zooniverse.org/projects/serengeti/subjects/'
     # read from disk if already exists
     if os.path.isfile(output_path):
