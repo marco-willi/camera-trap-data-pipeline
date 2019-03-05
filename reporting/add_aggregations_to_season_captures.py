@@ -3,6 +3,8 @@ import csv
 import logging
 import os
 import argparse
+import textwrap
+import pandas as pd
 from datetime import datetime
 from collections import OrderedDict
 
@@ -15,6 +17,9 @@ from global_vars import plurality_aggregation_flags as flags
 # args['aggregated_csv'] = '/home/packerc/shared/zooniverse/Exports/GRU/GRU_S1_classifications_aggregated_samples_subject_info.csv'
 # args['output_csv'] = '/home/packerc/shared/zooniverse/Exports/GRU/GRU_S1_report.csv'
 # args['default_season_id'] = 'GRU_S1'
+# args['deduplicate_subjects'] = True
+# args['export_only_species'] = False
+# args['export_only_with_aggregations'] = True
 
 if __name__ == '__main__':
 
@@ -26,6 +31,7 @@ if __name__ == '__main__':
     parser.add_argument("--default_season_id", type=str, default='')
     parser.add_argument("--export_only_with_aggregations", action="store_true")
     parser.add_argument("--export_only_species", action="store_true")
+    parser.add_argument("--deduplicate_subjects", action="store_true")
 
     args = vars(parser.parse_args())
 
@@ -60,12 +66,15 @@ if __name__ == '__main__':
     # Create per Capture Data
     season_dict = OrderedDict()
     for image_record in season_data:
-        capture_id = '#'.join([
-            image_record[header['season']],
-            image_record[header['site']],
-            image_record[header['roll']],
-            image_record[header['capture']],
-        ])
+        if 'capture_id' not in header:
+            capture_id = '#'.join([
+                image_record[header['season']],
+                image_record[header['site']],
+                image_record[header['roll']],
+                image_record[header['capture']],
+            ])
+        else:
+            capture_id = image_record[header['capture_id']]
         if capture_id not in season_dict:
             timestamp = image_record[header['timestamp']]
             # deal with different timeformats in different capture files
@@ -80,7 +89,6 @@ if __name__ == '__main__':
                     time_obj = datetime.strptime(
                         timestamp,
                         '%Y-%m-%d %H:%M:%SZ')
-
             date = time_obj.strftime("%Y-%m-%d")
             time = time_obj.strftime("%H:%M:%S")
             season_dict[capture_id] = {
@@ -94,27 +102,56 @@ if __name__ == '__main__':
 
     season_header = list(season_dict[capture_id].keys())
 
-    # Import Aggregated Data
+    # read aggregations
+    df_aggregated = pd.read_csv(args['aggregated_csv'], dtype='str')
+    df_aggregated.fillna('', inplace=True)
+    df_aggregated.loc[df_aggregated.season == '', 'season'] = \
+        args['default_season_id']
+
+    # add capture id if not specified
+    if 'capture_id' not in df_aggregated.columns:
+        for _id, row in df_aggregated.iterrows():
+            capture_id = '#'.join(
+                [row.season, row.site, row.roll, row.capture])
+            df_aggregated.loc[_id, 'capture_id'] = capture_id
+
+    # deduplicate Aggregated data
+    if args['deduplicate_subjects']:
+        capture_to_subject_mapping = dict()
+        duplicate_subject_ids = set()
+        for row_id, row_data in df_aggregated.iterrows():
+            capture_id = row_data['capture_id']
+            subject_id = row_data['subject_id']
+            if capture_id not in capture_to_subject_mapping:
+                capture_to_subject_mapping[capture_id] = subject_id
+                continue
+            else:
+                known_subject_id = capture_to_subject_mapping[capture_id]
+                is_identical = (known_subject_id == subject_id)
+            if not is_identical:
+                msg = textwrap.shorten(
+                    "Subject_ids with identical capture_id found -- \
+                     capture_id {} - subject_ids {} - {}").format(
+                     capture_id, known_subject_id, subject_id
+                     )
+                logger.warning(msg)
+            duplicate_subject_ids.add(subject_id)
+        logger.info("Found {} subjects with identical capture ids".format(
+            len(duplicate_subject_ids)))
+        if len(duplicate_subject_ids) > 0:
+            df_aggregated = \
+                df_aggregated[~df_aggregated['subject_id'].isin(
+                    duplicate_subject_ids)]
+
+    # Store all info per capture
     aggregated_data = dict()
-    with open(args['aggregated_csv'], "r") as ins:
-        csv_reader = csv.reader(ins, delimiter=',', quotechar='"')
-        header_input = next(csv_reader)
-        row_name_to_id_mapper_input = {x: i for i, x in enumerate(header_input)}
-        for line_no, line in enumerate(csv_reader):
-            roll = line[row_name_to_id_mapper_input['roll']]
-            season = line[row_name_to_id_mapper_input['season']]
-            if season == '':
-                season = args['default_season_id']
-            site = line[row_name_to_id_mapper_input['site']]
-            capture = line[row_name_to_id_mapper_input['capture']]
-            capture_id = '#'.join([season, site, roll, capture])
-            input_dict = {
-                k: line[v] for k, v in
-                row_name_to_id_mapper_input.items()}
-            input_dict['capture_id'] = capture_id
-            if capture_id not in aggregated_data:
-                aggregated_data[capture_id] = list()
-            aggregated_data[capture_id].append(input_dict)
+    header_input = df_aggregated.columns
+    row_name_to_id_mapper_input = {x: i for i, x in enumerate(header_input)}
+    for line_no, line in df_aggregated.iterrows():
+        capture_id = line['capture_id']
+        if capture_id not in aggregated_data:
+            aggregated_data[capture_id] = list()
+        aggregated_data[capture_id].append(line)
 
     agg_data_header = [x for x in header_input if x not in season_header]
     header_combined = season_header + agg_data_header
