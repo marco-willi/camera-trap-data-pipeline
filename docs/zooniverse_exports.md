@@ -69,6 +69,7 @@ cd $HOME/snapshot_safari_misc
 python3 -m zooniverse_exports.extract_annotations \
         --classification_csv /home/packerc/shared/zooniverse/Exports/RUA/RUA_S1_classifications.csv \
         --output_csv /home/packerc/shared/zooniverse/Exports/RUA/RUA_S1_annotations_extracted.csv \
+        --log_dir /home/packerc/shared/zooniverse/Exports/RUA/ \
         --workflow_id 4889 \
         --workflow_version_min 797
 ```
@@ -202,7 +203,8 @@ This will produce a file containing one record per subject that can be merged wi
 ```
 python3 -m zooniverse_exports.extract_subjects_legacy \
 --classifications_extracted /home/packerc/shared/zooniverse/Exports/SER/SER_S1_classifications_extracted.csv \
---output_csv /home/packerc/shared/zooniverse/Exports/SER/SER_S1_subjects_extracted.csv
+--output_csv /home/packerc/shared/zooniverse/Exports/SER/SER_S1_subjects_extracted.csv \
+--log_dir /home/packerc/shared/zooniverse/Exports/SER/
 ```
 
 

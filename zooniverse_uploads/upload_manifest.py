@@ -11,7 +11,7 @@ import logging
 from panoptes_client import Project, Panoptes, SubjectSet
 from panoptes_client.panoptes import PanoptesAPIException
 
-from logger import setup_logger, create_logfile_name
+from logger import setup_logger, create_log_file
 from zooniverse_uploads import uploader
 from image_compression.resize_and_compress_images import (
     process_images_list_multiprocess,
@@ -115,6 +115,13 @@ if __name__ == "__main__":
         "--debug_mode", action='store_true',
         help="Activate debug mode which will print more status messages.")
 
+    parser.add_argument(
+        "--log_dir", type=str, default=None)
+
+    parser.add_argument(
+        "--log_filename", type=str,
+        default='upload_manifest')
+
     args = vars(parser.parse_args())
 
     # Check Manifest file
@@ -135,10 +142,11 @@ if __name__ == "__main__":
                 "save_quality must be between 15 and 100"
 
     # logging
-    log_file_name = create_logfile_name('upload_manifest')
-    log_file_path = os.path.join(
-        os.path.dirname(args['manifest']), log_file_name)
-    setup_logger(log_file_path)
+    if args['log_dir'] is not None:
+        log_file_path = create_log_file(args['log_dir'], args['log_filename'])
+        setup_logger(log_file_path)
+    else:
+        setup_logger()
     logger = logging.getLogger(__name__)
 
     for k, v in args.items():

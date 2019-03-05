@@ -8,7 +8,7 @@ import random
 from collections import OrderedDict
 import logging
 
-from logger import setup_logger, create_logfile_name
+from logger import setup_logger, create_log_file
 from utils import (
     slice_generator, export_dict_to_json_with_newlines,
     file_path_splitter, file_path_generator, set_file_permission)
@@ -34,6 +34,11 @@ if __name__ == "__main__":
         "--number_of_batches", type=int, default=None,
         help="How many batches to create. \
              Choose either max_batch_size or number_of_batches.")
+    parser.add_argument(
+        "--log_dir", type=str, default=None)
+    parser.add_argument(
+        "--log_filename", type=str,
+        default='split_manifest_into_batches')
 
     args = vars(parser.parse_args())
 
@@ -55,9 +60,11 @@ if __name__ == "__main__":
             "Only one of: number_of_batches/max_batch_size can be specified")
 
     # logging
-    log_file_name = create_logfile_name('split_manifest_into_batches')
-    log_file_path = os.path.join(args['output_manifest_dir'], log_file_name)
-    setup_logger(log_file_path)
+    if args['log_dir'] is not None:
+        log_file_path = create_log_file(args['log_dir'], args['log_filename'])
+        setup_logger(log_file_path)
+    else:
+        setup_logger()
     logger = logging.getLogger(__name__)
 
     for k, v in args.items():

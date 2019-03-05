@@ -8,7 +8,7 @@ import pandas as pd
 from datetime import datetime
 from collections import OrderedDict
 
-from logger import setup_logger, create_logfile_name
+from logger import setup_logger, create_log_file
 from utils import read_cleaned_season_file, set_file_permission
 from global_vars import plurality_aggregation_flags as flags
 
@@ -32,6 +32,11 @@ if __name__ == '__main__':
     parser.add_argument("--export_only_with_aggregations", action="store_true")
     parser.add_argument("--export_only_species", action="store_true")
     parser.add_argument("--deduplicate_subjects", action="store_true")
+    parser.add_argument(
+        "--log_dir", type=str, default=None)
+    parser.add_argument(
+        "--log_filename", type=str,
+        default='add_aggregations_to_season_captures')
 
     args = vars(parser.parse_args())
 
@@ -48,10 +53,11 @@ if __name__ == '__main__':
                                 args['aggregated_csv']))
 
     # logging
-    log_file_name = create_logfile_name('add_aggregations_to_season_captures')
-    log_file_path = os.path.join(
-        os.path.dirname(args['output_csv']), log_file_name)
-    setup_logger(log_file_path)
+    if args['log_dir'] is not None:
+        log_file_path = create_log_file(args['log_dir'], args['log_filename'])
+        setup_logger(log_file_path)
+    else:
+        setup_logger()
     logger = logging.getLogger(__name__)
 
     season_data, header = read_cleaned_season_file(args['season_captures_csv'])

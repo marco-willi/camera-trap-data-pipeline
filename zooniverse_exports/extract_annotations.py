@@ -21,7 +21,7 @@ import argparse
 import logging
 import textwrap
 
-from logger import setup_logger, create_logfile_name
+from logger import setup_logger, create_log_file
 from zooniverse_exports import extractor
 from utils import print_nested_dict, set_file_permission
 from global_vars import extractor_flags as flags
@@ -53,6 +53,11 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("--classification_csv", type=str, required=True)
     parser.add_argument("--output_csv", type=str, required=True)
+    parser.add_argument(
+        "--log_dir", type=str, default=None)
+    parser.add_argument(
+        "--log_filename", type=str,
+        default='extract_annotations')
     parser.add_argument(
         "--workflow_id", type=str, default=None,
         help="Extract only classifications from the specified workflow_id")
@@ -88,10 +93,11 @@ if __name__ == '__main__':
     ######################################
 
     # logging
-    log_file_name = create_logfile_name('extract_classifications')
-    log_file_path = os.path.join(
-        os.path.dirname(args['output_csv']), log_file_name)
-    setup_logger(log_file_path)
+    if args['log_dir'] is not None:
+        log_file_path = create_log_file(args['log_dir'], args['log_filename'])
+        setup_logger(log_file_path)
+    else:
+        setup_logger()
     logger = logging.getLogger(__name__)
 
     for k, v in args.items():

@@ -19,6 +19,7 @@ python3 -m zooniverse_uploads.generate_manifest \
 --captures_csv /home/packerc/shared/season_captures/RUA/cleaned/RUA_S1_cleaned.csv \
 --output_manifest_dir /home/packerc/shared/zooniverse/Manifests/RUA/ \
 --images_root_path /home/packerc/shared/albums/RUA/ \
+--log_dir /home/packerc/shared/zooniverse/Manifests/RUA/ \
 --manifest_id RUA_S1 \
 --attribution 'University of Minnesota Lion Center + SnapshotSafari + Ruaha Carnivore Project + Tanzania + Ruaha National Park' \
 --license 'SnapshotSafari + Ruaha Carnivore Project'
@@ -155,6 +156,7 @@ This codes splits the manifest into several batches that can be uploaded separat
 cd $HOME/snapshot_safari_misc
 python3 -m zooniverse_uploads.split_manifest_into_batches \
 --manifest /home/packerc/shared/zooniverse/Manifests/RUA/RUA_S1__complete__manifest.json \
+--log_dir /home/packerc/shared/zooniverse/Manifests/RUA/ \
 --max_batch_size 20000
 ```
 
@@ -175,6 +177,7 @@ Change the paths analogue to this example:
 ```
 python3 -m zooniverse_uploads.upload_manifest \
 --manifest /home/packerc/shared/zooniverse/Manifests/RUA/RUA_S1__complete__manifest.json \
+--log_dir /home/packerc/shared/zooniverse/Manifests/RUA/ \
 --project_id 5155 \
 --password_file ~/keys/passwords.ini \
 --image_root_path /home/packerc/shared/albums/RUA/
@@ -223,6 +226,7 @@ Change the paths analogue to this example:
 ```
 python3 -m zooniverse_uploads.upload_manifest \
 --manifest /home/packerc/shared/zooniverse/Manifests/RUA/RUA_S1__complete__manifest.json \
+--log_dir /home/packerc/shared/zooniverse/Manifests/RUA/ \
 --project_id 5155 \
 --subject_set_id 7845 \
 --image_root_path /home/packerc/shared/albums/RUA/ \

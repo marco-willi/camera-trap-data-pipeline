@@ -44,7 +44,8 @@ This is an example to aggregate classifications using the plurality algorithm.
 ```
 python3 -m zooniverse_aggregations.aggregate_classifications_plurality \
 --classifications_extracted /home/packerc/shared/zooniverse/Exports/RUA/RUA_S1_classifications_extracted.csv \
---output_csv /home/packerc/shared/zooniverse/Exports/RUA/RUA_S1_classifications_aggregated.csv \
+--output_csv /home/packerc/shared/zooniverse/Aggregations/RUA/RUA_S1_classifications_aggregated.csv \
+--log_dir /home/packerc/shared/zooniverse/Aggregations/RUA/ \
 --export_consensus_only \
 --export_sample_size 300
 ```      

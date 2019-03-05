@@ -6,7 +6,7 @@ import argparse
 from collections import OrderedDict
 import logging
 
-from logger import setup_logger, create_logfile_name
+from logger import setup_logger, create_log_file
 from utils import (
     export_dict_to_json_with_newlines,
     read_cleaned_season_file, file_path_generator, set_file_permission)
@@ -59,6 +59,11 @@ if __name__ == "__main__":
     parser.add_argument(
         "--csv_quotechar", type=str, default='"',
         help="Quotechar used to import the captures_csv")
+    parser.add_argument(
+        "--log_dir", type=str, default=None)
+    parser.add_argument(
+        "--log_filename", type=str,
+        default='generate_manifest')
 
     args = vars(parser.parse_args())
 
@@ -80,9 +85,11 @@ if __name__ == "__main__":
         raise ValueError("manifest_id must not contain any of '.'/'__'")
 
     # logging
-    log_file_name = create_logfile_name('generate_manifest')
-    log_file_path = os.path.join(args['output_manifest_dir'], log_file_name)
-    setup_logger(log_file_path)
+    if args['log_dir'] is not None:
+        log_file_path = create_log_file(args['log_dir'], args['log_filename'])
+        setup_logger(log_file_path)
+    else:
+        setup_logger()
     logger = logging.getLogger(__name__)
 
     for k, v in args.items():
@@ -118,6 +125,11 @@ if __name__ == "__main__":
         capture = row[name_to_id_mapper['capture']]
         image_path = row[name_to_id_mapper['path']]
         invalid = row[name_to_id_mapper['invalid']]
+        # unique capture id
+        try:
+            capture_id = row[name_to_id_mapper['capture_id']]
+        except:
+            capture_id = '#'.join([season, site, roll, capture])
         # Skip image if not in valid codes
         if invalid not in valid_codes:
             omitted_images_counter += 1
@@ -128,8 +140,6 @@ if __name__ == "__main__":
             images_not_found_counter += 1
             logger.warning("Image not found: {}".format(image_path_full))
             continue
-        # unique capture id
-        capture_id = '#'.join([season, site, roll, capture])
         # Create a new entry in the manifest
         if capture_id not in manifest:
             # generate metadata for uploading to Zooniverse

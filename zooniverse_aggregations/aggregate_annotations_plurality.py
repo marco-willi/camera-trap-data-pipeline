@@ -9,7 +9,7 @@ from statistics import median_high, StatisticsError
 from collections import Counter, defaultdict
 import logging
 
-from logger import setup_logger, create_logfile_name
+from logger import setup_logger, create_log_file
 from global_vars import plurality_aggregation_flags as flags
 from zooniverse_aggregations import aggregator
 from utils import (
@@ -102,6 +102,11 @@ if __name__ == '__main__':
     parser.add_argument(
         "--export_sample_size", default=0, type=int,
         help="Export a csv with N samples (fewer if only consensus)")
+    parser.add_argument(
+        "--log_dir", type=str, default=None)
+    parser.add_argument(
+        "--log_filename", type=str,
+        default='aggregate_annotations_plurality')
 
     args = vars(parser.parse_args())
 
@@ -119,10 +124,11 @@ if __name__ == '__main__':
     ######################################
 
     # logging
-    log_file_name = create_logfile_name('aggregate_classifications_plurality')
-    log_file_path = os.path.join(
-        os.path.dirname(args['output_csv']), log_file_name)
-    setup_logger(log_file_path)
+    if args['log_dir'] is not None:
+        log_file_path = create_log_file(args['log_dir'], args['log_filename'])
+        setup_logger(log_file_path)
+    else:
+        setup_logger()
     logger = logging.getLogger(__name__)
 
     for k, v in args.items():
