@@ -372,7 +372,7 @@ def process_season_classifications(path, img_to_capture, flags):
                                user,
                                user_subject_class[user_sub_key],
                                classification_id)
-                        logger.info(textwrap.shorten(msg, width=150))
+                        logger.info(textwrap.shorten(msg, width=250))
                     elif n_duplicate_subject_classifications == 10:
                         logger.info(textwrap.shorten(
                             "not printing any more annotation removal due to \
