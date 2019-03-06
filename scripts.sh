@@ -354,8 +354,10 @@ python3 -m reporting.manifest_predictions_to_csv \
 # Reporting of Machine Learning Predictions
 python3 -m reporting.add_predictions_to_season_captures \
 --season_captures_csv /home/packerc/shared/season_captures/${SITE}/cleaned/${SEASON}_cleaned.csv \
---predictions_csv /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/${SEASON}__complete__machine_learning.csv \
---output_csv /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/${SEASON}_report_machine_learning.csv
+--predictions_csv /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/${SEASON}_ml_preds_flat.csv \
+--output_csv /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/${SEASON}_report_ml.csv \
+--log_dir /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/ \
+--export_only_with_predictions
 
 
 ###################################

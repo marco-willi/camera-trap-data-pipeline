@@ -1,18 +1,18 @@
 """ Add Machine Predictions to Season Captures """
-import csv
 import logging
 import os
 import argparse
-from datetime import datetime
-from collections import OrderedDict
+import pandas as pd
 
-from logger import setup_logger, create_logfile_name
-from utils import read_cleaned_season_file
+from logger import setup_logger, create_log_file
+from utils import (
+    read_cleaned_season_file_df, set_file_permission, sort_df_by_capture_id)
+from reporting.add_aggregations_to_season_captures import create_season_dict
 
 # args = dict()
 # args['season_captures_csv'] = '/home/packerc/shared/season_captures/GRU/cleaned/GRU_S1_cleaned.csv'
-# args['predictions_csv'] = '/home/packerc/shared/zooniverse/Manifests/GRU/GRU_S1_machine_learning.csv'
-# args['output_csv'] = '/home/packerc/shared/zooniverse/Exports/GRU/GRU_S1_report2.csv'
+# args['predictions_csv'] = '/home/packerc/shared/zooniverse/ConsensusReports/GRU/GRU_S1_ml_preds_flat.csv'
+# args['output_csv'] = '/home/packerc/shared/zooniverse/ConsensusReports/GRU/GRU_S1_report_ml.csv'
 # args['export_only_with_predictions'] = False
 
 if __name__ == '__main__':
@@ -23,6 +23,11 @@ if __name__ == '__main__':
     parser.add_argument("--predictions_csv", type=str, required=True)
     parser.add_argument("--output_csv", type=str, required=True)
     parser.add_argument("--export_only_with_predictions", action="store_true")
+    parser.add_argument(
+        "--log_dir", type=str, default=None)
+    parser.add_argument(
+        "--log_filename", type=str,
+        default='add_predictions_to_season_captures')
 
     args = vars(parser.parse_args())
 
@@ -39,87 +44,49 @@ if __name__ == '__main__':
                                 args['predictions_csv']))
 
     # logging
-    log_file_name = create_logfile_name('add_predictions_to_season_captures')
-    log_file_path = os.path.join(
-        os.path.dirname(args['output_csv']), log_file_name)
-    setup_logger(log_file_path)
+    if args['log_dir'] is not None:
+        log_file_path = create_log_file(args['log_dir'], args['log_filename'])
+        setup_logger(log_file_path)
+    else:
+        setup_logger()
     logger = logging.getLogger(__name__)
 
-    season_data, header = read_cleaned_season_file(args['season_captures_csv'])
+    for k, v in args.items():
+        logger.info("Argument {}: {}".format(k, v))
 
-    # Create per Capture Data
-    season_dict = OrderedDict()
-    for image_record in season_data:
-        capture_id = '#'.join([
-            image_record[header['season']],
-            image_record[header['site']],
-            image_record[header['roll']],
-            image_record[header['capture']],
-        ])
-        if capture_id not in season_dict:
-            timestamp = image_record[header['timestamp']]
-            time_obj = datetime.strptime(timestamp, '%Y:%m:%d %H:%M:%S')
-            date = time_obj.strftime("%Y-%m-%d")
-            time = time_obj.strftime("%H:%M:%S")
-            season_dict[capture_id] = {
-                'capture_id': capture_id,
-                'season': image_record[header['season']],
-                'site': image_record[header['site']],
-                'roll': image_record[header['roll']],
-                'capture': image_record[header['capture']],
-                'capture_date_local': date,
-                'capture_time_local': time}
+    season_data_df = read_cleaned_season_file_df(args['season_captures_csv'])
+    season_dict = create_season_dict(season_data_df)
 
-    season_header = list(season_dict[capture_id].keys())
+    random_record = season_dict[list(season_dict.keys())[0]]
+    season_header = list(random_record.keys())
 
-    # Import Prediction Data
-    prediction_data = dict()
-    with open(args['predictions_csv'], "r") as ins:
-        csv_reader = csv.reader(ins, delimiter=',', quotechar='"')
-        header_input = next(csv_reader)
-        row_name_to_id_mapper_input = {x: i for i, x in enumerate(header_input)}
-        for line_no, line in enumerate(csv_reader):
-            capture_id = line[row_name_to_id_mapper_input['capture_id']]
-            input_dict = {
-                k: line[v] for k, v in
-                row_name_to_id_mapper_input.items() if k != 'capture_id'}
-            prediction_data[capture_id] = input_dict
+    # Import Flatt Predictions
+    df_preds = pd.read_csv(
+        args['predictions_csv'], dtype='str',
+        index_col='capture_id')
+    df_preds.fillna('', inplace=True)
+    df_preds.index.name = 'capture_id'
 
-    pred_data_header = [x for x in header_input if x not in season_header]
-    header_combined = season_header + pred_data_header
+    # Join season captures with preds
+    season_df = pd.DataFrame.from_dict(season_dict, orient='index')
+    season_df.index.name = 'capture_id'
 
-    # Write Season File with Aggregations
-    with open(args['output_csv'], 'w') as f:
-        csv_writer = csv.writer(f, delimiter=',')
-        logger.info("Writing output to {}".format(args['output_csv']))
-        csv_writer.writerow(header_combined)
-        n_lines_written = 0
-        for line_no, (capture_id, season_data) in enumerate(season_dict.items()):
-            # get subject info data
-            to_write = list()
-            for x in season_header:
-                try:
-                    to_write.append(season_data[x])
-                except:
-                    to_write.append('')
-            try:
-                pred_data_current = prediction_data[capture_id]
-            except:
-                if args['export_only_with_predictions']:
-                    continue
-                pred_data_current = {}
-            for x in pred_data_header:
-                try:
-                    to_write.append(pred_data_current[x])
-                except:
-                    to_write.append('')
-            csv_writer.writerow(to_write)
-            n_lines_written += 1
-            # print status
-            if ((line_no % 10000) == 0) and (line_no > 0):
-                print("Wrote {:,} captures".format(line_no))
-        logger.info("Wrote {} records to {}".format(
-            n_lines_written+1, args['output_csv']))
+    if args['export_only_with_predictions']:
+        df_merged = pd.merge(
+            season_df, df_preds, how='inner',
+            left_index=True, right_index=True)
+    else:
+        df_merged = pd.merge(
+            season_df, df_preds, how='left',
+            left_index=True, right_index=True)
+        df_merged.fillna('', inplace=True)
+
+    # export
+    sort_df_by_capture_id(df_merged)
+    df_merged.to_csv(args['output_csv'], index=True)
+
+    logger.info("Wrote {} records to {}".format(
+        df_merged.shape[0], args['output_csv']))
 
     # change permmissions to read/write for group
-    os.chmod(args['output_csv'], 0o660)
+    set_file_permission(args['output_csv'])
