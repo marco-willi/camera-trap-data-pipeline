@@ -101,7 +101,7 @@ The following file contains one record per capture event and species detection. 
 
 ## Merge Season Captures with Machine Predictions
 
-Generate a csv with all machine learning predictions.
+Generate a csv with all machine learning predictions, one record per capture-id.
 
 ```
 # Create Flattened ML Predictions
@@ -114,10 +114,13 @@ python3 -m reporting.flatten_ml_predictions \
 
 Merge the machine learning predictions with the season captures.
 ```
+# Reporting of Machine Learning Predictions
 python3 -m reporting.add_predictions_to_season_captures \
-        --season_csv /home/packerc/shared/zooniverse/Exports/GRU/GRU_S1_subjects_extracted.csv \
-        --predictions_csv /home/packerc/shared/zooniverse/Exports/GRU/GRU_S1_classifications_aggregated_samples.csv \
-        --output_csv /home/packerc/shared/zooniverse/Reporting/GRU/GRU_S1_report_zooniverse.csv
+--season_captures_csv /home/packerc/shared/season_captures/${SITE}/cleaned/${SEASON}_cleaned.csv \
+--predictions_csv /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/${SEASON}_ml_preds_flat.csv \
+--output_csv /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/${SEASON}_report_ml.csv \
+--log_dir /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/ \
+--export_only_with_predictions
 ```
 
 The following file contains one record per capture event. Primary key is 'capture_id'.
@@ -127,12 +130,9 @@ The following file contains one record per capture event. Primary key is 'captur
 |capture_id, season, roll, site, capture | internal identifiers of the capture
 |capture_date_local | local date (YYYY-MM-DD) of the capture
 |capture_time_local | local time (HH:MM:SS) of the capture
-|machine_prediction_empty | 'empty' if machine predicts empty image, or 'species' if machine thinks species is present
-|machine_confidence_empty | Confidene of 'empty'/'species' prediction
-|machine_prediction_species| Species with the highest probability of being present.
-|machine_confidence_species| Confidence for the species with the highest probability of being present.
-|machine_prediction_(behavior) | Prediction of a behavior being present (1 for yes, 0 for no)
-|machine_confidence_(behavior) | Confidence of predicted behavior (1 for yes, 0 for no)
-|machine_prediction_count | Prediction of a behavior being present (1 for yes, 0 for no)
-|machine_confidence_(behavior) | Confidence of predicted behavior (1 for yes, 0 for no)
-|machine_prediction_(species)| Confidence of (species) being present in the image
+|machine_confidence_empty| confidence of the image being empty / blank
+|machine_confidence_species| confidence of the image containing a species
+|machine_topprediction_(label)| the models top prediction for (label), e.g., '5' for the 'count' label
+|machine_confidence_count_(num) | Confidence of the model of (num) species being present in the image.
+|machine_confidence_(behavior) | Confidence of predicted behavior (0-1)
+|machine_confidence_species_(species)| Confidence of (species) being present in the image (0-1)
