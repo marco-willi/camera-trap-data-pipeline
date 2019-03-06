@@ -14,8 +14,9 @@ from global_vars import plurality_aggregation_flags as flags
 
 # args = dict()
 # args['season_captures_csv'] = '/home/packerc/shared/season_captures/GRU/cleaned/GRU_S1_cleaned.csv'
-# args['aggregated_csv'] = '/home/packerc/shared/zooniverse/Exports/GRU/GRU_S1_classifications_aggregated_samples_subject_info.csv'
-# args['output_csv'] = '/home/packerc/shared/zooniverse/Exports/GRU/GRU_S1_report.csv'
+# args['aggregated_csv'] = '/home/packerc/shared/zooniverse/Aggregations/GRU/GRU_S1_annotations_aggregated_subject_info.csv'
+# args['output_csv'] = '/home/packerc/shared/zooniverse/ConsensusReports/GRU/GRU_S1_report_all.csv'
+# args['log_dir'] = '/home/packerc/shared/zooniverse/ConsensusReports/GRU/'
 # args['default_season_id'] = 'GRU_S1'
 # args['deduplicate_subjects'] = True
 # args['export_only_species'] = False
@@ -116,10 +117,12 @@ if __name__ == '__main__':
 
     # add capture id if not specified
     if 'capture_id' not in df_aggregated.columns:
+        capture_ids_all = list()
         for _id, row in df_aggregated.iterrows():
             capture_id = '#'.join(
                 [row.season, row.site, row.roll, row.capture])
-            df_aggregated.loc[_id, 'capture_id'] = capture_id
+            capture_ids_all.append(capture_id)
+        df_aggregated['capture_id'] = capture_ids_all
 
     # deduplicate Aggregated data
     if args['deduplicate_subjects']:

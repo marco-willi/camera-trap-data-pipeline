@@ -242,7 +242,7 @@ if __name__ == "__main__":
     capture_ids_all = list(mani.keys())
 
     n_tot = len(capture_ids_all)
-    n_remaining = n_tot - n_in_tracker_file
+    n_tot_remaining = n_tot - n_in_tracker_file
 
     upload_batch_size = 100
     batch_data = batch_data_storage()
@@ -349,8 +349,8 @@ if __name__ == "__main__":
             ts = time.time()
             tr = estimate_remaining_time(
                 time_start,
-                n_remaining,
-                max(0, uploaded_subjects_count-n_remaining))
+                n_tot_remaining,
+                max(0, uploaded_subjects_count-n_in_tracker_file))
             st = datetime.datetime.fromtimestamp(ts).strftime('%H:%M:%S')
             msg = "Saved {:5}/{:5} ({:4} %) - Current Time: {} - \
                    Estimated Time Remaining: {}".format(

@@ -249,7 +249,7 @@ python3 -m zooniverse_exports.get_zooniverse_export \
 --export_type subjects \
 --new_export 0
 
-# Extract Classification Data
+# Extract Annotations from Classifications
 python3 -m zooniverse_exports.extract_annotations \
 --classification_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_classifications.csv \
 --output_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_annotations.csv \
