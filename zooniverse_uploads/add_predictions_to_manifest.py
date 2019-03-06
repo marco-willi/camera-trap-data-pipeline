@@ -144,7 +144,7 @@ if __name__ == "__main__":
         if add_all_species:
             species_preds = preds['aggregated_pred']['species']
             for species, conf in species_preds.items():
-                meta_key = '#machine_prediction_species_{}'.format(species)
+                meta_key = '#machine_confidence_species_{}'.format(species)
                 meta_data[meta_key] = conf
 
     captures_with_preds = 0
