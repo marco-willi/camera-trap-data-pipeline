@@ -142,11 +142,14 @@ if __name__ == '__main__':
                     "Subject_ids with identical capture_id found -- \
                      capture_id {} - subject_ids {} - {}".format(
                      capture_id, known_subject_id, subject_id
-                     ), width=99)
+                     ), width=150)
                 logger.warning(msg)
-            duplicate_subject_ids.add(subject_id)
-        logger.info("Found {} subjects with identical capture ids".format(
-            len(duplicate_subject_ids)))
+                duplicate_subject_ids.add(subject_id)
+        msg = textwrap.shorten(
+                "Found {} subjects that have identical capture id to other \
+                 subjects - removing them ...".format(
+                 len(duplicate_subject_ids)), width=150)
+        logger.warning(msg)
         if len(duplicate_subject_ids) > 0:
             df_aggregated = \
                 df_aggregated[~df_aggregated['subject_id'].isin(
