@@ -83,7 +83,7 @@ if __name__ == '__main__':
 
     # export
     sort_df_by_capture_id(df_merged)
-    df_merged.to_csv(args['output_csv'], index=True)
+    df_merged.to_csv(args['output_csv'], index=False)
 
     logger.info("Wrote {} records to {}".format(
         df_merged.shape[0], args['output_csv']))
