@@ -6,6 +6,7 @@ import time
 import datetime
 import json
 import random
+import pandas as pd
 import math
 from hashlib import md5
 import logging
@@ -162,6 +163,19 @@ def assign_zero_one_to_split(zero_one_value, split_percents, split_names):
             return sn
 
 
+def sort_df_by_capture_id(df):
+    """ Sort df by capture_id """
+    if 'capture_id' in df.columns.tolist():
+        sort_id = [x.split('#') for x in df.capture_id]
+    else:
+        sort_id = [x.split('#') for x in df.index]
+    sort_id = ['{}#{}#{}#{:05}'.format(
+        x[0], x[1], x[2], int(x[3])) for x in sort_id]
+    df['sort_id'] = sort_id
+    df.sort_values(['sort_id'], inplace=True)
+    df.drop('sort_id', inplace=True, axis=1)
+
+
 def export_dict_to_json_with_newlines(data, path):
     """ Export a dictionary to a json file with newlines between each
         dictionary entry
@@ -226,6 +240,13 @@ def read_cleaned_season_file(path, quotechar='"'):
             cleaned_captures.append(row)
 
     return cleaned_captures, name_to_id_mapper
+
+
+def read_cleaned_season_file_df(path):
+    """ Check the input file """
+    df = pd.read_csv(path, dtype='str', index_col=None)
+    df.fillna('', inplace=True)
+    return df
 
 
 def print_nested_dict(key, dic):

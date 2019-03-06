@@ -336,10 +336,20 @@ python3 -m reporting.add_aggregations_to_season_captures \
 # --output_csv /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/${SEASON}_report_zooniverse.csv \
 # --default_season_id ${SEASON}
 
+
+# Create Flattened ML Predictions
+python3 -m reporting.flatten_ml_predictions \
+--predictions_empty /home/packerc/shared/zooniverse/Manifests/${SITE}/${SEASON}_predictions_empty_or_not.json \
+--predictions_species /home/packerc/shared/zooniverse/Manifests/${SITE}/${SEASON}_predictions_species.json \
+--output_csv /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/${SEASON}_ml_preds_flat.csv \
+--log_dir /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/
+
 # Prepare Reporting of Machine-Learning Predictions
 python3 -m reporting.manifest_predictions_to_csv \
 --manifest /home/packerc/shared/zooniverse/Manifests/${SITE}/${SEASON}__complete__manifest.json \
---output_csv /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/${SEASON}__complete__machine_learning.csv
+--output_csv /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/${SEASON}__complete__machine_learning.csv \
+--log_dir /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/
+
 
 # Reporting of Machine Learning Predictions
 python3 -m reporting.add_predictions_to_season_captures \

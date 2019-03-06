@@ -99,15 +99,17 @@ The following file contains one record per capture event and species detection. 
 |n_users_classified_this_subject | Number of users that classified this subject
 |species_is_plurality_consensus | Flag indicating a plurality consensus for this species (normally only species with a 1 are relevant)
 
-
 ## Merge Season Captures with Machine Predictions
 
 Generate a csv with all machine learning predictions.
 
 ```
-python3 -m reporting.manifest_predictions_to_csv \
---manifest /home/packerc/shared/zooniverse/Manifests/GRU/GRU_S1__complete__manifest.json \
---output_csv /home/packerc/shared/zooniverse/Reports/GRU/GRU_S1__complete__machine_learning.csv
+# Create Flattened ML Predictions
+python3 -m reporting.flatten_ml_predictions \
+--predictions_empty /home/packerc/shared/zooniverse/Manifests/${SITE}/${SEASON}_predictions_empty_or_not.json \
+--predictions_species /home/packerc/shared/zooniverse/Manifests/${SITE}/${SEASON}_predictions_species.json \
+--output_csv /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/${SEASON}_ml_preds_flat.csv \
+--log_dir /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/
 ```
 
 Merge the machine learning predictions with the season captures.

@@ -9,7 +9,7 @@ from datetime import datetime
 from collections import OrderedDict
 
 from logger import setup_logger, create_log_file
-from utils import read_cleaned_season_file, set_file_permission
+from utils import set_file_permission, read_cleaned_season_file_df
 from global_vars import plurality_aggregation_flags as flags
 
 # args = dict()
@@ -21,6 +21,47 @@ from global_vars import plurality_aggregation_flags as flags
 # args['deduplicate_subjects'] = True
 # args['export_only_species'] = False
 # args['export_only_with_aggregations'] = True
+
+
+def create_season_dict(season_data_df):
+    """ Create Dict of Season Data """
+    season_dict = OrderedDict()
+    season_dict_input = season_data_df.to_dict(orient='index')
+    for _id, image_record in season_dict_input.items():
+        try:
+            capture_id = image_record['capture_id']
+        except:
+            capture_id = '#'.join([
+                image_record['season'],
+                image_record['site'],
+                image_record['roll'],
+                image_record['capture']])
+        if capture_id not in season_dict:
+            timestamp = image_record['timestamp']
+            # deal with different timeformats in different capture files
+            try:
+                time_obj = datetime.strptime(timestamp, '%Y:%m:%d %H:%M:%S')
+            except ValueError:
+                try:
+                    time_obj = datetime.strptime(
+                        timestamp,
+                        '%Y-%m-%d %H:%M:%S')
+                except ValueError:
+                    time_obj = datetime.strptime(
+                        timestamp,
+                        '%Y-%m-%d %H:%M:%SZ')
+            date = time_obj.strftime("%Y-%m-%d")
+            time = time_obj.strftime("%H:%M:%S")
+            season_dict[capture_id] = {
+                'capture_id': capture_id,
+                'season': image_record['season'],
+                'site': image_record['site'],
+                'roll': image_record['roll'],
+                'capture': image_record['capture'],
+                'capture_date_local': date,
+                'capture_time_local': time}
+    return season_dict
+
 
 if __name__ == '__main__':
 
@@ -61,7 +102,7 @@ if __name__ == '__main__':
         setup_logger()
     logger = logging.getLogger(__name__)
 
-    season_data, header = read_cleaned_season_file(args['season_captures_csv'])
+    season_data_df = read_cleaned_season_file_df(args['season_captures_csv'])
 
     # determine empty/blank answer
     question_main_id = flags['QUESTION_DELIMITER'].join(
@@ -71,43 +112,10 @@ if __name__ == '__main__':
         flags['QUESTION_DELIMITER'])
 
     # Create per Capture Data
-    season_dict = OrderedDict()
-    for image_record in season_data:
-        if 'capture_id' not in header:
-            capture_id = '#'.join([
-                image_record[header['season']],
-                image_record[header['site']],
-                image_record[header['roll']],
-                image_record[header['capture']],
-            ])
-        else:
-            capture_id = image_record[header['capture_id']]
-        if capture_id not in season_dict:
-            timestamp = image_record[header['timestamp']]
-            # deal with different timeformats in different capture files
-            try:
-                time_obj = datetime.strptime(timestamp, '%Y:%m:%d %H:%M:%S')
-            except ValueError:
-                try:
-                    time_obj = datetime.strptime(
-                        timestamp,
-                        '%Y-%m-%d %H:%M:%S')
-                except ValueError:
-                    time_obj = datetime.strptime(
-                        timestamp,
-                        '%Y-%m-%d %H:%M:%SZ')
-            date = time_obj.strftime("%Y-%m-%d")
-            time = time_obj.strftime("%H:%M:%S")
-            season_dict[capture_id] = {
-                'capture_id': capture_id,
-                'season': image_record[header['season']],
-                'site': image_record[header['site']],
-                'roll': image_record[header['roll']],
-                'capture': image_record[header['capture']],
-                'capture_date_local': date,
-                'capture_time_local': time}
+    season_dict = create_season_dict(season_data_df)
 
-    season_header = list(season_dict[capture_id].keys())
+    random_record = season_dict[list(season_dict.keys())[0]]
+    season_header = list(random_record.keys())
 
     # read aggregations
     df_aggregated = pd.read_csv(args['aggregated_csv'], dtype='str')
