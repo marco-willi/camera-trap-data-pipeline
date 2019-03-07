@@ -190,6 +190,7 @@ global_processing_flags:
     EMPTY_ANNOTATION: blank
     QUESTION_DELIMITER: __
     QUESTION_PREFIX: question
+    QUESTION_MAIN: species
 
 
 ###################################################

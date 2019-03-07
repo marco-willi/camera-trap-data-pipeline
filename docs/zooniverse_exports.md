@@ -228,21 +228,29 @@ capture,capture_id,created_at,filenames,retired_at,retirement_reason,roll,season
 
 ### Get Subject URLs from Zooniverse API (warning - takes a long time)
 
-The following code gets Zooniverse URLs for subjects by querying the Oruboros API. The code can run a very long time (many hours per season). Resumes on failures by re-reading from file from disk.
+The following code queries the Ouroboros API from Zooniverse to get legacy subject data. The code can run a very long time (many hours per season). Resumes on failures by re-reading from file from disk.
 
 ```
-python3 -m zooniverse_exports.get_legacy_subject_urls \
+# Get Subject URLs from Zooniverse API (warning - takes a long time)
+python3 -m zooniverse_exports.get_legacy_ouroboros_data \
 --subjects_extracted /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subjects_extracted.csv \
---subjects_urls /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subject_urls.csv
+--subjects_ouroboros /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subjects_ouroboros.json
+```
+
+The following code extracts urls from the Ouroboros exports and saves them to a csv.
+```
+# Extract Zooniverse URLs from Oruboros Exports
+python3 -m zooniverse_exports.extract_legacy_subject_urls \
+--oruboros_export /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subjects_ouroboros.json \
+--output_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subject_urls.csv
 ```
 
 Example:
 ```
 subject_id,zooniverse_url_0,zooniverse_url_1,zooniverse_url_2
-ASG0002fg3,http://www.snapshotserengeti.org/subjects/standard/50c212248a607540b901bab3_0.jpg,http://www.snapshotserengeti.org/subjects/standard/50c212248a6
-07540b901bab3_1.jpg,http://www.snapshotserengeti.org/subjects/standard/50c212248a607540b901bab3_2.jpg
-ASG0002fg4,http://www.snapshotserengeti.org/subjects/standard/50c212248a607540b901bab4_0.jpg,http://www.snapshotserengeti.org/subjects/standard/50c212248a6
-07540b901bab4_1.jpg,http://www.snapshotserengeti.org/subjects/standard/50c212248a607540b901bab4_2.jpg
+ASG0000001,http://www.snapshotserengeti.org/subjects/standard/50c210188a607540b9000001_0.jpg,,
+ASG0000002,http://www.snapshotserengeti.org/subjects/standard/50c210188a607540b9000002_0.jpg,http://www.snapshotserengeti.org/subjects/standard/50c210188a60754
+0b9000002_1.jpg,
 ```
 
 ### Re-Create Season Captures
@@ -272,6 +280,57 @@ SER_S1#B04#1#2,S1,B04,R1,2,1,S1/B04/B04_R1/S1_B04_R1_PICT0002.JPG,2010-07-18 16:
 SER_S1#B04#1#3,S1,B04,R1,3,1,S1/B04/B04_R1/S1_B04_R1_PICT0003.JPG,2010-07-20 06:14:06
 ```
 
+### Add Zooniverse URLs to subjec exports
+
+The following code appends the Zooniverse Urls of each subject.
+
+```
+# Add subject urls to subject extracts
+python3 -m zooniverse_exports.merge_csvs \
+--base_cs /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subjects_extracted.csv \
+--to_add_cs /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subject_urls.csv \
+--output_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subjects_extracted_url.csv \
+--key subject_id \
+--add_new_cols_to_right
+```
+
+
 ### Aggregations
 
 Aggregations can be created with the usual aggregation code.
+
+Additionally, the following codes append subject into:
+
+
+The following code merges the subject_url infos with the aggregtions:
+
+```
+# Add subject data to Aggregations
+python3 -m zooniverse_exports.merge_csvs \
+--base_cs /home/packerc/shared/zooniverse/Aggregations/${SITE}/${SEASON}_annotations_aggregated.csv \
+--to_add_cs /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subjects_extracted_url.csv \
+--output_csv /home/packerc/shared/zooniverse/Aggregations/${SITE}/${SEASON}_annotations_aggregated_subject_info.csv \
+--key subject_id
+```
+
+```
+# Add subject data to Aggregations (samples)
+python3 -m zooniverse_exports.merge_csvs \
+--base_cs /home/packerc/shared/zooniverse/Aggregations/${SITE}/${SEASON}_annotations_aggregated_samples.csv \
+--to_add_cs /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subjects_extracted_url.csv \
+--output_csv /home/packerc/shared/zooniverse/Aggregations/${SITE}/${SEASON}_annotations_aggregated_subject_info_samples.csv \
+--key subject_id
+```
+
+Example:
+
+```
+capture_id,season,site,roll,capture,created_at,filenames,retired_at,retirement_reason,timestamps,zooniverse_url_0,zooniverse_url_1,zooniverse_url_2,subject_id,
+question__species,question__count,question__young_present,question__standing,question__resting,question__moving,question__eating,question__interacting,n_users_
+identified_this_species,p_users_identified_this_species,n_species_ids_per_user_median,n_users_classified_this_subject,n_users_saw_a_species,n_users_saw_no_spec
+ies,p_users_saw_a_species,pielous_evenness_index,species_is_plurality_consensus
+SER_S1#K11#1#205,S1,K11,R1,205,2012-12-14 22:33:50 UTC,S1/K11/K11_R1/S1_K11_R1_PICT0611.JPG;S1/K11/K11_R1/S1_K11_R1_PICT0612.JPG;S1/K11/K11_R1/S1_K11_R1_PICT06
+13.JPG,,blank,2010-09-10T05:17:40-05:00;2010-09-10T05:17:40-05:00;2010-09-10T05:17:42-05:00,http://www.snapshotserengeti.org/subjects/standard/50c2115c8a607540
+b9011370_0.jpg,http://www.snapshotserengeti.org/subjects/standard/50c2115c8a607540b9011370_1.jpg,http://www.snapshotserengeti.org/subjects/standard/50c2115c8a6
+07540b9011370_2.jpg,ASG0001ieo,blank,,,,,,,,5,1.00,0,5,0,5,0.00,0.00,1
+```
