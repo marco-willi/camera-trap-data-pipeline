@@ -297,7 +297,14 @@ python3 -m reporting.add_aggregations_to_season_captures \
 --aggregated_csv /home/packerc/shared/zooniverse/Aggregations/${SITE}/${SEASON}_annotations_aggregated_subject_info.csv \
 --output_csv /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/${SEASON}_report_all.csv \
 --log_dir /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/ \
---default_season_id ${SEASON}
+--default_season_id ${SEASON} \
+--deduplicate_subjects
+
+python3 -m reporting.create_report_stats \
+--report_path /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/${SEASON}_report_species.csv \
+--output_csv /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/${SEASON}_report_all_stats.csv \
+--log_dir /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/
+
 
 # Reporting of Zooniverse exports - only captures with annotations
 python3 -m reporting.add_aggregations_to_season_captures \
@@ -308,6 +315,12 @@ python3 -m reporting.add_aggregations_to_season_captures \
 --default_season_id ${SEASON} \
 --export_only_with_aggregations \
 --deduplicate_subjects
+
+python3 -m reporting.create_report_stats \
+--report_path /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/${SEASON}_report_species.csv \
+--output_csv /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/${SEASON}_report_stats.csv \
+--log_dir /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/
+
 
 # Reporting of Zooniverse exports - only captures with annotations and samples
 python3 -m reporting.add_aggregations_to_season_captures \
@@ -329,6 +342,10 @@ python3 -m reporting.add_aggregations_to_season_captures \
 --export_only_species \
 --deduplicate_subjects
 
+python3 -m reporting.create_report_stats \
+--report_path /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/${SEASON}_report_species.csv \
+--output_csv /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/${SEASON}_report_species_stats.csv \
+--log_dir /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/
 
 # python3 -m reporting.add_aggregations_to_season_captures \
 # --season_captures_csv '/home/isbell/shared/Snapshot Cedar Creek Images/CC_S01_cleaned_captures.csv' \
@@ -437,6 +454,12 @@ python3 -m reporting.add_aggregations_to_season_captures \
 --default_season_id ${SEASON} \
 --deduplicate_subjects
 
+python3 -m reporting.create_report_stats \
+--report_path /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/${SEASON}_report_species.csv \
+--output_csv /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/${SEASON}_report_all_stats.csv \
+--log_dir /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/
+
+
 # Reporting of Zooniverse exports - only captures with annotations
 python3 -m reporting.add_aggregations_to_season_captures \
 --season_captures_csv /home/packerc/shared/season_captures/${SITE}/cleaned/${SEASON}_cleaned.csv \
@@ -446,6 +469,12 @@ python3 -m reporting.add_aggregations_to_season_captures \
 --default_season_id ${SEASON} \
 --export_only_with_aggregations \
 --deduplicate_subjects
+
+python3 -m reporting.create_report_stats \
+--report_path /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/${SEASON}_report_species.csv \
+--output_csv /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/${SEASON}_report_stats.csv \
+--log_dir /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/
+
 
 # Reporting of Zooniverse exports - only captures with annotations and samples
 python3 -m reporting.add_aggregations_to_season_captures \
@@ -466,6 +495,12 @@ python3 -m reporting.add_aggregations_to_season_captures \
 --default_season_id ${SEASON} \
 --export_only_species \
 --deduplicate_subjects
+
+python3 -m reporting.create_report_stats \
+--report_path /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/${SEASON}_report_species.csv \
+--output_csv /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/${SEASON}_report_species_stats.csv \
+--log_dir /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/
+
 
 
 ###################################

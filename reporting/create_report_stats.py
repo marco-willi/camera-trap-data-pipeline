@@ -25,7 +25,7 @@ if __name__ == '__main__':
         "--log_dir", type=str, default=None)
     parser.add_argument(
         "--log_filename", type=str,
-        default='crate_question_stats')
+        default='crate_report_stats')
 
     args = vars(parser.parse_args())
 
