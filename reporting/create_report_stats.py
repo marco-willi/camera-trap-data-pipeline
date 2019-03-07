@@ -25,7 +25,7 @@ if __name__ == '__main__':
         "--log_dir", type=str, default=None)
     parser.add_argument(
         "--log_filename", type=str,
-        default='crate_report_stats')
+        default='create_report_stats')
 
     args = vars(parser.parse_args())
 
@@ -61,7 +61,8 @@ if __name__ == '__main__':
 
     question_stats = defaultdict(Counter)
     cols_all = df.columns.tolist()
-    question_cols = [x for x in cols_all if x.startswith(question_column_prefix)]
+    question_cols = [x for x in cols_all if
+                     x.startswith(question_column_prefix)]
     for _id, identification in df.iterrows():
         subject_id = identification['capture_id']
         for question in question_cols:
@@ -81,8 +82,9 @@ if __name__ == '__main__':
             "Stats for: {} - All annotations per subject".format(question))
         total = sum([x for x in answer_data.values()])
         for answer, count in answer_data.most_common():
-            logger.info("Answer: {:20} -- counts: {:10} / {} ({:.2f} %)".format(
-                answer, count, total, 100*count/total))
+            logger.info(
+                "Answer: {:20} -- counts: {:10} / {} ({:.2f} %)".format(
+                 answer, count, total, 100*count/total))
             stats_list.append(
                 [question, answer, count, total, round(100*count/total, 1)])
 
