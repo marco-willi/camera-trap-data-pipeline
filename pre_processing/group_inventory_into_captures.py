@@ -8,8 +8,11 @@ import logging
 from pre_processing.utils import (
     image_check_stats, read_image_inventory,
     export_inventory_to_csv, update_time_checks)
-from global_vars import pre_processing_flags as flags
+from config.cfg import cfg
 from logger import create_log_file, setup_logger
+
+
+flags = cfg['pre_processing_flags']
 
 
 # args = dict()

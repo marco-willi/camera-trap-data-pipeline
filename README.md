@@ -16,7 +16,7 @@ A high-level overview of how the scripts are connected can be found here:
 
 ## Configuration
 
-Global flags / parameters are defined here: [global_vars](global_vars.py)
+Parameters that define the behavior of some codes are defined here: [config/cfg.yaml](config/cfg.yaml)
 
 These need to be adjusted, for example:
 1. if a new question answer needs to be mapped to 'empty', e.g., 'no animal is here'

@@ -344,13 +344,6 @@ python3 -m reporting.flatten_ml_predictions \
 --output_csv /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/${SEASON}_ml_preds_flat.csv \
 --log_dir /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/
 
-# Prepare Reporting of Machine-Learning Predictions
-python3 -m reporting.manifest_predictions_to_csv \
---manifest /home/packerc/shared/zooniverse/Manifests/${SITE}/${SEASON}__complete__manifest.json \
---output_csv /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/${SEASON}__complete__machine_learning.csv \
---log_dir /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/
-
-
 # Reporting of Machine Learning Predictions
 python3 -m reporting.add_predictions_to_season_captures \
 --season_captures_csv /home/packerc/shared/season_captures/${SITE}/cleaned/${SEASON}_cleaned.csv \
@@ -387,7 +380,6 @@ python3 -m zooniverse_aggregations.aggregate_annotations_plurality \
 --export_consensus_only \
 --export_sample_size 300
 
-
 # Extract Subjects from Classifications
 python3 -m zooniverse_exports.extract_subjects_legacy \
 --annotations /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_annotations.csv \
@@ -395,13 +387,15 @@ python3 -m zooniverse_exports.extract_subjects_legacy \
 --log_dir /home/packerc/shared/zooniverse/Exports/${SITE}/
 
 # Get Subject URLs from Zooniverse API (warning - takes a long time)
-python3 -m zooniverse_exports.get_legacy_subject_urls \
---subjects_extracted /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subjects_extracted.csv \
---subjects_urls /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subject_urls.csv
-
 python3 -m zooniverse_exports.get_legacy_ouroboros_data \
 --subjects_extracted /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subjects_extracted.csv \
 --subjects_ouroboros /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subjects_ouroboros.json
+
+# Extract Zooniverse URLs from Oruboros Exports
+python3 -m zooniverse_exports.get_legacy_ouroboros_data \
+--oruboros_export /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subjects_ouroboros.json \
+--output_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subject_urls.csv
+
 
 # Re-Create Season Captures
 python3 -m zooniverse_exports.recreate_legacy_season_captures \

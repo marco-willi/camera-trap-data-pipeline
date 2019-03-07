@@ -14,7 +14,10 @@ from logger import setup_logger, create_log_file
 from utils import set_file_permission
 from zooniverse_exports.legacy_extractor import build_img_path
 
-from global_vars import add_subject_info_flags_legacy as flags
+from config.cfg import cfg
+
+
+flags = cfg['add_subject_info_flags_legacy']
 
 # args = dict()
 # args['annotations'] = '/home/packerc/shared/zooniverse/Exports/SER/SER_S1_annotations.csv'

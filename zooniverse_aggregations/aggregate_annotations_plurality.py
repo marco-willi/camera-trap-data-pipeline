@@ -10,10 +10,13 @@ from collections import Counter, defaultdict
 import logging
 
 from logger import setup_logger, create_log_file
-from global_vars import plurality_aggregation_flags as flags
+from config.cfg import cfg
 from zooniverse_aggregations import aggregator
 from utils import (
     print_nested_dict, set_file_permission, balanced_sample_best_effort)
+
+
+flags = cfg['plurality_aggregation_flags']
 
 # args = dict()
 # args['annotations'] = '/home/packerc/shared/zooniverse/Exports/CC/CC_S1_classifications_extracted.csv'

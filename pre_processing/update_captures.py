@@ -5,7 +5,7 @@ import logging
 from collections import OrderedDict
 
 from logger import setup_logger, create_log_file
-from global_vars import pre_processing_flags as flags
+from config.cfg import cfg
 from pre_processing.utils import (
     read_image_inventory, export_inventory_to_csv, image_check_stats)
 from pre_processing.group_inventory_into_captures import (
@@ -13,6 +13,9 @@ from pre_processing.group_inventory_into_captures import (
     update_inventory_with_capture_data,
     update_time_checks_inventory
 )
+
+
+flags = cfg['pre_processing_flags']
 
 
 if __name__ == '__main__':

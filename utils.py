@@ -304,3 +304,42 @@ def balanced_sample_best_effort(y, n_samples):
             break
     sampled_list = sampled_list[0:n_samples]
     return sampled_list
+
+
+def merge_csvs(base_csv, to_add_csv, key):
+    """ Merge two csvs and return a df """
+
+    df_base = pd.read_csv(
+        base_csv, dtype='str')
+    df_base.fillna('', inplace=True)
+
+    assert key in df_base.columns.tolist(), \
+        "column {} not found in {}".format(key, base_csv)
+
+    df_add = pd.read_csv(
+        to_add_csv, dtype='str', index_col=key)
+    df_add.fillna('', inplace=True)
+
+    # drop duplicate cols
+    to_add_cols = df_add.columns.tolist()
+    base_cols = df_base.columns.tolist()
+    to_add_cols = [
+        x for x in to_add_cols if
+        (x not in base_cols) or (x == key)]
+
+    print("Adding cols {}".format(to_add_cols))
+
+    df_add = df_add[to_add_cols]
+
+    df_merged = pd.merge(
+        df_base, df_add, how='left',
+        left_on=key, right_index=True)
+
+    all_cols = df_merged.columns.tolist()
+
+    # sort columns
+    first_cols = [x for x in to_add_cols if x in all_cols]
+    cols_rearranged = first_cols + [x for x in all_cols if x not in first_cols]
+    df_merged = df_merged[cols_rearranged]
+
+    return df_merged

@@ -24,7 +24,10 @@ import textwrap
 from logger import setup_logger, create_log_file
 from zooniverse_exports import extractor
 from utils import print_nested_dict, set_file_permission
-from global_vars import extractor_flags as flags
+from config.cfg import cfg
+
+
+flags = cfg['extractor_flags']
 
 # # Cedar Creek
 # args = dict()

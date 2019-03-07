@@ -17,8 +17,10 @@ from pre_processing.utils import (
     file_creation_date, image_check_stats, p_pixels_above_threshold,
     p_pixels_below_threshold, export_inventory_to_csv)
 from utils import slice_generator, estimate_remaining_time
-from global_vars import pre_processing_flags as flags
+from config.cfg import cfg
 
+
+flags = cfg['pre_processing_flags']
 
 # args = dict()
 # args['root_dir'] = '/home/packerc/shared/albums/ENO/ENO_S1'

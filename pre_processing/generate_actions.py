@@ -10,8 +10,11 @@ from collections import OrderedDict
 
 from logger import setup_logger, create_log_file
 from pre_processing.utils import read_image_inventory
-from global_vars import pre_processing_flags as flags
+from config.cfg import cfg
 from utils import set_file_permission
+
+
+flags = cfg['pre_processing_flags']
 
 # args = dict()
 # args['action_list'] = '/home/packerc/shared/season_captures/APN/captures/APN_S2_TEST_canBeDeleted_action_list_TEST1.csv'

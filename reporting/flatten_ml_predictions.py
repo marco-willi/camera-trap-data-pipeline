@@ -12,11 +12,11 @@ from machine_learning.flatten_preds import (
     flatten_ml_empty_preds, flatten_ml_species_preds
 )
 
-args = dict()
-args['predictions_empty'] = '/home/packerc/shared/zooniverse/Manifests/GRU/GRU_S1_predictions_empty_or_not.json'
-args['predictions_species'] = '/home/packerc/shared/zooniverse/Manifests/GRU/GRU_S1_predictions_species.json'
-args['output_csv'] = '/home/packerc/shared/zooniverse/ConsensusReports/GRU/GRU_S1_ml_preds_flat.csv'
-
+# args = dict()
+# args['predictions_empty'] = '/home/packerc/shared/zooniverse/Manifests/GRU/GRU_S1_predictions_empty_or_not.json'
+# args['predictions_species'] = '/home/packerc/shared/zooniverse/Manifests/GRU/GRU_S1_predictions_species.json'
+# args['output_csv'] = '/home/packerc/shared/zooniverse/ConsensusReports/GRU/GRU_S1_ml_preds_flat.csv'
+#
 
 if __name__ == '__main__':
 

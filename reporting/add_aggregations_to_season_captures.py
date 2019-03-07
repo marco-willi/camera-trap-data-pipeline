@@ -10,7 +10,10 @@ from collections import OrderedDict
 
 from logger import setup_logger, create_log_file
 from utils import set_file_permission, read_cleaned_season_file_df
-from global_vars import plurality_aggregation_flags as flags
+from config.cfg import cfg
+
+
+flags = cfg['plurality_aggregation_flags']
 
 # args = dict()
 # args['season_captures_csv'] = '/home/packerc/shared/season_captures/GRU/cleaned/GRU_S1_cleaned.csv'

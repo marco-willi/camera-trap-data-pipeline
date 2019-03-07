@@ -14,7 +14,10 @@ from pre_processing.utils import (
     image_check_stats,
     export_inventory_to_csv)
 from logger import create_log_file, setup_logger
-from global_vars import pre_processing_flags as flags
+from config.cfg import cfg
+
+
+flags = cfg['pre_processing_flags']
 
 # args = dict()
 #

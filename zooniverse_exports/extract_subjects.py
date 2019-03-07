@@ -23,7 +23,9 @@ from collections import OrderedDict
 from logger import setup_logger, create_logfile_name
 from utils import print_nested_dict
 from zooniverse_exports import extractor
-from global_vars import subject_extractor_flags as flags
+from config.cfg import cfg
+
+flags = cfg['subject_extractor_flags']
 
 
 if __name__ == '__main__':

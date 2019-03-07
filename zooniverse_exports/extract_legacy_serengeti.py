@@ -95,7 +95,10 @@ from logger import setup_logger, create_logfile_name
 
 from zooniverse_exports import legacy_extractor
 from utils import print_nested_dict
-from global_vars import legacy_extractor_flags as flags
+from config.cfg import cfg
+
+
+flags = cfg['legacy_extractor_flags']
 
 # To Test
 # args = dict()
@@ -249,7 +252,7 @@ if __name__ == '__main__':
 
     retirement_reasons = list()
     seasons = list()
-    answers = {k: list() for k in flags['CSV_QUESTIIONS']}
+    answers = {k: list() for k in flags['QUESTIONS']}
 
     for c_id, annotations in classifications.items():
         if not isinstance(annotations, list):

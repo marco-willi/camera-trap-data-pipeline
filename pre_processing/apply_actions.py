@@ -6,12 +6,14 @@ from datetime import datetime, timedelta
 
 from logger import setup_logger, create_log_file
 from pre_processing.utils import read_image_inventory, export_inventory_to_csv
-from global_vars import pre_processing_flags as flags
+from config.cfg import cfg
 
 # args = dict()
 # args['actions_to_perform'] = '/home/packerc/shared/season_captures/APN/captures/APN_S2_TEST_canBeDeleted_actions_inventory.csv'
 # args['captures'] = '/home/packerc/shared/season_captures/APN/captures/APN_S2_TEST_canBeDeleted_captures.csv'
 # args['log_dir'] = '/home/packerc/shared/season_captures/APN/log_files/'
+
+flags = cfg['pre_processing_flags']
 
 
 def change_time(captures, image_name, flags, shift_by_seconds):

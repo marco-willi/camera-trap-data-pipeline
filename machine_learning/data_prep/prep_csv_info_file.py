@@ -9,7 +9,10 @@ import argparse
 from utils import (
     correct_image_name, id_to_zero_one,
     assign_zero_one_to_split)
-from global_vars import label_mappings
+from config.cfg import cfg
+
+
+raise ValueError("Check label mapping cf")
 
 
 def binarize(x):
