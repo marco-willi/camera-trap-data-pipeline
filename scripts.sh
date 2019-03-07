@@ -301,7 +301,7 @@ python3 -m reporting.add_aggregations_to_season_captures \
 --deduplicate_subjects
 
 python3 -m reporting.create_report_stats \
---report_path /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/${SEASON}_report_species.csv \
+--report_path /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/${SEASON}_report_all.csv \
 --output_csv /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/${SEASON}_report_all_stats.csv \
 --log_dir /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/
 
@@ -317,7 +317,7 @@ python3 -m reporting.add_aggregations_to_season_captures \
 --deduplicate_subjects
 
 python3 -m reporting.create_report_stats \
---report_path /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/${SEASON}_report_species.csv \
+--report_path /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/${SEASON}_report.csv \
 --output_csv /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/${SEASON}_report_stats.csv \
 --log_dir /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/
 
@@ -347,17 +347,10 @@ python3 -m reporting.create_report_stats \
 --output_csv /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/${SEASON}_report_species_stats.csv \
 --log_dir /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/
 
-# python3 -m reporting.add_aggregations_to_season_captures \
-# --season_captures_csv '/home/isbell/shared/Snapshot Cedar Creek Images/CC_S01_cleaned_captures.csv' \
-# --aggregated_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_classifications_aggregated_subject_info.csv \
-# --output_csv /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/${SEASON}_report_zooniverse.csv \
-# --default_season_id ${SEASON}
-
-
 # Create Flattened ML Predictions
 python3 -m reporting.flatten_ml_predictions \
---predictions_empty /home/packerc/shared/zooniverse/Manifests/${SITE}/${SEASON}_predictions_empty_or_not.json \
---predictions_species /home/packerc/shared/zooniverse/Manifests/${SITE}/${SEASON}_predictions_species.json \
+--predictions_empty /home/packerc/shared/zooniverse/Manifests/${SITE}/${SEASON}__complete__predictions_empty_or_not.json \
+--predictions_species /home/packerc/shared/zooniverse/Manifests/${SITE}/${SEASON}__complete__predictions_species.json \
 --output_csv /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/${SEASON}_ml_preds_flat.csv \
 --log_dir /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/
 
@@ -455,7 +448,7 @@ python3 -m reporting.add_aggregations_to_season_captures \
 --deduplicate_subjects
 
 python3 -m reporting.create_report_stats \
---report_path /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/${SEASON}_report_species.csv \
+--report_path /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/${SEASON}_report_all.csv \
 --output_csv /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/${SEASON}_report_all_stats.csv \
 --log_dir /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/
 
@@ -471,7 +464,7 @@ python3 -m reporting.add_aggregations_to_season_captures \
 --deduplicate_subjects
 
 python3 -m reporting.create_report_stats \
---report_path /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/${SEASON}_report_species.csv \
+--report_path /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/${SEASON}_report.csv \
 --output_csv /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/${SEASON}_report_stats.csv \
 --log_dir /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/
 
