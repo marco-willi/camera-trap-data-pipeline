@@ -33,16 +33,16 @@ if __name__ == '__main__':
     # Check Input
     ######################################
 
-    if not os.path.isfile(args['input_csv']):
-        raise FileNotFoundError("input_csv: {} not found".format(
-                                args['input_csv']))
+    if not os.path.isfile(args['base_csv']):
+        raise FileNotFoundError("base_csv: {} not found".format(
+                                args['base_csv']))
 
-    if not os.path.isfile(args['subject_csv']):
-        raise FileNotFoundError("subject_csv: {} not found".format(
-                                args['subject_csv']))
+    if not os.path.isfile(args['to_add_csv']):
+        raise FileNotFoundError("to_add_csv: {} not found".format(
+                                args['to_add_csv']))
 
     if args['output_csv'] is None:
-        args['output_csv'] = args['input_csv']
+        args['output_csv'] = args['base_csv']
 
     ######################################
     # Configuration

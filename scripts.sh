@@ -392,7 +392,7 @@ python3 -m zooniverse_exports.get_legacy_ouroboros_data \
 --subjects_ouroboros /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subjects_ouroboros.json
 
 # Extract Zooniverse URLs from Oruboros Exports
-python3 -m zooniverse_exports.get_legacy_ouroboros_data \
+python3 -m zooniverse_exports.extract_legacy_subject_urls \
 --oruboros_export /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subjects_ouroboros.json \
 --output_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subject_urls.csv
 
@@ -402,7 +402,7 @@ python3 -m zooniverse_exports.recreate_legacy_season_captures \
 --output_csv /home/packerc/shared/season_captures/${SITE}/cleaned/${SEASON}_cleaned.csv
 
 # Add subject urls to subject extracts
-python3 -m zooniverse_exports.add_subject_info_to_csv \
+python3 -m zooniverse_exports.merge_csvs \
 --base_cs /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subjects_extracted.csv \
 --to_add_cs /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subject_urls.csv \
 --output_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subjects_extracted_url.csv \
