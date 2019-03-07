@@ -1,5 +1,4 @@
-""" Add Extracted Subject info to a CSV with subject_id column
-"""
+""" Merge CSVs based on common key """
 import os
 import logging
 import argparse
