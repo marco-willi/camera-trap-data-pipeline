@@ -306,7 +306,7 @@ def balanced_sample_best_effort(y, n_samples):
     return sampled_list
 
 
-def merge_csvs(base_csv, to_add_csv, key):
+def merge_csvs(base_csv, to_add_csv, key, merge_new_cols_to_right=True):
     """ Merge two csvs and return a df """
 
     df_base = pd.read_csv(
@@ -338,7 +338,10 @@ def merge_csvs(base_csv, to_add_csv, key):
     all_cols = df_merged.columns.tolist()
 
     # sort columns
-    first_cols = [x for x in to_add_cols if x in all_cols]
+    if not merge_new_cols_to_right:
+        first_cols = [x for x in to_add_cols if x in all_cols]
+    else:
+        first_cols = [x for x in base_cols if x in all_cols]
     cols_rearranged = first_cols + [x for x in all_cols if x not in first_cols]
     df_merged = df_merged[cols_rearranged]
 

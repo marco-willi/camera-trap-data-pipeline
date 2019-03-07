@@ -26,6 +26,7 @@ if __name__ == '__main__':
     parser.add_argument("--to_add_csv", type=str, required=True)
     parser.add_argument("--output_csv", type=str, required=True)
     parser.add_argument("--key", type=str, required=True)
+    parser.add_argument("--add_new_cols_to_right", action='store_true')
 
     args = vars(parser.parse_args())
 
@@ -54,7 +55,8 @@ if __name__ == '__main__':
     for k, v in args.items():
         logger.info("Argument {}: {}".format(k, v))
 
-    df = merge_csvs(args['base_csv'], args['to_add_csv'], args['key'])
+    df = merge_csvs(args['base_csv'], args['to_add_csv'], args['key'],
+        args['add_new_cols_to_right')
     # sort by capture_id
     if args['key'] == 'capture_id':
         sort_df_by_capture_id(df)
