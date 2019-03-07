@@ -396,11 +396,18 @@ python3 -m zooniverse_exports.get_legacy_ouroboros_data \
 --oruboros_export /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subjects_ouroboros.json \
 --output_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subject_urls.csv
 
-
 # Re-Create Season Captures
 python3 -m zooniverse_exports.recreate_legacy_season_captures \
 --subjects_extracted /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subjects_extracted.csv \
 --output_csv /home/packerc/shared/season_captures/${SITE}/cleaned/${SEASON}_cleaned.csv
+
+# Add subject urls to subject extracts
+python3 -m zooniverse_exports.add_subject_info_to_csv \
+--base_cs /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subjects_extracted.csv \
+--to_add_cs /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subject_urls.csv \
+--output_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subjects_extracted_url.csv \
+--key subject_id
+
 
 # Add subject data to Aggregations
 python3 -m zooniverse_exports.add_subject_info_to_csv \
