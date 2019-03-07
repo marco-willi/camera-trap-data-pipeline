@@ -45,14 +45,10 @@ if __name__ == '__main__':
     # Check Input
     ######################################
 
-    if not os.path.isfile(args['classification_csv']):
-        raise FileNotFoundError("classification_csv: {} not found".format(
-                                args['classification_csv']))
+    if not os.path.isfile(args['oruboros_export']):
+        raise FileNotFoundError("oruboros_export: {} not found".format(
+                                args['oruboros_export']))
 
-    at_least_one_none = [
-        args['workflow_version'], args['workflow_version_min']]
-    assert any([x is None for x in at_least_one_none]), \
-        "One of {} must be None".format(at_least_one_none)
 
     ######################################
     # Configuration
