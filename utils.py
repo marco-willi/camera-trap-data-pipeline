@@ -319,6 +319,7 @@ def merge_csvs(base_csv, to_add_csv, key, merge_new_cols_to_right=True):
     df_add = pd.read_csv(
         to_add_csv, dtype='str', index_col=key)
     df_add.fillna('', inplace=True)
+    df_add.index = df_add.index.astype('str')
 
     # drop duplicate cols
     to_add_cols = df_add.columns.tolist()
