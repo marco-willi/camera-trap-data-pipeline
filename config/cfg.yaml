@@ -89,6 +89,7 @@ legacy_extractor_flags:
       young_present:
        false: 0
        true: 1
+
     CLASSIFICATION_INFO_TO_ADD:
      - user_name
      - created_at
@@ -154,6 +155,9 @@ extractor_flags:
         nothing: blank
         nothinghere: blank
         nothingthere: blank
+      count:
+        1150: 11-50
+        51: 51+ 
     CLASSIFICATION_INFO_MAPPER:
       subject_ids: subject_id
     CLASSIFICATION_INFO_TO_ADD:

@@ -124,6 +124,17 @@ WORKFLOW_ID=3360
 WORFKLOW_VERSION_MIN=497.11
 
 
+###################################
+# NIA (Mariri)
+####################################
+
+
+cd $HOME/camera-trap-data-pipeline
+SITE=NIA
+SEASON=NIA_S1
+PROJECT_ID=5044
+WORKFLOW_ID=4986
+WORFKLOW_VERSION_MIN=531.12
 
 ###################################
 # Python Prep
@@ -542,30 +553,100 @@ python3 -m zooniverse_aggregations.aggregate_annotations_plurality \
 --export_sample_size 300
 
 # Loop over all seasons
-for season in 1 2 3 4 5 6 7 8 9 10; do
+for season in 2 3 4 5 6 7 8 9 10; do
   SITE=SER
   SEASON=SER_S${season}
 
-  # Extract Subjects from Classifications
-  python3 -m zooniverse_exports.extract_subjects_legacy \
-  --annotations /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_annotations.csv \
-  --output_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subjects_extracted.csv \
-  --log_dir /home/packerc/shared/zooniverse/Exports/${SITE}
+  # Extract Zooniverse URLs from Oruboros Exports
+  python3 -m zooniverse_exports.extract_legacy_subject_urls \
+  --oruboros_export /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subjects_ouroboros.json \
+  --output_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subject_urls.csv
 
   # Re-Create Season Captures
   python3 -m zooniverse_exports.recreate_legacy_season_captures \
   --subjects_extracted /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subjects_extracted.csv \
   --output_csv /home/packerc/shared/season_captures/${SITE}/cleaned/${SEASON}_cleaned.csv
 
+  # Add subject urls to subject extracts
+  python3 -m zooniverse_exports.merge_csvs \
+  --base_cs /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subjects_extracted.csv \
+  --to_add_cs /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subject_urls.csv \
+  --output_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subjects_extracted_url.csv \
+  --key subject_id \
+  --add_new_cols_to_right
+
   # Add subject data to Aggregations
-  python3 -m zooniverse_exports.add_subject_info_to_csv \
-  --subject_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subjects_extracted.csv \
-  --input_csv /home/packerc/shared/zooniverse/Aggregations/${SITE}/${SEASON}_annotations_aggregated.csv \
-  --output_csv /home/packerc/shared/zooniverse/Aggregations/${SITE}/${SEASON}_annotations_aggregated_subject_info.csv
+  python3 -m zooniverse_exports.merge_csvs \
+  --base_cs /home/packerc/shared/zooniverse/Aggregations/${SITE}/${SEASON}_annotations_aggregated.csv \
+  --to_add_cs /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subjects_extracted_url.csv \
+  --output_csv /home/packerc/shared/zooniverse/Aggregations/${SITE}/${SEASON}_annotations_aggregated_subject_info.csv \
+  --key subject_id
 
   # Add subject data to Aggregations (samples)
-  python3 -m zooniverse_exports.add_subject_info_to_csv \
-  --subject_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subjects_extracted.csv \
-  --input_csv /home/packerc/shared/zooniverse/Aggregations/${SITE}/${SEASON}_annotations_aggregated_samples.csv \
-  --output_csv /home/packerc/shared/zooniverse/Aggregations/${SITE}/${SEASON}_annotations_aggregated_subject_info_samples.csv
+  python3 -m zooniverse_exports.merge_csvs \
+  --base_cs /home/packerc/shared/zooniverse/Aggregations/${SITE}/${SEASON}_annotations_aggregated_samples.csv \
+  --to_add_cs /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subjects_extracted_url.csv \
+  --output_csv /home/packerc/shared/zooniverse/Aggregations/${SITE}/${SEASON}_annotations_aggregated_samples_subject_info.csv \
+  --key subject_id
+
+
+  ###################################
+  # Reporting
+  ####################################
+
+  # Reporting of Zooniverse exports
+  python3 -m reporting.add_aggregations_to_season_captures \
+  --season_captures_csv /home/packerc/shared/season_captures/${SITE}/cleaned/${SEASON}_cleaned.csv \
+  --aggregated_csv /home/packerc/shared/zooniverse/Aggregations/${SITE}/${SEASON}_annotations_aggregated_subject_info.csv \
+  --output_csv /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/${SEASON}_report_all.csv \
+  --log_dir /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/ \
+  --default_season_id ${SEASON} \
+  --deduplicate_subjects
+
+  python3 -m reporting.create_report_stats \
+  --report_path /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/${SEASON}_report_all.csv \
+  --output_csv /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/${SEASON}_report_all_stats.csv \
+  --log_dir /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/
+
+
+  # Reporting of Zooniverse exports - only captures with annotations
+  python3 -m reporting.add_aggregations_to_season_captures \
+  --season_captures_csv /home/packerc/shared/season_captures/${SITE}/cleaned/${SEASON}_cleaned.csv \
+  --aggregated_csv /home/packerc/shared/zooniverse/Aggregations/${SITE}/${SEASON}_annotations_aggregated_subject_info.csv \
+  --output_csv /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/${SEASON}_report.csv \
+  --log_dir /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/ \
+  --default_season_id ${SEASON} \
+  --export_only_with_aggregations \
+  --deduplicate_subjects
+
+  python3 -m reporting.create_report_stats \
+  --report_path /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/${SEASON}_report.csv \
+  --output_csv /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/${SEASON}_report_stats.csv \
+  --log_dir /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/
+
+
+  # Reporting of Zooniverse exports - only captures with annotations and samples
+  python3 -m reporting.add_aggregations_to_season_captures \
+  --season_captures_csv /home/packerc/shared/season_captures/${SITE}/cleaned/${SEASON}_cleaned.csv \
+  --aggregated_csv /home/packerc/shared/zooniverse/Aggregations/${SITE}/${SEASON}_annotations_aggregated_samples_subject_info.csv \
+  --output_csv /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/${SEASON}_report_samples.csv \
+  --log_dir /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/ \
+  --default_season_id ${SEASON} \
+  --export_only_with_aggregations \
+  --deduplicate_subjects
+
+  # Reporting of Zooniverse exports - only captures with species
+  python3 -m reporting.add_aggregations_to_season_captures \
+  --season_captures_csv /home/packerc/shared/season_captures/${SITE}/cleaned/${SEASON}_cleaned.csv \
+  --aggregated_csv /home/packerc/shared/zooniverse/Aggregations/${SITE}/${SEASON}_annotations_aggregated_subject_info.csv \
+  --output_csv /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/${SEASON}_report_species.csv \
+  --log_dir /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/ \
+  --default_season_id ${SEASON} \
+  --export_only_species \
+  --deduplicate_subjects
+
+  python3 -m reporting.create_report_stats \
+  --report_path /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/${SEASON}_report_species.csv \
+  --output_csv /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/${SEASON}_report_species_stats.csv \
+  --log_dir /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/
 done
