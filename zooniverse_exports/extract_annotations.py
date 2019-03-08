@@ -44,10 +44,11 @@ flags = cfg['extractor_flags']
 # args['workflow_version'] = None
 #
 # args = dict()
-# args['classification_csv'] = '/home/packerc/shared/zooniverse/Exports/GRU/GRU_S1_classifications.csv'
-# args['output_csv'] = '/home/packerc/shared/zooniverse/Exports/GRU/GRU_S1_classifications_extracted_v2.csv'
+# args['classification_csv'] = '/home/packerc/shared/zooniverse/Exports/MTZ/MTZ_S1_classifications.csv'
+# args['output_csv'] = '/home/packerc/shared/zooniverse/Exports/MTZ/MTZ_S1_annotations_test.csv'
 # args['workflow_id'] = None
 # args['workflow_version'] = None
+# args['workflow_version_min'] = None
 
 
 if __name__ == '__main__':
