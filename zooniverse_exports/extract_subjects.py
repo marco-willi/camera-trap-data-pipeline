@@ -90,7 +90,7 @@ if __name__ == '__main__':
             try:
                 created_at = line[row_name_to_id_mapper_sub['created_at']]
             except:
-                created_at ''
+                created_at = ''
             # collect all subject data
             subject_data_all = {
                 'subject_id': subject_id,
