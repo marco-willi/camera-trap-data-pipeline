@@ -176,7 +176,7 @@ if __name__ == '__main__':
         # Skip plurality consensus species
         if args['export_only_consensus']:
             try:
-                if line['species_is_plurality_consensus']:
+                if line['species_is_plurality_consensus'] != '1':
                     continue
             except:
                 pass
