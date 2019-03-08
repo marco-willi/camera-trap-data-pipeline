@@ -291,25 +291,23 @@ python3 -m zooniverse_exports.extract_subjects \
 # Zooniverse Aggregations
 ####################################
 
-# Aggregate Classifications
+# Aggregate Classifications with plurality algorithm
 python3 -m zooniverse_aggregations.aggregate_annotations_plurality \
 --annotations /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_annotations.csv \
---output_csv /home/packerc/shared/zooniverse/Aggregations/${SITE}/${SEASON}_annotations_aggregated.csv \
---log_dir /home/packerc/shared/zooniverse/Aggregations/${SITE}/ \
---export_consensus_only \
---export_sample_size 300
+--output_csv /home/packerc/shared/zooniverse/Aggregations/${SITE}/${SEASON}_annotations_aggregated_plurality.csv \
+--log_dir /home/packerc/shared/zooniverse/Aggregations/${SITE}/
 
-# Add subject data to Aggregations
-python3 -m zooniverse_exports.add_subject_info_to_csv \
---subject_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subjects_extracted.csv \
---input_csv /home/packerc/shared/zooniverse/Aggregations/${SITE}/${SEASON}_annotations_aggregated.csv \
---output_csv /home/packerc/shared/zooniverse/Aggregations/${SITE}/${SEASON}_annotations_aggregated_subject_info.csv
-
-# OPTIONAL - Add subject data to Aggregations Samples
-python3 -m zooniverse_exports.add_subject_info_to_csv \
---subject_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subjects_extracted.csv \
---input_csv /home/packerc/shared/zooniverse/Aggregations/${SITE}/${SEASON}_annotations_aggregated_samples.csv \
---output_csv /home/packerc/shared/zooniverse/Aggregations/${SITE}/${SEASON}_annotations_aggregated_samples_subject_info.csv
+# # Add subject data to Aggregations
+# python3 -m zooniverse_exports.add_subject_info_to_csv \
+# --subject_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subjects_extracted.csv \
+# --input_csv /home/packerc/shared/zooniverse/Aggregations/${SITE}/${SEASON}_annotations_aggregated.csv \
+# --output_csv /home/packerc/shared/zooniverse/Aggregations/${SITE}/${SEASON}_annotations_aggregated_subject_info.csv
+#
+# # OPTIONAL - Add subject data to Aggregations Samples
+# python3 -m zooniverse_exports.add_subject_info_to_csv \
+# --subject_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subjects_extracted.csv \
+# --input_csv /home/packerc/shared/zooniverse/Aggregations/${SITE}/${SEASON}_annotations_aggregated_samples.csv \
+# --output_csv /home/packerc/shared/zooniverse/Aggregations/${SITE}/${SEASON}_annotations_aggregated_samples_subject_info.csv
 
 
 ###################################
@@ -339,7 +337,8 @@ python3 -m reporting.add_aggregations_to_season_captures \
 --log_dir /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/ \
 --default_season_id ${SEASON} \
 --export_only_with_aggregations \
---deduplicate_subjects
+--deduplicate_subjects \
+--export_only_consensus
 
 python3 -m reporting.create_report_stats \
 --report_path /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/${SEASON}_report.csv \
@@ -356,6 +355,14 @@ python3 -m reporting.add_aggregations_to_season_captures \
 --default_season_id ${SEASON} \
 --export_only_with_aggregations \
 --deduplicate_subjects
+
+
+python3 -m reporting.sample_report \
+--report_csv /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/${SEASON}_report.csv \
+--output_csv /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/${SEASON}_report_samples.csv \
+--sample_size 300 \
+--log_dir /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/
+
 
 # Reporting of Zooniverse exports - only captures with species
 python3 -m reporting.add_aggregations_to_season_captures \

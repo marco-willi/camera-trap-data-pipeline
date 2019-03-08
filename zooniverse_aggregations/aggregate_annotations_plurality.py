@@ -13,7 +13,7 @@ from logger import setup_logger, create_log_file
 from config.cfg import cfg
 from zooniverse_aggregations import aggregator
 from utils import (
-    print_nested_dict, set_file_permission, balanced_sample_best_effort)
+    print_nested_dict, set_file_permission)
 
 
 flags = cfg['plurality_aggregation_flags']
@@ -102,9 +102,6 @@ if __name__ == '__main__':
     parser.add_argument(
         "--export_consensus_only", action="store_true",
         help="Export only species with plurality consensus")
-    parser.add_argument(
-        "--export_sample_size", default=0, type=int,
-        help="Export a csv with N samples (fewer if only consensus)")
     parser.add_argument(
         "--log_dir", type=str, default=None)
     parser.add_argument(
@@ -352,53 +349,3 @@ if __name__ == '__main__':
 
     # change permmissions to read/write for group
     set_file_permission(args['output_csv'])
-
-    if args['export_sample_size'] > 0:
-        # Create a file name for a sampled export
-        output_csv_path, output_csv_name = os.path.split(args['output_csv'])
-        output_csv_basename = output_csv_name.split('.csv')
-        output_csv_sample = os.path.join(
-            output_csv_path, output_csv_basename[0] + '_samples.csv')
-        # randomly shuffle records
-        # n_total = len(subject_identificatons)
-        # _ids_all = [i for i in range(0, n_total)]
-        # random.seed(123)
-        # random.shuffle(_ids_all)
-
-        # generate list with main answers for stratified sampling
-        if args['export_consensus_only']:
-            main_answers = \
-                [x[question_main_id] for x in subject_identificatons
-                 if x['species_is_plurality_consensus'] == 1]
-            _ids_all = [i for i, x in enumerate(subject_identificatons)
-                        if x['species_is_plurality_consensus'] == 1]
-        else:
-            main_answers = \
-                [x[question_main_id] for x in subject_identificatons]
-            _ids_all = [i for i in range(0, len(subject_identificatons))]
-
-        _ids_sampled = \
-            balanced_sample_best_effort(
-                main_answers, args['export_sample_size'])
-
-        _ids_sampled_mapped = [_ids_all[i] for i in _ids_sampled]
-
-        # sample_size = min(args['export_sample_size'], n_total)
-        # _ids_sampled = random.sample(_ids_all, sample_size)
-
-        with open(output_csv_sample, 'w') as f:
-            csv_writer = csv.writer(f, delimiter=',')
-            logger.info("Writing output to {}".format(output_csv_sample))
-            csv_writer.writerow(output_header)
-            n_written = 0
-            for line_no, line_id in enumerate(_ids_sampled_mapped):
-                record = subject_identificatons[line_id]
-                # get subject info data
-                to_write = [record[x] for x in output_header]
-                csv_writer.writerow(to_write)
-                n_written += 1
-            logger.info("Wrote {} aggregations to {}".format(
-                n_written, output_csv_sample))
-
-        # change permmissions to read/write for group
-        set_file_permission(output_csv_sample)

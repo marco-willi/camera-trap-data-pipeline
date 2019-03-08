@@ -77,6 +77,7 @@ if __name__ == '__main__':
     parser.add_argument("--export_only_with_aggregations", action="store_true")
     parser.add_argument("--export_only_species", action="store_true")
     parser.add_argument("--deduplicate_subjects", action="store_true")
+    parser.add_argument("--export_only_consensus", action="store_true")
     parser.add_argument(
         "--log_dir", type=str, default=None)
     parser.add_argument(
@@ -172,6 +173,13 @@ if __name__ == '__main__':
     row_name_to_id_mapper_input = {x: i for i, x in enumerate(header_input)}
     for line_no, line in df_aggregated.iterrows():
         capture_id = line['capture_id']
+        # Skip plurality consensus species
+        if args['export_only_consensus']:
+            try:
+                if line['species_is_plurality_consensus']:
+                    continue
+            except:
+                pass
         if capture_id not in aggregated_data:
             aggregated_data[capture_id] = list()
         aggregated_data[capture_id].append(line)
