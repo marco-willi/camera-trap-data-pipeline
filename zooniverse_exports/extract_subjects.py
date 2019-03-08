@@ -86,7 +86,11 @@ if __name__ == '__main__':
             # get other information
             retired_at = line[row_name_to_id_mapper_sub['retired_at']]
             retirement_reason = line[row_name_to_id_mapper_sub['retirement_reason']]
-            created_at = line[row_name_to_id_mapper_sub['created_at']]
+            # handle legacy case when 'created_at' was not in Zooniverse exports
+            try:
+                created_at = line[row_name_to_id_mapper_sub['created_at']]
+            except:
+                created_at ''
             # collect all subject data
             subject_data_all = {
                 'subject_id': subject_id,

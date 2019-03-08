@@ -112,6 +112,20 @@ WORFKLOW_VERSION_MIN=
 
 
 ###################################
+# GON
+####################################
+
+
+cd $HOME/camera-trap-data-pipeline
+SITE=GON
+SEASON=GON_S1
+PROJECT_ID=3812
+WORKFLOW_ID=3360
+WORFKLOW_VERSION_MIN=497.11
+
+
+
+###################################
 # Python Prep
 ####################################
 
@@ -346,6 +360,10 @@ python3 -m reporting.create_report_stats \
 --report_path /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/${SEASON}_report_species.csv \
 --output_csv /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/${SEASON}_report_species_stats.csv \
 --log_dir /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/
+
+###################################
+# Reporting - Machine Learning
+####################################
 
 # Create Flattened ML Predictions
 python3 -m reporting.flatten_ml_predictions \
