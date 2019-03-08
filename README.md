@@ -1,13 +1,13 @@
-# snapshot_safari_misc
-This repository contains code for the following tasks:
+# Camera Trap Data Pipeline
+This repository contains code to process camera trap images, specifically:
 
-1. [Pre-Processing Camera-Trap Images](docs/pre_processing.md) - in development
-2. [Upload Data to Zooniverse](docs/zooniverse_uploads.md) - allows for adding machine learning scores
+1. [Pre-Processing Camera-Trap Images](docs/pre_processing.md)
+2. [Upload Data to Zooniverse](docs/zooniverse_uploads.md)
 3. [Download & Extract Data from Zooniverse](docs/zooniverse_exports.md)
 4. [Aggregate Data from Zooniverse](docs/zooniverse_aggregations.md)
-5. [Merge Data into Reports](docs/reporting.md) - in development
+5. [Merge Data into Reports](docs/reporting.md)
 
-Most codes produce log-files containing important information about how the data was processed.
+The code was developed for the [Snapshot Safari](www.snapshotsafari.org) project but is generably usable for camera trap projects.
 
 ## Overview
 
@@ -49,25 +49,25 @@ chmod 600 ~/keys/passwords.ini
 
 ### Get the codes from GitHub
 
-To execute the following codes we need the most recent version of the GitHub code. We will clone the code into the our home directory. This avoids any conflicts with permissions and will create a directory 'snapshot_safari_misc' in your home directory.
+To execute the following codes we need the most recent version of the GitHub code. We will clone the code into the our home directory. This avoids any conflicts with permissions and will create a directory 'camera-trap-data-pipeline' in your home directory.
 
 ```
 cd
-git clone https://github.com/marco-willi/snapshot_safari_misc.git
+git clone https://github.com/marco-willi/camera-trap-data-pipeline.git
 ```
 
 If that code / directory already exists you can update it using following command:
 
 ```
-cd ~/snapshot_safari_misc
+cd ~/camera-trap-data-pipeline
 git pull
 ```
 
 Should there be any conflicts / issues, just delete your code and clone again. Any changes you made to the code are lost after this.
 ```
-rm -r -f ~/snapshot_safari_misc
+rm -r -f ~/camera-trap-data-pipeline
 cd
-git clone https://github.com/marco-willi/snapshot_safari_misc.git
+git clone https://github.com/marco-willi/camera-trap-data-pipeline.git
 ```
 
 
@@ -79,5 +79,5 @@ ssh lab
 module load python3
 pip install --upgrade --user panoptes-client
 pip install --upgrade --user pillow
-cd ~/snapshot_safari_misc
+cd ~/camera-trap-data-pipeline
 ```

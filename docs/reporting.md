@@ -8,7 +8,7 @@ The following codes can be used to:
 The following codes show an example for Grumeti:
 
 ```
-cd $HOME/snapshot_safari_misc
+cd $HOME/camera-trap-data-pipeline
 SITE=GRU
 SEASON=GRU_S1
 ```

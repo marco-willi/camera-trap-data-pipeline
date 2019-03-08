@@ -76,7 +76,7 @@ The following steps describe how to run the machine learning models. Note that t
 
 The following file needs to be adapted:
 ```
-$HOME/snapshot_safari_misc/machine_learning/jobs/ctc_predict_empty.pbs
+$HOME/camera-trap-data-pipeline/machine_learning/jobs/ctc_predict_empty.pbs
 ```
 Adapt the following parameters:
 ```
@@ -92,7 +92,7 @@ BATCH=complete
 After that we can run the script using this command:
 ```
 ssh mesabi
-cd $HOME/snapshot_safari_misc/machine_learning/jobs
+cd $HOME/camera-trap-data-pipeline/machine_learning/jobs
 qsub ctc_predict_empty.pbs
 ```
 
@@ -105,7 +105,7 @@ RUA_S1__complete__predictions_empty_or_not.json
 
 The following file needs to be adapted:
 ```
-$HOME/snapshot_safari_misc/machine_learning/jobs/ctc_predict_species.pbs
+$HOME/camera-trap-data-pipeline/machine_learning/jobs/ctc_predict_species.pbs
 ```
 
 Adapt the following parameters:
@@ -122,7 +122,7 @@ BATCH=complete
 After that we can run the script using this command:
 ```
 ssh mesabi
-cd $HOME/snapshot_safari_misc/machine_learning/jobs
+cd $HOME/camera-trap-data-pipeline/machine_learning/jobs
 qsub ctc_predict_species.pbs
 ```
 
@@ -136,7 +136,7 @@ RUA_S1__complete__predictions_species.json
 This code adds the aggregated predictions into the manifest.
 
 ```
-cd $HOME/snapshot_safari_misc
+cd $HOME/camera-trap-data-pipeline
 python3 -m zooniverse_uploads.add_predictions_to_manifest \
 --manifest /home/packerc/shared/zooniverse/Manifests/RUA/RUA_S1__complete__manifest.json
 ```
@@ -153,7 +153,7 @@ module load python3
 This codes splits the manifest into several batches that can be uploaded separately. Additionally, the machine scores can be updated for individual batches (usually batches that have not yet been uploaded). Either the number of batches 'number_of_batches' or the 'max_batch_size' can be specified. Default is to randomly split the manifest into the batches.
 
 ```
-cd $HOME/snapshot_safari_misc
+cd $HOME/camera-trap-data-pipeline
 python3 -m zooniverse_uploads.split_manifest_into_batches \
 --manifest /home/packerc/shared/zooniverse/Manifests/RUA/RUA_S1__complete__manifest.json \
 --log_dir /home/packerc/shared/zooniverse/Manifests/RUA/ \
@@ -192,14 +192,14 @@ To upload a specific batch instead use something analogue to:
 
 Adapt the command in the following file instead:
 ```
-$HOME/snapshot_safari_misc/zooniverse_uploads/upload_manifest.pbs
+$HOME/camera-trap-data-pipeline/zooniverse_uploads/upload_manifest.pbs
 ```
 
 To submit the job use the following command:
 
 ```
 ssh lab
-cd $HOME/snapshot_safari_misc/zooniverse_uploads/
+cd $HOME/camera-trap-data-pipeline/zooniverse_uploads/
 qsub upload_manifest.pbs
 ```
 

@@ -14,7 +14,7 @@ The following examples were run with the following settings:
 ssh lab
 qsub -I -l walltime=6:00:00,nodes=1:ppn=4,mem=16gb
 module load python3
-cd $HOME/snapshot_safari_misc
+cd $HOME/camera-trap-data-pipeline
 git pull
 SITE=APN
 SEASON=APN_S2
@@ -72,7 +72,7 @@ The following script generates an inventory of all camera trap images and perfor
 ssh lab
 qsub -I -l walltime=2:00:00,nodes=1:ppn=16,mem=16gb
 module load python3
-cd $HOME/snapshot_safari_misc
+cd $HOME/camera-trap-data-pipeline
 git pull
 SITE=APN
 SEASON=APN_S2

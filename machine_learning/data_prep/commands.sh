@@ -1,5 +1,5 @@
 module load python3
-cd /home/packerc/shared/scripts/snapshot_safari_misc
+cd /home/packerc/shared/scripts/camera-trap-data-pipeline
 
 python -m machine_learning.data_prep.prep_csv_info_file \
 -season 1 \

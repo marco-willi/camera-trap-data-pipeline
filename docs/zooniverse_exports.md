@@ -65,7 +65,7 @@ qsub -I -l walltime=2:00:00,nodes=1:ppn=4,mem=16gb
 ```
 
 ```
-cd $HOME/snapshot_safari_misc
+cd $HOME/camera-trap-data-pipeline
 python3 -m zooniverse_exports.extract_annotations \
         --classification_csv /home/packerc/shared/zooniverse/Exports/RUA/RUA_S1_classifications.csv \
         --output_csv /home/packerc/shared/zooniverse/Exports/RUA/RUA_S1_annotations_extracted.csv \
@@ -144,7 +144,7 @@ The script does the following:
 
 To run the code use the following command:
 ```
-cd $HOME/snapshot_safari_misc
+cd $HOME/camera-trap-data-pipeline
 
 python3 -m zooniverse_exports.extract_legacy_serengeti \
 --classification_csv '/home/packerc/shared/zooniverse/Exports/SER/2019-01-27_serengeti_classifications.csv' \

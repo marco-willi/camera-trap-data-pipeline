@@ -6,7 +6,7 @@
 #PBS -o ${HOME}/compress_images_${PBS_JOBID}.log
 #PBS -e ${HOME}/compress_images_error_${PBS_JOBID}.log
 
-cd $HOME/snapshot_safari_misc
+cd $HOME/camera-trap-data-pipeline
 
 module load python3
 

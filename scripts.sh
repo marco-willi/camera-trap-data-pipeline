@@ -2,7 +2,7 @@
 # Grumeti
 ####################################
 
-cd $HOME/snapshot_safari_misc
+cd $HOME/camera-trap-data-pipeline
 SITE=GRU
 SEASON=GRU_S1
 PROJECT_ID=5115
@@ -15,7 +15,7 @@ LICENSE="'Snapshot Safari + Singita Grumeti'"
 # Mountain Zebra
 ####################################
 
-cd $HOME/snapshot_safari_misc
+cd $HOME/camera-trap-data-pipeline
 SITE=MTZ
 SEASON=MTZ_S1
 PROJECT_ID=5124
@@ -26,7 +26,7 @@ WORFKLOW_VERSION_MIN=247
 # Karoo
 ####################################
 
-cd $HOME/snapshot_safari_misc
+cd $HOME/camera-trap-data-pipeline
 SITE=KAR
 SEASON=KAR_S1
 PROJECT_ID=7679
@@ -38,7 +38,7 @@ WORFKLOW_VERSION_MIN=237.7
 # Pilanesberg
 ####################################
 
-cd $HOME/snapshot_safari_misc
+cd $HOME/camera-trap-data-pipeline
 SITE=PLN
 SEASON=PLN_S1
 PROJECT_ID=6190
@@ -49,7 +49,7 @@ WORFKLOW_VERSION_MIN=311.5
 # Cedar Creek
 ####################################
 
-cd $HOME/snapshot_safari_misc
+cd $HOME/camera-trap-data-pipeline
 SITE=CC
 SEASON=CC_S1
 PROJECT_ID=5880
@@ -61,7 +61,7 @@ WORFKLOW_VERSION_MIN=289
 # Snapshot Serengeti
 ####################################
 
-cd $HOME/snapshot_safari_misc
+cd $HOME/camera-trap-data-pipeline
 SITE=SER
 SEASON=SER_S11
 PROJECT_ID=4996
@@ -73,7 +73,7 @@ WORFKLOW_VERSION_MIN=304
 # ENO
 ####################################
 
-cd $HOME/snapshot_safari_misc
+cd $HOME/camera-trap-data-pipeline
 SITE=ENO
 SEASON=ENO_S1
 PROJECT_ID=
@@ -81,7 +81,7 @@ WORKFLOW_ID=
 WORFKLOW_VERSION_MIN=
 
 # TEST
-cd $HOME/snapshot_safari_misc
+cd $HOME/camera-trap-data-pipeline
 SITE=ENO
 SEASON=ENO_S1_TEST_CANBEDELETED
 PROJECT_ID=
@@ -95,7 +95,7 @@ WORFKLOW_VERSION_MIN=
 ####################################
 
 
-cd $HOME/snapshot_safari_misc
+cd $HOME/camera-trap-data-pipeline
 SITE=APN
 SEASON=APN_S1
 PROJECT_ID=5561
@@ -103,7 +103,7 @@ WORKFLOW_ID=5719
 WORFKLOW_VERSION_MIN=159.9
 
 
-cd $HOME/snapshot_safari_misc
+cd $HOME/camera-trap-data-pipeline
 SITE=APN
 SEASON=APN_S2
 PROJECT_ID=
@@ -117,7 +117,7 @@ WORFKLOW_VERSION_MIN=
 
 qsub -I -l walltime=6:00:00,nodes=1:ppn=4,mem=16gb
 module load python3
-cd $HOME/snapshot_safari_misc
+cd $HOME/camera-trap-data-pipeline
 git pull
 
 
@@ -370,7 +370,7 @@ python3 -m reporting.add_predictions_to_season_captures \
 qsub -I -l walltime=10:00:00,nodes=1:ppn=4,mem=16gb
 module load python3
 
-cd $HOME/snapshot_safari_misc
+cd $HOME/camera-trap-data-pipeline
 SITE=SER
 SEASON=SER_S1
 SEASON_STRING='1'
@@ -430,7 +430,7 @@ python3 -m zooniverse_exports.merge_csvs \
 python3 -m zooniverse_exports.merge_csvs \
 --base_cs /home/packerc/shared/zooniverse/Aggregations/${SITE}/${SEASON}_annotations_aggregated_samples.csv \
 --to_add_cs /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subjects_extracted_url.csv \
---output_csv /home/packerc/shared/zooniverse/Aggregations/${SITE}/${SEASON}_annotations_aggregated_subject_info_samples.csv \
+--output_csv /home/packerc/shared/zooniverse/Aggregations/${SITE}/${SEASON}_annotations_aggregated_samples_subject_info.csv \
 --key subject_id
 
 
