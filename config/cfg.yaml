@@ -158,6 +158,9 @@ extractor_flags:
       count:
         '1150': '11-50'
         '51': '51+'
+      horns_count:
+        '1150': '11-50'
+        '51': '51+'
     CLASSIFICATION_INFO_MAPPER:
       subject_ids: subject_id
     CLASSIFICATION_INFO_TO_ADD:
