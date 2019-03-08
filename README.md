@@ -7,7 +7,7 @@ This repository contains code to process camera trap images, specifically:
 4. [Aggregate Data from Zooniverse](docs/zooniverse_aggregations.md)
 5. [Merge Data into Reports](docs/reporting.md)
 
-The code was developed for the [Snapshot Safari](www.snapshotsafari.org) project but is generably usable for camera trap projects.
+The code was developed for the [Snapshot Safari](http://www.snapshotsafari.org) project but is generably usable for camera trap projects.
 
 ## Overview
 
