@@ -33,23 +33,24 @@ We refer to an identification/answer by a volunteer as an annotation.
 To extract the classification data use the following code:
 ```
 python3 -m zooniverse_exports.get_zooniverse_export \
-        --password_file ~/keys/passwords.ini \
-        --project_id 5155 \
-        --output_file /home/packerc/shared/zooniverse/Exports/RUA/RUA_S1_classifications.csv \
-        --export_type classifications \
-        --new_export 0
+--password_file ~/keys/passwords.ini \
+--project_id $PROJECT_ID \
+--output_file /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_classifications.csv \
+--export_type classifications \
+--new_export 0
 ```
 
 ### Zooniverse Subject Export
 
 To get subject data go to Zooniverse and click 'Request new subject export'. To download the data use:
 ```
+# Get Zooniverse Subject Data
 python3 -m zooniverse_exports.get_zooniverse_export \
-        --password_file ~/keys/passwords.ini \
-        --project_id 5155 \
-        --output_file /home/packerc/shared/zooniverse/Exports/RUA/RUA_S1_subjects.csv \
-        --export_type subjects \
-        --new_export 0
+--password_file ~/keys/passwords.ini \
+--project_id $PROJECT_ID \
+--output_file /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subjects.csv \
+--export_type subjects \
+--new_export 0
 ```
 
 
@@ -65,13 +66,11 @@ qsub -I -l walltime=2:00:00,nodes=1:ppn=4,mem=16gb
 ```
 
 ```
-cd $HOME/camera-trap-data-pipeline
 python3 -m zooniverse_exports.extract_annotations \
-        --classification_csv /home/packerc/shared/zooniverse/Exports/RUA/RUA_S1_classifications.csv \
-        --output_csv /home/packerc/shared/zooniverse/Exports/RUA/RUA_S1_annotations_extracted.csv \
-        --log_dir /home/packerc/shared/zooniverse/Exports/RUA/ \
-        --workflow_id 4889 \
-        --workflow_version_min 797
+--classification_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_classifications.csv \
+--output_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_annotations.csv \
+--workflow_id $WORKFLOW_ID \
+--workflow_version_min $WORFKLOW_VERSION_MIN
 ```
 
 
@@ -107,8 +106,8 @@ The following codes extract subject data from the subject exports that Zoonivers
 
 ```
 python3 -m zooniverse_exports.extract_subjects \
-        --subject_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subjects.csv \
-        --output_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subjects_extracted.csv
+--subject_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subjects.csv \
+--output_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subjects_extracted.csv
 ```
 
 

@@ -16,47 +16,79 @@ SEASON=GRU_S1
 ## Merge Season Captures with Aggregated Annotations
 
 The following reports can be generated:
+
 ```
-# Reporting of Zooniverse exports
+# Reporting of Zooniverse exports - All Captures
 python3 -m reporting.add_aggregations_to_season_captures \
 --season_captures_csv /home/packerc/shared/season_captures/${SITE}/cleaned/${SEASON}_cleaned.csv \
---aggregated_csv /home/packerc/shared/zooniverse/Aggregations/${SITE}/${SEASON}_annotations_aggregated_subject_info.csv \
+--aggregated_csv /home/packerc/shared/zooniverse/Aggregations/${SITE}/${SEASON}_annotations_aggregated_plurality_info.csv \
 --output_csv /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/${SEASON}_report_all.csv \
 --log_dir /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/ \
---default_season_id ${SEASON}
+--default_season_id ${SEASON} \
+--deduplicate_subjects
+```
 
+```
+python3 -m reporting.create_report_stats \
+--report_path /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/${SEASON}_report_all.csv \
+--output_csv /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/${SEASON}_report_all_stats.csv \
+--log_dir /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/
+```
+
+```
 # Reporting of Zooniverse exports - only captures with annotations
-# deduplicate captures with more than one subject id
 python3 -m reporting.add_aggregations_to_season_captures \
 --season_captures_csv /home/packerc/shared/season_captures/${SITE}/cleaned/${SEASON}_cleaned.csv \
---aggregated_csv /home/packerc/shared/zooniverse/Aggregations/${SITE}/${SEASON}_annotations_aggregated_subject_info.csv \
+--aggregated_csv /home/packerc/shared/zooniverse/Aggregations/${SITE}/${SEASON}_annotations_aggregated_plurality_info.csv \
 --output_csv /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/${SEASON}_report.csv \
 --log_dir /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/ \
 --default_season_id ${SEASON} \
 --export_only_with_aggregations \
---deduplicate_subjects
+--deduplicate_subjects \
+--export_only_consensus
+```
 
-# Reporting of Zooniverse exports - only captures with annotations and samples
-# deduplicate captures with more than one subject id
-python3 -m reporting.add_aggregations_to_season_captures \
---season_captures_csv /home/packerc/shared/season_captures/${SITE}/cleaned/${SEASON}_cleaned.csv \
---aggregated_csv /home/packerc/shared/zooniverse/Aggregations/${SITE}/${SEASON}_annotations_aggregated_samples_subject_info.csv \
+```
+python3 -m reporting.create_report_stats \
+--report_path /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/${SEASON}_report.csv \
+--output_csv /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/${SEASON}_report_stats.csv \
+--log_dir /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/
+```
+
+```
+python3 -m reporting.sample_report \
+--report_csv /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/${SEASON}_report.csv \
 --output_csv /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/${SEASON}_report_samples.csv \
---log_dir /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/ \
---default_season_id ${SEASON} \
---export_only_with_aggregations \
---deduplicate_subjects
+--sample_size 300 \
+--log_dir /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/
+```
 
+```
 # Reporting of Zooniverse exports - only captures with species
-# deduplicate captures with more than one subject id
 python3 -m reporting.add_aggregations_to_season_captures \
 --season_captures_csv /home/packerc/shared/season_captures/${SITE}/cleaned/${SEASON}_cleaned.csv \
---aggregated_csv /home/packerc/shared/zooniverse/Aggregations/${SITE}/${SEASON}_annotations_aggregated_subject_info.csv \
+--aggregated_csv /home/packerc/shared/zooniverse/Aggregations/${SITE}/${SEASON}_annotations_aggregated_plurality_info.csv \
 --output_csv /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/${SEASON}_report_species.csv \
 --log_dir /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/ \
 --default_season_id ${SEASON} \
 --export_only_species \
---deduplicate_subjects
+--deduplicate_subjects \
+--export_only_consensus
+```
+
+```
+python3 -m reporting.create_report_stats \
+--report_path /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/${SEASON}_report_species.csv \
+--output_csv /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/${SEASON}_report_species_stats.csv \
+--log_dir /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/
+```
+
+```
+python3 -m reporting.sample_report \
+--report_csv /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/${SEASON}_report_species.csv \
+--output_csv /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/${SEASON}_report_species_samples.csv \
+--sample_size 300 \
+--log_dir /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/
 ```
 
 To de-duplicate capture ids with more than one subject (if accidentally uploaded more than once to Zooniverse) -- deleting some subject ids:
@@ -72,6 +104,11 @@ To export only species detections (no blanks):
 To export only with Zooniverse aggregations (otherwise also include captures without Zooniverse data):
 ```
 --export_only_with_aggregations
+```
+
+To export only consensus identifications (plurality algorithm):
+```
+--export_only_consensus
 ```
 
 ## Output Fields

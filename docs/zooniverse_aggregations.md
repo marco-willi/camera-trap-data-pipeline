@@ -23,9 +23,10 @@ The general aggregation logic (plurality algorithm) is as follows:
 |season, roll, site, capture  | internal identifiers of the capture
 |subject_id | Zooniverse subject_id (per capture)
 |retirement_reason | Zooniverse retirement reason
-|retired_at | Zooniverse date when retired
-|url1, url2, url3 | Zooniverse image links of the capture
-|question__* | Aggregated question answers
+|created_at | Zooniverse date when the capture was uploaded
+|retired_at | Zooniverse date when the capture was retired
+|zooniverse_url_*| Zooniverse image links of the capture (if uploaded)
+|question__* | Aggregated question answers, fractions, labels or counts
 |n_users_identified_this_species | Number of users that identified 'question__species'
 |p_users_identified_this_species | Proportion of users that identified 'question__species'
 |n_species_ids_per_user_median | Median number of different species identified among users who identified at least one species for this capture
@@ -36,18 +37,25 @@ The general aggregation logic (plurality algorithm) is as follows:
 |n_users_classified_this_subject | Number of users that classified this subject
 |species_is_plurality_consensus | Flag indicating a plurality consensus for this species (normally only species with a 1 are relevant)
 
-
 ## Aggregate Classifications (plurality algorithm)
 
 This is an example to aggregate classifications using the plurality algorithm.
 
 ```
-python3 -m zooniverse_aggregations.aggregate_classifications_plurality \
---classifications_extracted /home/packerc/shared/zooniverse/Exports/RUA/RUA_S1_classifications_extracted.csv \
---output_csv /home/packerc/shared/zooniverse/Aggregations/RUA/RUA_S1_classifications_aggregated.csv \
---log_dir /home/packerc/shared/zooniverse/Aggregations/RUA/ \
---export_consensus_only \
---export_sample_size 300
-```      
+python3 -m zooniverse_aggregations.aggregate_annotations_plurality \
+--annotations /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_annotations.csv \
+--output_csv /home/packerc/shared/zooniverse/Aggregations/${SITE}/${SEASON}_annotations_aggregated_plurality.csv \
+--log_dir /home/packerc/shared/zooniverse/Aggregations/${SITE}/
+```
 
-This generates two exports: one containing all data and one with 300 samples for testing. The option '--export_consensus_only' removes all species classifications that did not reach consensus (i.e. the majority of volunteers agreed on a different species).
+## Add subject data to Aggregations
+
+This scripts adds subject data to the export.
+
+```
+python3 -m zooniverse_exports.merge_csvs \
+--base_csv /home/packerc/shared/zooniverse/Aggregations/${SITE}/${SEASON}_annotations_aggregated_plurality.csv \
+--to_add_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subjects_extracted.csv \
+--output_csv /home/packerc/shared/zooniverse/Aggregations/${SITE}/${SEASON}_annotations_aggregated_plurality_info.csv \
+--key subject_id
+```

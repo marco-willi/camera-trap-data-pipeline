@@ -1,0 +1,301 @@
+species_mappings:
+  aardvark:
+    grouped: aardvark
+    standardized: aardvark
+  aardvarkantbear:
+    grouped: aardvark
+    standardized: aardvark
+  aardwolf:
+    grouped: aardwolf
+    standardized: aardwolf
+  baboon:
+    grouped: baboon
+    standardized: baboon
+  bat:
+    grouped: bat
+    standardized: bat
+  batEaredFox:
+    grouped: foxbateared
+    standardized: foxbateared
+  birdother:
+    grouped: birdother
+    standardized: birdother
+  birdsofprey:
+    grouped: birdother
+    standardized: birdsofprey
+  blank:
+    grouped: blank
+    standardized: blank
+  blesbok:
+    grouped: blesbok
+    standardized: blesbok
+  buffalo:
+    grouped: buffalo
+    standardized: buffalo
+  bushbuck:
+    grouped: bushbuck
+    standardized: bushbuck
+  bushpig:
+    grouped: bushpig
+    standardized: bushpig
+  bustardkori:
+    grouped: bustardkori
+    standardized: bustardkori
+  bustardludwigs:
+    grouped: bustardludwigs
+    standardized: bustardludwigs
+  caracal:
+    grouped: caracal
+    standardized: caracal
+  cattle:
+    grouped: cattle
+    standardized: cattle
+  cheetah:
+    grouped: cheetah
+    standardized: cheetah
+  civet:
+    grouped: civet
+    standardized: civet
+  craneblue:
+    grouped: craneblue
+    standardized: craneblue
+  dikdik:
+    grouped: dikdik
+    standardized: dikdik
+  domesticanimal:
+    grouped: domesticanimal
+    standardized: domesticanimal
+  duiker:
+    grouped: duiker
+    standardized: duiker
+  eland:
+    grouped: eland
+    standardized: eland
+  elephant:
+    grouped: elephant
+    standardized: elephant
+  fallowdeer:
+    grouped: fallowdeer
+    standardized: fallowdeer
+  fire:
+    grouped: fire
+    standardized: fire
+  foxbateared:
+    grouped: foxbateared
+    standardized: foxbateared
+  foxcape:
+    grouped: foxcape
+    standardized: foxcape
+  gazellegrants:
+    grouped: gazellegrants
+    standardized: gazellegrants
+  gazellethomsons:
+    grouped: gazellethomsons
+    standardized: gazellethomsons
+  gemsbokoryx:
+    grouped: gemsbokoryx
+    standardized: gemsbokoryx
+  genet:
+    grouped: genet
+    standardized: genet
+  genetcapelargespotted:
+    grouped: genet
+    standardized: genetcapelargespotted
+  genetcommonsmallspotted:
+    grouped: genet
+    standardized: genetcommonsmallspotted
+  giraffe:
+    grouped: giraffe
+    standardized: giraffe
+  groundsquirrel:
+    grouped: groundsquirrel
+    standardized: groundsquirrel
+  guineafowl:
+    grouped: guineafowl
+    standardized: guineafowl
+  hare:
+    grouped: hare
+    standardized: hare
+  hartebeest:
+    grouped: hartebeest
+    standardized: hartebeest
+  hartebeestred:
+    grouped: hartebeest
+    standardized: hartebeestred
+  hippopotamus:
+    grouped: hippopotamus
+    standardized: hippopotamus
+  honeyBadger:
+    grouped: honeybadger
+    standardized: honeybadger
+  human:
+    grouped: human
+    standardized: human
+  hyenabrown:
+    grouped: hyenabrown
+    standardized: hyenabrown
+  hyenaspotted:
+    grouped: hyenaspotted
+    standardized: hyenaspotted
+  hyenastriped:
+    grouped: hyenastriped
+    standardized: hyenastriped
+  impala:
+    grouped: impala
+    standardized: impala
+  insectspider:
+    grouped: insectspider
+    standardized: insectspider
+  jackal:
+    grouped: jackal
+    standardized: jackal
+  jackalblackbacked:
+    grouped: jackal
+    standardized: jackalblackbacked
+  klipspringer:
+    grouped: klipspringer
+    standardized: klipspringer
+  koribustard:
+    grouped: bustardkori
+    standardized: bustardkori
+  kudu:
+    grouped: kudu
+    standardized: kudu
+  leopard:
+    grouped: leopard
+    standardized: leopard
+  lioncub:
+    grouped: lion
+    standardized: lioncub
+  lionfemale:
+    grouped: lion
+    standardized: lionfemale
+  lionmale:
+    grouped: lion
+    standardized: lionmale
+  meerkatsuricate:
+    grouped: meerkatsuricate
+    standardized: meerkatsuricate
+  mongoose:
+    grouped: mongoose
+    standardized: mongoose
+  mongoosebanded:
+    grouped: mongoose
+    standardized: mongoosebanded
+  mongoosesmallcapegrey:
+    grouped: mongoose
+    standardized: mongoosesmallcapegrey
+  mongooseyellow:
+    grouped: mongoose
+    standardized: mongooseyellow
+  monkeysamango:
+    grouped: monkeysamango
+    standardized: monkeysamango
+  monkeyvervet:
+    grouped: monkeyvervet
+    standardized: monkeyvervet
+  nyala:
+    grouped: nyala
+    standardized: nyala
+  ostrich:
+    grouped: ostrich
+    standardized: ostrich
+  otherBird:
+    grouped: birdother
+    standardized: birdother
+  porcupine:
+    grouped: porcupine
+    standardized: porcupine
+  rabbitredrock:
+    grouped: rabbitredrock
+    standardized: rabbitredrock
+  rabbitriverine:
+    grouped: rabbitriverine
+    standardized: rabbitriverine
+  reedbuck:
+    grouped: reedbuck
+    standardized: reedbuck
+  reedbuckmountain:
+    grouped: reedbuck
+    standardized: reedbuckmountain
+  reptiles:
+    grouped: reptiles
+    standardized: reptiles
+  reptilesamphibians:
+    grouped: reptiles
+    standardized: reptilesamphibians
+  rhebokgrey:
+    grouped: rhebokgrey
+    standardized: rhebokgrey
+  rhinoceros:
+    grouped: rhinoceros
+    standardized: rhinoceros
+  rhinocerosblack:
+    grouped: rhinoceros
+    standardized: rhinocerosblack
+  rhinoceroswhite:
+    grouped: rhinoceros
+    standardized: rhinoceroswhite
+  rodents:
+    grouped: rodents
+    standardized: rodents
+  sable:
+    grouped: sable
+    standardized: sable
+  secretarybird:
+    grouped: secretarybird
+    standardized: secretarybird
+  serval:
+    grouped: serval
+    standardized: serval
+  springbok:
+    grouped: springbok
+    standardized: springbok
+  steenbok:
+    grouped: steenbok
+    standardized: steenbok
+  topi:
+    grouped: topi
+    standardized: topi
+  tortoise:
+    grouped: tortoise
+    standardized: tortoise
+  vervetMonkey:
+    grouped: monkeyvervet
+    standardized: monkeyvervet
+  vulture:
+    grouped: vulture
+    standardized: vulture
+  warthog:
+    grouped: warthog
+    standardized: warthog
+  waterbuck:
+    grouped: waterbuck
+    standardized: waterbuck
+  wildcat:
+    grouped: wildcat
+    standardized: wildcat
+  wilddog:
+    grouped: wilddog
+    standardized: wilddog
+  wildebeest:
+    grouped: wildebeest
+    standardized: wildebeest
+  wildebeestblack:
+    grouped: wildebeest
+    standardized: wildebeestblack
+  wildebeestblue:
+    grouped: wildebeest
+    standardized: wildebeestblue
+  zebra:
+    grouped: zebra
+    standardized: zebra
+  zebraburchells:
+    grouped: zebra
+    standardized: zebraburchells
+  zebramountain:
+    grouped: zebra
+    standardized: zebramountain
+  zorilla:
+    grouped: zorilla
+    standardized: zorilla
