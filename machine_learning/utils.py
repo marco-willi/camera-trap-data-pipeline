@@ -26,7 +26,7 @@ def find_all_reports(root_path, report_postfix='_report.csv'):
             if season_id in reports:
                 print("Warning report {} with id {} already found".format(
                     report, season_id))
-            reports[season_id] = os.path.join(root_path, site, report_files[0])
+            reports[season_id] = os.path.join(root_path, site, report)
     return reports
 
 

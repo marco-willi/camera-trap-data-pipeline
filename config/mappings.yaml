@@ -1,3 +1,4 @@
+# -> to lowercase
 species_mappings:
   aardvark:
     grouped: aardvark
