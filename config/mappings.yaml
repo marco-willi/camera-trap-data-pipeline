@@ -1,4 +1,4 @@
-# -> to lowercase
+# lowercase
 species_mappings:
   aardvark:
     grouped: aardvark
@@ -15,7 +15,7 @@ species_mappings:
   bat:
     grouped: bat
     standardized: bat
-  batEaredFox:
+  batearedfox:
     grouped: foxbateared
     standardized: foxbateared
   birdother:
@@ -126,7 +126,7 @@ species_mappings:
   hippopotamus:
     grouped: hippopotamus
     standardized: hippopotamus
-  honeyBadger:
+  honeybadger:
     grouped: honeybadger
     standardized: honeybadger
   human:
@@ -201,9 +201,12 @@ species_mappings:
   ostrich:
     grouped: ostrich
     standardized: ostrich
-  otherBird:
+  otherbird:
     grouped: birdother
     standardized: birdother
+  pangolin:
+    grouped: pangolin
+    standardized: pangolin
   porcupine:
     grouped: porcupine
     standardized: porcupine
@@ -261,7 +264,7 @@ species_mappings:
   tortoise:
     grouped: tortoise
     standardized: tortoise
-  vervetMonkey:
+  vervetmonkey:
     grouped: monkeyvervet
     standardized: monkeyvervet
   vulture:
