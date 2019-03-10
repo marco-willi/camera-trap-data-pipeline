@@ -313,13 +313,20 @@ questions_to_output:
   - horns_count
 
 question_types:
-  species': cat
-  count': cat
-  moving': binary
-  eating': binary
-  standing': binary
-  interacting': binary
-  young_present': binary
-  resting': binary
-  horns_visible': binary
-  horns_count': cat
+  species: cat
+  count: cat
+  moving: binary
+  eating: binary
+  standing: binary
+  interacting: binary
+  young_present: binary
+  resting: binary
+  horns_visible: binary
+  horns_count: cat
+
+question_behaviors:
+  - moving
+  - eating
+  - standing
+  - interacting
+  - resting
