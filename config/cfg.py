@@ -8,7 +8,7 @@ cfg = yaml.load(open(cfg_path, 'r'))
 
 # Read Mappings (if available)
 try:
-    mappings_path = os.path.join(working_dir, "../config/mappings.yaml")
-    mappings = yaml.load(open(mappings_path, 'r'))
+    ml_mappings_path = os.path.join(working_dir, "../config/ml_mappings.yaml")
+    ml_mappings = yaml.load(open(ml_mappings_path, 'r'))
 except:
-    mappings = None
+    ml_mappings = None
