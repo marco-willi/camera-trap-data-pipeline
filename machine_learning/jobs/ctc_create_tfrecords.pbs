@@ -1,0 +1,64 @@
+#!/bin/bash -l
+#PBS -l walltime=4:00:00,nodes=1:ppn=24
+#PBS -j oe
+#PBS -m abe
+#PBS -q small
+#PBS -N create_tfrecords
+#PBS -o ${HOME}/job_ml_create_tfrecords_${PBS_JOBID}.log
+#PBS -e ${HOME}/job_ml_error_create_tfrecords_${PBS_JOBID}.log
+
+for CONTENT in species blank_species_balanced
+#for CONTENT in species
+do
+  #for SEASON in GRU_S1 GON_S1 APN_S1 MTZ_S1 PLN_S1 KAR_S1 RUA_S1 NIA_S1 SER_S1 SER_S2 SER_S3 SER_S4 SER_S5 SER_S6 SER_S7 SER_S8 SER_S9 SER_S10 SER_S11
+  for SEASON in GRU_S1 GON_S1 APN_S1 MTZ_S1 PLN_S1 KAR_S1 SER_S1
+  do
+    SITE=${SEASON%_*}
+
+  # Parameters Static
+  INFO_FILE_ROOT_PATH=/home/packerc/shared/machine_learning/data/info_files/
+  DATA_INVENTORY_PATH=${INFO_FILE_ROOT_PATH}${SITE}/${SEASON}_data_inventory_${CONTENT}.json
+
+  TRAINING_DATA_ROOT_PATH=/home/packerc/shared/machine_learning/data/training_data/${CONTENT}/
+  TRAINING_DATA_PATH=${TRAINING_DATA_ROOT_PATH}${SITE}/
+
+  IMAGE_ROOT_PATH=/home/packerc/shared/albums/${SITE}/
+
+  # Log Parameters
+  echo "SITE: $SITE"
+  echo "SEASON: $SEASON"
+
+  echo "CONTENT: $CONTENT"
+  echo "INFO_FILE_ROOT_PATH: $INFO_FILE_ROOT_PATH"
+  echo "DATA_INVENTORY_PATH: $DATA_INVENTORY_PATH"
+  echo "TRAINING_DATA_ROOT_PATH: $TRAINING_DATA_ROOT_PATH"
+  echo "TRAINING_DATA_PATH: $TRAINING_DATA_PATH"
+  echo "IMAGE_ROOT_PATH: $IMAGE_ROOT_PATH"
+
+  # modules
+  module load singularity
+  module load python3
+
+  # download container and code
+  cd $HOME
+  singularity pull docker://will5448/camera-trap-classifier:latest-cpu
+
+  # run the script
+  singularity exec -B /home/packerc/shared:/home/packerc/shared ./camera-trap-classifier-latest-cpu.simg \
+    ctc.create_dataset \
+    -inventory $DATA_INVENTORY_PATH \
+    -output_dir $TRAINING_DATA_PATH \
+    -image_save_side_smallest 500 \
+    -image_save_quality 75 \
+    -split_by_meta split_name \
+    -remove_multi_label_records \
+    -image_root_path $IMAGE_ROOT_PATH \
+    -process_images_in_parallel \
+    -process_images_in_parallel_size 320 \
+    -processes_images_in_parallel_n_processes 24 \
+    -max_records_per_file 5000
+
+  chmod g+rw ${TRAINING_DATA_PATH}*
+  mv ${TRAINING_DATA_PATH}label_mapping.json ${TRAINING_DATA_PATH}${SEASON}_label_mapping.json
+ done
+done

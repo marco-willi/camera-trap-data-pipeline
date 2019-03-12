@@ -130,10 +130,13 @@ def create_ml_files_splitted(
         df_record['species'] = species_grouped
         df_record['species_original'] = species
         # create blank/non-blank
+        # 'empty' because of compatibility with Panthera data
         if df_record['species'] == 'blank':
             df_record['is_blank'] = '1'
+            df_record['empty'] = 'blank'
         else:
             df_record['is_blank'] = '0'
+            df_record['empty'] = 'species'
         # create training split
         capture_id = df_record['capture_id']
         zero_one_hash = id_to_zero_one(capture_id)

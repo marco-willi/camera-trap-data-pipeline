@@ -48,7 +48,7 @@ do
     -export_path $DATA_INVENTORY_PATH \
     -capture_id_field capture_id \
     -image_fields image1 image2 image3 \
-    -label_fields is_blank species species_original count standing resting moving eating interacting young_present horns_visible horns_count \
+    -label_fields is_blank empty species species_original count standing resting moving eating interacting young_present horns_visible horns_count \
     -meta_data_fields season capture_date_local capture_time_local site split_name
 
   chmod g+rw $DATA_INVENTORY_PATH
