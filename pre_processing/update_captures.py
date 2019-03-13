@@ -11,7 +11,8 @@ from pre_processing.utils import (
 from pre_processing.group_inventory_into_captures import (
     group_images_into_captures,
     update_inventory_with_capture_data,
-    update_time_checks_inventory
+    update_time_checks_inventory,
+    calculate_time_deltas
 )
 
 
@@ -73,6 +74,10 @@ if __name__ == '__main__':
              image_data['roll'], image_data['capture']])
         # image_data_new = {k: v for k, v in image_data if k in cols_to_export}
         captures_updated[image_name] = {k: v for k, v in image_data.items()}
+
+    # re-calculate time_deltas
+    time_deltas = calculate_time_deltas(captures_updated, flags)
+    update_inventory_with_capture_data(captures_updated, time_deltas)
 
     # update image to capture association
     image_to_capture = group_images_into_captures(captures_updated, flags)

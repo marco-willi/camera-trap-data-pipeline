@@ -16,9 +16,9 @@ flags = cfg['pre_processing_flags']
 
 
 # args = dict()
-# args['inventory'] = '/home/packerc/shared/season_captures/ENO/captures/ENO_S1_TEST_CANBEDELETED_inventory.csv'
-# args['output_csv'] = 'home/packerc/shared/season_captures/ENO/captures/ENO_S1_TEST_CANBEDELETED_captures.csv'
-# args['log_dir'] = '/home/packerc/shared/season_captures/ENO/log_files/'
+# args['inventory'] = '/home/packerc/will5448/data/pre_processing_tests/ENO_S1_inventory.csv'
+# args['output_csv'] = '/home/packerc/will5448/data/pre_processing_tests/ENO_S1_captures_TEST.csv'
+# args['log_dir'] = '/home/packerc/will5448/data/pre_processing_tests/'
 # args['no_older_than_year'] = 2017
 # args['no_newer_than_year'] = 2019
 
@@ -66,15 +66,17 @@ def group_images_into_site_and_roll(inventory):
     return site_roll_inventory
 
 
-# Group images into site and roll
-def group_images_into_captures(inventory, flags):
-    """ Group images into capture events """
+def calculate_time_deltas(inventory, flags):
+    """ Calulate time deltas between subsequent images """
+    # group images into site and roll
     site_roll_inventory = group_images_into_site_and_roll(inventory)
-    image_to_capture = dict()
+    image_time_deltas = dict()
+    # iterate over each roll individually
     for season_site_roll_key, site_roll_data in site_roll_inventory.items():
         # get all images from the current site and roll
         times = list()
         paths = list()
+        # iterate over each image in a roll
         for image_id, image_data in site_roll_data.items():
             # if exif time not available take file creation time
             if image_data['datetime'] == '':
@@ -98,8 +100,6 @@ def group_images_into_captures(inventory, flags):
         times_seconds_ordered = [times_seconds[i] for i in ordered_indexes]
         # Calculate time deltas between subsequent images
         # (next and previous) in seconds and days
-        #
-        # calculate times to last image
         delta_seconds_next_ordered = [
             (times_seconds_ordered[i+1] - times_seconds_ordered[i])
             for i in range(0, len(times_seconds_ordered)-1)]
@@ -107,6 +107,7 @@ def group_images_into_captures(inventory, flags):
             '{:.2f}'.format((x / (60*60*24)))
             for x in delta_seconds_next_ordered]
         delta_days_next_ordered.append(0)
+        delta_seconds_next_ordered.append(0)
         # calculate times to next image
         delta_seconds_last_ordered = [
             abs(times_seconds_ordered[i] - times_seconds_ordered[i-1])
@@ -115,16 +116,43 @@ def group_images_into_captures(inventory, flags):
             '{:.2f}'.format((x / (60*60*24)))
             for x in delta_seconds_last_ordered]
         delta_days_last_ordered.insert(0, 0)
+        delta_seconds_last_ordered.insert(0, 0)
+        # loop over all deltas
+        # (starting with the delta between first and second)
+        image_rank_in_roll_ordered = [1]
+        for i, delta in enumerate(delta_seconds_last_ordered):
+            image_rank_in_roll_ordered.append(i+2)
+        # add information to inventory
+        for i in range(0, len(paths_ordered)):
+            image_time_deltas[paths_ordered[i]] = {
+                'image_rank_in_roll': image_rank_in_roll_ordered[i],
+                'seconds_to_next_image_taken': delta_seconds_next_ordered[i],
+                'seconds_to_last_image_taken': delta_seconds_last_ordered[i],
+                'days_to_last_image_taken': delta_days_last_ordered[i],
+                'days_to_next_image_taken': delta_days_next_ordered[i]}
+    return image_time_deltas
 
+
+# Group images into site and roll
+def group_images_into_captures(inventory, flags):
+    """ Group images into capture events by time deltas"""
+    site_roll_inventory = group_images_into_site_and_roll(inventory)
+    image_to_capture = dict()
+    for season_site_roll_key, site_roll_data in site_roll_inventory.items():
+        # order images by time
+        image_to_order = {
+            k: v['image_rank_in_roll']
+            for k, v in site_roll_data.items()}
+        images_sorted = sorted(image_to_order.items(), key=lambda x: x[1])
         # initialize captures and ranks
         capture_ids_ordered = [1]
         image_rank_in_capture_ordered = [1]
-        image_rank_in_roll_ordered = [1]
         current_capture = 1
         current_rank_in_capture = 1
         # loop over all deltas
         # (starting with the delta between first and second)
-        for i, delta in enumerate(delta_seconds_last_ordered):
+        for i, (img_name, rank) in enumerate(images_sorted[1:]):
+            delta = inventory[img_name]['seconds_to_last_image_taken']
             if delta <= flags['general']['capture_delta_seconds']:
                 current_rank_in_capture += 1
             else:
@@ -132,14 +160,10 @@ def group_images_into_captures(inventory, flags):
                 current_capture += 1
             capture_ids_ordered.append(current_capture)
             image_rank_in_capture_ordered.append(current_rank_in_capture)
-            image_rank_in_roll_ordered.append(i+2)
-        for i in range(0, len(paths_ordered)):
-            image_to_capture[paths_ordered[i]] = {
+        for i, (image_name, rank) in enumerate(images_sorted):
+            image_to_capture[image_name] = {
                 'capture': capture_ids_ordered[i],
-                'image_rank_in_capture': image_rank_in_capture_ordered[i],
-                'image_rank_in_roll': image_rank_in_roll_ordered[i],
-                'days_to_last_image_taken': delta_days_last_ordered[i],
-                'days_to_next_image_taken': delta_days_next_ordered[i]
+                'image_rank_in_capture': image_rank_in_capture_ordered[i]
             }
     return image_to_capture
 
@@ -207,6 +231,11 @@ if __name__ == '__main__':
         args['inventory'],
         unique_id='image_path_original')
 
+    # calculate time_deltas
+    time_deltas = calculate_time_deltas(inventory, flags)
+    update_inventory_with_capture_data(inventory, time_deltas)
+
+    # group images into captures
     image_to_capture = group_images_into_captures(inventory, flags)
 
     update_inventory_with_capture_data(inventory, image_to_capture)
