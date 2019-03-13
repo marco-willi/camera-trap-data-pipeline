@@ -6,7 +6,7 @@ import time
 import traceback
 import textwrap
 import copy
-import datetime
+from datetime import datetime
 from multiprocessing import Process, Manager
 
 import exiftool
@@ -47,9 +47,15 @@ def _extract_time_info_from_exif(exif_tags, flags):
         output = dict()
         try:
             exif_date_str = exif_tags[exif_data_field]
-            dt_object = datetime.strptime(
-                exif_date_str,
-                flags['time_formats']['exif_input_datetime_format'])
+            try:
+                dt_object = datetime.strptime(
+                    exif_date_str,
+                    flags['time_formats']['exif_input_datetime_format'])
+            except:
+                logger.warning(
+                    "failed to convert exif data {} using format {}".format(
+                        exif_date_str,
+                        flags['time_formats']['exif_input_datetime_format']))
             exif_datetime = \
                 dt_object.strftime(
                    flags['time_formats']['output_datetime_format'])
@@ -194,7 +200,7 @@ if __name__ == '__main__':
                     prefixed_exif = _prefix_meta_data(selected_exif)
                     try:
                         time_info = _extract_time_info_from_exif(
-                            prefixed_exif, flags)
+                            selected_exif, flags)
                         current_data.update(time_info)
                     except:
                         logger.warning(
