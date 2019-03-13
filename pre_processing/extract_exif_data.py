@@ -75,8 +75,9 @@ if __name__ == '__main__':
     parser.add_argument("--update_inventory", action='store_true')
     parser.add_argument("--output_csv", type=str, default=None)
     parser.add_argument("--n_processes", type=int, default=4)
-    parser.add_argument("--exiftool_path", type=int, default=4)
-
+    parser.add_argument(
+        "--exiftool_path", type=str,
+        default='/home/packerc/will5448/software/Image-ExifTool-11.31/exiftool')
     parser.add_argument(
         "--log_dir", type=str, default=None)
     parser.add_argument(
@@ -179,7 +180,13 @@ if __name__ == '__main__':
                 exif_data = exif_all[img_name]
                 if exif_data is None:
                     current_data.update({'image_check__corrupt_exif': 1})
+                    logger.info(
+                        "could not read exif data for image: {}".format(
+                            img_name))
                 elif len(exif_data.keys()) == 0:
+                    logger.info(
+                        "exif data for image: {} empty".format(
+                            img_name))
                     current_data.update({'image_check__empty_exif': 1})
                 else:
                     selected_exif = _extract_meta_data(exif_data)
