@@ -125,7 +125,7 @@ def calculate_time_deltas(inventory, flags):
         # add information to inventory
         for i in range(0, len(paths_ordered)):
             image_time_deltas[paths_ordered[i]] = {
-                'image_rank_in_roll_time': image_rank_in_roll_ordered[i],
+                'image_rank_in_roll': image_rank_in_roll_ordered[i],
                 'seconds_to_next_image_taken': delta_seconds_next_ordered[i],
                 'seconds_to_last_image_taken': delta_seconds_last_ordered[i],
                 'days_to_last_image_taken': delta_days_last_ordered[i],
@@ -141,7 +141,7 @@ def group_images_into_captures_by_time_delta(inventory, flags):
     for season_site_roll_key, site_roll_data in site_roll_inventory.items():
         # order images by time
         image_to_order = {
-            k: v['image_rank_in_roll_time']
+            k: v['image_rank_in_roll']
             for k, v in site_roll_data.items()}
         images_sorted = sorted(image_to_order.items(), key=lambda x: x[1])
         # initialize captures and ranks
