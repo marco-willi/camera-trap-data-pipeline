@@ -75,6 +75,8 @@ if __name__ == '__main__':
     parser.add_argument("--update_inventory", action='store_true')
     parser.add_argument("--output_csv", type=str, default=None)
     parser.add_argument("--n_processes", type=int, default=4)
+    parser.add_argument("--exiftool_path", type=int, default=4)
+
     parser.add_argument(
         "--log_dir", type=str, default=None)
     parser.add_argument(
@@ -157,7 +159,7 @@ if __name__ == '__main__':
         for i, (start_i, end_i) in enumerate(slices):
             pr = Process(target=extract_exif_image_list,
                          args=(i, image_paths_all[start_i:end_i],
-                               results, args['exif_exec']))
+                               results, args['exiftool_path']))
             pr.start()
             processes_list.append(pr)
         for p in processes_list:
