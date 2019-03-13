@@ -7,8 +7,8 @@ import csv
 import argparse
 import logging
 
-from logger import setup_logger, create_logfile_name
-from utils import file_path_splitter, file_path_generator
+from logger import setup_logger, create_log_file
+from utils import file_path_splitter, file_path_generator, set_file_permission
 
 #For Testing
 # args = dict()
@@ -31,6 +31,11 @@ if __name__ == "__main__":
     parser.add_argument(
         "--max_images_per_capture", type=int, default=3,
         help="The maximum number of images per capture event (default 3)")
+    parser.add_argument(
+        "--log_dir", type=str, default=None)
+    parser.add_argument(
+        "--log_filename", type=str,
+        default='create_machine_learning_file')
 
     args = vars(parser.parse_args())
 
@@ -40,9 +45,11 @@ if __name__ == "__main__":
                                 args['manifest'])
 
     # logging
-    log_file_name = create_logfile_name('create_machine_learning_file')
-    log_file_path = os.path.join(args['manifest'], log_file_name)
-    setup_logger(log_file_path)
+    if args['log_dir'] is not None:
+        log_file_path = create_log_file(args['log_dir'], args['log_filename'])
+        setup_logger(log_file_path)
+    else:
+        setup_logger()
     logger = logging.getLogger(__name__)
 
     for k, v in args.items():
@@ -101,4 +108,4 @@ if __name__ == "__main__":
             row_to_write += images_to_write
             csvwriter.writerow(row_to_write)
 
-    os.chmod(args['machine_learning_file'], 0o660)
+    set_file_permission(args['machine_learning_file'])
