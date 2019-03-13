@@ -15,7 +15,7 @@ import pandas as pd
 from config.cfg import cfg
 from logger import setup_logger, create_log_file
 from pre_processing.utils import (
-    export_inventory_to_csv, read_image_inventory)
+    export_inventory_to_csv, read_image_inventory, image_check_stats)
 from utils import (
     slice_generator, estimate_remaining_time, set_file_permission)
 
@@ -84,7 +84,7 @@ if __name__ == '__main__':
     parser.add_argument("--n_processes", type=int, default=4)
     parser.add_argument(
         "--exiftool_path", type=str,
-        default='/home/packerc/will5448/software/Image-ExifTool-11.31/exiftool')
+        default='/home/packerc/shared/programs/Image-ExifTool-11.31/exiftool')
     parser.add_argument(
         "--log_dir", type=str, default=None)
     parser.add_argument(
@@ -212,7 +212,9 @@ if __name__ == '__main__':
                 current_data.update({'image_check__corrupt_exif': 1})
             image_inventory[img_name] = current_data
 
-        export_inventory_to_csv(image_inventory, args['output_csv'])
+        export_inventory_to_csv(image_inventory, args['inventory'])
+        logger.info("Updated inventory at {} stats:".format(args['inventory']))
+        image_check_stats(image_inventory, logger)
 
     # Export EXIF Data separately
     if args['output_csv'] is not None:
