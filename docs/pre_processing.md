@@ -2,10 +2,13 @@
 
 The following codes can be used to:
 
-1. Process and check camera trap images
-2. Inspect potential issues to resolve/waive them
-3. Obtain a cleaned inventory of the processed camera trap images
-4. Re-name all images
+1. Create Image Inventory
+2. Extract Exif data
+3. Perform basic checks
+4. Group images into captures
+5. Inspect potential issues to resolve/waive them
+6. Obtain a cleaned inventory of the processed camera trap images
+7. Re-name all images
 
 
 The following examples were run with the following settings:
@@ -22,6 +25,7 @@ SEASON=APN_S2
 
 It is recommended to create the following directories:
 ```
+season_captures/${SITE}/inventory
 season_captures/${SITE}/captures
 season_captures/${SITE}/cleaned
 season_captures/${SITE}/log_files
@@ -66,7 +70,19 @@ The script will print/log messages if something is invalid but not alter anythin
 
 ## Create Image Inventory
 
-The following script generates an inventory of all camera trap images and performs some basic checks. The code is parallelized to speed up the checks -- use the following options to make the most of the parallelization (it still takes roughly 1 hour per 60k images).
+The following script generates an inventory of all camera trap images.
+
+```
+python3 -m pre_processing.create_image_inventory \
+--root_dir /home/packerc/shared/albums/${SITE}/${SEASON}/ \
+--output_csv /home/packerc/shared/season_captures/${SITE}/inventory/${SEASON}_inventory_basic.csv \
+--log_dir /home/packerc/shared/season_captures/${SITE}/log_files/
+```
+
+
+## Perform Basic Checks
+
+The following script performs some basic checks. The code is parallelized to speed up the checks -- use the following options to make the most of the parallelization (it still takes roughly 1 hour per 60k images).
 
 ```
 ssh lab
@@ -80,12 +96,26 @@ SEASON=APN_S2
 
 Then run the code:
 ```
-python3 -m pre_processing.create_image_inventory \
---root_dir /home/packerc/shared/albums/${SITE}/${SEASON}/ \
---output_csv /home/packerc/shared/season_captures/${SITE}/captures/${SEASON}_inventory.csv \
+python3 -m pre_processing.basic_inventory_checks \
+--inventory /home/packerc/shared/season_captures/${SITE}/inventory/${SEASON}_inventory_basic.csv \
+--output_csv /home/packerc/shared/season_captures/${SITE}/inventory/${SEASON}_inventory.csv \
 --log_dir /home/packerc/shared/season_captures/${SITE}/log_files/ \
 --n_processes 16
 ```
+
+## Extract EXIF data
+
+The following script extracts EXIF data from all images.
+
+```
+python3 -m pre_processing.extract_exif_data \
+--inventory /home/packerc/shared/season_captures/${SITE}/inventory/${SEASON}_inventory.csv \
+--update_inventory \
+--output_csv /home/packerc/shared/season_captures/${SITE}/inventory/${SEASON}_exif_data.csv \
+--exiftool_path /home/packerc/shared/programs/Image-ExifTool-11.31/exiftool \
+--log_dir /home/packerc/shared/season_captures/${SITE}/log_files/
+```
+
 
 ## Group Images into Captures
 
@@ -93,7 +123,7 @@ The following script groups the images into capture events.
 
 ```
 python3 -m pre_processing.group_inventory_into_captures \
---inventory /home/packerc/shared/season_captures/${SITE}/captures/${SEASON}_inventory.csv \
+--inventory /home/packerc/shared/season_captures/${SITE}/inventory/${SEASON}_inventory.csv \
 --output_csv /home/packerc/shared/season_captures/${SITE}/captures/${SEASON}_captures.csv \
 --log_dir /home/packerc/shared/season_captures/${SITE}/log_files/ \
 --no_older_than_year 2017 \

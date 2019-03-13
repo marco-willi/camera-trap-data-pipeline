@@ -217,6 +217,39 @@ for season in 4 5 6 7 8 9 10; do
   create_reports
 done
 
+SITE=ENO
+SEASON=ENO_S1
+
+# Create Image Inventory
+python3 -m pre_processing.create_image_inventory_v3 \
+--root_dir /home/packerc/shared/albums/${SITE}/${SEASON}/ \
+--output_csv /home/packerc/will5448/data/pre_processing_tests/${SEASON}_inventory_basic.csv \
+--log_dir /home/packerc/will5448/data/pre_processing_tests/
+
+# Create Basic Inventory Checks
+python3 -m pre_processing.basic_inventory_checks \
+--inventory /home/packerc/will5448/data/pre_processing_tests/${SEASON}_inventory_basic.csv \
+--output_csv /home/packerc/will5448/data/pre_processing_tests/${SEASON}_inventory.csv \
+--log_dir /home/packerc/will5448/data/pre_processing_tests/ \
+--n_processes 16
+
+# Extract Exif Data
+python3 -m pre_processing.extract_exif_data \
+--inventory /home/packerc/will5448/data/pre_processing_tests/${SEASON}_inventory.csv \
+--update_inventory \
+--output_csv /home/packerc/will5448/data/pre_processing_tests/${SEASON}_exif_data.csv \
+--log_dir /home/packerc/will5448/data/pre_processing_tests/ \
+--n_processes 4 \
+--exiftool_path /home/packerc/shared/programs/Image-ExifTool-11.31/exiftool
+
+python3 -m pre_processing.group_inventory_into_captures \
+--inventory /home/packerc/will5448/data/pre_processing_tests/${SEASON}_inventory.csv \
+--output_csv /home/packerc/will5448/data/pre_processing_tests/${SEASON}_captures.csv \
+--log_dir /home/packerc/will5448/data/pre_processing_tests/ \
+--no_older_than_year 2017 \
+--no_newer_than_year 2019
+
+
 
 ###################################
 # Pre-Processing
@@ -227,12 +260,27 @@ python3 -m pre_processing.check_input_structure \
 --root_dir /home/packerc/shared/albums/${SITE}/${SEASON}/ \
 --log_dir /home/packerc/shared/season_captures/${SITE}/log_files/
 
+
 # Create Image Inventory
 python3 -m pre_processing.create_image_inventory \
 --root_dir /home/packerc/shared/albums/${SITE}/${SEASON}/ \
---output_csv /home/packerc/shared/season_captures/${SITE}/captures/${SEASON}_inventory.csv \
+--output_csv /home/packerc/shared/season_captures/${SITE}/inventory/${SEASON}_inventory_basic.csv \
+--log_dir /home/packerc/shared/season_captures/${SITE}/log_files/
+
+# Create Basic Inventory Checks
+python3 -m pre_processing.basic_inventory_checks \
+--inventory /home/packerc/shared/season_captures/${SITE}/inventory/${SEASON}_inventory_basic.csv \
+--output_csv /home/packerc/shared/season_captures/${SITE}/inventory/${SEASON}_inventory.csv \
 --log_dir /home/packerc/shared/season_captures/${SITE}/log_files/ \
 --n_processes 16
+
+# Extract Exif Data
+python3 -m pre_processing.extract_exif_data \
+--inventory /home/packerc/shared/season_captures/${SITE}/inventory/${SEASON}_inventory.csv \
+--update_inventory \
+--output_csv /home/packerc/shared/season_captures/${SITE}/inventory/${SEASON}_exif_data.csv \
+--log_dir /home/packerc/shared/season_captures/${SITE}/log_files/
+
 
 # Group Images into Captures
 python3 -m pre_processing.group_inventory_into_captures \

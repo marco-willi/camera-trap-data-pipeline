@@ -29,6 +29,13 @@ The recommended way is to use parameters and then run the scripts as shown here:
 
 Alternatively, copy & paste the commands to a text editor, adjust the parameters, and copy & paste them to the command line.
 
+Before executing (most of) the code, you need to execute the follwing:
+```
+ssh lab
+module load python3
+cd ~/camera-trap-data-pipeline
+```
+
 ## Pre-Requisites
 
 ### Prepare Zooniverse-Access (one-time only)
@@ -71,13 +78,31 @@ git clone https://github.com/marco-willi/camera-trap-data-pipeline.git
 ```
 
 
-### Prepare Python
+### Installations
 
-Before executing (most of) the code, you need to execute the follwing:
+One time Python module installations:
+
 ```
-ssh lab
 module load python3
+
+# get python wrapper for exiftool
+cd
+git clone git://github.com/smarnach/pyexiftool.git
+cd pyexiftool
+python setup.py install --user
+
+# install panoptes-client for Zooniverse access
 pip install --upgrade --user panoptes-client
+
+# install pillow for Image data manipulation
 pip install --upgrade --user pillow
-cd ~/camera-trap-data-pipeline
+```
+
+If no exiftool installation available, get it here [exiftool](https://www.sno.phy.queensu.ca/~phil/exiftool/install.html), and install:
+```
+# get file
+wget -O exiftool.tar.gz "https://www.sno.phy.queensu.ca/~phil/exiftool/Image-ExifTool-11.31.tar.gz"
+
+# unpack file
+tar xvzf exiftool.tar.gz
 ```
