@@ -211,7 +211,7 @@ pre_processing_flags:
      - EXIF:DateTime
      - EXIF:DateTimeOriginal
     general:
-     - capture_delta_seconds: 5
+     capture_delta_seconds: 5
     image_check_parameters:
      all_black:
        percent: 0.8
