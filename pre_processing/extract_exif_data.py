@@ -21,10 +21,10 @@ from utils import (
 
 
 # args = dict()
-# args['inventory'] = '/home/packerc/will5448/ENO_S1_captures_raw.csv'
+# args['inventory'] = '/home/packerc/will5448/data/pre_processing_tests/ENO_S1_inventory.csv'
 # args['update_inventory'] = True
-# args['output_exif_csv'] = '/home/packerc/will5448/ENO_S1_captures_TEST_EXIF.csv'
-# args['exif_exec'] = '/home/packerc/will5448/software/Image-ExifTool-11.31/exiftool'
+# args['output_csv'] = '/home/packerc/will5448/data/pre_processing_tests/ENO_S1_captures_TEST_EXIF.csv'
+# args['exiftool_path'] = '/home/packerc/will5448/software/Image-ExifTool-11.31/exiftool'
 # args['n_processes'] = 4
 
 flags = cfg['pre_processing_flags']
@@ -64,7 +64,8 @@ def _extract_time_info_from_exif(exif_tags, flags):
             output['time'] = exif_time
             return output
         except:
-            raise ValueError("Failed to extract datetime info")
+            pass
+    raise ValueError("Failed to extract datetime info.")
 
 
 if __name__ == '__main__':
@@ -205,13 +206,13 @@ if __name__ == '__main__':
                 current_data.update({'image_check__corrupt_exif': 1})
             image_inventory[img_name] = current_data
 
-        export_inventory_to_csv(image_inventory, args['output_exif_csv'])
+        export_inventory_to_csv(image_inventory, args['output_csv'])
 
     # Export EXIF Data separately
-    if args['output_exif_csv'] is not None:
+    if args['output_csv'] is not None:
         df = pd.DataFrame.from_dict(exif_all, orient='index')
         df.index.name = 'image_path_original'
         # export
-        df.to_csv(args['output_exif_csv'], index=True)
+        df.to_csv(args['output_csv'], index=True)
         # change permmissions to read/write for group
-        set_file_permission(args['output_exif_csv'])
+        set_file_permission(args['output_csv'])
