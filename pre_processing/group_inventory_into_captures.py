@@ -133,13 +133,17 @@ def calculate_time_deltas(inventory, flags):
     return image_time_deltas
 
 
-# Group images into site and roll
+# Group images into captures - based on timestamps
 def group_images_into_captures(inventory, flags):
-    """ Group images into capture events by time deltas"""
+    """ Group images into capture events by time deltas
+        Output: dict
+            - key unique id for an image
+            - values: {'capture': 1, 'image_rank_in_capture': 1}
+    """
     site_roll_inventory = group_images_into_site_and_roll(inventory)
     image_to_capture = dict()
     for season_site_roll_key, site_roll_data in site_roll_inventory.items():
-        # order images by time
+        # order images by time (rank in roll)
         image_to_order = {
             k: v['image_rank_in_roll']
             for k, v in site_roll_data.items()}

@@ -1,5 +1,5 @@
 #!/bin/bash -l
-#PBS -l walltime=4:00:00,nodes=1:ppn=24
+#PBS -l walltime=6:00:00,nodes=1:ppn=24
 #PBS -j oe
 #PBS -m abe
 #PBS -q small
@@ -10,8 +10,8 @@
 for CONTENT in species blank_species_balanced
 #for CONTENT in species
 do
-  #for SEASON in GRU_S1 GON_S1 APN_S1 MTZ_S1 PLN_S1 KAR_S1 RUA_S1 NIA_S1 SER_S1 SER_S2 SER_S3 SER_S4 SER_S5 SER_S6 SER_S7 SER_S8 SER_S9 SER_S10 SER_S11
-  for SEASON in GRU_S1 GON_S1 APN_S1 MTZ_S1 PLN_S1 KAR_S1 SER_S1
+  for SEASON in GRU_S1 GON_S1 APN_S1 MTZ_S1 PLN_S1 KAR_S1 RUA_S1 NIA_S1 SER_S1 SER_S2 SER_S3 SER_S4 SER_S5 SER_S6 SER_S7 SER_S8 SER_S9 SER_S10 SER_S11
+  #for SEASON in GRU_S1 GON_S1 APN_S1 MTZ_S1 PLN_S1 KAR_S1 SER_S1
   do
     SITE=${SEASON%_*}
 
@@ -48,7 +48,7 @@ do
     ctc.create_dataset \
     -inventory $DATA_INVENTORY_PATH \
     -output_dir $TRAINING_DATA_PATH \
-    -image_save_side_smallest 500 \
+    -image_save_side_smallest 600 \
     -image_save_quality 75 \
     -split_by_meta split_name \
     -remove_multi_label_records \
