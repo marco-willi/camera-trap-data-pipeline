@@ -196,7 +196,9 @@ if __name__ == '__main__':
                             img_name))
                     current_data.update({'image_check__empty_exif': 1})
                 else:
-                    selected_exif = _extract_meta_data(exif_data)
+                    selected_exif = _extract_meta_data(
+                        exif_data,
+                        flags['exif_tag_groups_to_extract'])
                     prefixed_exif = _prefix_meta_data(selected_exif)
                     try:
                         time_info = _extract_time_info_from_exif(

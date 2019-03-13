@@ -210,6 +210,10 @@ pre_processing_flags:
      - DateTimeOriginal
      - EXIF:DateTime
      - EXIF:DateTimeOriginal
+    exif_tag_groups_to_extract:
+     - EXIF
+     - MakerNotes
+     - Composite
     general:
      capture_delta_seconds: 5
     image_check_parameters:
