@@ -208,6 +208,8 @@ pre_processing_flags:
     exif_data_timestamps:
      - DateTime
      - DateTimeOriginal
+     - EXIF:DateTime
+     - EXIF:DateTimeOriginal
     general:
      - capture_delta_seconds: 5
     image_check_parameters:
