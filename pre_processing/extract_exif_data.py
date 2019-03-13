@@ -36,6 +36,11 @@ def _extract_meta_data(tags, groups=['EXIF', 'MakerNotes', 'Composite']):
             if any([k.startswith(g) for g in groups])}
 
 
+def _exclude_specific_tags(tags, excl=[]):
+    """ Exclude specific image meta-data from extraction """
+    return {k: v for k, v in tags.items() if k not in excl}
+
+
 def _prefix_meta_data(tags, prefix='exif__'):
     """ Specify a prefix for the meta-data """
     return {'{}{}'.format(prefix, k): v for k, v in tags.items()}
@@ -199,7 +204,9 @@ if __name__ == '__main__':
                     selected_exif = _extract_meta_data(
                         exif_data,
                         flags['exif_tag_groups_to_extract'])
-                    prefixed_exif = _prefix_meta_data(selected_exif)
+                    excluded_exif = _exclude_specific_tags(
+                        selected_exif, flags['exif_tags_to_exclude'])
+                    prefixed_exif = _prefix_meta_data(excluded_exif)
                     try:
                         time_info = _extract_time_info_from_exif(
                             selected_exif, flags)

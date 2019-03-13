@@ -214,6 +214,9 @@ pre_processing_flags:
      - EXIF
      - MakerNotes
      - Composite
+    exif_tags_to_exclude:
+     - EXIF:ThumbnailImage
+     - MakerNotes:PreviewImage
     general:
      capture_delta_seconds: 5
     image_check_parameters:
