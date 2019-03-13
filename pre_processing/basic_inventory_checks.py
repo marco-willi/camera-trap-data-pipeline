@@ -33,9 +33,13 @@ if __name__ == '__main__':
     parser.add_argument("--inventory", type=str, required=True)
     parser.add_argument("--output_csv", type=str, required=True)
     parser.add_argument("--n_processes", type=int, default=4)
-    parser.add_argument("--log_dir", type=str, default=None)
+    parser.add_argument(
+        "--log_dir", type=str, default=None)
+    parser.add_argument(
+        "--log_filename", type=str,
+        default='basic_inventory_checks')
     args = vars(parser.parse_args())
-
+    
     ######################################
     # Check Input
     ######################################

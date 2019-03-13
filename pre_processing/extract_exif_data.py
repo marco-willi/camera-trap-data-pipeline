@@ -217,8 +217,7 @@ if __name__ == '__main__':
     # Export EXIF Data separately
     if args['output_csv'] is not None:
         df = pd.DataFrame.from_dict(exif_all, orient='index')
-        df.index.name = 'image_path_original'
         # export
-        df.to_csv(args['output_csv'], index=True)
+        df.to_csv(args['output_csv'], index=False)
         # change permmissions to read/write for group
         set_file_permission(args['output_csv'])
