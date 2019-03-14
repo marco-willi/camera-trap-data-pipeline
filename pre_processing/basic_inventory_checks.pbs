@@ -1,0 +1,19 @@
+#!/bin/bash -l
+#PBS -l walltime=24:00:00,nodes=1:ppn=32,mem=16gb
+#PBS -j oe
+#PBS -q lab
+#PBS -N basic_inventory_check
+#PBS -o ${HOME}/basic_inventory_check_${PBS_JOBID}.log
+
+module load python3
+
+cd $HOME/camera-trap-data-pipeline
+
+SITE=DEB
+SEASON=DEB_S1
+
+python3 -m pre_processing.basic_inventory_checks \
+--inventory /home/packerc/shared/season_captures/${SITE}/inventory/${SEASON}_inventory_basic.csv \
+--output_csv /home/packerc/shared/season_captures/${SITE}/inventory/${SEASON}_inventory.csv \
+--log_dir /home/packerc/shared/season_captures/${SITE}/log_files/ \
+--n_processes 32
