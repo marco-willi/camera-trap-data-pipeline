@@ -21,7 +21,7 @@ import argparse
 from collections import OrderedDict
 
 from logger import setup_logger, create_logfile_name
-from utils import print_nested_dict
+from utils import print_nested_dict, set_file_permission
 from zooniverse_exports import extractor
 from config.cfg import cfg
 
@@ -151,4 +151,4 @@ if __name__ == '__main__':
             line_no, args['output_csv']))
 
     # change permmissions to read/write for group
-    os.chmod(args['output_csv'], 0o660)
+    set_file_permission(args['output_csv'])
