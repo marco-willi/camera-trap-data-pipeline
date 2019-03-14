@@ -41,3 +41,15 @@ def get_question_stats(df_report, non_binary_questions):
             rounded = [int(float(x) + 0.5) if x is not '' else '' for x in df_report[question]]
             question_stats[question] = Counter(rounded)
     return question_stats
+
+
+def map_label_list_to_numeric_dict(label_list):
+    """ Map a list of labels to numeric values alphabetically
+        Input: ['b', 'c', 'd', 'a']
+        Output: {'a': 0, 'b': 1, 'c': 2, 'd': 3}
+    """
+    numeric_map = dict()
+    label_list.sort()
+    for i, sorted_label in enumerate(label_list):
+        numeric_map[sorted_label] = i
+    return numeric_map
