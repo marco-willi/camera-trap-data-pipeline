@@ -338,19 +338,11 @@ question_behaviors:
 panthera_to_snapshot_mappings:
   vervetmonkey: monkeyvervet
   capefox: foxcape
-  suni: suni
   batearedfox: foxbateared
   capeclawlessotter: ottercapeclawless
-  roan: roan
-  bontebok: bontebok
-  grysbok: grysbok
   rhino: rhinoceros
   samangomonkey: monkeysamango
   otherbird: birdother
-  pangolin: pangolin
-  sitatunga: sitatunga
-  tsessebe: tsessebe
   rhebok: rhebokgrey
-  bushbaby: bushbaby
   meerkat: meerkatsuricate
   gemsbok: gemsbokoryx
