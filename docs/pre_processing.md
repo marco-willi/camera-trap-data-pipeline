@@ -103,6 +103,20 @@ python3 -m pre_processing.basic_inventory_checks \
 --n_processes 16
 ```
 
+For processing very large datasets (>200k images) it is recommended to adapt the following script and submit a job, instead of running the script interactively: [basic_inventory_checks.pbs](pre_processing/basic_inventory_checks.pbs)
+
+And then submit that script using the qsub system:
+```
+cd $HOME/camera-trap-data-pipeline/pre_processing
+qsub basic_inventory_checks.pbs
+```
+
+Check the status of the job by:
+```
+qsub
+```
+
+
 ## Extract EXIF data
 
 The following script extracts EXIF data from all images.

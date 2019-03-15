@@ -65,6 +65,15 @@ ssh lab
 qsub -I -l walltime=2:00:00,nodes=1:ppn=4,mem=16gb
 ```
 
+If WORKFLOW_ID / WORFKLOW_VERSION_MIN are unknown run the script like this:
+```
+python3 -m zooniverse_exports.extract_annotations \
+--classification_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_classifications.csv \
+--output_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_annotations.csv
+```
+
+Then investiage the output of the script in the terminal to determine which workflows to use and then re-run the code with the specified workflows:
+
 ```
 python3 -m zooniverse_exports.extract_annotations \
 --classification_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_classifications.csv \

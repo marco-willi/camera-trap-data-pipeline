@@ -37,9 +37,9 @@ The general aggregation logic (plurality algorithm) is as follows:
 |n_users_classified_this_subject | Number of users that classified this subject
 |species_is_plurality_consensus | Flag indicating a plurality consensus for this species (normally only species with a 1 are relevant)
 
-## Aggregate Classifications (plurality algorithm)
+## Aggregate Annotations (plurality algorithm)
 
-This is an example to aggregate classifications using the plurality algorithm.
+This is an example to aggregate annotations using the plurality algorithm.
 
 ```
 python3 -m zooniverse_aggregations.aggregate_annotations_plurality \
