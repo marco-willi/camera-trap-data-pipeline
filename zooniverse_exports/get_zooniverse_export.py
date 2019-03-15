@@ -1,10 +1,12 @@
 """ Get Zooniverse Data using the Panoptes Client """
 import argparse
 import csv
+import logging
 
 from panoptes_client import Project, Panoptes
 
 from utils import read_config_file, set_file_permission
+from logger import setup_logger, create_log_file
 
 
 if __name__ == '__main__':
@@ -22,9 +24,20 @@ if __name__ == '__main__':
     parser.add_argument("--output_file", type=str, required=True)
     parser.add_argument("--export_type", default='classifications',
                         type=str, required=False)
-    parser.add_argument("--new_export", default=0, type=int, required=False)
+    parser.add_argument("--generate_new_export", action='store_true')
+    parser.add_argument("--log_dir", type=str, default=None)
+    parser.add_argument(
+        "--log_filename", type=str, default='get_zooniverse_export')
 
     args = vars(parser.parse_args())
+
+    # logging
+    if args['log_dir'] is not None:
+        log_file_path = create_log_file(args['log_dir'], args['log_filename'])
+        setup_logger(log_file_path)
+    else:
+        setup_logger()
+    logger = logging.getLogger(__name__)
 
     # get Zooniverse passowrd
     config = read_config_file(args['password_file'])
@@ -36,12 +49,12 @@ if __name__ == '__main__':
     # Get Project
     my_project = Project(args['project_id'])
 
-    print("Getting Data for Project id %s - %s" %
-          (args['project_id'], my_project.display_name))
+    logger.info("Getting Data for Project id %s - %s" %
+                (args['project_id'], my_project.display_name))
 
     # generate new export and wait until it is ready
-    if args['new_export']:
-        print("Generating new export and wait until it is ready")
+    if args['generate_new_export']:
+        logger.info("Generating new export and wait until it is ready")
         my_project.wait_export(args['export_type'])
 
     # get info about export
@@ -51,7 +64,7 @@ if __name__ == '__main__':
     export = my_project.get_export(args['export_type'])
 
     # save classifications to csv file
-    print("Starting to write file %s" % args['output_file'])
+    logger.info("Starting to write file %s" % args['output_file'])
     with open(args['output_file'], 'w', newline='') as csvfile:
         writer = csv.writer(csvfile, delimiter=',')
         for i, row in enumerate(export.csv_reader()):
@@ -59,7 +72,7 @@ if __name__ == '__main__':
             if (i % 10000) == 0:
                 print("Wrote %s records" % i)
 
-    print("Finished Writing File %s - Wrote %s records" %
-          (args['output_file'], i))
+    logger.info("Finished Writing File %s - Wrote %s records" %
+                (args['output_file'], i))
 
     set_file_permission(args['output_file'])

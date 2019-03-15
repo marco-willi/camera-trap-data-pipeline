@@ -37,7 +37,7 @@ python3 -m zooniverse_exports.get_zooniverse_export \
 --project_id $PROJECT_ID \
 --output_file /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_classifications.csv \
 --export_type classifications \
---new_export 0
+--log_dir /home/packerc/shared/zooniverse/Exports/${SITE}/
 ```
 
 ### Zooniverse Subject Export
@@ -50,7 +50,7 @@ python3 -m zooniverse_exports.get_zooniverse_export \
 --project_id $PROJECT_ID \
 --output_file /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subjects.csv \
 --export_type subjects \
---new_export 0
+--log_dir /home/packerc/shared/zooniverse/Exports/${SITE}/
 ```
 
 
