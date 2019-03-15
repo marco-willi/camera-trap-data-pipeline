@@ -1,0 +1,47 @@
+#!/bin/bash -l
+#PBS -l walltime=12:00:00,nodes=1:ppn=24
+#PBS -j oe
+#PBS -m abe
+#PBS -q small
+#PBS -N create_panthera_tfrecords
+#PBS -o ${HOME}/job_ml_create_tfrecords_${PBS_JOBID}.log
+#PBS -e ${HOME}/job_ml_error_create_tfrecords_${PBS_JOBID}.log
+
+
+CONTENT=species
+
+DATA_INVENTORY_PATH=/home/packerc/shared/machine_learning/data/images/panthera_dataset_inventory_part1.json
+TRAINING_DATA_PATH=/home/packerc/shared/machine_learning/data/training_data/${CONTENT}/panthera_southern_africa_v2/
+IMAGE_ROOT_PATH=home/packerc/shared/machine_learning/data/images/panthera_species/
+
+# Log Parameters
+echo "CONTENT: $CONTENT"
+echo "DATA_INVENTORY_PATH: $DATA_INVENTORY_PATH"
+echo "TRAINING_DATA_PATH: $TRAINING_DATA_PATH"
+echo "IMAGE_ROOT_PATH: $IMAGE_ROOT_PATH"
+
+# modules
+module load singularity
+module load python3
+
+# download container and code
+cd $HOME
+singularity pull docker://will5448/camera-trap-classifier:latest-cpu
+
+# run the script
+singularity exec -B /home/packerc/shared:/home/packerc/shared ./camera-trap-classifier-latest-cpu.simg \
+  ctc.create_dataset \
+  -inventory $DATA_INVENTORY_PATH \
+  -output_dir $TRAINING_DATA_PATH \
+  -image_save_side_smallest 600 \
+  -image_save_quality 75 \
+  -split_by_meta split_name \
+  -remove_multi_label_records \
+  -image_root_path $IMAGE_ROOT_PATH \
+  -process_images_in_parallel \
+  -process_images_in_parallel_size 320 \
+  -processes_images_in_parallel_n_processes 24 \
+  -max_records_per_file 5000
+
+chmod g+rw ${TRAINING_DATA_PATH}*
+mv ${TRAINING_DATA_PATH}label_mapping.json ${TRAINING_DATA_PATH}part1_label_mapping.json

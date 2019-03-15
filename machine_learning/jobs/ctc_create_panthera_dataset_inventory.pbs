@@ -1,0 +1,31 @@
+#!/bin/bash -l
+#PBS -l walltime=01:00:00,nodes=1:ppn=4
+#PBS -j oe
+#PBS -m abe
+#PBS -q small
+#PBS -N create_panthera_dataset_inventory
+#PBS -o ${HOME}/job_ml_create_panthera_dataset_inventory_${PBS_JOBID}.log
+#PBS -e ${HOME}/job_ml_error_create_panthera_dataset_inventory_${PBS_JOBID}.log
+
+# modules
+module load singularity
+module load python3
+
+# download container and code
+cd $HOME
+singularity pull docker://will5448/camera-trap-classifier:latest-cpu
+
+# Parameters Static
+INFO_FILE_PATH=/home/packerc/shared/machine_learning/data/images/panthera_species_inventory_part1.csv
+DATA_INVENTORY_PATH=/home/packerc/shared/machine_learning/data/images/panthera_dataset_inventory_part1.json
+
+# run the script
+singularity exec -B /home/packerc/shared:/home/packerc/shared ./camera-trap-classifier-latest-cpu.simg \
+  ctc.create_dataset_inventory csv -path $INFO_FILE_PATH \
+  -export_path $DATA_INVENTORY_PATH \
+  -capture_id_field capture_id \
+  -image_fields image \
+  -label_fields is_blank empty species species_panthera count count_orig standing resting moving eating interacting young_present  \
+  -meta_data_fields location split_name image
+
+chmod g+rw $DATA_INVENTORY_PATH
