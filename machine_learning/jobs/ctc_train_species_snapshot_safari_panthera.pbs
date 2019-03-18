@@ -1,0 +1,67 @@
+#!/bin/bash -l
+#PBS -l walltime=24:00:00,nodes=1:ppn=24:gpus=2
+#PBS -j oe
+#PBS -m abe
+#PBS -M will5448@umn.edu
+#PBS -q k40
+#PBS -N train
+#PBS -o ${HOME}/job_ml_output_train_species_${PBS_JOBID}.log
+#PBS -e ${HOME}/job_ml_error_train_species_${PBS_JOBID}.log
+
+# Load Tensorflow
+module load singularity
+module load python3
+
+# download container
+cd $HOME
+singularity pull docker://will5448/camera-trap-classifier:latest-gpu
+
+# Parameters
+TIMESTAMP=`date +%Y%m%d%H%M`
+DATE=`date +%Y%m%d`
+SITE=SNAPSHOT_SAFARI
+MODEL_TYPE=species
+ID=run_snapshot_safari_${DATE}
+ROOT=/home/packerc/shared/machine_learning/data/runs/${SITE}/${MODEL_TYPE}
+RUN_OUTPUT=${ROOT}/run_outputs_resnet18_TEST_V2/
+MODEL_SAVE=${ROOT}/model_save_resnet18_TEST_V2/
+
+# TFR-DATA
+TFR_ROOT_PATH=/home/packerc/shared/machine_learning/data/training_data/
+TFR_FILES=${TFR_ROOT_PATH}${MODEL_TYPE}
+LABEL_MAPPINGS=${TFR_ROOT_PATH}${MODEL_TYPE}/label_mappings_consolidated.json
+
+
+# Log Parameters
+echo "TIMESTAMP: $TIMESTAMP"
+echo "DATE: $DATE"
+echo "ID: $ID"
+echo "SITE: $SITE"
+echo "ROOT: $ROOT"
+echo "RUN_OUTPUT: $RUN_OUTPUT"
+echo "MODEL_SAVE: $MODEL_SAVE"
+echo "TFR_FILES: $TFR_FILES"
+echo "LABEL_MAPPINGS: $LABEL_MAPPINGS"
+
+# create output paths if they dont exist
+mkdir -p $RUN_OUTPUT
+mkdir -p $MODEL_SAVE
+
+# run the script
+singularity exec --nv -B /home/packerc/shared:/home/packerc/shared ./camera-trap-classifier-latest-gpu.simg \
+  ctc.train \
+  -train_tfr_path $TFR_FILES \
+  -val_tfr_path $TFR_FILES \
+  -test_tfr_path $TFR_FILES \
+  -class_mapping_json  $LABEL_MAPPINGS \
+  -run_outputs_dir $RUN_OUTPUT \
+  -model_save_dir $MODEL_SAVE \
+  -model ResNet18 \
+  -labels species count standing resting moving eating interacting young_present \
+  -batch_size 256 \
+  -n_cpus 22 \
+  -n_gpus 2 \
+  -buffer_size 512 \
+  -max_epochs 70 \
+  -reduce_lr_on_plateau_patience 4 \
+  -early_stopping_patience 6
