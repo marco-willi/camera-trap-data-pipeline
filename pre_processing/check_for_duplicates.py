@@ -49,8 +49,8 @@ def check_for_duplicates(paths, hash=hashlib.sha1):
             # create the list for this file size
             hashes_by_size[file_size] = []
             hashes_by_size[file_size].append(path)
-        if ((i % 5000) == 0) and i > 0:
-            print("Checked size of {}/{} files".format(i+1, n_tot))
+        if ((i % 10000) == 0) and i > 0:
+            print("Checked size of {}/{} files".format(i, n_tot))
     # For all files with the same file size, get their
     # hash on the 1st 1024 bytes
     logger.info("Checking for duplication by comparing small hashes ..")
