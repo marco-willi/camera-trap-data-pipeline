@@ -188,20 +188,21 @@ To upload a specific batch instead use something analogue to:
 --manifest /home/packerc/shared/zooniverse/Manifests/RUA/RUA_S1__batch_1__manifest.json \
 ```
 
-### Run via qsub
+### Run via qsub (if not via Terminal)
 
-Adapt the command in the following file instead:
-```
-$HOME/camera-trap-data-pipeline/zooniverse_uploads/upload_manifest.pbs
-```
-
-To submit the job use the following command:
-
+Run the script in the following way:
 ```
 ssh lab
 cd $HOME/camera-trap-data-pipeline/zooniverse_uploads/
-qsub upload_manifest.pbs
+
+SITE=RUA
+SEASON=RUA_S1
+PROJECT_ID=5155
+BATCH=batch_0
+
+qsub -v SITE=${SITE},SEASON=${SEASON},PROJECT_ID=${PROJECT_ID},BATCH=${BATCH} upload_manifest.pbs
 ```
+
 
 ### Image Compression
 
@@ -231,6 +232,20 @@ python3 -m zooniverse_uploads.upload_manifest \
 --subject_set_id 7845 \
 --image_root_path /home/packerc/shared/albums/RUA/ \
 --password_file ~/keys/passwords.ini
+```
+
+Alternatively, use the qsub system:
+```
+ssh lab
+cd $HOME/camera-trap-data-pipeline/zooniverse_uploads/
+
+SITE=RUA
+SEASON=RUA_S1
+PROJECT_ID=5155
+BATCH=batch_0
+SUBJECT_SET_ID=7845
+
+qsub -v SITE=${SITE},SEASON=${SEASON},PROJECT_ID=${PROJECT_ID},BATCH=${BATCH},SUBJECT_SET_ID={SUBJECT_SET_ID} upload_manifest.pbs
 ```
 
 ### Notes
