@@ -1,4 +1,76 @@
 ###################################################
+# GLobal Processing Flags
+###################################################
+
+global_processing_flags:
+    EMPTY_ANNOTATION: blank
+    QUESTION_DELIMITER: __
+    QUESTION_PREFIX: question
+    QUESTION_MAIN: species
+
+###################################################
+# Pre-Processing Flags
+###################################################
+
+pre_processing_flags:
+    exif_data_timestamps:
+     - DateTime
+     - DateTimeOriginal
+     - EXIF:DateTime
+     - EXIF:DateTimeOriginal
+    exif_tag_groups_to_extract:
+     - EXIF
+     - MakerNotes
+     - Composite
+    exif_tags_to_exclude:
+     - EXIF:ThumbnailImage
+     - MakerNotes:PreviewImage
+    general:
+     capture_delta_seconds: 5
+    image_check_parameters:
+     all_black:
+       percent: 0.8
+       thresh: 30
+     all_white:
+       percent: 0.8
+       thresh: 200
+     captures_with_too_many_images:
+       max_images: 3
+     time_lapse_days:
+       max_days: 30
+     time_too_new:
+       max_year: 2018
+     time_too_old:
+       min_year: 2012
+    image_checks:
+     - all_black
+     - all_white
+     - corrupt_file
+     - corrupt_exif
+     - empty_exif
+     - time_lapse
+     - time_too_new
+     - time_too_old
+     - captures_with_too_many_images
+    image_checks_invalidate:
+     - all_black
+     - all_white
+     - corrupt_exif
+     - empty_exif
+    image_checks_delete:
+     - corrupt_file
+    image_checks_time:
+     - time_lapse
+     - time_too_new
+     - time_too_old
+     - captures_with_too_many_images
+    time_formats:
+      exif_input_datetime_format: '%Y:%m:%d %H:%M:%S'
+      output_date_format: '%Y-%m-%d'
+      output_datetime_format: '%Y-%m-%d %H:%M:%S'
+      output_time_format: '%H:%M:%S'
+
+###################################################
 # Subject Extractor
 ###################################################
 subject_extractor_flags:
@@ -53,10 +125,9 @@ plurality_aggregation_flags:
     QUESTION_COUNTS:
      - count
      - horns_count
-    QUESTION_DELIMITER: __
     QUESTION_MAIN: species
     QUESTION_MAIN_EMPTY: blank
-    QUESTION_PREFIX: question
+
 
 
 ###################################################
@@ -186,77 +257,3 @@ extractor_flags:
     RETIREMENT_INFO_TO_ADD:
      - retirement_reason
      - retired_at
-
-
-
-###################################################
-# GLobal Processing Flags
-###################################################
-
-global_processing_flags:
-    EMPTY_ANNOTATION: blank
-    QUESTION_DELIMITER: __
-    QUESTION_PREFIX: question
-    QUESTION_MAIN: species
-
-
-###################################################
-# Pre-Processing Flags
-###################################################
-
-pre_processing_flags:
-    exif_data_timestamps:
-     - DateTime
-     - DateTimeOriginal
-     - EXIF:DateTime
-     - EXIF:DateTimeOriginal
-    exif_tag_groups_to_extract:
-     - EXIF
-     - MakerNotes
-     - Composite
-    exif_tags_to_exclude:
-     - EXIF:ThumbnailImage
-     - MakerNotes:PreviewImage
-    general:
-     capture_delta_seconds: 5
-    image_check_parameters:
-     all_black:
-       percent: 0.8
-       thresh: 30
-     all_white:
-       percent: 0.8
-       thresh: 200
-     captures_with_too_many_images:
-       max_images: 3
-     time_lapse_days:
-       max_days: 30
-     time_too_new:
-       max_year: 2018
-     time_too_old:
-       min_year: 2012
-    image_checks:
-     - all_black
-     - all_white
-     - corrupt_file
-     - corrupt_exif
-     - empty_exif
-     - time_lapse
-     - time_too_new
-     - time_too_old
-     - captures_with_too_many_images
-    image_checks_basic:
-     - all_black
-     - all_white
-     - corrupt_file
-     - corrupt_exif
-     - empty_exif
-    image_checks_time:
-     - time_lapse
-     - time_too_new
-     - time_too_old
-     - captures_with_too_many_images
-    time_formats:
-      exif_input_datetime_format: '%Y:%m:%d %H:%M:%S'
-      output_date_format: '%Y-%m-%d'
-      output_datetime_format: '%Y-%m-%d %H:%M:%S'
-      output_time_format: '%H:%M:%S'

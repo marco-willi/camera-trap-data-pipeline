@@ -9,9 +9,6 @@ module load python3
 
 cd $HOME/camera-trap-data-pipeline
 
-SITE=DEB
-SEASON=DEB_S1
-
 python3 -m pre_processing.basic_inventory_checks \
 --inventory /home/packerc/shared/season_captures/${SITE}/inventory/${SEASON}_inventory_basic.csv \
 --output_csv /home/packerc/shared/season_captures/${SITE}/inventory/${SEASON}_inventory.csv \

@@ -19,6 +19,19 @@ from config.cfg import cfg
 
 flags = cfg['pre_processing_flags']
 
+
+def at_least_one_specific_check(image_data, check_columns, checks_to_find):
+    """ Find specific checks """
+    return any([float(image_data[x]) == 1 for x in
+                checks_to_find if x in check_columns])
+
+
+def generate_check_string(image_data, check_columns, checks_to_find):
+    """ Generate a string of checks """
+    return [x.replace('image_check__', '') for x in
+            checks_to_find if x in check_columns and float(image_data[x]) == 1]
+
+
 # args = dict()
 #
 # args['captures'] = '/home/packerc/shared/season_captures/ENO/captures/ENO_S1_captures_grouped.csv'
@@ -64,8 +77,10 @@ if __name__ == '__main__':
 
     # check columns
     check_columns = [x for x in header if x.startswith('image_check__')]
-    basic_checks = \
-        ['image_check__{}'.format(x) for x in flags['image_checks_basic']]
+    to_delete_checks = \
+        ['image_check__{}'.format(x) for x in flags['image_checks_delete']]
+    to_invalidate_checks = \
+        ['image_check__{}'.format(x) for x in flags['image_checks_invalidate']]
     time_checks = \
         ['image_check__{}'.format(x) for x in flags['image_checks_time']]
 
@@ -84,23 +99,30 @@ if __name__ == '__main__':
     inventory_with_issues = OrderedDict()
     for image_path_original, image_data in inventory.items():
         automatic_status = {x: '' for x in action_cols}
-        at_least_one_basic_check = \
-            any([float(image_data[x]) == 1 for x in
-                basic_checks if x in check_columns])
-        at_least_one_time_check = \
-            any([float(image_data[x]) == 1 for x in
-                time_checks if x in check_columns])
+        has_deletion = at_least_one_specific_check(
+            image_data,
+            check_columns,
+            to_delete_checks)
+        has_invalidation = at_least_one_specific_check(
+            image_data,
+            check_columns,
+            to_invalidate_checks)
+        has_time_check = at_least_one_specific_check(
+            image_data,
+            check_columns,
+            time_checks)
+
         # generate check-string
-        time_checks_list = \
-            [x.replace('image_check__', '') for x in
-             time_checks if x in check_columns and float(image_data[x]) == 1]
-        basic_checks_list = \
-            [x.replace('image_check__', '') for x in
-             basic_checks if x in check_columns and float(image_data[x]) == 1]
-        all_check_string = '#'.join(basic_checks_list + time_checks_list)
-        if at_least_one_basic_check:
+        all_checks_list = generate_check_string(
+            image_data, check_columns, check_columns)
+
+        all_check_string = '#'.join(all_checks_list)
+
+        if has_deletion:
             automatic_status['action_to_take'] = 'delete'
-        elif at_least_one_time_check:
+        elif has_invalidation:
+            automatic_status['action_to_take'] = 'invalidate'
+        elif has_time_check:
             automatic_status['action_to_take'] = 'inspect'
         automatic_status['action_to_take_reason'] = all_check_string
         # populate action columns
@@ -110,11 +132,11 @@ if __name__ == '__main__':
         # check if image was in previous action lists and was flagged as ok
         try:
             previous_action_is_ok = \
-                (image_data['action_taken'] in ('ok', 'invalid'))
+                (image_data['action_taken'] in ('ok'))
         except:
             previous_action_is_ok = False
         # export problematic cases only
-        has_issue = (at_least_one_basic_check or at_least_one_time_check)
+        has_issue = (has_deletion or has_invalidation or has_time_check)
         if has_issue and not previous_action_is_ok:
             inventory_with_issues[image_path_original] = image_data
 

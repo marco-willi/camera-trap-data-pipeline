@@ -13,3 +13,4 @@ serengeti_db/*
 machine_learning/analyses/*
 misc/*
 TODO
+**/__pycache__/**

@@ -8,11 +8,11 @@
 #PBS -e ${HOME}/job_ml_error_create_tfrecords_${PBS_JOBID}.log
 
 
-CONTENT=species
+CONTENT=blank_species_balanced
 
-DATA_INVENTORY_PATH=/home/packerc/shared/machine_learning/data/images/panthera_dataset_inventory_part1.json
+DATA_INVENTORY_PATH=/home/packerc/shared/machine_learning/data/images/panthera_blank_species_balanced_inventory.json
 TRAINING_DATA_PATH=/home/packerc/shared/machine_learning/data/training_data/${CONTENT}/panthera_southern_africa_v2/
-IMAGE_ROOT_PATH=home/packerc/shared/machine_learning/data/images/panthera_species/
+IMAGE_ROOT_PATH=/home/packerc/shared/machine_learning/data/images/panthera_blank_species_balanced/
 
 # Log Parameters
 echo "CONTENT: $CONTENT"
@@ -44,4 +44,4 @@ singularity exec -B /home/packerc/shared:/home/packerc/shared ./camera-trap-clas
   -max_records_per_file 5000
 
 chmod g+rw ${TRAINING_DATA_PATH}*
-mv ${TRAINING_DATA_PATH}label_mapping.json ${TRAINING_DATA_PATH}part1_label_mapping.json
+#mv ${TRAINING_DATA_PATH}label_mapping.json ${TRAINING_DATA_PATH}part2_label_mapping.json

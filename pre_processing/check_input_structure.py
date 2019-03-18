@@ -72,8 +72,10 @@ if __name__ == '__main__':
         help="Root directory of the organized camera-trap data -- \
         contains the site folders.")
     parser.add_argument(
-        "--log_dir", type=str, default=None,
-        help="Output directory for storing a log-file.")
+        "--log_dir", type=str, default=None)
+    parser.add_argument(
+        "--log_filename", type=str,
+        default='check_directory_structure')
     args = vars(parser.parse_args())
 
     # check existence of root dir
@@ -81,13 +83,6 @@ if __name__ == '__main__':
         raise FileNotFoundError(
             "root_dir {} does not exist -- must be a directory".format(
                 args['root_dir']))
-
-    # check existence of log dir
-    if not args['log_dir'] is None:
-        if not os.path.isdir(args['log_dir']):
-            raise FileNotFoundError(
-                "log_dir {} does not exist -- must be a directory".format(
-                    args['log_dir']))
 
     # logging
     if not args['log_dir'] is None:

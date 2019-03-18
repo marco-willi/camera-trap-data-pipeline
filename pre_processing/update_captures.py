@@ -12,11 +12,34 @@ from pre_processing.group_inventory_into_captures import (
     group_images_into_captures,
     update_inventory_with_capture_data,
     update_time_checks_inventory,
-    calculate_time_deltas
+    calculate_time_deltas,
+    update_inventory_with_capture_id
 )
 
 
 flags = cfg['pre_processing_flags']
+
+
+def include_image(image_data):
+    """ Rule to include only certain images """
+    if 'action_taken' in image_data:
+        if image_data['action_taken'] in ('delete', 'invalidate'):
+            return False
+    return True
+
+
+def select_valid_images(captures):
+    """ Select valid images """
+    captures_updated = OrderedDict()
+    for image_name, image_data in captures.items():
+        if not include_image(image_data):
+            continue
+        try:
+            image_data['invalid'] = image_data['action_taken']
+        except:
+            image_data['invalid'] = ''
+        captures_updated[image_name] = {k: v for k, v in image_data.items()}
+    return captures_updated
 
 
 if __name__ == '__main__':
@@ -45,35 +68,12 @@ if __name__ == '__main__':
     setup_logger(log_file_path)
     logger = logging.getLogger(__name__)
 
-    def include_image(image_data):
-        if 'action_taken' in image_data:
-            if image_data['action_taken'] == 'delete':
-                return False
-        return True
-
-    # read grouped data
+    # read captures
     captures = read_image_inventory(
         args['captures'],
         unique_id='image_name')
 
-    # select relevant columns
-    captures_updated = OrderedDict()
-    cols_to_export = [
-        'capture_id', 'season', 'site', 'roll', 'capture',
-        'image_rank_in_capture', 'image_path', 'image_path_rel',
-        'invalid', 'date', 'time']
-    for image_name, image_data in captures.items():
-        if not include_image(image_data):
-            continue
-        try:
-            image_data['invalid'] = image_data['action_taken']
-        except:
-            image_data['invalid'] = ''
-        image_data['capture_id'] = '#'.join(
-            [image_data['season'], image_data['site'],
-             image_data['roll'], image_data['capture']])
-        # image_data_new = {k: v for k, v in image_data if k in cols_to_export}
-        captures_updated[image_name] = {k: v for k, v in image_data.items()}
+    captures_updated = select_valid_images(captures)
 
     # re-calculate time_deltas
     time_deltas = calculate_time_deltas(captures_updated, flags)
@@ -81,14 +81,21 @@ if __name__ == '__main__':
 
     # update image to capture association
     image_to_capture = group_images_into_captures(captures_updated, flags)
-
     update_inventory_with_capture_data(captures_updated, image_to_capture)
+
+    update_inventory_with_capture_id(captures_updated)
 
     update_time_checks_inventory(captures_updated, flags)
 
     image_check_stats(captures_updated, logger)
 
+    # first columns in exported file
+    first_cols_to_export = [
+        'capture_id', 'season', 'site', 'roll', 'capture',
+        'image_rank_in_capture', 'image_path', 'image_path_rel',
+        'invalid', 'date', 'time']
+
     export_inventory_to_csv(
             captures_updated,
             args['captures_updated'],
-            first_cols=cols_to_export)
+            first_cols=first_cols_to_export)

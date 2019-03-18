@@ -9,6 +9,8 @@ from statistics import median_high, StatisticsError
 from collections import Counter, defaultdict
 import logging
 
+import pandas as pd
+
 from logger import setup_logger, create_log_file
 from config.cfg import cfg
 from zooniverse_aggregations import aggregator
@@ -17,12 +19,8 @@ from utils import (
 
 
 flags = cfg['plurality_aggregation_flags']
+flags_global = cfg['global_processing_flags']
 
-# args = dict()
-# args['annotations'] = '/home/packerc/shared/zooniverse/Exports/CC/CC_S1_classifications_extracted.csv'
-# args['output_csv'] = '/home/packerc/shared/zooniverse/Exports/CC/CC_S1_classifications_aggregated.csv'
-# args['subject_csv'] = '/home/packerc/shared/zooniverse/Exports/CC/CC_S1_subjects.csv'
-#
 # args = dict()
 # args['annotations'] = '/home/packerc/shared/zooniverse/Exports/SER/SER_S1_classifications_extracted.csv'
 # args['output_csv'] = '/home/packerc/shared/zooniverse/Exports/SER/SER_S1_classifications_aggregated.csv'
@@ -32,20 +30,15 @@ flags = cfg['plurality_aggregation_flags']
 # args['annotations'] = '/home/packerc/shared/zooniverse/Exports/GRU/GRU_S1_classifications_extracted.csv'
 # args['output_csv'] = '/home/packerc/shared/zooniverse/Exports/GRU/GRU_S1_classifications_aggregated.csv'
 # args['subject_csv'] = '/home/packerc/shared/zooniverse/Exports/GRU/GRU_S1_subjects.csv'
-#
+
 # args = dict()
-# args['annotations'] = '/home/packerc/shared/zooniverse/Exports/MTZ/MTZ_S1_classifications_extracted.csv'
-# args['output_csv'] = '/home/packerc/shared/zooniverse/Exports/MTZ/MTZ_S1_classifications_aggregated.csv'
+# args['annotations'] = '/home/packerc/shared/zooniverse/Exports/MTZ/MTZ_S1_annotations.csv'
+# args['output_csv'] = '/home/packerc/will5448/MTZ_TEST_ANNOS.csv'
 # args['subject_csv'] = '/home/packerc/shared/zooniverse/Exports/MTZ/MTZ_S1_subjects.csv'
 # args['export_consensus_only'] = False
+# args['log_dir'] = None
+# args['log_filename'] = ''
 
-
-# args = dict()
-# args['annotations'] = '/home/packerc/shared/zooniverse/Exports/PLN/PLN_S1_annotations.csv'
-# args['output_csv'] = '/home/packerc/shared/zooniverse/Exports/PLN/PLN_S1_annotations_aggregated.csv'
-# args['subject_csv'] = '/home/packerc/shared/zooniverse/Exports/PLN/PLN_S1_subjects.csv'
-# args['export_consensus_only'] = True
-# args['export_sample_size'] = 300
 
 def aggregate_species(
         species_names, species_stats,
@@ -137,11 +130,11 @@ if __name__ == '__main__':
     # logging flags
     print_nested_dict('', flags)
 
-    question_main_id = flags['QUESTION_DELIMITER'].join(
-        [flags['QUESTION_PREFIX'], flags['QUESTION_MAIN']])
+    question_main_id = flags_global['QUESTION_DELIMITER'].join(
+        [flags_global['QUESTION_PREFIX'], flags_global['QUESTION_MAIN']])
     question_column_prefix = '{}{}'.format(
-        flags['QUESTION_PREFIX'],
-        flags['QUESTION_DELIMITER'])
+        flags_global['QUESTION_PREFIX'],
+        flags_global['QUESTION_DELIMITER'])
 
     ######################################
     # Import Annotations
@@ -322,30 +315,29 @@ if __name__ == '__main__':
         logger.info("Number of Classifications per Subject: {:20} -- counts: {:10} / {} ({:.2f} %)".format(
             n_classifications, count, total, 100*count/total))
 
-    output_header = list(record.keys())
+    ######################################
+    # Export to CSV
+    ######################################
 
-    logger.info("Automatically generated output header: {}".format(
-        output_header))
+    df_out = pd.DataFrame(subject_identificatons)
 
-    # Output all Species
-    with open(args['output_csv'], 'w') as f:
-        csv_writer = csv.writer(f, delimiter=',')
-        logger.info("Writing output to {}".format(args['output_csv']))
-        csv_writer.writerow(output_header)
-        tot = len(subject_identificatons)
-        for line_no, record in enumerate(subject_identificatons):
-            # skip record if no plurality consensus species
-            if args['export_consensus_only']:
-                if record['species_is_plurality_consensus'] == 0:
-                    continue
-            # get subject info data
-            to_write = [record[x] for x in output_header]
-            csv_writer.writerow(to_write)
-            # print status
-            if ((line_no % 10000) == 0) and (line_no > 0):
-                print("Wrote {:,} identifications".format(line_no))
-        logger.info("Wrote {} aggregations to {}".format(
-            line_no, args['output_csv']))
+    # order columns: subject_id, questions, rest
+    cols = df_out.columns.tolist()
+    first_cols = ['subject_id'] + questions
+    first_cols = [x for x in first_cols if x in cols]
+    cols_rearranged = first_cols + [x for x in cols if x not in first_cols]
+    df_out = df_out[cols_rearranged]
+
+    # sort output by subject_id
+    df_out.sort_values(by=first_cols, inplace=True)
+
+    if args['export_consensus_only']:
+        df_out = df_out[df_out['species_is_plurality_consensus'] == 1]
+
+    df_out.to_csv(args['output_csv'], index=False)
+
+    logger.info("Wrote {} aggregations to {}".format(
+        df_out.shape[0], args['output_csv']))
 
     # change permmissions to read/write for group
     set_file_permission(args['output_csv'])

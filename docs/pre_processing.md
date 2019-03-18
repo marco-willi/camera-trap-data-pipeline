@@ -68,6 +68,17 @@ python3 -m pre_processing.check_input_structure \
 
 The script will print/log messages if something is invalid but not alter anything.
 
+## Check for Duplicate Images
+
+The following script will check for duplicate images.
+
+```
+python3 -m pre_processing.check_for_duplicates \
+--root_dir /home/packerc/shared/albums/${SITE}/${SEASON}/ \
+--log_dir /home/packerc/shared/season_captures/${SITE}/log_files/
+```
+The script will print/log duplicates if any are found but won't alter anything.
+
 ## Create Image Inventory
 
 The following script generates an inventory of all camera trap images.
@@ -103,17 +114,21 @@ python3 -m pre_processing.basic_inventory_checks \
 --n_processes 16
 ```
 
-For processing very large datasets (>200k images) it is recommended to adapt the following script and submit a job, instead of running the script interactively: [basic_inventory_checks.pbs](pre_processing/basic_inventory_checks.pbs)
+For processing very large datasets (>200k images) it is recommended to run the following script via job queue.
 
-And then submit that script using the qsub system:
 ```
+ssh lab
+SITE=APN
+SEASON=APN_S2
+
 cd $HOME/camera-trap-data-pipeline/pre_processing
-qsub basic_inventory_checks.pbs
+
+qsub -v SITE=${SITE},SEASON=${SEASON} basic_inventory_checks.pbs
 ```
 
 Check the status of the job by:
 ```
-qsub
+qstat
 ```
 
 
@@ -179,7 +194,7 @@ action_to_take | meaning
 delete | the selected images will be deleted
 timechange | the time of the selected images will be changed (see below)
 ok | do nothing
-invalid | do nothing, but keep invalid flag
+invalidate | remove the image from further processing (but do not delete)
 
 4. To add new actions simply create a new row in the csv.
 
@@ -199,8 +214,8 @@ action_site	| action_roll | action_from_image |	action_to_image	| action_to_take
 :---|:---|:--- | :---| :---| :---|:---|:---
  A01| | |		|delete	|camera_produced_unrecognizable_images	||
  A01| 2| |		|timechange	|camera clock off by minus one day	| 2000-01-01 00:00:00| 2000-01-02 00:00:00		
- | | |ENO_S1__B02_R1_IMAG1012.JPG	| ENO_S1__B02_R1_IMAG1012.JPG	|delete	|all_white		||
- | | |ENO_S1__B02_R1_IMAG0054.JPG	| ENO_S1__B02_R1_IMAG0054.JPG	|delete	|all_black||
+ | | |ENO_S1__B02_R1_IMAG1012.JPG	| ENO_S1__B02_R1_IMAG1012.JPG	|invalidate	|all_white		||
+ | | |ENO_S1__B02_R1_IMAG0054.JPG	| ENO_S1__B02_R1_IMAG0054.JPG	|invalidate	|all_black||
  | | |ENO_S1__B02_R1_IMAG0990.JPG	|ENO_S1__B02_R1_IMAG0999.JPG	|delete	|human	||
 
 

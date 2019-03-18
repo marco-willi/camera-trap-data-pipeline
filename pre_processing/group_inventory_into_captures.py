@@ -181,6 +181,14 @@ def update_inventory_with_capture_data(inventory, image_to_capture):
         inventory[image_path_original].update(image_capture_data)
 
 
+def update_inventory_with_capture_id(inventory):
+    """ add /update capture_id to each image"""
+    for image_id in inventory.keys():
+        image_data = inventory[image_id]
+        capture_id = '{season}#{site}#{roll}#{capture}'.format(**image_data)
+        image_data.update({'capture_id': capture_id})
+
+
 def update_inventory_with_image_names(inventory):
     """ Create new image names """
     for image_data in inventory.values():
@@ -243,6 +251,8 @@ if __name__ == '__main__':
     image_to_capture = group_images_into_captures(inventory, flags)
 
     update_inventory_with_capture_data(inventory, image_to_capture)
+
+    update_inventory_with_capture_id(inventory)
 
     update_inventory_with_image_names(inventory)
 

@@ -106,3 +106,10 @@ wget -O exiftool.tar.gz "https://www.sno.phy.queensu.ca/~phil/exiftool/Image-Exi
 # unpack file
 tar xvzf exiftool.tar.gz
 ```
+
+### Testing the Code
+
+Some pre-processing tests:
+```
+python -m unittest discover test/pre_processing
+```

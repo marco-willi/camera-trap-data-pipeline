@@ -41,6 +41,28 @@ def add_seconds_to_time(date_time, seconds_to_add, format):
     return shifted_time
 
 
+def apply_actions(actions, captures, logger):
+    """ apply actions """
+    for image_name, action in actions.items():
+        reason = action['action_to_take_reason']
+        if action['action_to_take'] == 'delete':
+            image_path = captures[image_name]['image_path']
+            os.remove(image_path)
+            logger.info("Reason: {:20} Action: deleted image: {}".format(
+                reason, image_path))
+        elif action['action_to_take'] == 'timechange':
+            change_time(
+                captures,
+                image_name, flags,
+                action['action_shift_time_by_seconds'])
+            logger.info("Reason: {:20} Action: timechange for: {}".format(
+                reason, image_name))
+        captures[image_name]['action_taken'] = \
+            action['action_to_take']
+        captures[image_name]['action_reason'] = \
+            action['action_to_take_reason']
+
+
 if __name__ == '__main__':
 
     # Parse command line arguments
@@ -75,23 +97,6 @@ if __name__ == '__main__':
     captures = read_image_inventory(
         args['captures'], unique_id='image_name')
 
-    for image_name, action in actions.items():
-        reason = action['action_to_take_reason']
-        if action['action_to_take'] == 'delete':
-            image_path = captures[image_name]['image_path']
-            os.remove(image_path)
-            logger.info("Reason: {:20} Action: deleted image: {}".format(
-                reason, image_path))
-        elif action['action_to_take'] == 'timechange':
-            change_time(
-                captures,
-                image_name, flags,
-                action['action_shift_time_by_seconds'])
-            logger.info("Reason: {:20} Action: timechange for: {}".format(
-                reason, image_name))
-        captures[image_name]['action_taken'] = \
-            action['action_to_take']
-        captures[image_name]['action_reason'] = \
-            action['action_to_take_reason']
+    apply_actions(actions, captures, logger)
 
     export_inventory_to_csv(captures, args['captures'])
