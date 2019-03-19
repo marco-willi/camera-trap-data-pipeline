@@ -227,6 +227,11 @@ python3 -m pre_processing.check_input_structure \
 --root_dir /home/packerc/shared/albums/${SITE}/${SEASON}/ \
 --log_dir /home/packerc/shared/season_captures/${SITE}/log_files/
 
+# Check for duplicate images
+python3 -m pre_processing.check_for_duplicates \
+--root_dir /home/packerc/shared/albums/${SITE}/${SEASON}/ \
+--log_dir /home/packerc/shared/season_captures/${SITE}/log_files/
+
 # Create Image Inventory
 python3 -m pre_processing.create_image_inventory \
 --root_dir /home/packerc/shared/albums/${SITE}/${SEASON}/ \
