@@ -16,6 +16,22 @@ The general aggregation logic (plurality algorithm) is as follows:
 4. Flag the top N species (median number of different species identified) with 'species_is_plurality_consensus'. Choose the first species identified by any users on ties.
 5. Export the full dataset including species without consensus, blanks, and additional information.
 
+
+For most scripts we use the following ressources (unless indicated otherwise):
+```
+ssh lab
+module load python3
+cd ~/camera-trap-data-pipeline
+qsub -I -l walltime=02:00:00,nodes=1:ppn=4,mem=16gb
+```
+
+The following examples were run with the following paramters:
+```
+SITE=RUA
+SEASON=RUA_S1
+```
+
+
 ## Output Fields
 
 | Columns   | Description |

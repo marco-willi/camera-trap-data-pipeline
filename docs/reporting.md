@@ -7,11 +7,20 @@ The following codes can be used to:
 
 The following codes show an example for Grumeti:
 
+For most scripts we use the following ressources (unless indicated otherwise):
 ```
-cd $HOME/camera-trap-data-pipeline
+ssh lab
+module load python3
+cd ~/camera-trap-data-pipeline
+qsub -I -l walltime=02:00:00,nodes=1:ppn=2,mem=8gb
+```
+
+The following examples were run with the following paramters (non-legacy):
+```
 SITE=GRU
 SEASON=GRU_S1
 ```
+
 
 ## Merge Season Captures with Aggregated Annotations
 

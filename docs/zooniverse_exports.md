@@ -6,8 +6,16 @@ The following codes can be used to:
 2. Extract Annotations from Zooniverse Classifications
 3. Handle Legacy (S1-S10 Serengeti) Data
 
-The following example was run with the following paramters:
 
+For most scripts we use the following ressources (unless indicated otherwise):
+```
+ssh lab
+module load python3
+cd ~/camera-trap-data-pipeline
+qsub -I -l walltime=02:00:00,nodes=1:ppn=4,mem=16gb
+```
+
+The following examples were run with the following paramters (non-legacy):
 ```
 SITE=RUA
 SEASON=RUA_S1
@@ -15,6 +23,7 @@ PROJECT_ID=5155
 WORKFLOW_ID=4889
 WORKFLOW_VERSION_MIN=797
 ```
+
 
 ## Get Zooniverse Exports
 
