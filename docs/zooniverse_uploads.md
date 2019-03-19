@@ -10,24 +10,34 @@ The following steps are required to upload new data to Zooniverse. The following
 
 The optional steps can simply be skipped.
 
+The following examples were run with the following paramters:
+```
+SITE=RUA
+SEASON=RUA_S1
+PROJECT_ID=5155
+ATTRIBUTION="'University of Minnesota Lion Center + SnapshotSafari + Ruaha Carnivore Project + Tanzania + Ruaha National Park'"
+LICENSE="'SnapshotSafari + Ruaha Carnivore Project'"
+
+```
+
 ## Generate Manifest
 
 This generates a manifest from the captures csv. A manifest contains all the information required to upload data to Zooniverse.
 
 ```
 python3 -m zooniverse_uploads.generate_manifest \
---captures_csv /home/packerc/shared/season_captures/RUA/cleaned/RUA_S1_cleaned.csv \
---output_manifest_dir /home/packerc/shared/zooniverse/Manifests/RUA/ \
---images_root_path /home/packerc/shared/albums/RUA/ \
---log_dir /home/packerc/shared/zooniverse/Manifests/RUA/ \
---manifest_id RUA_S1 \
+--captures_csv /home/packerc/shared/season_captures/RUA/cleaned/${SEASON}_cleaned.csv \
+--output_manifest_dir /home/packerc/shared/zooniverse/Manifests/${SITE}/ \
+--images_root_path /home/packerc/shared/albums/${SITE}/ \
+--log_dir /home/packerc/shared/zooniverse/Manifests/${SITE}/ \
+--manifest_id ${SEASON} \
 --attribution 'University of Minnesota Lion Center + SnapshotSafari + Ruaha Carnivore Project + Tanzania + Ruaha National Park' \
 --license 'SnapshotSafari + Ruaha Carnivore Project'
 ```
 
 The default settings create the following file:
 ```
-RUA_S1__complete__manifest.json
+${SEASON}__complete__manifest.json
 ```
 
 The 'image_root_path' has to be specified if the 'captures_csv' contains relative paths to the images -- the manifest creation code checks for file existence.
@@ -60,12 +70,12 @@ This code creates a 'machine learning file' that has the correct format for the 
 
 ```
 python3 -m zooniverse_uploads.create_machine_learning_file \
---manifest /home/packerc/shared/zooniverse/Manifests/RUA/RUA_S1__complete__manifest.json
+--manifest /home/packerc/shared/zooniverse/Manifests/${SITE}/${SEASON}__complete__manifest.json
 ```
 
 The default settings create the following file:
 ```
-RUA_S1__complete__machine_learning_input.csv
+${SEASON}__complete__machine_learning_input.csv
 ```
 
 ## Generate new Predictions (Optional)
@@ -98,7 +108,7 @@ qsub ctc_predict_empty.pbs
 
 The default settings create the following file:
 ```
-RUA_S1__complete__predictions_empty_or_not.json
+${SEASON}__complete__predictions_empty_or_not.json
 ```
 
 ### Generating 'Species' Predictions
@@ -128,7 +138,7 @@ qsub ctc_predict_species.pbs
 
 The default settings create the following file:
 ```
-RUA_S1__complete__predictions_species.json
+${SEASON}__complete__predictions_species.json
 ```
 
 ### Add Model Predictions to Manifest (Optional)
@@ -138,7 +148,7 @@ This code adds the aggregated predictions into the manifest.
 ```
 cd $HOME/camera-trap-data-pipeline
 python3 -m zooniverse_uploads.add_predictions_to_manifest \
---manifest /home/packerc/shared/zooniverse/Manifests/RUA/RUA_S1__complete__manifest.json
+--manifest /home/packerc/shared/zooniverse/Manifests/${SITE}/${SEASON}__complete__manifest.json
 ```
 
 Note: If the script is 'killed' the most likely reason is memory usage. In that case use this command to launch a session with more memory and try again:
@@ -155,15 +165,15 @@ This codes splits the manifest into several batches that can be uploaded separat
 ```
 cd $HOME/camera-trap-data-pipeline
 python3 -m zooniverse_uploads.split_manifest_into_batches \
---manifest /home/packerc/shared/zooniverse/Manifests/RUA/RUA_S1__complete__manifest.json \
---log_dir /home/packerc/shared/zooniverse/Manifests/RUA/ \
+--manifest /home/packerc/shared/zooniverse/Manifests/${SITE}/${SEASON}__complete__manifest.json \
+--log_dir /home/packerc/shared/zooniverse/Manifests/${SITE}/ \
 --max_batch_size 20000
 ```
 
 This creates the following files:
 ```
-RUA_S1__batch_1__manifest.json
-RUA_S1__batch_2__manifest.json
+${SEASON}__batch_1__manifest.json
+${SEASON}__batch_2__manifest.json
 ...
 ```
 
@@ -176,16 +186,16 @@ This code uploads a manifest to Zooniverse. Note that Zooniverse credentials hav
 Change the paths analogue to this example:
 ```
 python3 -m zooniverse_uploads.upload_manifest \
---manifest /home/packerc/shared/zooniverse/Manifests/RUA/RUA_S1__complete__manifest.json \
---log_dir /home/packerc/shared/zooniverse/Manifests/RUA/ \
---project_id 5155 \
+--manifest /home/packerc/shared/zooniverse/Manifests/${SITE}/${SEASON}__complete__manifest.json \
+--log_dir /home/packerc/shared/zooniverse/Manifests/${SITE}/ \
+--project_id ${PROJECT_ID} \
 --password_file ~/keys/passwords.ini \
---image_root_path /home/packerc/shared/albums/RUA/
+--image_root_path /home/packerc/shared/albums/${SITE}/
 ```
 
 To upload a specific batch instead use something analogue to:
 ```
---manifest /home/packerc/shared/zooniverse/Manifests/RUA/RUA_S1__batch_1__manifest.json \
+--manifest /home/packerc/shared/zooniverse/Manifests/${SITE}/${SEASON}__batch_1__manifest.json \
 ```
 
 ### Run via qsub (if not via Terminal)
@@ -226,11 +236,11 @@ If the upload fails (which can happen if the connection to Zooniverse crashes) y
 Change the paths analogue to this example:
 ```
 python3 -m zooniverse_uploads.upload_manifest \
---manifest /home/packerc/shared/zooniverse/Manifests/RUA/RUA_S1__complete__manifest.json \
---log_dir /home/packerc/shared/zooniverse/Manifests/RUA/ \
---project_id 5155 \
+--manifest /home/packerc/shared/zooniverse/Manifests/${SITE}/${SEASON}__complete__manifest.json \
+--log_dir /home/packerc/shared/zooniverse/Manifests/${SITE}/ \
+--project_id ${PROJECT_ID} \
 --subject_set_id 7845 \
---image_root_path /home/packerc/shared/albums/RUA/ \
+--image_root_path /home/packerc/shared/albums/${SITE}/ \
 --password_file ~/keys/passwords.ini
 ```
 

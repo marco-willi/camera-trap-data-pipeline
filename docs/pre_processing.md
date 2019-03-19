@@ -2,14 +2,15 @@
 
 The following codes can be used to:
 
-1. Create Image Inventory
-2. Extract Exif data
-3. Perform basic checks
-4. Group images into captures
-5. Inspect potential issues to resolve/waive them
-6. Obtain a cleaned inventory of the processed camera trap images
-7. Re-name all images
-
+1. Check File Organization
+2. Check for Duplicate Images
+3. Create Image Inventory
+4. Extract Exif data
+5. Perform basic checks
+6. Re-name all images
+7. Group images into captures
+8. Inspect potential issues to resolve/waive them
+9. Obtain a cleaned inventory of the processed camera trap images
 
 The following examples were run with the following settings:
 

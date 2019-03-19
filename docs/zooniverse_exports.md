@@ -6,6 +6,15 @@ The following codes can be used to:
 2. Extract Annotations from Zooniverse Classifications
 3. Handle Legacy (S1-S10 Serengeti) Data
 
+The following example was run with the following paramters:
+
+```
+SITE=RUA
+SEASON=RUA_S1
+PROJECT_ID=5155
+WORKFLOW_ID=4889
+WORKFLOW_VERSION_MIN=797
+```
 
 ## Get Zooniverse Exports
 

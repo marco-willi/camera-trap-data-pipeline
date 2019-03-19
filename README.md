@@ -11,7 +11,10 @@ The code was developed for the [Snapshot Safari](http://www.snapshotsafari.org) 
 
 ## Overview
 
-A high-level overview of how the scripts are connected can be found here:
+<img src="https://github.com/marco-willi/camera-trap-data-pipeline/blob/master/docs/code_repo_high_level_overview.pdf"/>
+*This figure shows a high-level overview of what can be done with this repository.*
+
+An overview of how the scripts are connected can be found here:
 [Process Overview](docs/data_processing_overview.pdf)
 
 ## Configuration
