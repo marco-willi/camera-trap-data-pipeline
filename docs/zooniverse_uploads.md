@@ -33,7 +33,7 @@ This generates a manifest from the captures csv. A manifest contains all the inf
 
 ```
 python3 -m zooniverse_uploads.generate_manifest \
---captures_csv /home/packerc/shared/season_captures/RUA/cleaned/${SEASON}_cleaned.csv \
+--captures_csv /home/packerc/shared/season_captures/${SITE}/cleaned/${SEASON}_cleaned.csv \
 --output_manifest_dir /home/packerc/shared/zooniverse/Manifests/${SITE}/ \
 --images_root_path /home/packerc/shared/albums/${SITE}/ \
 --log_dir /home/packerc/shared/zooniverse/Manifests/${SITE}/ \
