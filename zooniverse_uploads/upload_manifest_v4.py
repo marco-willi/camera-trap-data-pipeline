@@ -121,18 +121,13 @@ def create_subjects_from_captures(
         capture_ids_to_upload,
         batch_data,
         mani,
-        tracker_data,
-        retry_on_connection_failure=False,
-        config=None,
-        max_retries=20,
-        current_retry=0):
+        tracker_data):
     """ Create and Upload Subjects from Captures
         capture_ids: list of capture ids to upload
         batch_data: dict to keep track of created subjects
         mani: manifest dictionary containing the captures
         tracker_data: dict to keep track of uploaded captures
     """
-
     # upload each capture
     for capture_id in capture_ids_to_upload:
 
@@ -143,65 +138,37 @@ def create_subjects_from_captures(
         if capture_id in tracker_data:
             logger.debug("capture_id {} alreday uploaded".format(capture_id))
             continue
-        try:
-            images_to_upload = get_images_from_capture_data(
-                capture_data, args['image_root_path'])
+        images_to_upload = get_images_from_capture_data(
+            capture_data, args['image_root_path'])
 
-            # Compress images if specified
-            if not args['dont_compress_images']:
-                images_to_upload = compress_images(images_to_upload, args)
+        # Compress images if specified
+        if not args['dont_compress_images']:
+            images_to_upload = compress_images(images_to_upload, args)
 
-            # skip subject if no images present
-            if len(images_to_upload) == 0:
-                logger.warning(
-                    "capture_id {} has no valid images - skipping".format(
-                     capture_id))
-                continue
-            # add meta-data to the subject required for the subject upload
-            metadata = capture_data['upload_metadata']
-            metadata['#original_images'] = capture_data['images']['original_images']
-            metadata['capture_id_anonymized'] = \
-                uploader.anonymize_id(capture_id)
-            # create the subject
-            subject = uploader.create_subject(
-                my_project, images_to_upload, metadata)
-            # get and store information about the created subject
-            batch_data['subjects_to_link'].append(subject)
-            batch_data['capture_ids'].append(capture_id)
-            batch_data['subject_ids'].append(subject.id)
-            logger.debug("finished saving {} - {}".format(
-                        capture_id, current_time_str()))
+        # skip subject if no images present
+        if len(images_to_upload) == 0:
+            logger.warning(
+                "capture_id {} has no valid images - skipping".format(
+                 capture_id))
+            continue
 
-        except PanoptesAPIException as e:
-            logger.info('Error occurred for capture_id: %s' % capture_id)
-            logger.info('Details of error: {}'.format(e))
-            uploader.handle_batch_failure(batch_data['subjects_to_link'])
-            # Recursively call this function again upon API Exception
-            if retry_on_connection_failure:
-                # do not re-try if max retries has been reached
-                if current_retry > max_retries:
-                    msg = "Max number of re-tries reached, aborting."
-                    logger.info(textwrap.shorten(msg, width=150))
-                    raise SystemExit
-                # Sleep for 60 seconds and re-try connection
-                msg = "Retry on connection failure is specified -- \
-                       sleeping for 60 seconds and re-try upload, please \
-                       wait..."
-                logger.info(textwrap.shorten(msg, width=150))
-                time.sleep(60)
-                # Re-Connect to Panoptes
-                Panoptes.connect(username=config['zooniverse']['username'],
-                                 password=config['zooniverse']['password'])
-                create_subjects_from_captures(
-                        capture_ids_to_upload,
-                        batch_data,
-                        mani,
-                        tracker_data,
-                        retry_on_connection_failure=retry_on_connection_failure,
-                        max_retries=max_retries,
-                        current_retry=(current_retry + 1))
-            else:
-                raise SystemExit
+        # add meta-data to the subject required for the subject upload
+        metadata = capture_data['upload_metadata']
+        metadata['#original_images'] = capture_data['images']['original_images']
+        metadata['capture_id_anonymized'] = \
+            uploader.anonymize_id(capture_id)
+
+        # create the subject
+        subject = uploader.create_subject(
+            my_project, images_to_upload, metadata)
+
+        # get and store information about the created subject
+        batch_data['subjects_to_link'].append(subject)
+        batch_data['capture_ids'].append(capture_id)
+        batch_data['subject_ids'].append(subject.id)
+        logger.debug("finished saving {} - {}".format(
+                    capture_id, current_time_str()))
+
     return batch_data
 
 
@@ -434,6 +401,9 @@ if __name__ == "__main__":
     # Upload
     ###################################
 
+    retry_on_connection_failure = True
+    max_retries_per_batch = 5
+
     # loop over upload batches
     for batch_no, (start_i, end_i) in enumerate(upload_slices):
 
@@ -442,16 +412,45 @@ if __name__ == "__main__":
 
         batch_data = batch_data_storage()
 
-        # create subjects for each capture
-        create_subjects_from_captures(
-            capture_ids_batch,
-            batch_data,
-            mani,
-            tracker_data,
-            retry_on_connection_failure=True,
-            config=config,
-            max_retries=20,
-            current_retry=0)
+        current_batch_is_uploaded = False
+        current_batch_retry = 0
+
+        # Try to upload batch until max re-tries are exhausted
+        while not current_batch_is_uploaded:
+            try:
+                create_subjects_from_captures(
+                    capture_ids_batch,
+                    batch_data,
+                    mani,
+                    tracker_data,
+                    config=config)
+                current_batch_is_uploaded = True
+            except OSError as e:
+                # catch timeout error
+                if e.errno == os.errno.errno.ETIMEDOUT:
+                    if (retry_on_connection_failure) and \
+                       (current_batch_retry < max_retries_per_batch):
+                        # Sleep for 60 seconds and re-try connection
+                        msg = "Retry on connection failure is specified -- \
+                               sleeping for 60 seconds and re-try upload, \
+                               please wait..."
+                        logger.info(textwrap.shorten(msg, width=150))
+                        time.sleep(60)
+                        current_batch_retry += 1
+                        # Re-Connect to Panoptes
+                        logger.info("Trying to re-connect to Panoptes")
+                        Panoptes.connect(
+                            username=config['zooniverse']['username'],
+                            password=config['zooniverse']['password'])
+                else:
+                    logger.info('Error during subject creation: {}'.format(e))
+                    uploader.handle_batch_failure(
+                        batch_data['subjects_to_link'])
+                    raise
+            except Exception as e:
+                logger.info('Error during subject creation: {}'.format(e))
+                uploader.handle_batch_failure(batch_data['subjects_to_link'])
+                raise
 
         # link current batch to subject set
         if len(batch_data['subjects_to_link']) > 0:
