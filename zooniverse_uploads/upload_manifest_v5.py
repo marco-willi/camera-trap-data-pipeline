@@ -32,7 +32,7 @@ from utils import (
 # --password_file ~/keys/passwords.ini \
 # --image_root_path /home/packerc/shared/albums/GRU/
 
-# 
+
 # python3 -m zooniverse_uploads.upload_manifest_v5 \
 # --manifest /home/packerc/shared/zooniverse/Manifests/GRU_TEST/GRU_S1__batch_16__manifest.json \
 # --log_dir /home/packerc/shared/zooniverse/Manifests/GRU_TEST/ \
@@ -190,8 +190,6 @@ def create_subjects_from_captures(
         batch_data['subject_ids'].append(subject.id)
         logger.debug("finished saving {} - {}".format(
                     capture_id, current_time_str()))
-
-    return batch_data
 
 
 if __name__ == "__main__":
@@ -441,7 +439,8 @@ if __name__ == "__main__":
                   args=(capture_ids_batch,
                         batch_data,
                         mani,
-                        tracker_data))
+                        tracker_data),
+                  log_args=False)
         except Exception as e:
             logger.info('Error during subject creation: {}'.format(e))
             uploader.handle_batch_failure(batch_data['subjects_to_link'])
