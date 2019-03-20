@@ -77,7 +77,8 @@ def get_images_from_capture_data(capture_data, root_path):
         logger.warning("no images found for capture_id: {}".format(
             capture_id))
     if root_path is not None:
-        images_to_upload = [os.path.join(root_path, x) for x in images_to_upload]
+        images_to_upload = [os.path.join(root_path, x)
+                            for x in images_to_upload]
     return images_to_upload
 
 
@@ -366,7 +367,7 @@ if __name__ == "__main__":
     ###################################
 
     time_start = time.time()
-    uploaded_subjects_count = 0
+    total_uploaded_subjects = n_in_tracker_file
 
     capture_ids_all = list(mani.keys())
 
@@ -464,7 +465,7 @@ if __name__ == "__main__":
         if len(batch_data['subjects_to_link']) > 0:
             uploader.add_batch_to_subject_set(
                 my_set, batch_data['subjects_to_link'])
-            uploaded_subjects_count += len(batch_data['subjects_to_link'])
+            total_uploaded_subjects += len(batch_data['subjects_to_link'])
 
             # update upload tracker
             uploader.update_tracker_file(
@@ -477,12 +478,12 @@ if __name__ == "__main__":
             tr = estimate_remaining_time(
                 time_start,
                 n_tot_remaining,
-                max(0, uploaded_subjects_count-n_in_tracker_file))
+                max(0, total_uploaded_subjects-n_in_tracker_file))
             st = datetime.datetime.fromtimestamp(ts).strftime('%H:%M:%S')
             msg = "Saved {:5}/{:5} ({:4} %) - Current Time: {} - \
                    Estimated Time Remaining: {}".format(
-                   uploaded_subjects_count, n_tot,
-                   round((uploaded_subjects_count/n_tot) * 100, 2), st, tr)
+                   total_uploaded_subjects, n_tot,
+                   round((total_uploaded_subjects/n_tot) * 100, 2), st, tr)
             logger.info(textwrap.shorten(msg, width=99))
 
     ###################################
@@ -498,7 +499,7 @@ if __name__ == "__main__":
 
     logger.info(
       "Finished uploading subjects - total {}/{} successfully uploaded".format(
-       uploaded_subjects_count, n_tot))
+       total_uploaded_subjects, n_tot))
 
     # Export Manifest
     export_dict_to_json_with_newlines(mani, args['output_file'])
