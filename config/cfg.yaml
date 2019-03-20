@@ -73,6 +73,7 @@ pre_processing_flags:
 ###################################################
 # Subject Extractor
 ###################################################
+
 subject_extractor_flags:
     SUBJECT_ADD_LOCATION_DATA: true
     SUBJECT_DATA_TO_ADD:

@@ -14,6 +14,7 @@ from config.cfg import cfg
 
 
 flags = cfg['plurality_aggregation_flags']
+flags_global = cfg['global_processing_flags']
 
 # args = dict()
 # args['season_captures_csv'] = '/home/packerc/shared/season_captures/GRU/cleaned/GRU_S1_cleaned.csv'
@@ -109,11 +110,11 @@ if __name__ == '__main__':
     season_data_df = read_cleaned_season_file_df(args['season_captures_csv'])
 
     # determine empty/blank answer
-    question_main_id = flags['QUESTION_DELIMITER'].join(
-        [flags['QUESTION_PREFIX'], flags['QUESTION_MAIN']])
+    question_main_id = flags_global['QUESTION_DELIMITER'].join(
+        [flags_global['QUESTION_PREFIX'], flags_global['QUESTION_MAIN']])
     question_column_prefix = '{}{}'.format(
-        flags['QUESTION_PREFIX'],
-        flags['QUESTION_DELIMITER'])
+        flags_global['QUESTION_PREFIX'],
+        flags_global['QUESTION_DELIMITER'])
 
     # Create per Capture Data
     season_dict = create_season_dict(season_data_df)
