@@ -25,19 +25,19 @@ from utils import (
     slice_generator)
 
 
-# python3 -m zooniverse_uploads.upload_manifest_v4 \
-# --manifest /home/packerc/shared/zooniverse/Manifests/GRU_TEST/GRU_S1__batch_17__manifest.json \
+# python3 -m zooniverse_uploads.upload_manifest_v5 \
+# --manifest /home/packerc/shared/zooniverse/Manifests/GRU_TEST/GRU_S1__batch_16__manifest.json \
 # --log_dir /home/packerc/shared/zooniverse/Manifests/GRU_TEST/ \
 # --project_id 5115 \
 # --password_file ~/keys/passwords.ini \
 # --image_root_path /home/packerc/shared/albums/GRU/
 
-
-# python3 -m zooniverse_uploads.upload_manifest_v4 \
-# --manifest /home/packerc/shared/zooniverse/Manifests/GRU_TEST/GRU_S1__batch_17__manifest.json \
+# 
+# python3 -m zooniverse_uploads.upload_manifest_v5 \
+# --manifest /home/packerc/shared/zooniverse/Manifests/GRU_TEST/GRU_S1__batch_16__manifest.json \
 # --log_dir /home/packerc/shared/zooniverse/Manifests/GRU_TEST/ \
 # --project_id 5115 \
-# --subject_set_id 73916 \
+# --subject_set_id 73919 \
 # --password_file ~/keys/passwords.ini \
 # --image_root_path /home/packerc/shared/albums/GRU/
 
@@ -69,6 +69,7 @@ def batch_data_storage():
 
 
 def connect_to_panoptes():
+    logger.info("Connecting to Panoptes")
     Panoptes.connect(username=config['zooniverse']['username'],
                      password=config['zooniverse']['password'])
 
@@ -355,7 +356,7 @@ if __name__ == "__main__":
 
     ###################################
     # Create Zooniverse Connection
-    # SubjectSet
+    # Fetch/Create SubjectSet
     ###################################
 
     # connect to panoptes
