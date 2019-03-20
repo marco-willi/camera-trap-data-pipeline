@@ -32,6 +32,15 @@ from utils import (
 # --image_root_path /home/packerc/shared/albums/GRU/
 
 
+# python3 -m zooniverse_uploads.upload_manifest_v4 \
+# --manifest /home/packerc/shared/zooniverse/Manifests/GRU_TEST/GRU_S1__batch_17__manifest.json \
+# --log_dir /home/packerc/shared/zooniverse/Manifests/GRU_TEST/ \
+# --project_id 5115 \
+# --subject_set_id 73916 \
+# --password_file ~/keys/passwords.ini \
+# --image_root_path /home/packerc/shared/albums/GRU/
+
+
 def add_subject_data_to_manifest(subject_set, capture_id, subject_id, data):
     """ Add subject data to manifest
         - extracts data as uploaded and created to/by Zooniverse
@@ -422,8 +431,7 @@ if __name__ == "__main__":
                     capture_ids_batch,
                     batch_data,
                     mani,
-                    tracker_data,
-                    config=config)
+                    tracker_data)
                 current_batch_is_uploaded = True
             except OSError as e:
                 # catch timeout error
