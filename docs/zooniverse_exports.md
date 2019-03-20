@@ -83,7 +83,7 @@ ssh lab
 qsub -I -l walltime=2:00:00,nodes=1:ppn=4,mem=16gb
 ```
 
-If WORKFLOW_ID / WORFKLOW_VERSION_MIN are unknown run the script like this:
+If WORKFLOW_ID / WORKFLOW_VERSION_MIN are unknown run the script like this:
 ```
 python3 -m zooniverse_exports.extract_annotations \
 --classification_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_classifications.csv \
@@ -97,7 +97,7 @@ python3 -m zooniverse_exports.extract_annotations \
 --classification_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_classifications.csv \
 --output_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_annotations.csv \
 --workflow_id $WORKFLOW_ID \
---workflow_version_min $WORFKLOW_VERSION_MIN
+--workflow_version_min $WORKFLOW_VERSION_MIN
 ```
 
 
