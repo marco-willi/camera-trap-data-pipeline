@@ -13,6 +13,7 @@ from utils import (
 
 
 flags = cfg['plurality_aggregation_flags']
+flags_global = cfg['global_processing_flags']
 
 
 if __name__ == '__main__':
@@ -52,11 +53,11 @@ if __name__ == '__main__':
     # logging flags
     print_nested_dict('', flags)
 
-    question_main_id = flags['QUESTION_DELIMITER'].join(
-        [flags['QUESTION_PREFIX'], flags['QUESTION_MAIN']])
+    question_main_id = flags_global['QUESTION_DELIMITER'].join(
+        [flags_global['QUESTION_PREFIX'], flags_global['QUESTION_MAIN']])
     question_column_prefix = '{}{}'.format(
-        flags['QUESTION_PREFIX'],
-        flags['QUESTION_DELIMITER'])
+        flags_global['QUESTION_PREFIX'],
+        flags_global['QUESTION_DELIMITER'])
 
     # read report
     df_report = pd.read_csv(args['report_csv'], dtype='str')
