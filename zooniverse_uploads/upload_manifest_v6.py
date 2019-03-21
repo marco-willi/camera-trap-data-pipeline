@@ -32,10 +32,10 @@ from utils import (
 
 
 # python3 -m zooniverse_uploads.upload_manifest_v6 \
-# --manifest /home/packerc/shared/zooniverse/Manifests/GRU_TEST/GRU_S1__batch_16__manifest.json \
+# --manifest /home/packerc/shared/zooniverse/Manifests/GRU_TEST/GRU_S1__batch_15__manifest.json \
 # --log_dir /home/packerc/shared/zooniverse/Manifests/GRU_TEST/ \
 # --project_id 5115 \
-# --subject_set_id 73919 \
+# --subject_set_id 73952 \
 # --password_file ~/keys/passwords.ini \
 # --image_root_path /home/packerc/shared/albums/GRU/
 
@@ -412,7 +412,7 @@ if __name__ == "__main__":
                 args=(capture_id,
                       capture_data,
                       args),
-                log_args=False)
+                log_args=False,)
 
             # get and store information about the created subject
             batch_data['subjects_to_link'].append(subject)
