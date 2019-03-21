@@ -258,3 +258,11 @@ extractor_flags:
     RETIREMENT_INFO_TO_ADD:
      - retirement_reason
      - retired_at
+
+###################################################
+# Flags for the Report Generation
+###################################################
+
+report_flags:
+  humans:
+    - human
