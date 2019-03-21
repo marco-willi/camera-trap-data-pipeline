@@ -23,7 +23,7 @@ from utils import (
     file_path_splitter, file_path_generator, set_file_permission)
 
 
-# python3 -m zooniverse_uploads.upload_manifest_v5 \
+# python3 -m zooniverse_uploads.upload_manifest_v6 \
 # --manifest /home/packerc/shared/zooniverse/Manifests/GRU_TEST/GRU_S1__batch_15__manifest.json \
 # --log_dir /home/packerc/shared/zooniverse/Manifests/GRU_TEST/ \
 # --project_id 5115 \
@@ -31,7 +31,7 @@ from utils import (
 # --image_root_path /home/packerc/shared/albums/GRU/
 
 
-# python3 -m zooniverse_uploads.upload_manifest_v5 \
+# python3 -m zooniverse_uploads.upload_manifest_v6 \
 # --manifest /home/packerc/shared/zooniverse/Manifests/GRU_TEST/GRU_S1__batch_16__manifest.json \
 # --log_dir /home/packerc/shared/zooniverse/Manifests/GRU_TEST/ \
 # --project_id 5115 \
@@ -211,6 +211,10 @@ if __name__ == "__main__":
         '--dont_compress_images' is not specified.")
 
     parser.add_argument(
+        "--upload_batch_size", type=int, default=100,
+        help="The number of subjects to create before linking them.")
+
+    parser.add_argument(
         "--image_root_path", type=str, default=None,
         help="The root path of all images in the manifest. Used when reading \
         them from disk.")
@@ -352,8 +356,6 @@ if __name__ == "__main__":
     n_tot = len(capture_ids_all)
     n_tot_remaining = n_tot - n_in_tracker_file
 
-    upload_batch_size = 10
-
     ###################################
     # Create Signal Handler
     ###################################
@@ -429,7 +431,7 @@ if __name__ == "__main__":
             raise
 
         # link current batch to subject set
-        if len(batch_data['subjects_to_link']) > upload_batch_size:
+        if len(batch_data['subjects_to_link']) >= args['upload_batch_size']:
             uploader.add_batch_to_subject_set(
                 my_set, batch_data['subjects_to_link'])
             total_uploaded_subjects += len(batch_data['subjects_to_link'])
