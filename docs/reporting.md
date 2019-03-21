@@ -2,8 +2,8 @@
 
 The following codes can be used to:
 
-1. Merge season captures with Zooniverse aggregations
-2. Merge season captures with Machine Learning predictions
+1. Create reports from Zooniverse aggregations
+2. Create reports from Machine Learning predictions
 
 The following codes show an example for Grumeti:
 
@@ -21,71 +21,76 @@ SITE=GRU
 SEASON=GRU_S1
 ```
 
+## Create Zooniverse Reports
 
-## Merge Season Captures with Aggregated Annotations
+The next scripts produce reports based on Zooniverse aggregations.
 
-The following reports can be generated:
+### Options to modify the Reports
+Different reports can be generated based on the following options:
+
+
+To export only species / exclude blanks:
+```
+--exclude_blanks
+```
+
+To export only captures with at least one Zooniverse annotation (otherwise each capture in the inventory will have one row in the export -- it will be mostly empty):
+```
+--exclude_captures_without_data
+```
+
+To export only consensus identifications (plurality algorithm):
+```
+--exclude_non_consensus
+```
+
+To exclude captures of humans:
+```
+--exclude_humans
+```
+
+### Full Report
+
+This report contains everything: blanks, consensus, non-consensus, captures without data, and humans.
 
 ```
-# Reporting of Zooniverse exports - All Captures
-python3 -m reporting.add_aggregations_to_season_captures \
+# Create report
+python3 -m reporting.create_zooniverse_report \
 --season_captures_csv /home/packerc/shared/season_captures/${SITE}/cleaned/${SEASON}_cleaned.csv \
 --aggregated_csv /home/packerc/shared/zooniverse/Aggregations/${SITE}/${SEASON}_annotations_aggregated_plurality_info.csv \
 --output_csv /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/${SEASON}_report_all.csv \
---log_dir /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/ \
 --default_season_id ${SEASON} \
---deduplicate_subjects
+--log_dir /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/
 ```
 
 ```
+# Create statistics file
 python3 -m reporting.create_report_stats \
 --report_path /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/${SEASON}_report_all.csv \
 --output_csv /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/${SEASON}_report_all_stats.csv \
 --log_dir /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/
 ```
 
-```
-# Reporting of Zooniverse exports - only captures with annotations
-python3 -m reporting.add_aggregations_to_season_captures \
---season_captures_csv /home/packerc/shared/season_captures/${SITE}/cleaned/${SEASON}_cleaned.csv \
---aggregated_csv /home/packerc/shared/zooniverse/Aggregations/${SITE}/${SEASON}_annotations_aggregated_plurality_info.csv \
---output_csv /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/${SEASON}_report.csv \
---log_dir /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/ \
---default_season_id ${SEASON} \
---export_only_with_aggregations \
---deduplicate_subjects \
---export_only_consensus
-```
+### Consensus Species Report
+
+This report contains only species consensus identifications.
 
 ```
-python3 -m reporting.create_report_stats \
---report_path /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/${SEASON}_report.csv \
---output_csv /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/${SEASON}_report_stats.csv \
---log_dir /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/
-```
-
-```
-python3 -m reporting.sample_report \
---report_csv /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/${SEASON}_report.csv \
---output_csv /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/${SEASON}_report_samples.csv \
---sample_size 300 \
---log_dir /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/
-```
-
-```
-# Reporting of Zooniverse exports - only captures with species
-python3 -m reporting.add_aggregations_to_season_captures \
+# Create species consensus only report
+python3 -m reporting.create_zooniverse_report \
 --season_captures_csv /home/packerc/shared/season_captures/${SITE}/cleaned/${SEASON}_cleaned.csv \
 --aggregated_csv /home/packerc/shared/zooniverse/Aggregations/${SITE}/${SEASON}_annotations_aggregated_plurality_info.csv \
 --output_csv /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/${SEASON}_report_species.csv \
 --log_dir /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/ \
 --default_season_id ${SEASON} \
---export_only_species \
---deduplicate_subjects \
---export_only_consensus
+--exclude_blanks \
+--exclude_humans \
+--exclude_non_consensus \
+--exclude_captures_without_data
 ```
 
 ```
+# Create statistics file
 python3 -m reporting.create_report_stats \
 --report_path /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/${SEASON}_report_species.csv \
 --output_csv /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/${SEASON}_report_species_stats.csv \
@@ -93,6 +98,7 @@ python3 -m reporting.create_report_stats \
 ```
 
 ```
+# Create a small sample report
 python3 -m reporting.sample_report \
 --report_csv /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/${SEASON}_report_species.csv \
 --output_csv /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/${SEASON}_report_species_samples.csv \
@@ -100,27 +106,43 @@ python3 -m reporting.sample_report \
 --log_dir /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/
 ```
 
-To de-duplicate capture ids with more than one subject (if accidentally uploaded more than once to Zooniverse) -- deleting some subject ids:
+
+### Consensus & Non-Consensus Species Report
+
+This report contains only species identifications -- consensus & non-consensus.
+
 ```
---deduplicate_subjects
+# Create species consensus and non-consensu report
+python3 -m reporting.create_zooniverse_report \
+--season_captures_csv /home/packerc/shared/season_captures/${SITE}/cleaned/${SEASON}_cleaned.csv \
+--aggregated_csv /home/packerc/shared/zooniverse/Aggregations/${SITE}/${SEASON}_annotations_aggregated_plurality_info.csv \
+--output_csv /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/${SEASON}_report.csv \
+--log_dir /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/ \
+--default_season_id ${SEASON} \
+--exclude_blanks \
+--exclude_humans \
+--exclude_captures_without_data
 ```
 
-To export only species detections (no blanks):
 ```
---export_only_species
-```
-
-To export only with Zooniverse aggregations (otherwise also include captures without Zooniverse data):
-```
---export_only_with_aggregations
+# Create statistics file
+python3 -m reporting.create_report_stats \
+--report_path /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/${SEASON}_report.csv \
+--output_csv /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/${SEASON}_report_stats.csv \
+--log_dir /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/
 ```
 
-To export only consensus identifications (plurality algorithm):
 ```
---export_only_consensus
+# Create a small sample report
+python3 -m reporting.sample_report \
+--report_csv /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/${SEASON}_report.csv \
+--output_csv /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/${SEASON}_report_samples.csv \
+--sample_size 300 \
+--log_dir /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/
 ```
 
-## Output Fields
+
+### Output Fields
 
 The following file contains one record per capture event and species detection. Primary-key is 'subject_id' and 'question__species'.
 

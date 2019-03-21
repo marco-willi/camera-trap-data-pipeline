@@ -264,5 +264,5 @@ extractor_flags:
 ###################################################
 
 report_flags:
-  humans:
+  identify_humans_for_exclusion:
     - human

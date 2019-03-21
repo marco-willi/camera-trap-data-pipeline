@@ -116,7 +116,7 @@ if __name__ == '__main__':
         "--log_dir", type=str, default=None)
     parser.add_argument(
         "--log_filename", type=str,
-        default='add_aggregations_to_season_captures')
+        default='create_zooniverse_report')
 
     args = vars(parser.parse_args())
 
@@ -191,7 +191,7 @@ if __name__ == '__main__':
                 pass
         # Exclude humans
         if args['exclude_humans']:
-            if main_answer in flags_report['humans']:
+            if main_answer in flags_report['identify_humans_for_exclusion']:
                 logger.debug("Exclude capture {} because of human".format(
                     capture_id))
                 n_humans_excluded += 1

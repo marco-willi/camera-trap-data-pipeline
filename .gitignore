@@ -14,3 +14,4 @@ machine_learning/analyses/*
 misc/*
 TODO
 **/__pycache__/**
+.ipynb_checkpoints/*
