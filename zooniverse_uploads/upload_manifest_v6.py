@@ -24,7 +24,7 @@ from utils import (
 
 
 # python3 -m zooniverse_uploads.upload_manifest_v6 \
-# --manifest /home/packerc/shared/zooniverse/Manifests/GRU_TEST/GRU_S1__batch_15__manifest.json \
+# --manifest /home/packerc/shared/zooniverse/Manifests/GRU_TEST/GRU_S1__batch_16__manifest.json \
 # --log_dir /home/packerc/shared/zooniverse/Manifests/GRU_TEST/ \
 # --project_id 5115 \
 # --password_file ~/keys/passwords.ini \
@@ -123,7 +123,7 @@ def get_subject_set(subject_set_id, subject_set_name):
     return my_set
 
 
-def create_subject_set(my_project, subject_set_name, subject_set_id=None):
+def create_subject_set(my_project, subject_set_name):
     """  Create a Subject_Set """
     my_set = uploader.create_subject_set(
         my_project, subject_set_name)
@@ -155,8 +155,13 @@ def create_subject(capture_id, capture_data, args):
         uploader.anonymize_id(capture_id)
 
     # create the subject
-    subject = uploader.create_subject(
-        my_project, images_to_upload, metadata)
+    try:
+        subject = uploader.create_subject(
+            my_project, images_to_upload, metadata)
+    except TypeError:
+        logger.info("Type error catched -- ignoring")
+    except Exception:
+        raise
 
     return subject
 
@@ -286,6 +291,8 @@ if __name__ == "__main__":
 
     ###################################
     # Create / Load Tracker File
+    # keeps track of already uploaded
+    # captures to resume uploads
     ###################################
 
     # define tracker file path
@@ -341,8 +348,7 @@ if __name__ == "__main__":
         my_set = get_subject_set(
             args['subject_set_id'], args['subject_set_name'])
     else:
-        my_set = create_subject_set(
-            my_project, args['subject_set_name'], subject_set_id=None)
+        my_set = create_subject_set(my_project, args['subject_set_name'])
 
     ###################################
     # Create Stats Variables
@@ -402,7 +408,7 @@ if __name__ == "__main__":
             # current capture data
             capture_data = mani[capture_id]
 
-            # Create subject
+            # Create subject - retry on connection issues
             subject = retry(
                 create_subject,
                 attempts=MAX_RETRIES_PER_BATCH,
@@ -474,7 +480,6 @@ if __name__ == "__main__":
     # Update Manifest
     ###################################
 
-    # update manifest
     tracker_data = uploader.read_tracker_file(tracker_file_path)
 
     for capture_id, subject_id in tracker_data.items():
