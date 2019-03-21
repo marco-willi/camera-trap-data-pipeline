@@ -147,6 +147,12 @@ if __name__ == '__main__':
         flags_global['QUESTION_PREFIX'],
         flags_global['QUESTION_DELIMITER'])
 
+    # create stats variables
+    n_humans_excluded = 0
+    n_blanks_excluded = 0
+    n_non_consensus_excluded = 0
+    n_without_data_excluded = 0
+
     ###############################
     # Read / Process Aggregations
     ###############################
@@ -179,6 +185,7 @@ if __name__ == '__main__':
         if args['exclude_non_consensus']:
             try:
                 if line['species_is_plurality_consensus'] == '0':
+                    n_non_consensus_excluded += 1
                     continue
             except:
                 pass
@@ -187,12 +194,14 @@ if __name__ == '__main__':
             if main_answer in flags_report['humans']:
                 logger.debug("Exclude capture {} because of human".format(
                     capture_id))
+                n_humans_excluded += 1
                 continue
         # Exclude blanks
         if args['exclude_blanks']:
             if main_answer == flags['QUESTION_MAIN_EMPTY']:
                 logger.debug("Exclude capture {} because it is blank".format(
                     capture_id))
+                n_blanks_excluded += 1
                 continue
         try:
             aggregated_data[capture_id].append(line)
@@ -226,6 +235,7 @@ if __name__ == '__main__':
         capture_has_aggregations = (capture_id in aggregated_data)
         if args['exclude_captures_without_data']:
             if not capture_has_aggregations:
+                n_without_data_excluded += 1
                 continue
         # for each capture get all annotations
         aggregations_list = aggregated_data[capture_id]
@@ -234,6 +244,14 @@ if __name__ == '__main__':
             row += [season_data[x] for x in season_header]
             row += [aggregation[x] for x in agg_data_to_add]
             report_list.append(row)
+
+    # report stats
+    logger.info("Excluded {} blank aggregations".format(n_blanks_excluded))
+    logger.info("Excluded {} human aggregations".format(n_humans_excluded))
+    logger.info("Excluded {} non-consensus aggregations".format(
+        n_non_consensus_excluded))
+    logger.info("Excluded {} without aggregations".format(
+        n_without_data_excluded))
 
     # build df
     df_report = pd.DataFrame(report_list)
