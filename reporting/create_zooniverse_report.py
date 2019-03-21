@@ -52,8 +52,8 @@ def deduplicate_captures(df_aggregated):
             "Found {} subjects that have identical capture id to other \
              subjects - removing them ...".format(
              len(duplicate_subject_ids)), width=150)
-    logger.warning(msg)
     if len(duplicate_subject_ids) > 0:
+        logger.warning(msg)
         df_aggregated = \
             df_aggregated[~df_aggregated['subject_id'].isin(
                 duplicate_subject_ids)]
@@ -237,8 +237,13 @@ if __name__ == '__main__':
             if not capture_has_aggregations:
                 n_without_data_excluded += 1
                 continue
+
+        if capture_has_aggregations:
+            aggregations_list = aggregated_data[capture_id]
+        else:
+            aggregations_list = [{x: '' for x in agg_data_to_add}]
+
         # for each capture get all annotations
-        aggregations_list = aggregated_data[capture_id]
         for aggregation in aggregations_list:
             row = list()
             row += [season_data[x] for x in season_header]
