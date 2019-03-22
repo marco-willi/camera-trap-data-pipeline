@@ -117,3 +117,8 @@ Some pre-processing tests:
 ```
 python -m unittest discover test/pre_processing
 ```
+
+Set log-level befor running the code:
+```
+export LOGLEVEL=DEBUG
+```

@@ -21,7 +21,7 @@ def setup_logger(log_file=None):
     stdout_handler = logging.StreamHandler(sys.stdout)
     handlers.append(stdout_handler)
     # logger configuration
-    logging.basicConfig(level=logging.INFO,
+    logging.basicConfig(level=os.environ.get("LOGLEVEL", "INFO"),
                         format='%(asctime)s - %(funcName)s - %(levelname)s:' +
                                '%(message)s',
                         handlers=handlers)
@@ -31,7 +31,7 @@ def setup_logger(log_file=None):
 
 
 def create_log_file(log_dir, log_file_name):
-    """ Create Log File """
+    """ Create Log File Path """
     if not os.path.isdir(log_dir):
         raise FileNotFoundError(
             "log_dir {} does not exist -- must be a directory".format(
