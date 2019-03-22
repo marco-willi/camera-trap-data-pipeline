@@ -177,9 +177,11 @@ if __name__ == '__main__':
 
     # Store aggregated data per capture
     aggregated_data = dict()
+    capture_ids_with_aggregations = set()
     header_input = df_aggregated.columns
     for line_no, line in df_aggregated.iterrows():
         capture_id = line['capture_id']
+        capture_ids_with_aggregations.add(capture_id)
         main_answer = line[question_main_id]
         # Skip non-consensus aggregations if specified
         if args['exclude_non_consensus']:
@@ -231,17 +233,32 @@ if __name__ == '__main__':
     agg_data_to_add = [x for x in header_input if x not in season_header]
 
     for line_no, (capture_id, season_data) in enumerate(season_dict.items()):
-        # skip captures without aggregations if specified
-        capture_has_aggregations = (capture_id in aggregated_data)
+
+        # captures with a valid aggregation
+        # (in season file and at least one aggregation to export)
+        capture_has_valid_aggregations = (capture_id in aggregated_data)
+
+        # captures with no aggregations at all
+        # (in season file but no aggregation)
+        capture_has_no_aggregations = \
+            (capture_id not in capture_ids_with_aggregations)
+
+        # exclude captures without aggregations to export
         if args['exclude_captures_without_data']:
-            if not capture_has_aggregations:
-                n_without_data_excluded += 1
+            if not capture_has_valid_aggregations:
+                # count only captures without any aggregations at all
+                if capture_has_no_aggregations:
+                    n_without_data_excluded += 1
                 continue
 
-        if capture_has_aggregations:
+        # export captures with valid aggregations or no aggregations at all
+        # however, exclude deliberately excluded captures
+        if capture_has_valid_aggregations:
             aggregations_list = aggregated_data[capture_id]
-        else:
+        elif capture_has_no_aggregations:
             aggregations_list = [{x: '' for x in agg_data_to_add}]
+        else:
+            continue
 
         # for each capture get all annotations
         for aggregation in aggregations_list:
