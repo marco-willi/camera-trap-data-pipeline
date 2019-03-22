@@ -10,6 +10,7 @@ import logging
 
 from panoptes_client import Project, Panoptes, SubjectSet
 from panoptes_client.panoptes import PanoptesAPIException
+from redo import retry
 
 from logger import setup_logger, create_log_file
 from zooniverse_uploads import uploader
@@ -21,14 +22,22 @@ from utils import (
     current_time_str, export_dict_to_json_with_newlines,
     file_path_splitter, file_path_generator, set_file_permission)
 
-# # For Testing
-# args = dict()
-# args['manifest'] = "/home/packerc/shared/zooniverse/Manifests/KAR/KAR_S1_manifest1.json"
-# args['output_file'] = "/home/packerc/shared/zooniverse/Manifests/KAR/KAR_S1_manifest2.json"
-# args['project_id'] = 7679
-# #args['subject_set_id'] = '40557'
-# args['subject_set_name'] = 'KAR_S1_TEST_v2'
-# args['password_file'] = '~/keys/passwords.ini'
+
+# python3 -m zooniverse_uploads.upload_manifest_v6 \
+# --manifest /home/packerc/shared/zooniverse/Manifests/GRU_TEST/GRU_S1__batch_17__manifest.json \
+# --log_dir /home/packerc/shared/zooniverse/Manifests/GRU_TEST/ \
+# --project_id 5115 \
+# --password_file ~/keys/passwords.ini \
+# --image_root_path /home/packerc/shared/albums/GRU/
+
+
+# python3 -m zooniverse_uploads.upload_manifest_v6 \
+# --manifest /home/packerc/shared/zooniverse/Manifests/GRU_TEST/GRU_S1__batch_16__manifest.json \
+# --log_dir /home/packerc/shared/zooniverse/Manifests/GRU_TEST/ \
+# --project_id 5115 \
+# --subject_set_id 74005 \
+# --password_file ~/keys/passwords.ini \
+# --image_root_path /home/packerc/shared/albums/GRU/
 
 
 def add_subject_data_to_manifest(subject_set, capture_id, subject_id, data):
@@ -55,6 +64,99 @@ def batch_data_storage():
     return {'subjects_to_link': list(),
             'capture_ids': list(),
             'subject_ids': list()}
+
+
+def connect_to_panoptes():
+    logger.info("Connecting to Panoptes")
+    Panoptes.connect(username=config['zooniverse']['username'],
+                     password=config['zooniverse']['password'])
+
+
+def get_images_from_capture_data(capture_data, root_path):
+    """ Return a list of images """
+    if isinstance(capture_data['images'], dict):
+        images_to_upload = capture_data['images']['original_images']
+    elif isinstance(capture_data['images'], list):
+        images_to_upload = capture_data['images']
+    else:
+        logger.warning("no images found for capture_id: {}".format(
+            capture_id))
+    if root_path is not None:
+        images_to_upload = [os.path.join(root_path, x)
+                            for x in images_to_upload]
+    return images_to_upload
+
+
+def compress_images(images_to_upload, args):
+    """ Compress a list of images and return list of Byte strings """
+    images_to_upload = \
+        process_images_list_multiprocess(
+                images_to_upload,
+                resize_and_compress_list_of_images,
+                n_processes=args['n_processes'],
+                print_status=False,
+                max_pixel_of_largest_side=args['max_pixel_of_largest_side'],
+                save_quality=args['save_quality'])
+    # remove images that failed to process
+    images_to_upload = [
+        x for x in images_to_upload if x is not None]
+    return images_to_upload
+
+
+def get_subject_set(subject_set_id, subject_set_name):
+    """ Get an existing subject set """
+    my_set = SubjectSet().find(subject_set_id)
+    logger.info("Subject set {} found, will upload into this set".format(
+                subject_set_id))
+    # check subject_set name is identical to what is expected from the
+    # manifest name, if not abort
+    if not my_set.display_name == subject_set_name:
+        msg = "Found subject-set with id {} and name {} on Zooniverse -- \
+        but tried to continue uploading from manifest with \
+        id {} -- this discrepancy is unexpected, therefore, \
+        upload is aborted - did you choose the wrong manifest?".format(
+            my_set.id, my_set.display_name, subject_set_name)
+        logger.error(textwrap.shorten(msg, width=150))
+        raise ValueError("Subject-set name {} not identical to {}".format(
+            my_set.display_name, subject_set_name
+        ))
+    return my_set
+
+
+def create_subject_set(my_project, subject_set_name):
+    """  Create a Subject_Set """
+    my_set = uploader.create_subject_set(
+        my_project, subject_set_name)
+    logger.info("Created new subject set with id {}, name {}".format(
+                 my_set.id, my_set.display_name))
+    return my_set
+
+
+def create_subject(capture_id, capture_data, args):
+    """ Create a Subject """
+    images_to_upload = get_images_from_capture_data(
+        capture_data, args['image_root_path'])
+
+    # Compress images if specified
+    if not args['dont_compress_images']:
+        images_to_upload = compress_images(images_to_upload, args)
+
+    # skip subject if no images present
+    if len(images_to_upload) == 0:
+        logger.warning("capture_id {} has no valid images".format(capture_id))
+        return None
+
+    # add meta-data to the subject required for the subject upload
+    metadata = capture_data['upload_metadata']
+    metadata['#original_images'] = capture_data['images']['original_images']
+    metadata['capture_id_anonymized'] = \
+        uploader.anonymize_id(capture_id)
+
+    # create the subject
+    subject = uploader.create_subject(
+        my_project, images_to_upload, metadata)
+
+    return subject
 
 
 if __name__ == "__main__":
@@ -107,13 +209,13 @@ if __name__ == "__main__":
         '--dont_compress_images' is not specified.")
 
     parser.add_argument(
+        "--upload_batch_size", type=int, default=100,
+        help="The number of subjects to create before linking them.")
+
+    parser.add_argument(
         "--image_root_path", type=str, default=None,
         help="The root path of all images in the manifest. Used when reading \
         them from disk.")
-
-    parser.add_argument(
-        "--debug_mode", action='store_true',
-        help="Activate debug mode which will print more status messages.")
 
     parser.add_argument(
         "--log_dir", type=str, default=None)
@@ -123,6 +225,10 @@ if __name__ == "__main__":
         default='upload_manifest')
 
     args = vars(parser.parse_args())
+
+    ###################################
+    # Check Input
+    ###################################
 
     # Check Manifest file
     if not os.path.exists(args['manifest']):
@@ -152,6 +258,10 @@ if __name__ == "__main__":
     for k, v in args.items():
         logger.info("Argument {}: {}".format(k, v))
 
+    ###################################
+    # Generate Filenames
+    ###################################
+
     file_name_parts = file_path_splitter(args['manifest'])
 
     # generate subject_set name
@@ -159,6 +269,24 @@ if __name__ == "__main__":
     args['subject_set_name'] = sub_name
     logger.info("Automatically generated subject_set_name: {}".format(
         sub_name))
+
+    # define output_file
+    if args['output_file'] is None:
+        args['output_file'] = file_path_generator(
+            dir=os.path.dirname(args['manifest']),
+            id=file_name_parts['id'],
+            name="%s_%s" % (file_name_parts['name'], 'uploaded'),
+            batch=file_name_parts['batch'],
+            file_delim=file_name_parts['file_delim'],
+            file_ext='json'
+            )
+        logger.info("Outputfile is {}".format(args['output_file']))
+
+    ###################################
+    # Create / Load Tracker File
+    # keeps track of already uploaded
+    # captures to resume uploads
+    ###################################
 
     # define tracker file path
     tracker_file_path = file_path_generator(
@@ -183,17 +311,9 @@ if __name__ == "__main__":
     logger.info("Found {} already uploaded subjects in tracker file".format(
                 n_in_tracker_file))
 
-    # define output_file
-    if args['output_file'] is None:
-        args['output_file'] = file_path_generator(
-            dir=os.path.dirname(args['manifest']),
-            id=file_name_parts['id'],
-            name="%s_%s" % (file_name_parts['name'], 'uploaded'),
-            batch=file_name_parts['batch'],
-            file_delim=file_name_parts['file_delim'],
-            file_ext='json'
-            )
-        logger.info("Outputfile is {}".format(args['output_file']))
+    ###################################
+    # Load Files
+    ###################################
 
     # import manifest
     with open(args['manifest'], 'r') as f:
@@ -205,47 +325,39 @@ if __name__ == "__main__":
     # read Zooniverse credentials
     config = read_config_file(args['password_file'])
 
+    ###################################
+    # Create Zooniverse Connection
+    # Fetch/Create SubjectSet
+    ###################################
+
     # connect to panoptes
-    Panoptes.connect(username=config['zooniverse']['username'],
-                     password=config['zooniverse']['password'])
+    connect_to_panoptes()
 
     # Get Project
     my_project = Project(args['project_id'])
 
     # get or create a subject set
     if args['subject_set_id'] is not None:
-        # Get an existing subject_set
-        my_set = SubjectSet().find(args['subject_set_id'])
-        logger.info("Subject set {} found, will upload into this set".format(
-                    args['subject_set_id']))
-        # check subject_set name is identical to what is expected from the
-        # manifest name, if not abort
-        if not my_set.display_name == args['subject_set_name']:
-            msg = "Found subject-set with id {} and name {} on Zooniverse -- \
-            but tried to continue uploading from manifest with \
-            id {} -- this discrepancy is unexpected, threfore, \
-            upload is aborted - did you choose the wrong manifest?".format(
-                my_set.id, my_set.display_name, args['subject_set_name'])
-            logger.error(textwrap.shorten(msg, width=150))
-            raise ValueError("Subject-set name {} not identical to {}".format(
-                my_set.display_name, args['subject_set_name']
-            ))
+        my_set = get_subject_set(
+            args['subject_set_id'], args['subject_set_name'])
     else:
-        my_set = uploader.create_subject_set(
-            my_project, args['subject_set_name'])
-        logger.info("Created new subject set with id {}, name {}".format(
-                     my_set.id, my_set.display_name))
+        my_set = create_subject_set(my_project, args['subject_set_name'])
+
+    ###################################
+    # Create Stats Variables
+    ###################################
 
     time_start = time.time()
-    uploaded_subjects_count = 0
+    total_uploaded_subjects = n_in_tracker_file
 
     capture_ids_all = list(mani.keys())
 
     n_tot = len(capture_ids_all)
     n_tot_remaining = n_tot - n_in_tracker_file
 
-    upload_batch_size = 100
-    batch_data = batch_data_storage()
+    ###################################
+    # Create Signal Handler
+    ###################################
 
     # handle (Ctrl+C) keyboard interrupt
     def signal_handler(*args):
@@ -269,72 +381,65 @@ if __name__ == "__main__":
     # register the handler for interrupt signal
     signal.signal(signal.SIGINT, signal_handler)
 
-    # loop over manifest
-    for capture_id in capture_ids_all:
+    ###################################
+    # Iterate over Manifest and
+    # Upload
+    ###################################
 
-        # current subject data
-        data = mani[capture_id]
+    MAX_RETRIES_PER_BATCH = 5
+    batch_data = batch_data_storage()
+
+    # loop over upload batches
+    for _no, capture_id in enumerate(capture_ids_all):
 
         # skip if capture_id arleady in tracker_file / uploaded
         if capture_id in tracker_data:
-            uploaded_subjects_count += 1
+            logger.debug("capture_id {} alreday uploaded".format(capture_id))
             continue
+
         try:
-            if isinstance(data['images'], dict):
-                images_to_upload = data['images']['original_images']
-            elif isinstance(data['images'], list):
-                images_to_upload = data['images']
-            else:
-                logger.warning("no images found for capture_id: {}".format(
-                    capture_id))
-            # append root path if specified
-            if args['image_root_path'] is not None:
-                images_to_upload = [
-                    os.path.join(args['image_root_path'], x)
-                    for x in images_to_upload]
-            # Compress images if specified
-            if not args['dont_compress_images']:
-                images_to_upload = \
-                    process_images_list_multiprocess(
-                            images_to_upload,
-                            resize_and_compress_list_of_images,
-                            n_processes=args['n_processes'],
-                            print_status=False,
-                            max_pixel_of_largest_side=args['max_pixel_of_largest_side'],
-                            save_quality=args['save_quality'])
-                # remove images that failed to process
-                images_to_upload = [
-                    x for x in images_to_upload if x is not None]
-                # skip subject if no images present
-                if len(images_to_upload) == 0:
-                    logger.warning(
-                        "capture_id {} has no valid images - skipping".format(
-                         capture_id))
-                    continue
-            metadata = data['upload_metadata']
-            metadata['#original_images'] = data['images']['original_images']
-            metadata['capture_id_anonymized'] = \
-                uploader.anonymize_id(capture_id)
-            subject = uploader.create_subject(
-                my_project, images_to_upload, metadata)
+            # current capture data
+            capture_data = mani[capture_id]
+
+            # Create subject - retry on connection issues
+            subject = retry(
+                create_subject,
+                attempts=MAX_RETRIES_PER_BATCH,
+                sleeptime=60,
+                retry_exceptions=(OSError, PanoptesAPIException),
+                cleanup=connect_to_panoptes,
+                args=(capture_id,
+                      capture_data,
+                      args),
+                log_args=False,)
+
+            if subject is None:
+                logger.warning(
+                    "subject creation for capture_id {} failed".format(
+                        capture_id))
+                continue
+
+            # get and store information about the created subject
             batch_data['subjects_to_link'].append(subject)
             batch_data['capture_ids'].append(capture_id)
             batch_data['subject_ids'].append(subject.id)
-            if args['debug_mode']:
-                logger.info("finished saving {} - {}".format(
-                            capture_id, current_time_str()))
 
-        except PanoptesAPIException as e:
-            logger.info('Error occurred for capture_id: %s' % capture_id)
+            logger.debug("finished saving capture_id {} - {}".format(
+                         capture_id, current_time_str()))
+
+        except Exception as e:
+            logger.info(
+                'Error while creating subject for capture_id: {}'.format(
+                    capture_id))
             logger.info('Details of error: {}'.format(e))
             uploader.handle_batch_failure(batch_data['subjects_to_link'])
-            raise SystemExit
+            raise
 
-        # link each batch of new subjects to the subject set
-        if len(batch_data['subjects_to_link']) % upload_batch_size == 0:
+        # link current batch to subject set
+        if len(batch_data['subjects_to_link']) >= args['upload_batch_size']:
             uploader.add_batch_to_subject_set(
                 my_set, batch_data['subjects_to_link'])
-            uploaded_subjects_count += len(batch_data['subjects_to_link'])
+            total_uploaded_subjects += len(batch_data['subjects_to_link'])
 
             # update upload tracker
             uploader.update_tracker_file(
@@ -342,7 +447,6 @@ if __name__ == "__main__":
                 batch_data['capture_ids'],
                 batch_data['subject_ids'])
 
-            # reset batch data
             batch_data = batch_data_storage()
 
             # print progress information
@@ -350,25 +454,31 @@ if __name__ == "__main__":
             tr = estimate_remaining_time(
                 time_start,
                 n_tot_remaining,
-                max(0, uploaded_subjects_count-n_in_tracker_file))
+                max(0, total_uploaded_subjects-n_in_tracker_file))
             st = datetime.datetime.fromtimestamp(ts).strftime('%H:%M:%S')
             msg = "Saved {:5}/{:5} ({:4} %) - Current Time: {} - \
                    Estimated Time Remaining: {}".format(
-                   uploaded_subjects_count, n_tot,
-                   round((uploaded_subjects_count/n_tot) * 100, 2), st, tr)
+                   total_uploaded_subjects, n_tot,
+                   round((total_uploaded_subjects/n_tot) * 100, 2), st, tr)
             logger.info(textwrap.shorten(msg, width=99))
 
-    # catch any left over batches in the file
+    ###################################
+    # Link any remaining subjects
+    ###################################
+
     if len(batch_data['subjects_to_link']) > 0:
         uploader.add_batch_to_subject_set(
             my_set, batch_data['subjects_to_link'])
-        uploaded_subjects_count += len(batch_data['subjects_to_link'])
+        total_uploaded_subjects += len(batch_data['subjects_to_link'])
         uploader.update_tracker_file(
             tracker_file_path,
             batch_data['capture_ids'],
             batch_data['subject_ids'])
 
-    # update manifest
+    ###################################
+    # Update Manifest
+    ###################################
+
     tracker_data = uploader.read_tracker_file(tracker_file_path)
 
     for capture_id, subject_id in tracker_data.items():
@@ -377,7 +487,7 @@ if __name__ == "__main__":
 
     logger.info(
       "Finished uploading subjects - total {}/{} successfully uploaded".format(
-       uploaded_subjects_count, n_tot))
+       total_uploaded_subjects, n_tot))
 
     # Export Manifest
     export_dict_to_json_with_newlines(mani, args['output_file'])
