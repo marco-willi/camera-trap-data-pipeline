@@ -163,7 +163,7 @@ if __name__ == '__main__':
                         continue
                 except:
                     pass
-                # check if subject was already classiifed by user
+                # check if subject was already classified by user
                 # if so, skip it
                 try:
                     user_name = classification_info['user_name']

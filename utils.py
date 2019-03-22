@@ -7,7 +7,6 @@ import datetime
 import json
 import random
 import pandas as pd
-import math
 from hashlib import md5
 import logging
 import configparser
@@ -274,30 +273,47 @@ def set_file_permission(path):
 
 
 def balanced_sample_best_effort(y, n_samples):
-    """ Sample as balanced as possible """
-    class_samples = Counter(y)
-    freq = class_samples.most_common()
-    n_tot = sum(class_samples.values())
+    """ Sample as balanced as possible from labels
+    Args:
+        y: list - class labels of all observations
+        n_samples: int - number of samples to take
+    Returns:
+        sampled_list: list - indexes of 'y' that have been sampled
+    Example:
+        y: ['zebra', 'zebra', 'elephant', 'lion']
+        n_samples: 3
+        sampled_list: [3, 2, 0]
+    """
+    # calculate class frequencies
+    class_to_frequency = Counter(y)
+    class_ordered_by_freq = class_to_frequency.most_common()
+    # calculate how many samples to (ideally) get per class
+    n_tot = sum(class_to_frequency.values())
     n_samples = min(n_samples, n_tot)
-    n_samples_per_step = math.ceil(n_samples / len(class_samples))
-    # n_samples_per_step = math.ceil(
-    #     np.quantile(list(class_samples.values()), 0.01))
-    n_samples_per_step = 1
-    maps = {k: [] for k in class_samples.keys()}
-    sampled = {k: [] for k in class_samples.keys()}
+    # create class to id map / class to sample ids
+    class_to_ids_map = {k: [] for k in class_to_frequency.keys()}
+    class_ids_sampled = {k: [] for k in class_to_frequency.keys()}
     for _id, yy in enumerate(y):
-        maps[yy].append(_id)
+        class_to_ids_map[yy].append(_id)
+    # sample iteratively
     n_sampled = 0
+    n_to_sample_per_step = 1
     while n_sampled < n_samples:
-        for k, f in reversed(freq):
-            n_in_group = len(maps[k])
-            n_to_sample = min(n_in_group, n_samples_per_step)
-            sampled[k] += [
-                maps[k].pop(random.randrange(len(maps[k])))
+        # sample from least frequent class
+        for k, f in reversed(class_ordered_by_freq):
+            n_in_group = len(class_to_ids_map[k])
+            n_to_sample = min(n_in_group, n_to_sample_per_step)
+            # randomly sample n_to_sample from the class and remove them
+            class_ids_sampled[k] += [
+                class_to_ids_map[k].pop(
+                    random.randrange(len(class_to_ids_map[k])))
                 for _ in range(n_to_sample)]
             n_sampled += n_to_sample
-    sampled_ids = [sampled[k] for k, f in reversed(freq)]
+    # get all sampled ids
+    sampled_ids = [class_ids_sampled[k] for k, f in
+                   reversed(class_ordered_by_freq)]
     sampled_list = list()
+    # ensure that sampled list has the correct length
     for i, x in enumerate(sampled_ids):
         sampled_list += x
         if i >= n_samples:
