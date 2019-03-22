@@ -32,10 +32,10 @@ from utils import (
 
 
 # python3 -m zooniverse_uploads.upload_manifest_v6 \
-# --manifest /home/packerc/shared/zooniverse/Manifests/GRU_TEST/GRU_S1__batch_15__manifest.json \
+# --manifest /home/packerc/shared/zooniverse/Manifests/GRU_TEST/GRU_S1__batch_16__manifest.json \
 # --log_dir /home/packerc/shared/zooniverse/Manifests/GRU_TEST/ \
 # --project_id 5115 \
-# --subject_set_id 73952 \
+# --subject_set_id 74005 \
 # --password_file ~/keys/passwords.ini \
 # --image_root_path /home/packerc/shared/albums/GRU/
 
@@ -155,13 +155,8 @@ def create_subject(capture_id, capture_data, args):
         uploader.anonymize_id(capture_id)
 
     # create the subject
-    try:
-        subject = uploader.create_subject(
-            my_project, images_to_upload, metadata)
-    except TypeError:
-        logger.info("Type error catched -- ignoring")
-    except Exception:
-        raise
+    subject = uploader.create_subject2(
+        my_project, images_to_upload, metadata)
 
     return subject
 
