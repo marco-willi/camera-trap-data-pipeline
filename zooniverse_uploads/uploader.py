@@ -22,27 +22,6 @@ def create_subject(project, media_files, metadata):
     return subject
 
 
-def create_subject2(project, media_files, metadata):
-    """ Create a subject
-        Args:
-        - project: a Project() object defining the Zooniverse project
-        - media_files: a list of media files to link to the subject
-        - metadata: a dictionary with metadata to attach
-    """
-    subject = Subject()
-    subject.links.project = project
-    for media in media_files:
-        subject.add_location(media)
-    subject.metadata.update(metadata)
-    try:
-        subject.save()
-    except TypeError:
-        print("Type error catched -- ignoring")
-    except Exception:
-        raise
-    return subject
-
-
 def handle_batch_failure(subjects_to_link):
     print('Rolling back, attempting to clean up any unlinked subjects.')
     for subject in subjects_to_link:

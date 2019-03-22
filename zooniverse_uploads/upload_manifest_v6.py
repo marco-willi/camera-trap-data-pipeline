@@ -155,7 +155,7 @@ def create_subject(capture_id, capture_data, args):
         uploader.anonymize_id(capture_id)
 
     # create the subject
-    subject = uploader.create_subject2(
+    subject = uploader.create_subject(
         my_project, images_to_upload, metadata)
 
     return subject
