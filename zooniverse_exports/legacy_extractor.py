@@ -238,10 +238,18 @@ def fix_roll_id(roll):
         return 'R{}'.format(roll).upper()
 
 
+def fix_legacy_season_id(season):
+    """ Fix Legacy Season IDs - change to format 'S10' (example) """
+    if season.lower().startswith('s'):
+        return season.upper()
+    else:
+        return 'S{}'.format(season).upper()
+
+
 def build_img_path(season, site, roll, img):
     """ build path """
     roll_key = '_'.join([site, fix_roll_id(roll)])
-    img_path = os.path.join(season, site, roll_key, img)
+    img_path = os.path.join(fix_legacy_season_id(season), site, roll_key, img)
     return correct_image_name(img_path)
 
 
