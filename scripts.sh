@@ -234,71 +234,82 @@ done
 # Check Input Structure
 python3 -m pre_processing.check_input_structure \
 --root_dir /home/packerc/shared/albums/${SITE}/${SEASON}/ \
---log_dir /home/packerc/shared/season_captures/${SITE}/log_files/
+--log_dir /home/packerc/shared/season_captures/${SITE}/log_files/ \
+--log_filename ${SEASON}_check_input_structure
 
 # Check for duplicate images
 python3 -m pre_processing.check_for_duplicates \
 --root_dir /home/packerc/shared/albums/${SITE}/${SEASON}/ \
---log_dir /home/packerc/shared/season_captures/${SITE}/log_files/
+--log_dir /home/packerc/shared/season_captures/${SITE}/log_files/ \
+--log_filename ${SEASON}_check_for_duplicates
 
 # Create Image Inventory
 python3 -m pre_processing.create_image_inventory \
 --root_dir /home/packerc/shared/albums/${SITE}/${SEASON}/ \
 --output_csv /home/packerc/shared/season_captures/${SITE}/inventory/${SEASON}_inventory_basic.csv \
---log_dir /home/packerc/shared/season_captures/${SITE}/log_files/
+--log_dir /home/packerc/shared/season_captures/${SITE}/log_files/ \
+--log_filename ${SEASON}_create_image_inventory
 
 # Create Basic Inventory Checks
 python3 -m pre_processing.basic_inventory_checks \
 --inventory /home/packerc/shared/season_captures/${SITE}/inventory/${SEASON}_inventory_basic.csv \
 --output_csv /home/packerc/shared/season_captures/${SITE}/inventory/${SEASON}_inventory.csv \
+--n_processes 16 \
 --log_dir /home/packerc/shared/season_captures/${SITE}/log_files/ \
---n_processes 16
+--log_filename ${SEASON}_basic_inventory_checks
 
 # Extract Exif Data
 python3 -m pre_processing.extract_exif_data \
 --inventory /home/packerc/shared/season_captures/${SITE}/inventory/${SEASON}_inventory.csv \
 --update_inventory \
 --output_csv /home/packerc/shared/season_captures/${SITE}/inventory/${SEASON}_exif_data.csv \
---log_dir /home/packerc/shared/season_captures/${SITE}/log_files/
+--log_dir /home/packerc/shared/season_captures/${SITE}/log_files/ \
+--log_filename ${SEASON}_extract_exif_data
 
 # Group Images into Captures
 python3 -m pre_processing.group_inventory_into_captures \
 --inventory /home/packerc/shared/season_captures/${SITE}/inventory/${SEASON}_inventory.csv \
 --output_csv /home/packerc/shared/season_captures/${SITE}/captures/${SEASON}_captures.csv \
---log_dir /home/packerc/shared/season_captures/${SITE}/log_files/ \
 --no_older_than_year 2017 \
---no_newer_than_year 2019
+--no_newer_than_year 2019 \
+--log_dir /home/packerc/shared/season_captures/${SITE}/log_files/ \
+--log_filename ${SEASON}_group_inventory_into_captures
 
 # rename all images
 python3 -m pre_processing.rename_images \
 --inventory /home/packerc/shared/season_captures/${SITE}/captures/${SEASON}_captures.csv \
---log_dir /home/packerc/shared/season_captures/${SITE}/log_files/
+--log_dir /home/packerc/shared/season_captures/${SITE}/log_files/ \
+--log_filename ${SEASON}_rename_images
 
 # generate action list
 python3 -m pre_processing.create_action_list \
 --captures /home/packerc/shared/season_captures/${SITE}/captures/${SEASON}_captures.csv \
 --action_list_csv /home/packerc/shared/season_captures/${SITE}/captures/${SEASON}_action_list.csv \
+--plot_timelines \
 --log_dir /home/packerc/shared/season_captures/${SITE}/log_files/ \
---plot_timelines
+--log_filename ${SEASON}_create_action_list
 
 # generate actions
 python3 -m pre_processing.generate_actions \
 --captures /home/packerc/shared/season_captures/${SITE}/captures/${SEASON}_captures.csv \
 --action_list /home/packerc/shared/season_captures/${SITE}/captures/${SEASON}_action_list.csv \
 --actions_to_perform_csv /home/packerc/shared/season_captures/${SITE}/captures/${SEASON}_actions_to_perform.csv \
---log_dir /home/packerc/shared/season_captures/${SITE}/log_files/
+--log_dir /home/packerc/shared/season_captures/${SITE}/log_files/ \
+--log_filename ${SEASON}_generate_actions
 
 # apply actions
 python3 -m pre_processing.apply_actions \
 --captures /home/packerc/shared/season_captures/${SITE}/captures/${SEASON}_captures.csv \
 --actions_to_perform /home/packerc/shared/season_captures/${SITE}/captures/${SEASON}_actions_to_perform.csv \
---log_dir /home/packerc/shared/season_captures/${SITE}/log_files/
+--log_dir /home/packerc/shared/season_captures/${SITE}/log_files/ \
+--log_filename ${SEASON}_apply_actions
 
 # Update Captures
 python3 -m pre_processing.update_captures \
 --captures /home/packerc/shared/season_captures/${SITE}/captures/${SEASON}_captures.csv \
 --captures_updated /home/packerc/shared/season_captures/${SITE}/captures/${SEASON}_captures_updated.csv \
---log_dir /home/packerc/shared/season_captures/${SITE}/log_files/
+--log_dir /home/packerc/shared/season_captures/${SITE}/log_files/ \
+--log_filename ${SEASON}_update_captures
 
 cp /home/packerc/shared/season_captures/${SITE}/captures/${SEASON}_captures_updated.csv /home/packerc/shared/season_captures/${SITE}/cleaned/${SEASON}_captures_cleaned.csv
 
@@ -306,8 +317,8 @@ cp /home/packerc/shared/season_captures/${SITE}/captures/${SEASON}_captures_upda
 python3 -m pre_processing.create_action_list \
 --captures /home/packerc/shared/season_captures/${SITE}/captures/${SEASON}_captures_updated.csv \
 --action_list_csv /home/packerc/shared/season_captures/${SITE}/captures/${SEASON}_action_list2.csv \
---log_dir /home/packerc/shared/season_captures/${SITE}/log_files/
-
+--log_dir /home/packerc/shared/season_captures/${SITE}/log_files/ \
+--log_filename ${SEASON}_create_action_list
 
 ###################################
 # Zooniverse Uploads

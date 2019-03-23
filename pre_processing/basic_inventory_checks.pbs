@@ -12,5 +12,6 @@ cd $HOME/camera-trap-data-pipeline
 python3 -m pre_processing.basic_inventory_checks \
 --inventory /home/packerc/shared/season_captures/${SITE}/inventory/${SEASON}_inventory_basic.csv \
 --output_csv /home/packerc/shared/season_captures/${SITE}/inventory/${SEASON}_inventory.csv \
+--n_processes 32 \
 --log_dir /home/packerc/shared/season_captures/${SITE}/log_files/ \
---n_processes 32
+--log_filename ${SEASON}_basic_inventory_checks

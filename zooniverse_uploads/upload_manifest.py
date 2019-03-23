@@ -124,7 +124,6 @@ def get_subject_set(subject_set_id, subject_set_name):
 
 
 def create_subject_set(my_project, subject_set_name):
-    """  Create a Subject_Set """
     my_set = uploader.create_subject_set(
         my_project, subject_set_name)
     logger.info("Created new subject set with id {}, name {}".format(
@@ -133,7 +132,6 @@ def create_subject_set(my_project, subject_set_name):
 
 
 def create_subject(capture_id, capture_data, args):
-    """ Create a Subject """
     images_to_upload = get_images_from_capture_data(
         capture_data, args['image_root_path'])
 
@@ -383,13 +381,12 @@ if __name__ == "__main__":
 
     ###################################
     # Iterate over Manifest and
-    # Upload
+    # upload Captures
     ###################################
 
     MAX_RETRIES_PER_BATCH = 5
     batch_data = batch_data_storage()
 
-    # loop over upload batches
     for _no, capture_id in enumerate(capture_ids_all):
 
         # skip if capture_id arleady in tracker_file / uploaded
