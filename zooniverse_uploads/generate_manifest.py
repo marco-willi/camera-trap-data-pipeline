@@ -113,7 +113,7 @@ if __name__ == "__main__":
     manifest = OrderedDict()
     omitted_images_counter = 0
     images_not_found_counter = 0
-    valid_codes = ('0', '3')
+    invalid_codes = ('1', '2')
     n_records_total = cleaned_captures.shape[0]
     for row_no, row in cleaned_captures.iterrows():
         # Extract important fields
@@ -128,8 +128,8 @@ if __name__ == "__main__":
             capture_id = row.capture_id
         except:
             capture_id = '#'.join([season, site, roll, capture])
-        # Skip image if not in valid codes
-        if invalid not in valid_codes:
+        # Skip image if code indicates invalid code
+        if invalid in invalid_codes:
             omitted_images_counter += 1
             continue
         # Skip if image is not on disk
