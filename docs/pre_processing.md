@@ -265,7 +265,7 @@ python3 -m pre_processing.update_captures \
 
 If the previous code showed no further issues in the printed output, the generated file is the finalized cleaned captures file and can be moved like this:
 ```
-cp /home/packerc/shared/season_captures/${SITE}/captures/${SEASON}_captures_updated.csv /home/packerc/shared/season_captures/${SITE}/cleaned/${SEASON}_captures_cleaned.csv
+cp /home/packerc/shared/season_captures/${SITE}/captures/${SEASON}_captures_updated.csv /home/packerc/shared/season_captures/${SITE}/cleaned/${SEASON}_cleaned.csv
 ```
 
 If there are further issues, we generate a new action list and start over with:

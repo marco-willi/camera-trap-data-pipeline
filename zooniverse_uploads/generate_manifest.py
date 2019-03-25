@@ -9,7 +9,7 @@ import logging
 from logger import setup_logger, create_log_file
 from utils import (
     export_dict_to_json_with_newlines,
-    read_cleaned_season_file, file_path_generator, set_file_permission)
+    read_cleaned_season_file_df, file_path_generator, set_file_permission)
 
 
 # For Testing
@@ -104,30 +104,28 @@ if __name__ == "__main__":
         raise FileExistsError("manifest already exists: %s" % manifest_path)
 
     # Read Season Captures CSV
-    cleaned_captures, name_to_id_mapper = \
-        read_cleaned_season_file(args['captures_csv'],
-                                 args['csv_quotechar'])
+    cleaned_captures = read_cleaned_season_file_df(args['captures_csv'])
 
     logger.info("Found %s images in %s" %
-                (len(cleaned_captures), args['captures_csv']))
+                (cleaned_captures.shape[0], args['captures_csv']))
 
     # Create the manifest
     manifest = OrderedDict()
     omitted_images_counter = 0
     images_not_found_counter = 0
     valid_codes = ('0', '3')
-    n_records_total = len(cleaned_captures)
-    for row_no, row in enumerate(cleaned_captures):
+    n_records_total = cleaned_captures.shape[0]
+    for row_no, row in cleaned_captures.iterrows():
         # Extract important fields
-        season = row[name_to_id_mapper['season']]
-        site = row[name_to_id_mapper['site']]
-        roll = row[name_to_id_mapper['roll']]
-        capture = row[name_to_id_mapper['capture']]
-        image_path = row[name_to_id_mapper['path']]
-        invalid = row[name_to_id_mapper['invalid']]
+        season = row.season
+        site = row.site
+        roll = row.roll
+        capture = row.capture
+        image_path = row.path
+        invalid = row.invalid
         # unique capture id
         try:
-            capture_id = row[name_to_id_mapper['capture_id']]
+            capture_id = row.capture_id
         except:
             capture_id = '#'.join([season, site, roll, capture])
         # Skip image if not in valid codes

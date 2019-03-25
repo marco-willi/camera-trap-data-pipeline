@@ -221,6 +221,31 @@ def file_path_splitter(path, file_delim="__", file_ext='json'):
             'file_delim': file_delim, 'file_ext': file_ext}
 
 
+def _append_season_to_image_path(path, season):
+    """ Appned season tag to image path """
+    path_first = next(part for part in path.split(os.path.sep) if part)
+    if not path_first == season:
+        return os.path.join(season, path)
+    else:
+        return path
+
+
+def read_cleaned_season_file_df(path):
+    df = pd.read_csv(path, dtype='str', index_col=None)
+    df.fillna('', inplace=True)
+    required_header_cols = ('season', 'site', 'roll', 'capture',
+                            'path', 'invalid')
+    if 'path' not in df.columns:
+        if 'image_path_rel' in df.columns:
+            df['path'] = df[['image_path_rel', 'season']].apply(
+                lambda x: _append_season_to_image_path(*x), axis=1)
+
+    for col in required_header_cols:
+        if col not in df.columns:
+            print("Column {} not found in cleaned_season_file".format(col))
+    return df
+
+
 def read_cleaned_season_file(path, quotechar='"'):
     """ Check the input file """
     cleaned_captures = list()
@@ -239,13 +264,6 @@ def read_cleaned_season_file(path, quotechar='"'):
             cleaned_captures.append(row)
 
     return cleaned_captures, name_to_id_mapper
-
-
-def read_cleaned_season_file_df(path):
-    """ Check the input file """
-    df = pd.read_csv(path, dtype='str', index_col=None)
-    df.fillna('', inplace=True)
-    return df
 
 
 def print_nested_dict(key, dic):
