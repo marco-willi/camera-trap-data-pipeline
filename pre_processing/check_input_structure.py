@@ -154,9 +154,8 @@ if __name__ == '__main__':
                             roll_directory_path, image_file_name)
                         logger.error(
                             textwrap.shorten(
-                                "File {} at {} must end in .jpg.JPG, \
-                                 remove is".format(
-                                 image_file_name, roll
+                                "File {} at {} must end in .jpg / .JPG".format(
+                                 image_file_name, roll_directory_name
                                  ), width=msg_width))
 
     logger.info("Finished checking input structure")

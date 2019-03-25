@@ -23,8 +23,8 @@ The following examples were run with the following paramters:
 SITE=RUA
 SEASON=RUA_S1
 PROJECT_ID=5155
-ATTRIBUTION="'University of Minnesota Lion Center + SnapshotSafari + Ruaha Carnivore Project + Tanzania + Ruaha National Park'"
-LICENSE="'SnapshotSafari + Ruaha Carnivore Project'"
+ATTRIBUTION='University of Minnesota Lion Center + SnapshotSafari + Ruaha Carnivore Project + Tanzania + Ruaha National Park'
+LICENSE='SnapshotSafari + Ruaha Carnivore Project'
 ```
 
 ## Generate Manifest
@@ -38,8 +38,8 @@ python3 -m zooniverse_uploads.generate_manifest \
 --images_root_path /home/packerc/shared/albums/${SITE}/ \
 --log_dir /home/packerc/shared/zooniverse/Manifests/${SITE}/ \
 --manifest_id ${SEASON} \
---attribution ${ATTRIBUTION} \
---license ${LICENSE}
+--attribution "${ATTRIBUTION}" \
+--license "${LICENSE}"
 ```
 
 The default settings create the following file:

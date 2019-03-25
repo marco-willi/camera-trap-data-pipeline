@@ -49,7 +49,6 @@ if __name__ == '__main__':
         raise FileNotFoundError("oruboros_export: {} not found".format(
                                 args['oruboros_export']))
 
-
     ######################################
     # Configuration
     ######################################

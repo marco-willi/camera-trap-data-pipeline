@@ -19,8 +19,8 @@ SEASON=GRU_S1
 PROJECT_ID=5115
 WORKFLOW_ID=4979
 WORKFLOW_VERSION_MIN=275
-ATTRIBUTION="'University of Minnesota Lion Center + Snapshot Safari + Singita Grumeti + Tanzania'"
-LICENSE="'Snapshot Safari + Singita Grumeti'"
+ATTRIBUTION='University of Minnesota Lion Center + Snapshot Safari + Singita Grumeti + Tanzania'
+LICENSE='Snapshot Safari + Singita Grumeti'
 
 }
 
@@ -330,8 +330,8 @@ python3 -m zooniverse_uploads.generate_manifest \
 --output_manifest_dir /home/packerc/shared/zooniverse/Manifests/${SITE}/ \
 --log_dir /home/packerc/shared/zooniverse/Manifests/${SITE}/ \
 --manifest_id ${SEASON} \
---attribution ${ATTRIBUTION} \
---license ${LICENSE}
+--attribution "${ATTRIBUTION}" \
+--license "${LICENSE}"
 
 # Create machine learning file
 python3 -m zooniverse_uploads.create_machine_learning_file \
