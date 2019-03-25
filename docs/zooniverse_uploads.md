@@ -60,15 +60,15 @@ The 'captures_csv' input is a csv file with (at least) the following columns:
 |roll | roll identifier (SD card of a camera)
 |capture | capture identifier
 |path | Absolute or relative path of the image
-|invalid| Code that has to be one of '0' or '3' in order for the image to be considered valid (else it is not included in the manifest)
+|invalid| (legacy column) -- excludes images from the manifest if value is '1' or '2'
 
-The fields can either be quoted by "" or not. It is expected that the input is ordered by: season, site, roll, capture, image (ordered by sequence in the capture).
+It is expected that the input is ordered by: season, site, roll, capture, image (ordered by sequence in the capture).
 
 Example:
 ```
 season,site,roll,capture,image,path,timestamp,oldtime,sr,imname,invalid,timez,J
 GRU_S1,J05,1,14,1,GRU_S1/J05/J05_R1/GRU_S1_J05_R1_IMAG0036.JPG,2017:06:06 03:56:50,2017:06:06 03:56:50,J05_R1,GRU_S1_J05_R1_IMAG0036.JPG,1,,
-GRU_S1,J06,1,17,1,GRU_S1/J06/J06_R1/GRU_S1_J06_R1_IMAG0043.JPG,2017:06:09 22:28:38,2017:06:09 22:28:38,J06_R1,GRU_S1_J06_R1_IMAG0043.JPG,1,,
+GRU_S1,J06,1,17,1,GRU_S1/J06/J06_R1/GRU_S1_J06_R1_IMAG0043.JPG,2017:06:09 22:28:38,2017:06:09 22:28:38,J06_R1,GRU_S1_J06_R1_IMAG0043.JPG,0,,
 ```
 
 ## Create Machine Lerning File for Model Input (Optional)
