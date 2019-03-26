@@ -20,9 +20,9 @@ The general aggregation logic (plurality algorithm) is as follows:
 For most scripts we use the following ressources (unless indicated otherwise):
 ```
 ssh lab
+qsub -I -l walltime=02:00:00,nodes=1:ppn=4,mem=16gb
 module load python3
 cd ~/camera-trap-data-pipeline
-qsub -I -l walltime=02:00:00,nodes=1:ppn=4,mem=16gb
 ```
 
 The following examples were run with the following paramters:

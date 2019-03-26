@@ -5,14 +5,16 @@ The following codes can be used to:
 1. Create reports from Zooniverse aggregations
 2. Create reports from Machine Learning predictions
 
+A report in this context refers to a file (a csv) that contains individual species identifications for the data that was processed throug the entire data pipeline. It does not refer to ecological analyses or analytical products -- it is the basis to create such analyses.
+
 The following codes show an example for Grumeti:
 
 For most scripts we use the following ressources (unless indicated otherwise):
 ```
 ssh lab
+qsub -I -l walltime=02:00:00,nodes=1:ppn=2,mem=8gb
 module load python3
 cd ~/camera-trap-data-pipeline
-qsub -I -l walltime=02:00:00,nodes=1:ppn=2,mem=8gb
 ```
 
 The following examples were run with the following paramters (non-legacy):
@@ -23,7 +25,7 @@ SEASON=GRU_S1
 
 ## Create Zooniverse Reports
 
-The next scripts produce reports based on Zooniverse aggregations.
+The next scripts produce reports based on Zooniverse aggregations. The full report (without any modification as listed below) contains one or more records per capture event as defined in the 'cleaned.csv' -- multiple records if multiple species were identified.
 
 ### Options to modify the Reports
 Different reports can be generated based on the following options:
