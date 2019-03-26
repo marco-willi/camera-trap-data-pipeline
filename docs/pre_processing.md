@@ -78,7 +78,7 @@ python3 -m pre_processing.check_for_duplicates \
 --root_dir /home/packerc/shared/albums/${SITE}/${SEASON}/ \
 --log_dir /home/packerc/shared/season_captures/${SITE}/log_files/
 ```
-The script will print/log duplicates if any are found but won't alter anything.
+The script will print/log duplicates if any are found but won't alter anything. Note that some corrupt files (such with 0 size) will also be recognized as duplicates.
 
 ## Create Image Inventory
 
