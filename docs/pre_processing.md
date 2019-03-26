@@ -226,7 +226,7 @@ action_site	| action_roll | action_from_image |	action_to_image	| action_to_take
 8. Upload the modified csv and proceed.
 
 
-## Generate Actions
+## Parse Action Items
 
 This code unpacks the defined actions, performs some checks and generates a list with action items. One row per action / image.
 

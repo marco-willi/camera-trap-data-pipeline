@@ -3,7 +3,7 @@
 The following steps are required to upload new data to Zooniverse. The following codes show an example for processing RUA data. These are the steps:
 
 1. Generate Manifest (a file containing all info for the Zooniverse upload)
-2. Create Machine Lerning File for Model Input (Optional - create input for machine classifier)
+2. Create Machine Learning File for Model Input (Optional - create input for machine classifier)
 3. Generate new Predictions (Optional - run a machine classifier)
 4. Split/Batch Manifest (Optional - Zooniverse recommends not to use too large batches at once)
 5. Upload Manifest
@@ -13,9 +13,9 @@ The optional steps can simply be skipped.
 For most scripts we use the following ressources (unless indicated otherwise):
 ```
 ssh lab
+qsub -I -l walltime=12:00:00,nodes=1:ppn=4,mem=16gb
 module load python3
 cd ~/camera-trap-data-pipeline
-qsub -I -l walltime=12:00:00,nodes=1:ppn=4,mem=16gb
 ```
 
 The following examples were run with the following paramters:
@@ -71,7 +71,7 @@ GRU_S1,J05,1,14,1,GRU_S1/J05/J05_R1/GRU_S1_J05_R1_IMAG0036.JPG,2017:06:06 03:56:
 GRU_S1,J06,1,17,1,GRU_S1/J06/J06_R1/GRU_S1_J06_R1_IMAG0043.JPG,2017:06:09 22:28:38,2017:06:09 22:28:38,J06_R1,GRU_S1_J06_R1_IMAG0043.JPG,0,,
 ```
 
-## Create Machine Lerning File for Model Input (Optional)
+## Create Machine Learning File for Model Input (Optional)
 
 This code creates a 'machine learning file' that has the correct format for the machine learning models to classify the images in the manifest.
 
