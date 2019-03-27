@@ -72,6 +72,19 @@ def connect_to_panoptes():
                      password=config['zooniverse']['password'])
 
 
+def get_images_list_from_capture_data(capture_data):
+    """ Get images list from capture data -- handles different cases """
+    if isinstance(capture_data['images'], dict):
+        images = capture_data['images']['original_images']
+    elif isinstance(capture_data['images'], list):
+        images = capture_data['images']
+    else:
+        logger.warning("no images found for capture_id: {}".format(
+            capture_id))
+        images = list()
+    return images
+
+
 def get_images_from_capture_data(capture_data, root_path):
     """ Return a list of images """
     if isinstance(capture_data['images'], dict):
@@ -132,8 +145,13 @@ def create_subject_set(my_project, subject_set_name):
 
 
 def create_subject(capture_id, capture_data, args):
-    images_to_upload = get_images_from_capture_data(
-        capture_data, args['image_root_path'])
+    """ Create a Subject """
+    images_to_upload = get_images_list_from_capture_data(capture_data)
+
+    # add root path if specified
+    if args['image_root_path'] is not None:
+        images_to_upload = [os.path.join(args['image_root_path'], x)
+                            for x in images_to_upload]
 
     # Compress images if specified
     if not args['dont_compress_images']:
@@ -146,7 +164,8 @@ def create_subject(capture_id, capture_data, args):
 
     # add meta-data to the subject required for the subject upload
     metadata = capture_data['upload_metadata']
-    metadata['#original_images'] = capture_data['images']['original_images']
+    metadata['#original_images'] = \
+        get_images_list_from_capture_data(capture_data)
     metadata['capture_id_anonymized'] = \
         uploader.anonymize_id(capture_id)
 
