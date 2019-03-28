@@ -95,64 +95,42 @@ ${SEASON}__complete__machine_learning_input.csv
 
 ## Generate new Predictions (Optional)
 
-The following steps describe how to run the machine learning models. Note that the files 'ctc_predict_species.pbs' and 'ctc_predict_empty.pbs' have to be adapted. The predictions process is split into two parts: predict the presence of an animal (empty or not) and predict the animal species. Both of the following scripts can be run in parallel. The scripts process approximately 300 capture events / minute on a CPU queue so it can take several hours for large manifests to process. Please note that the following codes will create a file in your home directory 'camera-trap-classifier-latest-cpu.simg', you can safely delete that after the scripts have finished (it contains the machine learning software).
+The following steps describe how to run the machine learning models. We run two separate models: one to predict the presence of an animal (empty or not) and one to predict the animal species. The scripts process approximately 300 capture events / minute on a CPU so it can take several hours for large manifests to process. Please note that the following codes will create a file in your home directory 'camera-trap-classifier-latest-cpu.simg', you can safely delete that after the scripts have finished (it contains the machine learning software).
 
-### Generating 'Empty or Not' Predictions
+### Define the Parameters
 
-The following file needs to be adapted:
+Run / Define the following commands / parameters:
 ```
-$HOME/camera-trap-data-pipeline/machine_learning/jobs/ctc_predict_empty.pbs
-```
-Adapt the following parameters:
-```
+ssh mesabi
+cd $HOME/camera-trap-data-pipeline/machine_learning/jobs/
+
 SITE=RUA
 SEASON=RUA_S1
+BATCH=complete
 ```
 
 Optionally -- if choosing a specific batch to create predictions for, also adapt the batch name (derived from the manifest file name, default is 'complete', could be 'batch_1'):
 ```
-BATCH=complete
+BATCH=batch_1
 ```
 
-After that we can run the script using this command:
+### Submit the Machine Learning Jobs
+
+Both of the following commands can be run in parallel.
+
+To run the 'Empty or Not' model execute the following command:
 ```
-ssh mesabi
-cd $HOME/camera-trap-data-pipeline/machine_learning/jobs
-qsub ctc_predict_empty.pbs
+qsub -v SITE=${SITE},SEASON=${SEASON},BATCH=${BATCH} ctc_predict_empty.pbs
+```
+
+To run the 'Species' model execute the following command:
+```
+qsub -v SITE=${SITE},SEASON=${SEASON},BATCH=${BATCH} ctc_predict_species.pbs
 ```
 
 The default settings create the following file:
 ```
 ${SEASON}__complete__predictions_empty_or_not.json
-```
-
-### Generating 'Species' Predictions
-
-The following file needs to be adapted:
-```
-$HOME/camera-trap-data-pipeline/machine_learning/jobs/ctc_predict_species.pbs
-```
-
-Adapt the following parameters:
-```
-SITE=RUA
-SEASON=RUA_S1
-```
-
-Optionally -- if choosing a specific batch to create predictions for, also adapt the batch name (derived from the manifest file name, default is 'complete', could be 'batch_1'):
-```
-BATCH=complete
-```
-
-After that we can run the script using this command:
-```
-ssh mesabi
-cd $HOME/camera-trap-data-pipeline/machine_learning/jobs
-qsub ctc_predict_species.pbs
-```
-
-The default settings create the following file:
-```
 ${SEASON}__complete__predictions_species.json
 ```
 

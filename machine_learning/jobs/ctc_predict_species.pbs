@@ -8,11 +8,11 @@
 #PBS -e ${HOME}/job_ml_error_pred_species_${PBS_JOBID}.log
 
 # Parameters to Adapt (Mandatory)
-SITE=GRU
-SEASON=GRU_S1
+#SITE=GRU
+#SEASON=GRU_S1
 
 # Parameters to Adapt (Optional)
-BATCH=complete
+#BATCH=complete
 DELIMITER=__
 
 # Parameters Static
@@ -47,6 +47,12 @@ echo "MODEL_PRE_PROCESSING: $MODEL_PRE_PROCESSING"
 # modules
 module load singularity
 module load python3
+
+
+# sleep for 2 minutes to reduce chance of conflict with 'empty' script when it
+# is pulling the following docker container
+sleep 2m
+
 
 # download container and code
 cd $HOME

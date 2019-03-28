@@ -8,11 +8,11 @@
 #PBS -e ${HOME}/job_ml_error_pred_empty_${PBS_JOBID}.log
 
 # Parameters to Adapt (Mandatory)
-SITE=GRU
-SEASON=GRU_S1
+#SITE=GRU
+#SEASON=GRU_S1
 
 # Parameters to Adapt (Optional)
-BATCH=complete
+#BATCH=complete
 DELIMITER=__
 
 # Parameters Static
@@ -50,7 +50,7 @@ module load python3
 
 # download container and code
 cd $HOME
-singularity pull docker://will5448/camera-trap-classifier:latest-cpu
+singularity pull -F docker://will5448/camera-trap-classifier:latest-cpu
 
 # run the script
 singularity exec -B /home/packerc/shared:/home/packerc/shared ./camera-trap-classifier-latest-cpu.simg \
