@@ -64,7 +64,8 @@ The check can be performed using the following script:
 ```
 python3 -m pre_processing.check_input_structure \
 --root_dir /home/packerc/shared/albums/${SITE}/${SEASON}/ \
---log_dir /home/packerc/shared/season_captures/${SITE}/log_files/
+--log_dir /home/packerc/shared/season_captures/${SITE}/log_files/ \
+--log_filename ${SEASON}_check_input_structure
 ```
 
 The script will print/log messages if something is invalid but not alter anything.
@@ -76,7 +77,8 @@ The following script will check for duplicate images.
 ```
 python3 -m pre_processing.check_for_duplicates \
 --root_dir /home/packerc/shared/albums/${SITE}/${SEASON}/ \
---log_dir /home/packerc/shared/season_captures/${SITE}/log_files/
+--log_dir /home/packerc/shared/season_captures/${SITE}/log_files/ \
+--log_filename ${SEASON}_check_for_duplicates
 ```
 The script will print/log duplicates if any are found but won't alter anything. Note that some corrupt files (such with 0 size) will also be recognized as duplicates.
 
@@ -88,7 +90,8 @@ The following script generates an inventory of all camera trap images.
 python3 -m pre_processing.create_image_inventory \
 --root_dir /home/packerc/shared/albums/${SITE}/${SEASON}/ \
 --output_csv /home/packerc/shared/season_captures/${SITE}/inventory/${SEASON}_inventory_basic.csv \
---log_dir /home/packerc/shared/season_captures/${SITE}/log_files/
+--log_dir /home/packerc/shared/season_captures/${SITE}/log_files/ \
+--log_filename ${SEASON}_create_image_inventory
 ```
 
 
@@ -112,6 +115,7 @@ python3 -m pre_processing.basic_inventory_checks \
 --inventory /home/packerc/shared/season_captures/${SITE}/inventory/${SEASON}_inventory_basic.csv \
 --output_csv /home/packerc/shared/season_captures/${SITE}/inventory/${SEASON}_inventory.csv \
 --log_dir /home/packerc/shared/season_captures/${SITE}/log_files/ \
+--log_filename ${SEASON}_basic_inventory_checks \
 --n_processes 16
 ```
 
@@ -143,7 +147,8 @@ python3 -m pre_processing.extract_exif_data \
 --update_inventory \
 --output_csv /home/packerc/shared/season_captures/${SITE}/inventory/${SEASON}_exif_data.csv \
 --exiftool_path /home/packerc/shared/programs/Image-ExifTool-11.31/exiftool \
---log_dir /home/packerc/shared/season_captures/${SITE}/log_files/
+--log_dir /home/packerc/shared/season_captures/${SITE}/log_files/ \
+--log_filename ${SEASON}_extract_exif_data
 ```
 
 
@@ -155,9 +160,10 @@ The following script groups the images into capture events.
 python3 -m pre_processing.group_inventory_into_captures \
 --inventory /home/packerc/shared/season_captures/${SITE}/inventory/${SEASON}_inventory.csv \
 --output_csv /home/packerc/shared/season_captures/${SITE}/captures/${SEASON}_captures.csv \
---log_dir /home/packerc/shared/season_captures/${SITE}/log_files/ \
 --no_older_than_year 2017 \
---no_newer_than_year 2019
+--no_newer_than_year 2019 \
+--log_dir /home/packerc/shared/season_captures/${SITE}/log_files/ \
+--log_filename ${SEASON}_group_inventory_into_captures
 ```
 
 ## Rename all images
@@ -167,7 +173,8 @@ The following script renames the images.
 ```
 python3 -m pre_processing.rename_images \
 --inventory /home/packerc/shared/season_captures/${SITE}/captures/${SEASON}_captures.csv \
---log_dir /home/packerc/shared/season_captures/${SITE}/log_files/
+--log_dir /home/packerc/shared/season_captures/${SITE}/log_files/ \
+--log_filename ${SEASON}_rename_images
 ```
 
 ## Generate Action List
@@ -179,6 +186,7 @@ python3 -m pre_processing.create_action_list \
 --captures /home/packerc/shared/season_captures/${SITE}/captures/${SEASON}_captures.csv \
 --action_list_csv /home/packerc/shared/season_captures/${SITE}/captures/${SEASON}_action_list.csv \
 --log_dir /home/packerc/shared/season_captures/${SITE}/log_files/ \
+--log_filename ${SEASON}_create_action_list \
 --plot_timelines
 ```
 
@@ -235,7 +243,8 @@ python3 -m pre_processing.generate_actions \
 --captures /home/packerc/shared/season_captures/${SITE}/captures/${SEASON}_captures.csv \
 --action_list /home/packerc/shared/season_captures/${SITE}/captures/${SEASON}_action_list.csv \
 --actions_to_perform_csv /home/packerc/shared/season_captures/${SITE}/captures/${SEASON}_actions_to_perform.csv \
---log_dir /home/packerc/shared/season_captures/${SITE}/log_files/
+--log_dir /home/packerc/shared/season_captures/${SITE}/log_files/ \
+--log_filename ${SEASON}_generate_actions
 ```
 This file can be checked to ensure if everything is correct.
 
@@ -247,7 +256,8 @@ This code applies the actions. It updates the captures file and deletes specific
 python3 -m pre_processing.apply_actions \
 --captures /home/packerc/shared/season_captures/${SITE}/captures/${SEASON}_captures.csv \
 --actions_to_perform /home/packerc/shared/season_captures/${SITE}/captures/${SEASON}_actions_to_perform.csv \
---log_dir /home/packerc/shared/season_captures/${SITE}/log_files/
+--log_dir /home/packerc/shared/season_captures/${SITE}/log_files/ \
+--log_filename ${SEASON}_apply_actions
 ```
 
 ## Generate Updated Captures
@@ -258,7 +268,8 @@ This code generates an updated captures file after applying actions. Deleted ima
 python3 -m pre_processing.update_captures \
 --captures /home/packerc/shared/season_captures/${SITE}/captures/${SEASON}_captures.csv \
 --captures_updated /home/packerc/shared/season_captures/${SITE}/captures/${SEASON}_captures_updated.csv \
---log_dir /home/packerc/shared/season_captures/${SITE}/log_files/
+--log_dir /home/packerc/shared/season_captures/${SITE}/log_files/ \
+--log_filename ${SEASON}_update_captures
 ```
 
 ## Finalize (create cleaned captures) or Iterate (go back to creating action list)
@@ -274,7 +285,8 @@ If there are further issues, we generate a new action list and start over with:
 python3 -m pre_processing.create_action_list \
 --captures /home/packerc/shared/season_captures/${SITE}/captures/${SEASON}_captures_updated.csv \
 --action_list_csv /home/packerc/shared/season_captures/${SITE}/captures/${SEASON}_action_list2.csv \
---log_dir /home/packerc/shared/season_captures/${SITE}/log_files/
+--log_dir /home/packerc/shared/season_captures/${SITE}/log_files/ \
+--log_filename ${SEASON}_create_action_list
 ```
 
 This code can be run in any case to check if further actions need to be taken if the output of the previous code (update_captures) was not clear.

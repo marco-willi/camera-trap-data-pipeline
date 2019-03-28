@@ -27,6 +27,13 @@ ATTRIBUTION='University of Minnesota Lion Center + SnapshotSafari + Ruaha Carniv
 LICENSE='SnapshotSafari + Ruaha Carnivore Project'
 ```
 
+Make sure to create the following folders:
+```
+Manifests/${SITE}/
+Manifests/${SITE}/log_files/
+```
+
+
 ## Generate Manifest
 
 This generates a manifest from the captures csv. A manifest contains all the information required to upload data to Zooniverse.
@@ -36,7 +43,8 @@ python3 -m zooniverse_uploads.generate_manifest \
 --captures_csv /home/packerc/shared/season_captures/${SITE}/cleaned/${SEASON}_cleaned.csv \
 --output_manifest_dir /home/packerc/shared/zooniverse/Manifests/${SITE}/ \
 --images_root_path /home/packerc/shared/albums/${SITE}/ \
---log_dir /home/packerc/shared/zooniverse/Manifests/${SITE}/ \
+--log_dir /home/packerc/shared/zooniverse/Manifests/${SITE}/log_files/ \
+--log_filename ${SEASON}_generate_manifest \
 --manifest_id ${SEASON} \
 --attribution "${ATTRIBUTION}" \
 --license "${LICENSE}"
@@ -173,7 +181,8 @@ This codes splits the manifest into several batches that can be uploaded separat
 cd $HOME/camera-trap-data-pipeline
 python3 -m zooniverse_uploads.split_manifest_into_batches \
 --manifest /home/packerc/shared/zooniverse/Manifests/${SITE}/${SEASON}__complete__manifest.json \
---log_dir /home/packerc/shared/zooniverse/Manifests/${SITE}/ \
+--log_dir /home/packerc/shared/zooniverse/Manifests/${SITE}/log_files/ \
+--log_filename ${SEASON}_split_manifest_into_batches \
 --max_batch_size 20000
 ```
 
@@ -194,7 +203,8 @@ Change the paths analogue to this example:
 ```
 python3 -m zooniverse_uploads.upload_manifest \
 --manifest /home/packerc/shared/zooniverse/Manifests/${SITE}/${SEASON}__complete__manifest.json \
---log_dir /home/packerc/shared/zooniverse/Manifests/${SITE}/ \
+--log_dir /home/packerc/shared/zooniverse/Manifests/${SITE}/log_files/ \
+--log_filename ${SEASON}_upload_manifest \
 --project_id ${PROJECT_ID} \
 --password_file ~/keys/passwords.ini \
 --image_root_path /home/packerc/shared/albums/${SITE}/
@@ -205,7 +215,7 @@ To upload a specific batch instead use something analogue to:
 --manifest /home/packerc/shared/zooniverse/Manifests/${SITE}/${SEASON}__batch_1__manifest.json \
 ```
 
-### Run via qsub (if not via Terminal)
+### Run via qsub (if not via Terminal) - Recommended if connection issues
 
 Run the script in the following way:
 ```
@@ -244,7 +254,8 @@ Change the paths analogue to this example:
 ```
 python3 -m zooniverse_uploads.upload_manifest \
 --manifest /home/packerc/shared/zooniverse/Manifests/${SITE}/${SEASON}__complete__manifest.json \
---log_dir /home/packerc/shared/zooniverse/Manifests/${SITE}/ \
+--log_dir /home/packerc/shared/zooniverse/Manifests/${SITE}/log_files/ \
+--log_filename ${SEASON}_upload_manifest \
 --project_id ${PROJECT_ID} \
 --subject_set_id 7845 \
 --image_root_path /home/packerc/shared/albums/${SITE}/ \
@@ -273,3 +284,4 @@ qsub -v SITE=${SITE},SEASON=${SEASON},PROJECT_ID=${PROJECT_ID},BATCH=${BATCH},SU
 INFO:Error occurred for capture_id: PLN_S1#D05#2#3345
 INFO:Details of error: Received HTTP status code 504 from API
 ```
+The script tries to re-try on connection issues, however, it can take a long time until connection issues are detected. It is thus useful to use the 'qsub' version of the script with a long runtime and be patient until everything is uploaded.

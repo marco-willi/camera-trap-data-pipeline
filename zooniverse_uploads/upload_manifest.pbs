@@ -14,7 +14,8 @@ if [[ -z "${SUBJECT_SET_ID}" ]]; then
   python3 -m zooniverse_uploads.upload_manifest \
   --manifest /home/packerc/shared/zooniverse/Manifests/${SITE}/${SEASON}__${BATCH}__manifest.json \
   --project_id $PROJECT_ID \
-  --log_dir /home/packerc/shared/zooniverse/Manifests/${SITE}/ \
+  --log_dir /home/packerc/shared/zooniverse/Manifests/${SITE}/log_files/ \
+  --log_filename ${SEASON}_upload_manifest \
   --password_file ~/keys/passwords.ini \
   --image_root_path /home/packerc/shared/albums/${SITE}/
 else
@@ -22,7 +23,8 @@ else
   --manifest /home/packerc/shared/zooniverse/Manifests/${SITE}/${SEASON}__${BATCH}__manifest.json \
   --project_id $PROJECT_ID \
   --subject_set_id $SUBJECT_SET_ID \
-  --log_dir /home/packerc/shared/zooniverse/Manifests/${SITE}/ \
+  --log_dir /home/packerc/shared/zooniverse/Manifests/${SITE}/log_files/ \
+  --log_filename ${SEASON}_upload_manifest \
   --password_file ~/keys/passwords.ini \
   --image_root_path /home/packerc/shared/albums/${SITE}/
 fi

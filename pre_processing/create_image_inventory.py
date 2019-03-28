@@ -52,8 +52,8 @@ if __name__ == '__main__':
     setup_logger(log_file_path)
     logger = logging.getLogger(__name__)
 
+    last_dir = os.path.basename(os.path.normpath(args['root_dir']))
     if args['season_id'] == '':
-        last_dir = os.path.basename(os.path.normpath(args['root_dir']))
         args['season_id'] = last_dir
         logger.info("Updating 'season_id' with {}".format(
             args['season_id']))
@@ -79,6 +79,7 @@ if __name__ == '__main__':
             for image_file_name in image_file_names:
                 image_path = os.path.join(roll_directory_path, image_file_name)
                 image_path_rel = os.path.join(
+                    last_dir,
                     roll_directory_path_rel,
                     image_file_name)
                 image_inventory[image_path] = {
