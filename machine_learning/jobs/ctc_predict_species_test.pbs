@@ -48,9 +48,15 @@ echo "MODEL_PRE_PROCESSING: $MODEL_PRE_PROCESSING"
 module load singularity
 module load python3
 
+
+# sleep for 2 minutes to reduce chance of conflict with 'empty' script when it
+# is pulling the following docker container
+sleep 2m
+
+
 # download container and code
 cd $HOME
-singularity pull -F docker://will5448/camera-trap-classifier:latest-cpu
+singularity pull docker://will5448/camera-trap-classifier:latest-cpu
 
 # run the script
 singularity exec -B /home/packerc/shared:/home/packerc/shared ./camera-trap-classifier-latest-cpu.simg \
