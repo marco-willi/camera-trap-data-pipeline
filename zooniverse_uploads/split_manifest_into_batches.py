@@ -79,7 +79,7 @@ if __name__ == "__main__":
     n_captures = len(manifest.keys())
 
     logger.info("Imported Manfest file %s with %s records" %
-                (args['manifest'], n_captures), flush=True)
+                (args['manifest'], n_captures))
 
     # Create evenly sized splits
     if args['number_of_batches'] is not None:
