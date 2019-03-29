@@ -218,20 +218,19 @@ if __name__ == '__main__':
     parser.add_argument("--no_older_than_year", type=int, default=1970)
     parser.add_argument("--no_newer_than_year", type=int, default=9999)
     parser.add_argument("--log_dir", type=str, default=None)
+    parser.add_argument(
+        "--log_filename", type=str, default='group_inventory_into_captures')
     args = vars(parser.parse_args())
 
     # image check paramters
     msg_width = 99
 
-    # Logging
+    # logging
     if args['log_dir'] is not None:
-        log_file_dir = args['log_dir']
+        log_file_path = create_log_file(args['log_dir'], args['log_filename'])
+        setup_logger(log_file_path)
     else:
-        log_file_dir = os.path.dirname(args['output_csv'])
-    log_file_path = create_log_file(
-        log_file_dir,
-        'group_inventory_into_captures')
-    setup_logger(log_file_path)
+        setup_logger()
     logger = logging.getLogger(__name__)
 
     # update time checks

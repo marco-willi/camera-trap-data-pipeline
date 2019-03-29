@@ -48,6 +48,8 @@ if __name__ == '__main__':
     parser.add_argument("--captures", type=str, required=True)
     parser.add_argument("--action_list_csv", type=str, required=True)
     parser.add_argument("--log_dir", type=str, default=None)
+    parser.add_argument(
+        "--log_filename", type=str, default='create_action_list')
     parser.add_argument("--plot_timelines", action='store_true')
     args = vars(parser.parse_args())
 
@@ -57,15 +59,12 @@ if __name__ == '__main__':
             "captures {} does not exist -- must be a file".format(
                 args['captures']))
 
-    # Logging
+    # logging
     if args['log_dir'] is not None:
-        log_file_dir = args['log_dir']
+        log_file_path = create_log_file(args['log_dir'], args['log_filename'])
+        setup_logger(log_file_path)
     else:
-        log_file_dir = os.path.dirname(args['action_list_csv'])
-    log_file_path = create_log_file(
-        log_file_dir,
-        'create_action_list')
-    setup_logger(log_file_path)
+        setup_logger()
     logger = logging.getLogger(__name__)
 
     # read grouped data

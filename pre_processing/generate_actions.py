@@ -308,6 +308,8 @@ if __name__ == '__main__':
     parser.add_argument("--actions_to_perform_csv", type=str, required=True)
     parser.add_argument("--captures", type=str, required=True)
     parser.add_argument("--log_dir", type=str, default=None)
+    parser.add_argument(
+        "--log_filename", type=str, default='generate_actions')
     args = vars(parser.parse_args())
 
     # check existence of root dir
@@ -323,11 +325,10 @@ if __name__ == '__main__':
 
     # logging
     if args['log_dir'] is not None:
-        log_file_dir = args['log_dir']
+        log_file_path = create_log_file(args['log_dir'], args['log_filename'])
+        setup_logger(log_file_path)
     else:
-        log_file_dir = os.path.dirname(args['actions_to_perform_csv'])
-    log_file_path = create_log_file(log_file_dir, 'generate_actions_to_peform')
-    setup_logger(log_file_path)
+        setup_logger()
     logger = logging.getLogger(__name__)
 
     # read files

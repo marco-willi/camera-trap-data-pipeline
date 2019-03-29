@@ -30,6 +30,8 @@ if __name__ == '__main__':
         help="identifier that is exported to the inventory")
     parser.add_argument("--output_csv", type=str, required=True)
     parser.add_argument("--log_dir", type=str, default=None)
+    parser.add_argument(
+        "--log_filename", type=str, default='create_image_inventory')
     args = vars(parser.parse_args())
 
     # image check paramters
@@ -41,15 +43,12 @@ if __name__ == '__main__':
             "root_dir {} does not exist -- must be a directory".format(
                 args['root_dir']))
 
-    # Logging
+    # logging
     if args['log_dir'] is not None:
-        log_file_dir = args['log_dir']
+        log_file_path = create_log_file(args['log_dir'], args['log_filename'])
+        setup_logger(log_file_path)
     else:
-        log_file_dir = os.path.dirname(args['output_csv'])
-    log_file_path = create_log_file(
-        log_file_dir,
-        'create_image_inventory')
-    setup_logger(log_file_path)
+        setup_logger()
     logger = logging.getLogger(__name__)
 
     last_dir = os.path.basename(os.path.normpath(args['root_dir']))

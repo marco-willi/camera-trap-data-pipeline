@@ -85,10 +85,8 @@ if __name__ == '__main__':
                 args['root_dir']))
 
     # logging
-    if not args['log_dir'] is None:
-        log_file_path = create_log_file(
-            args['log_dir'],
-            'check_directory_structure')
+    if args['log_dir'] is not None:
+        log_file_path = create_log_file(args['log_dir'], args['log_filename'])
         setup_logger(log_file_path)
     else:
         setup_logger()

@@ -45,17 +45,16 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("--inventory", type=str, required=True)
     parser.add_argument("--log_dir", type=str, default=None)
+    parser.add_argument(
+        "--log_filename", type=str, default='rename_images')
     args = vars(parser.parse_args())
 
-    # Logging
+    # logging
     if args['log_dir'] is not None:
-        log_file_dir = args['log_dir']
+        log_file_path = create_log_file(args['log_dir'], args['log_filename'])
+        setup_logger(log_file_path)
     else:
-        log_file_dir = os.path.dirname(args['inventory'])
-    log_file_path = create_log_file(
-        log_file_dir,
-        'rename_images')
-    setup_logger(log_file_path)
+        setup_logger()
     logger = logging.getLogger(__name__)
 
     inventory = read_image_inventory(args['inventory'])
