@@ -12,8 +12,8 @@
 #SEASON=PLN_S1
 
 # Parameters to Adapt (Optional)
-BATCH=complete
-#DELIMITER=__
+#BATCH=complete
+DELIMITER=__
 
 # Parameters Static
 MANIFEST_ROOT_DIR=/home/packerc/shared/zooniverse/Manifests/
