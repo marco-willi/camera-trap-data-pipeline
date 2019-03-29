@@ -7,7 +7,7 @@ import pandas as pd
 from logger import setup_logger, create_log_file
 from utils import (
     read_cleaned_season_file_df, set_file_permission, sort_df_by_capture_id)
-from reporting.add_aggregations_to_season_captures import create_season_dict
+from reporting.create_zooniverse_report import create_season_dict
 
 # args = dict()
 # args['season_captures_csv'] = '/home/packerc/shared/season_captures/GRU/cleaned/GRU_S1_cleaned.csv'
@@ -27,7 +27,7 @@ if __name__ == '__main__':
         "--log_dir", type=str, default=None)
     parser.add_argument(
         "--log_filename", type=str,
-        default='add_predictions_to_season_captures')
+        default='create_ml_report')
 
     args = vars(parser.parse_args())
 

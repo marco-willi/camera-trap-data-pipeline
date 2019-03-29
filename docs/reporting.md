@@ -176,8 +176,8 @@ Generate a csv with all machine learning predictions, one record per capture-id.
 ```
 # Create Flattened ML Predictions
 python3 -m reporting.flatten_ml_predictions \
---predictions_empty /home/packerc/shared/zooniverse/Manifests/${SITE}/${SEASON}_predictions_empty_or_not.json \
---predictions_species /home/packerc/shared/zooniverse/Manifests/${SITE}/${SEASON}_predictions_species.json \
+--predictions_empty /home/packerc/shared/zooniverse/Manifests/${SITE}/${SEASON}__complete__predictions_empty_or_not.json \
+--predictions_species /home/packerc/shared/zooniverse/Manifests/${SITE}/${SEASON}__complete__predictions_species.json \
 --output_csv /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/${SEASON}_ml_preds_flat.csv \
 --log_dir /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/
 ```
@@ -185,7 +185,7 @@ python3 -m reporting.flatten_ml_predictions \
 Merge the machine learning predictions with the season captures.
 ```
 # Reporting of Machine Learning Predictions
-python3 -m reporting.add_predictions_to_season_captures \
+python3 -m reporting.create_ml_report \
 --season_captures_csv /home/packerc/shared/season_captures/${SITE}/cleaned/${SEASON}_cleaned.csv \
 --predictions_csv /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/${SEASON}_ml_preds_flat.csv \
 --output_csv /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/${SEASON}_report_ml.csv \
