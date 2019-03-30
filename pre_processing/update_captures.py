@@ -48,6 +48,8 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("--captures", type=str, required=True)
     parser.add_argument("--captures_updated", type=str, required=True)
+    parser.add_argument("--no_older_than_year", type=int, default=1970)
+    parser.add_argument("--no_newer_than_year", type=int, default=9999)
     parser.add_argument("--log_dir", type=str, default=None)
     parser.add_argument(
         "--log_filename", type=str, default='update_captures')
