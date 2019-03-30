@@ -208,6 +208,17 @@ BATCH=batch_0
 qsub -v SITE=${SITE},SEASON=${SEASON},PROJECT_ID=${PROJECT_ID},BATCH=${BATCH} upload_manifest.pbs
 ```
 
+### Upload Tracker File
+
+The code creates an upload 'tracker' file that tracks which captures have already been uploaded successfully. This allows for resuming uploads upon connection failures while avoiding to upload duplicates. This file is automatically deleted after the manifest has been completely uploaded.
+
+Important: If, for some reason, one uploads a manifest incompletely, deletes the subject-set on Zooniverse, and at some point starts over with the upload, the upload-tracker file needs to be manually deleted, else it's content is inconsistent with what is already on Zooniverse.
+
+Example file:
+```
+RUA_S1__batch_1__upload_tracker_file.txt
+```
+
 
 ### Image Compression Options
 
