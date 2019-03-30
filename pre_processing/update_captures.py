@@ -69,6 +69,12 @@ if __name__ == '__main__':
         setup_logger()
     logger = logging.getLogger(__name__)
 
+
+    # update time checks
+    time_checks = flags['image_check_parameters']
+    time_checks['time_too_old']['min_year'] = args['no_older_than_year']
+    time_checks['time_too_new']['max_year'] = args['no_newer_than_year']
+
     # read captures
     captures = read_image_inventory(
         args['captures'],
