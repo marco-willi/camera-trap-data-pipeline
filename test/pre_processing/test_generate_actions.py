@@ -7,7 +7,8 @@ from pre_processing.group_inventory_into_captures import (
         update_inventory_with_capture_id, update_inventory_with_image_names,
         update_inventory_with_capture_data,
         update_time_checks_inventory)
-from pre_processing.generate_actions import generate_actions
+from pre_processing.generate_actions import (
+    generate_actions, check_action_is_valid, check_datetime_format)
 from pre_processing.utils import read_image_inventory
 from logger import setup_logger
 
@@ -110,9 +111,43 @@ class GenerateActionsTests(unittest.TestCase):
                 self.actions['APN_S2_A1_R2_IMAG0012.JPG']['action_to_take_reason'],
                 'test_delete')
 
+    def testActionIsValid(self):
+        test_wrong_action_if_datetime = {
+         'action_to_take': 'ok',
+         'datetime_current': '2000-01-01 00:00:00',
+         'datetime_new': '2000-01-01 00:00:01'
+         }
+        with self.assertRaises(AssertionError):
+            check_action_is_valid(test_wrong_action_if_datetime)
+        test_correct_action_if_datetime = {
+         'action_to_take': 'timechange',
+         'datetime_current': '2000-01-01 00:00:00',
+         'datetime_new': '2000-01-01 00:00:01'
+         }
+        check_action_is_valid(test_correct_action_if_datetime)
+        test_invalid_action = {
+         'action_to_take': 'dummy',
+         'datetime_current': '',
+         'datetime_new': ''
+         }
+        with self.assertRaises(ImportError):
+            check_action_is_valid(test_invalid_action)
+
+    def testTimeFormatIsValid(self):
+        test_wrong_format = {
+        'datetime_current': '2000-01-01 00:00:00 PM',
+        'datetime_new': '2000-01-01 00:00:01 AM'}
+        with self.assertRaises(ImportError):
+            check_datetime_format(test_wrong_format, '%Y-%m-%d %H:%M:%S')
+        test_correct_format = {
+        'datetime_current': '2000-01-01 00:00:00',
+        'datetime_new': '2000-01-01 00:00:01'}
+        check_datetime_format(test_correct_format, '%Y-%m-%d %H:%M:%S')
 
 if __name__ == '__main__':
     unittest.main()
+
+
 
 
 #file_inventory = './test/files/test_inventory.csv'

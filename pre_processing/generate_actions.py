@@ -81,6 +81,8 @@ def check_image_from_if_image_to(action):
 
 
 def check_datetime_format(action, date_format):
+    print_date = datetime.strptime('2000-01-01', '%Y-%m-%d')
+    print_date_format = print_date.strftime(date_format)
     if action['datetime_current'] != '':
         try:
             datetime.strptime(action['datetime_current'], date_format)
@@ -88,7 +90,7 @@ def check_datetime_format(action, date_format):
             msg = textwrap.shorten(
                     "datetime format in datetime_current invalid, \
                      must be {}, is {}".format(
-                     date_format, action['datetime_current']),
+                     print_date_format, action['datetime_current']),
                     width=msg_width)
             raise ImportError(msg)
     if action['datetime_new'] != '':
@@ -98,7 +100,7 @@ def check_datetime_format(action, date_format):
             msg = textwrap.shorten(
                     "datetime format in datetime_new invalid, \
                      must be {}, is {}".format(
-                     date_format, action['datetime_new']),
+                     print_date_format, action['datetime_new']),
                     width=msg_width)
             raise ImportError(msg)
 
@@ -117,6 +119,13 @@ def check_action_is_valid(action):
                 "if action_to_take is 'timechange' \
                 datetime_current \
                 and datetime_new must be specified", width=msg_width)
+    if any([x != '' for x in [action['datetime_current'],
+                              action['datetime_new']]]):
+        assert action['action_to_take'] == 'timechange', \
+            textwrap.shorten(
+                "If 'datetime_current' / 'datetime_new' are \
+                specified, 'action_to_take' must be 'timechange', is '{}'",
+                width=msg_width).format(action['action_to_take'])
 
 
 def check_action_reason_given(action):
