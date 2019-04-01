@@ -97,11 +97,20 @@ if __name__ == '__main__':
         setup_logger()
     logger = logging.getLogger(__name__)
 
+    logger.info("Reading actions from {}".format(args['actions_to_perform']))
     actions = read_image_inventory(
         args['actions_to_perform'], unique_id='image_name')
+
+    logger.info("Reading captures from {}".format(args['captures']))
     captures = read_image_inventory(
         args['captures'], unique_id='image_name')
 
-    apply_actions(actions, captures, logger)
+    try:
+        apply_actions(actions, captures, logger)
+        logger.info("Successfully applied actions")
+    except:
+        logger.error("Failed to apply actions")
 
     export_inventory_to_csv(captures, args['captures'])
+
+    logger.info("Updated captures file at: {}".format(args['captures']))
