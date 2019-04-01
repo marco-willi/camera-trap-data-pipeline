@@ -156,7 +156,7 @@ def group_images_into_captures(inventory, flags):
         # loop over all deltas
         # (starting with the delta between first and second)
         for i, (img_name, rank) in enumerate(images_sorted[1:]):
-            delta = inventory[img_name]['seconds_to_last_image_taken']
+            delta = float(inventory[img_name]['seconds_to_last_image_taken'])
             if delta <= flags['general']['capture_delta_seconds']:
                 current_rank_in_capture += 1
             else:
