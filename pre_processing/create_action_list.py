@@ -41,6 +41,13 @@ def generate_check_string(image_data, check_columns, checks_to_find):
 # args['ignore_excluded_images'] = False
 # args['plot_timelines'] = True
 
+# args = dict()
+# args['captures'] = '/home/packerc/shared/season_captures/MAD/captures/MAD_S1_captures_updated2.csv'
+# args['captures_updated'] = '/home/packerc/shared/season_captures/MAD/captures/MAD_S1_captures_updated2.csv'
+# args['no_older_than_year'] = 0000
+# args['no_newer_than_year'] = 9999
+
+
 if __name__ == '__main__':
 
     # Parse command line arguments
@@ -114,9 +121,7 @@ if __name__ == '__main__':
         # generate check-string
         all_checks_list = generate_check_string(
             image_data, check_columns, check_columns)
-
         all_check_string = '#'.join(all_checks_list)
-
         if has_deletion:
             automatic_status['action_to_take'] = 'delete'
         elif has_invalidation:
@@ -124,14 +129,16 @@ if __name__ == '__main__':
         elif has_time_check:
             automatic_status['action_to_take'] = 'inspect'
         automatic_status['action_to_take_reason'] = all_check_string
+
         # populate action columns
         automatic_status['action_from_image'] = image_data['image_name']
         automatic_status['action_to_image'] = image_data['image_name']
         image_data.update(automatic_status)
+        
         # check if image was in previous action lists and was flagged as ok
         try:
             previous_action_is_ok = \
-                (image_data['action_taken'] in ('ok'))
+                (image_data['action_taken'] == 'ok')
         except:
             previous_action_is_ok = False
         # export problematic cases only
