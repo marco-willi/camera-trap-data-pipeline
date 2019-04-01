@@ -9,8 +9,8 @@ from pre_processing.utils import read_image_inventory, export_inventory_to_csv
 from config.cfg import cfg
 
 # args = dict()
-# args['actions_to_perform'] = '/home/packerc/shared/season_captures/APN/captures/APN_S2_TEST_canBeDeleted_actions_inventory.csv'
-# args['captures'] = '/home/packerc/shared/season_captures/APN/captures/APN_S2_TEST_canBeDeleted_captures.csv'
+# args['actions_to_perform'] = '/home/packerc/shared/season_captures/MAD/captures/MAD_S1_actions_to_perform.csv'
+# args['captures'] = '/home/packerc/shared/season_captures/MAD/captures/MAD_S1_captures.csv'
 # args['log_dir'] = '/home/packerc/shared/season_captures/APN/log_files/'
 
 flags = cfg['pre_processing_flags']
@@ -47,9 +47,13 @@ def apply_actions(actions, captures, logger):
         reason = action['action_to_take_reason']
         if action['action_to_take'] == 'delete':
             image_path = captures[image_name]['image_path']
-            os.remove(image_path)
-            logger.info("Reason: {:20} Action: deleted image: {}".format(
-                reason, image_path))
+            try:
+                os.remove(image_path)
+                logger.info("Reason: {:20} Action: deleted image: {}".format(
+                    reason, image_path))
+            except FileNotFoundError:
+                logger.warning(
+                    "Failed to remove {} - file not found".format(image_path))
         elif action['action_to_take'] == 'timechange':
             change_time(
                 captures,
