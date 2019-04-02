@@ -1,0 +1,30 @@
+#!/bin/bash -l
+#PBS -l walltime=12:00:00,nodes=1:ppn=4
+#PBS -j oe
+#PBS -q lab
+#PBS -N upload_manifest
+#PBS -o ${HOME}/upload_manifest_small_${PBS_JOBID}.log
+#PBS -e ${HOME}/upload_manifest_small_error_${PBS_JOBID}.log
+
+module load python3
+
+cd $HOME/camera-trap-data-pipeline
+
+if [[ -z "${SUBJECT_SET_ID}" ]]; then
+  python3 -m zooniverse_uploads.upload_manifest \
+  --manifest /home/packerc/shared/zooniverse/Manifests/${SITE}/${SEASON}__${BATCH}__manifest.json \
+  --project_id $PROJECT_ID \
+  --log_dir /home/packerc/shared/zooniverse/Manifests/${SITE}/log_files/ \
+  --log_filename ${SEASON}_upload_manifest \
+  --password_file ~/keys/passwords.ini \
+  --image_root_path /home/packerc/shared/albums/${SITE}/
+else
+  python3 -m zooniverse_uploads.upload_manifest \
+  --manifest /home/packerc/shared/zooniverse/Manifests/${SITE}/${SEASON}__${BATCH}__manifest.json \
+  --project_id $PROJECT_ID \
+  --subject_set_id $SUBJECT_SET_ID \
+  --log_dir /home/packerc/shared/zooniverse/Manifests/${SITE}/log_files/ \
+  --log_filename ${SEASON}_upload_manifest \
+  --password_file ~/keys/passwords.ini \
+  --image_root_path /home/packerc/shared/albums/${SITE}/
+fi

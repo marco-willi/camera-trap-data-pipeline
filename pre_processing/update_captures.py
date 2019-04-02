@@ -19,6 +19,12 @@ from pre_processing.group_inventory_into_captures import (
 
 flags = cfg['pre_processing_flags']
 
+# args = dict()
+# args['captures'] = '/home/packerc/shared/season_captures/MAD/captures/MAD_S1_captures.csv'
+# args['captures_updated'] = '/home/packerc/shared/season_captures/MAD/captures/MAD_S1_captures_updated2.csv'
+# args['no_older_than_year'] = 0000
+# args['no_newer_than_year'] = 9999
+
 
 def include_image(image_data):
     """ Rule to include only certain images """
@@ -68,7 +74,6 @@ if __name__ == '__main__':
     else:
         setup_logger()
     logger = logging.getLogger(__name__)
-
 
     # update time checks
     time_checks = flags['image_check_parameters']
