@@ -1,0 +1,70 @@
+#!/bin/bash -l
+#PBS -l walltime=12:00:00,nodes=1:ppn=24
+#PBS -j oe
+#PBS -m abe
+#PBS -q small
+#PBS -N predict_empty
+#PBS -o ${HOME}/job_ml_output_pred_empty_${PBS_JOBID}.log
+#PBS -e ${HOME}/job_ml_error_pred_empty_${PBS_JOBID}.log
+
+
+# Parameters to Adapt (Mandatory)
+#SITE=GRU
+#SEASON=GRU_S1
+#BATCH=complete
+
+DELIMITER=__
+
+# Parameters Static
+MANIFEST_ROOT_DIR=/home/packerc/shared/zooniverse/Manifests/
+TO_PREDICT_PATH=${MANIFEST_ROOT_DIR}${SITE}/${SEASON}${DELIMITER}${BATCH}${DELIMITER}machine_learning_input.csv
+IMAGES_ROOT=/home/packerc/shared/albums/${SITE}/
+OUTPUT_PATH=${MANIFEST_ROOT_DIR}${SITE}/${SEASON}${DELIMITER}${BATCH}${DELIMITER}predictions_empty_or_not.json
+
+# Model Parameters
+MODEL_ROOT_PATH=/home/packerc/shared/machine_learning/data/models/PANTHERA_SNAPSHOT_SAFARI/empty_or_not/
+MODEL_NAME=ResNet18_448_v1
+MODEL_PATH=${MODEL_ROOT_PATH}${MODEL_NAME}/best_model.hdf5
+MODEL_CLASS_MAPPING=${MODEL_ROOT_PATH}${MODEL_NAME}/label_mappings.json
+MODEL_PRE_PROCESSING=${MODEL_ROOT_PATH}${MODEL_NAME}/image_processing.json
+
+
+# Log Parameters
+echo "SITE: $SITE"
+echo "SEASON: $SEASON"
+
+echo "MANIFEST_ROOT_DIR: $MANIFEST_ROOT_DIR"
+echo "TO_PREDICT_PATH: $TO_PREDICT_PATH"
+echo "IMAGES_ROOT: $IMAGES_ROOT"
+echo "OUTPUT_PATH: $OUTPUT_PATH"
+
+echo "MODEL_ROOT_PATH: $MODEL_ROOT_PATH"
+echo "MODEL_NAME: $MODEL_NAME"
+echo "MODEL_PATH: $MODEL_PATH"
+echo "MODEL_CLASS_MAPPING: $MODEL_CLASS_MAPPING"
+echo "MODEL_PRE_PROCESSING: $MODEL_PRE_PROCESSING"
+
+
+# modules
+module load singularity
+module load python3
+
+# download container and code
+cd $HOME
+singularity pull -F docker://will5448/camera-trap-classifier:latest-cpu
+
+# run the script
+singularity exec -B /home/packerc/shared:/home/packerc/shared ./camera-trap-classifier-latest-cpu.simg \
+  ctc.predict \
+    -csv_path $TO_PREDICT_PATH \
+    -csv_id_col capture_id \
+    -csv_images_cols image1 image2 image3 \
+    -csv_images_root_path $IMAGES_ROOT \
+    -export_file_type json \
+    -results_file $OUTPUT_PATH \
+    -model_path $MODEL_PATH \
+    -class_mapping_json $MODEL_CLASS_MAPPING \
+    -pre_processing_json $MODEL_PRE_PROCESSING \
+    -aggregation_mode mean
+
+chmod g+rw $OUTPUT_PATH
