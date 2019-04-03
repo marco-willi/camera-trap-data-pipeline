@@ -177,10 +177,18 @@ This code uploads a manifest to Zooniverse. Note that Zooniverse credentials hav
 
 ### Run in Terminal
 
+Define the parameters:
+```
+SITE=RUA
+SEASON=RUA_S1
+PROJECT_ID=5155
+BATCH=complete
+```
+
 Change the paths analogue to this example:
 ```
 python3 -m zooniverse_uploads.upload_manifest \
---manifest /home/packerc/shared/zooniverse/Manifests/${SITE}/${SEASON}__complete__manifest.json \
+--manifest /home/packerc/shared/zooniverse/Manifests/${SITE}/${SEASON}__${BATCH}__manifest.json \
 --log_dir /home/packerc/shared/zooniverse/Manifests/${SITE}/log_files/ \
 --log_filename ${SEASON}_upload_manifest \
 --project_id ${PROJECT_ID} \
@@ -188,9 +196,9 @@ python3 -m zooniverse_uploads.upload_manifest \
 --image_root_path /home/packerc/shared/albums/${SITE}/
 ```
 
-To upload a specific batch instead use something analogue to:
+To upload a specific batch instead use:
 ```
---manifest /home/packerc/shared/zooniverse/Manifests/${SITE}/${SEASON}__batch_1__manifest.json \
+BATCH=batch_1
 ```
 
 ### Run via qsub (if not via Terminal) - Recommended if connection issues
