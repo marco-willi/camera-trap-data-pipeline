@@ -54,9 +54,20 @@ def _flatten_ml_toppreds(preds):
 
 def _flatten_ml_empty_confidences(preds):
     """ Add Empty/or Not predictions """
-    empty_preds = preds['aggregated_pred']['empty']
-    res = {}
-    for empty_cat, conf in empty_preds.items():
-        key = 'machine_confidence_{}'.format(empty_cat)
-        res[key] = conf
+    if 'empty' in preds['aggregated_pred']:
+        empty_preds = preds['aggregated_pred']['empty']
+        res = {}
+        for empty_cat, conf in empty_preds.items():
+            key = 'machine_confidence_{}'.format(empty_cat)
+            res[key] = conf
+    elif 'is_blank' in preds['aggregated_pred']:
+        empty_preds = preds['aggregated_pred']['is_blank']
+        res = {}
+        is_blank_conf = empty_preds['1']
+        key = 'machine_confidence_is_empty'
+        res[key] = is_blank_conf
+    else:
+        raise ValueError(
+            "'is_blank' or 'empty' expected in preds, found: {}".format(
+                preds['aggregated_pred'].keys()))
     return res
