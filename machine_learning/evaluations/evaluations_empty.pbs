@@ -59,6 +59,6 @@ singularity exec -B /home/packerc/shared:/home/packerc/shared ./camera-trap-clas
     -model_path $MODEL_PATH \
     -class_mapping_json $MODEL_CLASS_MAPPING \
     -pre_processing_json $MODEL_PRE_PROCESSING \
-    -aggregation_mode mean
+    -aggregation_mode min
 
 chmod g+rw $OUTPUT_PATH
