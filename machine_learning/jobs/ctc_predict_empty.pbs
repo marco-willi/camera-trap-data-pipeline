@@ -7,12 +7,12 @@
 #PBS -o ${HOME}/job_ml_output_pred_empty_${PBS_JOBID}.log
 #PBS -e ${HOME}/job_ml_error_pred_empty_${PBS_JOBID}.log
 
+
 # Parameters to Adapt (Mandatory)
 #SITE=GRU
 #SEASON=GRU_S1
-
-# Parameters to Adapt (Optional)
 #BATCH=complete
+
 DELIMITER=__
 
 # Parameters Static
@@ -21,8 +21,9 @@ TO_PREDICT_PATH=${MANIFEST_ROOT_DIR}${SITE}/${SEASON}${DELIMITER}${BATCH}${DELIM
 IMAGES_ROOT=/home/packerc/shared/albums/${SITE}/
 OUTPUT_PATH=${MANIFEST_ROOT_DIR}${SITE}/${SEASON}${DELIMITER}${BATCH}${DELIMITER}predictions_empty_or_not.json
 
-MODEL_ROOT_PATH=/home/packerc/shared/machine_learning/data/models/SNAPSHOT_SAFARI/empty_or_not/
-MODEL_NAME=model_save_empty_resnet18
+# Model Parameters
+MODEL_ROOT_PATH=/home/packerc/shared/machine_learning/data/models/PANTHERA_SNAPSHOT_SAFARI/empty_or_not/
+MODEL_NAME=ResNet18_448_v1
 MODEL_PATH=${MODEL_ROOT_PATH}${MODEL_NAME}/best_model.hdf5
 MODEL_CLASS_MAPPING=${MODEL_ROOT_PATH}${MODEL_NAME}/label_mappings.json
 MODEL_PRE_PROCESSING=${MODEL_ROOT_PATH}${MODEL_NAME}/image_processing.json

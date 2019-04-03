@@ -10,9 +10,8 @@
 # Parameters to Adapt (Mandatory)
 #SITE=GRU
 #SEASON=GRU_S1
-
-# Parameters to Adapt (Optional)
 #BATCH=complete
+
 DELIMITER=__
 
 # Parameters Static
@@ -21,8 +20,8 @@ TO_PREDICT_PATH=${MANIFEST_ROOT_DIR}${SITE}/${SEASON}${DELIMITER}${BATCH}${DELIM
 IMAGES_ROOT=/home/packerc/shared/albums/${SITE}/
 OUTPUT_PATH=${MANIFEST_ROOT_DIR}${SITE}/${SEASON}${DELIMITER}${BATCH}${DELIMITER}predictions_species.json
 
-MODEL_ROOT_PATH=/home/packerc/shared/machine_learning/data/models/SNAPSHOT_SAFARI/species/
-MODEL_NAME=model_save_species_no_weights_resnet18
+MODEL_ROOT_PATH=/home/packerc/shared/machine_learning/data/models/PANTHERA_SNAPSHOT_SAFARI/species/
+MODEL_NAME=Xception_v1
 MODEL_PATH=${MODEL_ROOT_PATH}${MODEL_NAME}/best_model.hdf5
 MODEL_CLASS_MAPPING=${MODEL_ROOT_PATH}${MODEL_NAME}/label_mappings.json
 MODEL_PRE_PROCESSING=${MODEL_ROOT_PATH}${MODEL_NAME}/image_processing.json
@@ -57,6 +56,7 @@ sleep 2m
 # download container and code
 cd $HOME
 singularity pull docker://will5448/camera-trap-classifier:latest-cpu
+
 
 # run the script
 singularity exec -B /home/packerc/shared:/home/packerc/shared ./camera-trap-classifier-latest-cpu.simg \
