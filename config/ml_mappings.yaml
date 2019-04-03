@@ -243,6 +243,9 @@ species_mappings:
   rodents:
     grouped: rodents
     standardized: rodents
+  rodent:
+    grouped: rodents
+    standardized: rodents
   sable:
     grouped: sable
     standardized: sable
