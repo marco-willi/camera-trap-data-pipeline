@@ -260,11 +260,16 @@ if __name__ == '__main__':
     seasons = list()
     answers = {k: list() for k in flags['CSV_QUESTIONS']}
 
+    try:
+        retirement_reason = flags['CSV_HEADER_MAPPER']['retire_reason']
+    except:
+        retirement_reason = 'retire_reason'
+
     for c_id, annotations in classifications.items():
         if not isinstance(annotations, list):
             logger.info(annotations)
         for annotation in annotations:
-            retirement_reasons.append(annotation['retirement_reason'])
+            retirement_reasons.append(annotation[retirement_reason])
             seasons.append(annotation['season'])
             for question, _answers_list in answers.items():
                 _answers_list.append(annotation[question])
