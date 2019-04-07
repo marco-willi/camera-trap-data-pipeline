@@ -94,7 +94,7 @@ import logging
 from logger import setup_logger, create_logfile_name
 
 from zooniverse_exports import legacy_extractor
-from utils import print_nested_dict
+from utils import print_nested_dict, set_file_permission
 from config.cfg import cfg
 
 
@@ -252,7 +252,7 @@ if __name__ == '__main__':
 
     retirement_reasons = list()
     seasons = list()
-    answers = {k: list() for k in flags['QUESTIONS']}
+    answers = {k: list() for k in flags['CSV_QUESTIONS']}
 
     for c_id, annotations in classifications.items():
         if not isinstance(annotations, list):
@@ -302,4 +302,4 @@ if __name__ == '__main__':
         output_paths[s_id], classifications, header, flags)
 
     # change permmissions to read/write for group
-    os.chmod(output_paths[s_id], 0o660)
+    set_file_permission(output_paths[s_id])

@@ -139,28 +139,30 @@ plurality_aggregation_flags:
 legacy_extractor_flags:
     ANSWER_TYPE_MAPPER:
       eating:
-       false: 0
-       true: 1
+       'false': 0
+       'true': 1
       interacting:
+       'false': 0
+       'true': 1
       eating:
-       false: 0
-       true: 1
+       'false': 0
+       'true': 1
       moving:
-       false: 0
-       true: 1
+       'false': 0
+       'true': 1
       resting:
-       false: 0
-       true: 1
+       'false': 0
+       'true': 1
       species:
         no animals present: blank
         nothing: blank
         '': blank
       standing:
-       false: 0
-       true: 1
+       'false': 0
+       'true': 1
       young_present:
-       false: 0
-       true: 1
+       'false': 0
+       'true': 1
 
     CLASSIFICATION_INFO_TO_ADD:
      - user_name
@@ -180,7 +182,7 @@ legacy_extractor_flags:
      retire_reason: retirement_reason
      species_count: count
      subject_zooniverse_id: subject_id
-    QUESTIONS:
+    CSV_QUESTIONS:
      - species
      - count
      - standing

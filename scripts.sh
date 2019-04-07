@@ -7,6 +7,24 @@ for LOC in MTZ KAR PLN NIA GON APN GRU SER RUA; do
   mkdir -m 770 -p {ConsensusReports,Exports,Aggregations,Manifests}/${LOC}/log_files
 done
 
+
+###################################
+# MAD
+####################################
+
+
+set_params_MAD () {
+
+cd $HOME/camera-trap-data-pipeline
+SITE=MAD
+SEASON=MAD_S1
+PROJECT_ID=8776
+WORKFLOW_ID=10337
+WORKFLOW_VERSION_MIN=383
+
+}
+
+
 ###################################
 # Grumeti
 ####################################

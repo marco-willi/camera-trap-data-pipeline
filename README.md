@@ -20,7 +20,7 @@ An overview of how the scripts are connected can be found here:
 
 ## Configuration
 
-Parameters that define the behavior of some codes are defined here: [config/cfg.yaml](config/cfg.yaml)
+Default parameters that define the behavior of some codes are defined here: [config/cfg_default.yaml](config/cfg_default.yaml). To use a custom cfg create a 'cfg.yaml' file in [config/](config/) and it will be used instead.
 
 These need to be adjusted, for example:
 1. if a new question answer needs to be mapped to 'empty', e.g., 'no animal is here'

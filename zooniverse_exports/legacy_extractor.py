@@ -14,6 +14,7 @@ import textwrap
 import logging
 
 from utils import correct_image_name
+from zooniverse_exports import extractor
 
 logger = logging.getLogger(__name__)
 
@@ -53,59 +54,14 @@ def split_raw_classification_csv(input_csv, output_path):
     return file_writers
 
 
-def map_task_answers(answers, map):
-    """ Map Task Answers
-        Input: [{'species': 'NOTHING'}]
-        Output: [{'species': 'nothinghere'}]
-    """
-    if isinstance(answers, str):
-        if answers.lower() in map:
-            return map[answers]
-    elif isinstance(answers, list):
-        lower_case = [x.lower() for x in answers]
-        mapped = [x if x not in map else map[x] for x in lower_case]
-        return mapped
-    return answers
-
-
-def extract_classification_info(line, map, flags):
-    """ Extract info on classification level """
-    res = {x: line[map[x]] for x in
-           flags['CLASSIFICATION_INFO_TO_ADD']}
-    return res
-
-
-def extract_questions(line, map, flags):
-    """ Extract info on classification level
-    Input:
-        - line (list) - CSV line
-        - row_name_to_id_mapper (dict) - mapping column name to col id
-    Output:
-        - dict - questions and answers
-    Example:
-        - Input:
-            ['56bb74735cabfc008e000956', 'matollik', 'ASG001gjr9',
-            '59355', '2016-02-10 17:33:39 UTC', 'consensus', 'S1', 'G04',
-            'R2', 'S1_G04_R2_PICT2534.JPG;...',
-            '2010-09-26 22:57:02 UTC;;', 'zebra', '2', '', '', '', '', '', '']
-         - Output:
-            {'species': 'zebra', 'count': 2'', 'young_present': '',
-             'standing': '', 'resting': '', 'moving': '',
-             'eating': '', 'interacting': ''}
-    """
-    res = {x: line[map[x]] for x in
-           flags['CSV_QUESTIIONS']}
-    return res
-
-
-def is_eligible(line, map):
+def is_eligible(cls_dict):
     """ Check whether classification is eligible """
-    if line[map['season']] == 'tutorial':
+    if cls_dict['season'] == 'tutorial':
         return False
     return True
 
 
-def map_answers(answers, map, flags):
+def map_answers(answers, flags):
     """ Map answers according to ANSWER_TYPE_MAPPER
     Example:
         - input:
@@ -115,14 +71,14 @@ def map_answers(answers, map, flags):
     """
     # map answers
     for question, answer_map in flags['ANSWER_TYPE_MAPPER'].items():
-        if question in map:
-            if question not in answers:
-                logger.warning("Did not find question {} in answers {}".format(
-                    question, answers))
+        if question in answers:
             answer = answers[question]
             if answer in answer_map:
                 mapped_answer = answer_map[answer]
                 answers[question] = mapped_answer
+        else:
+            logger.warning("Did not find question {} in answers {}".format(
+                question, answers))
 
 
 # check if classification needs to be consolidate
@@ -144,8 +100,9 @@ def needs_consolidation(annotations):
             return False
         else:
             return True
-    logger.warning("Unexpected case in needs_consolidation for annotations {}".format(
-        annotations))
+    logger.warning(
+        "Unexpected case in needs_consolidation for annotations {}".format(
+            annotations))
 
 
 def consolidate_annotations(annotations, flags):
@@ -179,7 +136,7 @@ def consolidate_annotations(annotations, flags):
             for entry, value in annotation.items():
                 # if field does not need to be consolidated
                 # store it as-is
-                if entry not in flags['CSV_QUESTIIONS']:
+                if entry not in flags['CSV_QUESTIONS']:
                     consolidated[entry] = value
                 # if field needs to be consolidated but is the first
                 # one of multiple to be consolidated, store as-is
@@ -305,110 +262,137 @@ def build_img_to_capture_map(path, flags):
     return img_to_capture
 
 
+def extract_raw_classification(
+        cls_dict,
+        img_to_capture,
+        flags,
+        stats,
+        user_subject_tracker):
+    """ Extract data from raw classifications
+        cls_dict: dict of raw classification
+        args: dict with configuration
+        stats: Counter object to track stats
+        user_subject_tracker: dict to track user and subjects
+    """
+
+    # list to store extracted annotations
+    record = {}
+
+    # map header
+    cls_dict = extractor.rename_dict_keys(
+        cls_dict, flags['CSV_HEADER_MAPPER'])
+
+    # check eligibility of classification
+    is_eligible_workflow = is_eligible(cls_dict)
+    if not is_eligible_workflow:
+        stats.update({'n_not_eligible_workflow'})
+        return record
+
+    # extract classification-level info
+    classification_info = {
+        x: cls_dict[x] for x in flags['CLASSIFICATION_INFO_TO_ADD']}
+
+    # build lookup key to get capture id
+    season = build_season_id(classification_info['season'])
+    image_name = classification_info['filenames'].split(';')[0]
+    site = cls_dict['site']
+    roll = fix_roll_id(cls_dict['roll'])
+    img_key = '#'.join([season, site, roll, image_name])
+
+    try:
+        # add full capture_id and capture num
+        capture_id = img_to_capture[img_key]
+        capture = capture_id.split('#')[-1]
+    except:
+        if stats['n_capture_id_not_found'] < 10:
+            logger.info("Did not find img_key: {}".format(img_key))
+        elif stats['n_capture_id_not_found'] == 10:
+            logger.info("Not printing more not found img_key msgs...")
+        stats.update({'n_capture_id_not_found'})
+        return record
+    if len(image_name) == 0:
+        stats.update({'n_annos_without_images'})
+    # Add capture id
+    classification_info['capture_id'] = capture_id
+    classification_info['capture'] = capture
+    # get answers
+    answers = {x: cls_dict[x] for x in flags['CSV_QUESTIONS']}
+
+    # map answers
+    map_answers(answers, flags)
+    # check if subject was already classified by the same user
+    # during a different classification, if so skip
+    user = classification_info['user_name']
+    subject_id = classification_info['subject_id']
+    classification_id = classification_info['classification_id']
+    user_sub_key = '#'.join([user, subject_id])
+    if user_sub_key not in user_subject_tracker:
+        user_subject_tracker[user_sub_key] = classification_id
+    # check whether there is a previous classification from
+    # the same user on the same subject
+    if classification_id not in user_subject_tracker[user_sub_key]:
+        if stats['n_duplicate_subject_classifications'] < 10:
+            msg = "Removed annnotation due \
+                   to subject_id {} already classified by \
+                   user {} in a prev classification_id: {} \
+                   current classification id: {}".format(
+                   subject_id,
+                   user,
+                   user_subject_tracker[user_sub_key],
+                   classification_id)
+            logger.info(textwrap.shorten(msg, width=250))
+        elif stats['n_duplicate_subject_classifications'] == 10:
+            logger.info(textwrap.shorten(
+                "not printing any more annotation removal due to \
+                 identical user/subjec", width=99))
+        stats.update({'n_duplicate_subject_classifications'})
+        return record
+    record = {**classification_info, **answers}
+    return record
+
+
 def process_season_classifications(path, img_to_capture, flags):
     """ Process season classifications """
-    n_not_eligible = 0
-    n_capture_id_not_found = 0
-    n_annos_without_images = 0
-    n_duplicate_subject_classifications = 0
-    user_subject_class = dict()
+    stats = Counter()
+    user_subject_tracker = dict()
     classifications = OrderedDict()
     with open(path, "r") as ins:
         csv_reader = csv.reader(ins, delimiter=',', quotechar='"')
         header = next(csv_reader)
-        # map header
-        header = [flags['CSV_HEADER_MAPPER'][x]
-                  if x in flags['CSV_HEADER_MAPPER'] else x for x in header]
-        header.append('capture_id')
-        row_name_to_id_mapper = {x: i for i, x in enumerate(header)}
         for line_no, line in enumerate(csv_reader):
             # print status
             if ((line_no % 10000) == 0) and (line_no > 0):
                 print("Processed %s annotations" % line_no)
-            # check eligibility of classification
-            if not is_eligible(line, row_name_to_id_mapper):
-                n_not_eligible += 1
-                continue
+            # create dictionary from input line
+            cls_dict = {header[i]: x for i, x in enumerate(line)}
             try:
-                # extract classification-level info
-                classification_info = extract_classification_info(
-                    line, row_name_to_id_mapper, flags)
-                # build lookup key to get capture id
-                season = build_season_id(classification_info['season'])
-                image_name = classification_info['filenames'].split(';')[0]
-                site = line[row_name_to_id_mapper['site']]
-                roll = fix_roll_id(line[row_name_to_id_mapper['roll']])
-                img_key = '#'.join([season, site, roll, image_name])
-                try:
-                    # add full capture_id and capture num
-                    capture_id = img_to_capture[img_key]
-                    capture = capture_id.split('#')[-1]
-                except:
-                    if n_capture_id_not_found < 10:
-                        logger.info("Did not find img_key: {}".format(img_key))
-                    elif n_capture_id_not_found == 10:
-                        logger.info("Not printing more not found img_key msgs...")
-                    n_capture_id_not_found += 1
-                    continue
-                    # capture_id = ''
-                    # capture = ''
-                if len(image_name) == 0:
-                    n_annos_without_images += 1
-                classification_info['capture_id'] = capture_id
-                classification_info['capture'] = capture
-                # get answers
-                answers = extract_questions(line, row_name_to_id_mapper, flags)
-                # map answers
-                map_answers(answers, row_name_to_id_mapper, flags)
-                # check if subject was already classified by the same user
-                # during a different classification, if so skip
-                user = classification_info['user_name']
-                subject_id = classification_info['subject_id']
-                classification_id = classification_info['classification_id']
-                user_sub_key = '#'.join([user, subject_id])
-                if user_sub_key not in user_subject_class:
-                    user_subject_class[user_sub_key] = classification_id
-                # check whether there is a previous classification from
-                # the same user on the same subject
-                if classification_id not in user_subject_class[user_sub_key]:
-                    if n_duplicate_subject_classifications < 10:
-                        msg = "Removed annnotation due \
-                               to subject_id {} already classified by \
-                               user {} in a prev classification_id: {} \
-                               current classification id: {}".format(
-                               subject_id,
-                               user,
-                               user_subject_class[user_sub_key],
-                               classification_id)
-                        logger.info(textwrap.shorten(msg, width=250))
-                    elif n_duplicate_subject_classifications == 10:
-                        logger.info(textwrap.shorten(
-                            "not printing any more annotation removal due to \
-                             identical user/subjec", width=99))
-                    n_duplicate_subject_classifications += 1
-                    continue
-                record = {**classification_info, **answers}
-                # store in classifiations dict
-                c_id = classification_info['classification_id']
-                if c_id not in classifications:
-                    classifications[c_id] = list()
-                classifications[c_id].append(record)
+                record = extract_raw_classification(
+                            cls_dict,
+                            img_to_capture,
+                            flags,
+                            stats,
+                            user_subject_tracker)
             except Exception:
                 logger.warning("Error - Skipping Record %s" % line_no)
                 logger.warning("Full line:\n %s" % line)
                 logger.warning(traceback.format_exc())
 
-    msg = "Removed {} non-eligible annotations".format(n_not_eligible)
+            if len(record.keys()) > 0:
+                if record['classification_id'] not in classifications:
+                    classifications[record['classification_id']] = list()
+                classifications[record['classification_id']].append(record)
+    # print stats
+    msg = "Removed {} non-eligible annotations".format(stats['n_not_eligible'])
     logger.info(textwrap.shorten(msg, width=150))
     msg = "Capture Ids not found - Removed: {} annotations".format(
-        n_capture_id_not_found)
+        stats['n_capture_id_not_found'])
     logger.info(textwrap.shorten(msg, width=150))
     msg = "Images not found in season.csv: {}".format(
-        n_annos_without_images)
+        stats['n_annos_without_images'])
     logger.info(textwrap.shorten(msg, width=150))
     msg = "Removed {} duplicate annotations - same user, subject, \
      but different classification id".format(
-     n_duplicate_subject_classifications)
+     stats['n_duplicate_subject_classifications'])
     logger.info(textwrap.shorten(msg, width=150))
 
     return classifications
@@ -441,7 +425,7 @@ def export_cleaned_annotations(path, classifications, header, flags):
     # map questions if necessary
     header_to_print = list()
     for col in header:
-        if col in flags['QUESTIONS']:
+        if col in flags['CSV_QUESTIONS']:
             header_to_print.append(
                 flags['QUESTION_DELIMITER'].join(
                     [flags['QUESTION_PREFIX'], col]))

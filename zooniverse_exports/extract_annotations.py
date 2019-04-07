@@ -14,12 +14,13 @@
             4,0,1,0,0,1,1,wildebeest,
 """
 import csv
-from collections import Counter
+from collections import Counter, defaultdict
 import traceback
 import os
 import argparse
 import logging
 import textwrap
+import json
 
 from logger import setup_logger, create_log_file
 from zooniverse_exports import extractor
@@ -28,6 +29,7 @@ from config.cfg import cfg
 
 
 flags = cfg['extractor_flags']
+logger = logging.getLogger(__name__)
 
 # # Cedar Creek
 # args = dict()
@@ -51,6 +53,107 @@ flags = cfg['extractor_flags']
 # args['workflow_version_min'] = None
 
 
+def extract_raw_classification(
+        cls_dict,
+        args,
+        stats,
+        user_subject_tracker):
+    """ Extract data from raw classifications
+        cls_dict: dict of raw classification
+        args: dict with configuration
+        stats: Counter object to track stats
+        user_subject_tracker: dict to track user and subjects
+    """
+
+    # list to store extracted annotations
+    extracted_annotations = list()
+
+    # check eligibility of classification
+    is_eligible_workflow = extractor.is_eligible_workflow(
+        cls_dict,
+        args['workflow_id'],
+        args['workflow_version_min'])
+    if not is_eligible_workflow:
+        stats.update({'n_not_eligible_workflow'})
+        return extracted_annotations
+    # extract classification-level info
+    classification_info = {
+        x: cls_dict[x] for x in flags['CLASSIFICATION_INFO_TO_ADD']}
+    # map classification info header
+    classification_info = extractor.rename_dict_keys(
+        classification_info, flags['CLASSIFICATION_INFO_MAPPER'])
+    # extract Zooniverse subject metadata
+    subject_zooniverse_metadata = json.loads(cls_dict['metadata'])
+    # if subject was flagged as 'seen_before' skip it
+    try:
+        if extractor.subject_already_seen(subject_zooniverse_metadata):
+            if stats['n_seen_before'] < 10:
+                msg = "Removed classification_id: {} due to \
+                       'seen_before' flag".format(
+                     classification_info['classification_id'])
+                logger.debug(textwrap.shorten(msg, width=99))
+            elif stats['n_seen_before'] == 10:
+                logger.debug("Stop printing 'seen_before' msgs..")
+            stats.update({'n_seen_before'})
+            return extracted_annotations
+    except:
+        pass
+    # check if subject was already classified by user
+    # if so, skip it
+    user_name = classification_info['user_name']
+    subject_id = classification_info['subject_id']
+    if user_name not in user_subject_tracker:
+        user_subject_tracker[user_name] = set()
+    if subject_id in user_subject_tracker[user_name]:
+        # generate logging message
+        msg = "Removed classification_id: {} due \
+               to subject_id {} already classified by \
+               user {}".format(
+               classification_info['classification_id'],
+               subject_id, user_name)
+        logger.debug(textwrap.shorten(msg, width=150))
+        stats.update({'n_duplicate_subject_by_same_user'})
+        return extracted_annotations
+    user_subject_tracker[user_name].add(subject_id)
+    # extract subject-level data / retirement info
+    subject_info_extracted = json.loads(cls_dict['subject_data'])
+    subject_info_raw = \
+        subject_info_extracted[classification_info['subject_id']]
+    subject_info_to_add = dict()
+    for field in flags['RETIREMENT_INFO_TO_ADD']:
+        try:
+            ret_info = subject_info_raw['retired'][field]
+            subject_info_to_add[field] = ret_info
+        except:
+            subject_info_to_add[field] = ''
+    # get all annotations (list of annotations)
+    annotations_list = json.loads(cls_dict['annotations'])
+    # get all tasks of an annotation
+    classification_answers = list()
+    for task in annotations_list:
+        if not extractor.task_is_completed(task):
+            stats.update({'n_incomplete_tasks'})
+            continue
+        task_type = extractor.identify_task_type(task)
+        ids_or_answers = extractor.extract_task_info(
+            task, task_type, flags)
+        # get all identifications/answers of a task
+        for _id_answer in ids_or_answers:
+            _id_answer_mapped = extractor.map_task_questions(
+                _id_answer, flags)
+            classification_answers.append(_id_answer_mapped)
+    # de-duplicate answers (example: two identical species
+    # annotations from different tasks)
+    classifications_deduplicated = extractor.deduplicate_answers(
+            classification_answers, flags)
+    for classification_answer in classifications_deduplicated:
+        record = {**classification_info, **subject_info_to_add,
+                  'annos': classification_answer}
+        extracted_annotations.append(record)
+
+    return extracted_annotations
+
+
 if __name__ == '__main__':
 
     # Parse command line arguments
@@ -65,11 +168,6 @@ if __name__ == '__main__':
     parser.add_argument(
         "--workflow_id", type=str, default=None,
         help="Extract only classifications from the specified workflow_id")
-    parser.add_argument(
-        "--workflow_version", type=str, default=None,
-        help="Extract only classifications from the specified workflow \
-        version. Only the major version number is compared, e.g., \
-        version 45.12 is identical to 45.45")
     parser.add_argument(
         "--workflow_version_min", type=str, default=None,
         help="Extract only classifications with at least the speciefied \
@@ -86,11 +184,6 @@ if __name__ == '__main__':
     if not os.path.isfile(args['classification_csv']):
         raise FileNotFoundError("classification_csv: {} not found".format(
                                 args['classification_csv']))
-
-    at_least_one_none = [
-        args['workflow_version'], args['workflow_version_min']]
-    assert any([x is None for x in at_least_one_none]), \
-        "One of {} must be None".format(at_least_one_none)
 
     ######################################
     # Configuration
@@ -114,200 +207,126 @@ if __name__ == '__main__':
     # Read and Process Classifications
     ######################################
 
-    all_records = list()
-    n_incomplete_tasks = 0
-    n_seen_before = 0
-    n_exceptions = 0
-    n_duplicate_subject_by_same_user = 0
-    n_not_eligible_workflow = 0
-    user_subject_dict = dict()
+    # store all extracted annotations
+    all_extracted_classifications = list()
+
+    # keep track of statistics
+    stats = Counter()
+
     with open(args['classification_csv'], "r") as ins:
         csv_reader = csv.reader(ins, delimiter=',', quotechar='"')
         header = next(csv_reader)
-        row_name_to_id_mapper = {x: i for i, x in enumerate(header)}
+
+        # keep track of potential duplicates
+        user_subject_tracker = dict()
+
         for line_no, line in enumerate(csv_reader):
             # print status
             if ((line_no % 10000) == 0) and (line_no > 0):
                 print("Processed {:,} classifications".format(line_no))
-            # check eligibility of classification
-            is_eligible_workflow = extractor.is_eligible_workflow(
-                line, row_name_to_id_mapper,
-                args['workflow_id'],
-                args['workflow_version'],
-                args['workflow_version_min'])
-            if not is_eligible_workflow:
-                n_not_eligible_workflow += 1
-                continue
-            try:
-                # extract classification-level info
-                classification_info = extractor.extract_classification_info(
-                    line, row_name_to_id_mapper, flags)
-                # map classification info header
-                classification_info = extractor.rename_dict_keys(
-                    classification_info, flags['CLASSIFICATION_INFO_MAPPER'])
-                # extract Zooniverse subject metadata
-                subject_zooniverse_metadata = extractor.extract_key_from_json(
-                    line, 'metadata', row_name_to_id_mapper
-                    )
-                # if subject was flagged as 'seen_before' skip it
-                try:
-                    if subject_zooniverse_metadata['seen_before']:
-                        if n_seen_before < 10:
-                            msg = "Removed classification_id: {} due to \
-                                   'seen_before' flag".format(
-                                 classification_info['classification_id'])
-                            logger.debug(textwrap.shorten(msg, width=99))
-                        elif n_seen_before == 10:
-                            logger.debug("Stop printing 'seen_before' msgs..")
-                        n_seen_before += 1
-                        continue
-                except:
-                    pass
-                # check if subject was already classified by user
-                # if so, skip it
-                try:
-                    user_name = classification_info['user_name']
-                    subject_id = classification_info['subject_id']
-                    if user_name not in user_subject_dict:
-                        user_subject_dict[user_name] = set()
-                    if subject_id in user_subject_dict[user_name]:
-                        msg = "Removed classification_id: {} due \
-                               to subject_id {} already classified by \
-                               user {}".format(
-                         classification_info['classification_id'],
-                         subject_id, user_name)
-                        logger.debug(textwrap.shorten(msg, width=99))
-                        n_duplicate_subject_by_same_user += 1
-                        continue
-                    user_subject_dict[user_name].add(subject_id)
-                except:
-                    pass
-                # extract subject-level data / retirement info
-                subject_info_raw = extractor.extract_key_from_json(
-                    line, 'subject_data', row_name_to_id_mapper
-                    )[classification_info['subject_id']]
-                subject_info_to_add = dict()
-                for field in flags['RETIREMENT_INFO_TO_ADD']:
-                    try:
-                        ret_info = subject_info_raw['retired'][field]
-                        subject_info_to_add[field] = ret_info
-                    except:
-                        subject_info_to_add[field] = ''
-                # get all annotations (list of annotations)
-                annotations_list = extractor.extract_key_from_json(
-                    line, 'annotations', row_name_to_id_mapper)
-                # get all tasks of an annotation
-                classification_answers = list()
-                for task in annotations_list:
-                    if not extractor.task_is_completed(task):
-                        n_incomplete_tasks += 1
-                        continue
-                    task_type = extractor.identify_task_type(task)
-                    ids_or_answers = extractor.extract_task_info(
-                        task, task_type, flags)
-                    # get all identifications/answers of a task
-                    for _id_answer in ids_or_answers:
-                        _id_answer_mapped = extractor.map_task_questions(
-                            _id_answer, flags)
-                        classification_answers.append(_id_answer_mapped)
-                # de-duplicate answers (example: two identical species
-                # annotations from different tasks)
-                classifications_deduplicated = extractor.deduplicate_answers(
-                        classification_answers, flags)
-                for classification_answer in classifications_deduplicated:
-                    record = {**classification_info, **subject_info_to_add,
-                              'annos': classification_answer}
-                    all_records.append(record)
-            except Exception:
-                logger.warning("Error - Skipping Record %s" % line_no)
-                logger.warning("Full line:\n %s" % line)
-                logger.warning(traceback.format_exc())
 
+            # create dictionary from input line
+            cls_dict = {header[i]: x for i, x in enumerate(line)}
+
+            # check validity of classification
+            if not extractor.classification_is_valid(cls_dict):
+                logger.warning(
+                    "Classification number {} not valid, data: {}".format(
+                        line_no, cls_dict
+                    ))
+
+            # Extract annotations
+            try:
+                extracted_classifications = extract_raw_classification(
+                    cls_dict, args, stats, user_subject_tracker)
+            except Exception:
+                logger.warning(
+                    "Failed to extract classification number {}".format(
+                        line_no
+                    ))
+                logger.warning(
+                    "Full data {}".format(
+                        cls_dict
+                    ))
+                logger.warning(traceback.format_exc())
+                stats.update({'n_exceptions'})
+
+            all_extracted_classifications += extracted_classifications
+
+    # print statistics
     logger.info("Processed {:,} classifications".format(line_no))
-    logger.info("Extracted {:,} identifications".format(len(all_records)))
-    logger.info("Incomplete tasks: {:,}".format(n_incomplete_tasks))
-    logger.info("Skipped due to 'seen_before' flag: {:,}".format(
-        n_seen_before))
-    logger.info("Skipped {:,} classifications due to prev. annot. by user".format(
-        n_duplicate_subject_by_same_user))
-    logger.info("Skipped {:,} classifications due to non-eligible workflow".format(
-        n_not_eligible_workflow))
-    logger.info("Skipped {:,} classifications due to unknown error".format(
-        n_exceptions))
+    logger.info("Extracted {:,} identifications".format(
+        len(all_extracted_classifications)))
+
+    for stats_name, count in stats.items():
+        logger.info('{}: {:,}'.format(stats_name, count))
 
     ######################################
     # Analyse Classifications
     ######################################
 
-    # Analyse the dataset
-    question_stats = dict()
-    user_stats = dict()
-    not_logged_in_counter = 0
-    workflow_stats = dict()
+    question_stats = defaultdict(Counter)
+    workflow_stats = defaultdict(Counter)
     retirement_stats = Counter()
+    general_stats = Counter()
+    user_stats = Counter()
 
-    for record in all_records:
+    for classification in all_extracted_classifications:
         # get annotation information
-        for anno in record['annos']:
+        for anno in classification['annos']:
             # get question/answer stats
             for question, answers in anno.items():
-                if question not in question_stats:
-                    question_stats[question] = Counter()
                 if not isinstance(answers, list):
                     question_stats[question].update([answers])
                 else:
                     question_stats[question].update(answers)
-        # get retirement stats
-        if 'retirement_reason' in record:
-            retirement_stats.update({record['retirement_reason']})
-        # get workflow information
-        if ('workflow_id' in record) and ('workflow_version' in record):
-            wid = record['workflow_id']
-            wv = record['workflow_version']
-            if wid not in workflow_stats:
-                workflow_stats[wid] = Counter()
-            workflow_stats[wid].update([wv])
-        # get user information
-        if ('user_name' in record) and ('user_id' in record):
-            uid = record['user_id']
-            un = record['user_name']
-            if uid == '' and un.startswith('not-logged-in-'):
-                not_logged_in_counter += 1
+        # get retirement_reason stats
+        try:
+            retirement_stats.update({classification['retirement_reason']})
+        except:
+            pass
+        try:
+            workflow_stats[classification['workflow_id']].update(
+                    {classification['workflow_version']}
+            )
+        except:
+            pass
+        try:
+            not_log = classification['user_name'].startswith('not-logged-in-')
+            if classification['user_id'] == '' and not_log:
+                general_stats.update({'n_not_logged_in'})
             else:
-                if un not in user_stats:
-                    user_stats[un] = {'classifications': set()}
-                user_stats[un]['classifications'].add(
-                    record['classification_id'])
+                user_stats.update({classification['user_name']})
+        except:
+            pass
 
-    # print header info
+    # Print Stats
     logger.info("Found the following questions/tasks: {}".format(
         [x for x in question_stats.keys()]))
 
     # Stats not-logged-in users
     logger.info("Number of classifications by not logged in users: {}".format(
-        not_logged_in_counter))
+        general_stats['n_not_logged_in']))
 
     # print label stats
     for question, answer_data in question_stats.items():
         logger.info("Stats for question: %s" % question)
         total = sum([x for x in answer_data.values()])
         for answer, count in answer_data.most_common():
-            logger.info("Answer: {:20} -- counts: {:10} / {} ({:.2f} %)".format(
-                answer, count, total, 100*count/total))
+            logger.info(
+                "Answer: {:20} -- counts: {:10} / {} ({:.2f} %)".format(
+                 answer, count, total, 100*count/total))
+
     # workflow stats
     logger.info("Workflow stats:")
     for workflow_id, workflow_version_data in workflow_stats.items():
         for workflow_version, count in workflow_version_data.items():
-            logger.info("Workflow id: {:7} Workflow version: {:10} -- counts: {}".format(
+            logger.info(
+                "Workflow id: {:7} Workflow version: {:10} -- counts: {}".format(
                   workflow_id, workflow_version, count))
-    # user stats
-    user_n_classifications = Counter()
-    for user_name, user_data in user_stats.items():
-        n_class = len(user_data['classifications'])
-        user_n_classifications.update({user_name: n_class})
 
     logger.info("The top-10 most active users are:")
-    for i, (user, count) in enumerate(user_n_classifications.most_common(10)):
+    for i, (user, count) in enumerate(user_stats.most_common(10)):
         logger.info("Rank {:3} - User: {:20} - Classifications: {}".format(
             i+1, user, count))
 
@@ -316,8 +335,9 @@ if __name__ == '__main__':
         logger.info("Retirement-Reason Stats:")
         total = sum([x for x in retirement_stats.values()])
         for answer, count in retirement_stats.most_common():
-            logger.info("Retirement-Reason: {:20} -- counts: {:10} / {} ({:.2f} %)".format(
-                answer, count, total, 100*count/total))
+            logger.info(
+                "Retirement-Reason: {:20} -- counts: {:10} / {} ({:.2f} %)".format(
+                 answer, count, total, 100*count/total))
 
     ######################################
     # Unpack Classifications into
@@ -325,10 +345,12 @@ if __name__ == '__main__':
     ######################################
 
     # get all possible answers to the questions
-    question_answer_pairs = extractor.find_question_answer_pairs(all_records)
+    question_answer_pairs = extractor.find_question_answer_pairs(
+        all_extracted_classifications)
 
     # analyze the question types
-    question_types = extractor.analyze_question_types(all_records)
+    question_types = extractor.analyze_question_types(
+        all_extracted_classifications)
 
     # build question header for csv export
     question_header = extractor.build_question_header(
@@ -370,8 +392,8 @@ if __name__ == '__main__':
         csv_writer = csv.writer(f, delimiter=',')
         logger.info("Writing output to {}".format(args['output_csv']))
         csv_writer.writerow(header)
-        tot = len(all_records)
-        for line_no, record in enumerate(all_records):
+        tot = len(all_extracted_classifications)
+        for line_no, record in enumerate(all_extracted_classifications):
             # get retirement info data
             retirement_data = [record[x] for x in retirement_header_cols]
             # get classification info data
