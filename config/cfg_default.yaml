@@ -145,10 +145,9 @@ legacy_extractor_flags:
       young_present:
        'false': 0
        'true': 1
-
     CLASSIFICATION_INFO_TO_ADD:
      - user_name
-     - zooniverse_created_at
+     - created_at
      - subject_id
      - capture_event_id
      - zooniverse_retirement_reason
@@ -164,7 +163,7 @@ legacy_extractor_flags:
      retire_reason: zooniverse_retirement_reason
      species_count: count
      subject_zooniverse_id: subject_id
-     created_at: zooniverse_created_at
+     created_at: created_at
     CSV_QUESTIONS:
      - species
      - count
@@ -222,6 +221,7 @@ extractor_flags:
     CLASSIFICATION_INFO_TO_ADD:
      - user_name
      - user_id
+     - created_at
      - subject_ids
      - workflow_id
      - workflow_version

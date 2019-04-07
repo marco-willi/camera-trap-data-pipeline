@@ -106,12 +106,9 @@ The resulting file may have the following column headers:
 | Columns   | Description |
 | --------- | ----------- |
 |user_name,user_id | user information (user_id null for anonymous users)
-|created_at | when the classification was created
 |subject_id | zooniverse unique id of the capture (a subject)
 |workflow_id,workflow_version | workflow info
 |classification_id | classification_id (multiple annotations possible)
-|retirement_reason| Zooniverse generated retirement reason
-|retired_at| Zooniverse generated retirement date
 |question__count, question__eating | question answers
 |question__interacting | question answers
 |question__lyingdown, question__moving | question answers
@@ -134,7 +131,9 @@ The following codes extract subject data from the subject exports that Zoonivers
 ```
 python3 -m zooniverse_exports.extract_subjects \
 --subject_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subjects.csv \
---output_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subjects_extracted.csv
+--output_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subjects_extracted.csv \
+--log_dir /home/packerc/shared/zooniverse/Exports/${SITE}/log_files/ \
+--log_filename ${SEASON}_extract_subjects
 ```
 
 
