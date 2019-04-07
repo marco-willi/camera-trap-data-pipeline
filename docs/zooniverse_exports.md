@@ -206,7 +206,7 @@ The data has the following columns:
 |created_at | when the classification was made
 |subject_id | zooniverse subject_id (unique id per capture event)
 |capture_event_id | old capture_event_id as uploaded to zooniverse
-|retirement_reason | string defining the retirement reason as defined by Zooniverse
+|zooniverse_retirement_reason | string defining the retirement reason as defined by Zooniverse
 |season,site,roll,capture | internal id for season, site, roll and capture
 |filenames | image names, separated by ; if multiple (some are missing)
 |timestamps | image timestamps, separated by ; if multiple (some are missing)
@@ -223,7 +223,7 @@ The data has the following columns:
 
 
 ```
-user_name,created_at,subject_id,capture_event_id,retirement_reason,season,site,roll,filenames,timestamps,classification_id,capture_id,capture,question__species,question__count,question__young_present,question__standing,question__resting,question__moving,question__eating,question__interacting
+user_name,created_at,subject_id,capture_event_id,zooniverse_retirement_reason,season,site,roll,filenames,timestamps,classification_id,capture_id,capture,question__species,question__count,question__young_present,question__standing,question__resting,question__moving,question__eating,question__interacting
 XYZ,2012-12-11 01:39:51 UTC,ASG00019km,61592,consensus,S1,I06,R2,PICT0344.JPG;PICT0345.JPG;PICT0346.JPG,2010-08-20T13:34:44-05:00;2010-08-20T13:34:46-05:00;2010-08-20T13:34:4605:00,50c68ee79177d0298c0002da,SER_S1#I06#2#116,116,gazelleThomsons,1,0,1,0,0,0,0
 ```
 
@@ -245,16 +245,15 @@ python3 -m zooniverse_exports.extract_subjects_legacy \
 |capture,roll,season,site | internal ids of the capture (some are missing)
 |capture_id| capture-id
 |subject_id | zooniverse unique id of the capture (a subject)
-|created_at | timestamp when the subject was created on Zooniverse
 |filenames | filenames of the images making up the capture, separated by ';' (some are missing)
 |timestamps | timestamps of the images making up the capture, separated by ';' (some are missing)
-|retirement_reason| Zooniverse generated retirement reason
-|retired_at| Zooniverse generated retirement date
-
+|zooniverse_retirement_reason| Zooniverse generated retirement reason ('' if not available)
+|zooniverse_retired_at| Zooniverse generated retirement date of the subject ('' if not available)
+|zooniverse_created_at| Zooniverse generated creation date of the subject ('' if not available)
 
 Example:
 ```
-capture,capture_id,created_at,filenames,retired_at,retirement_reason,roll,season,site,timestamps,subject_id
+capture,capture_id,created_at,filenames,retired_at,zooniverse_retirement_reason,roll,season,site,timestamps,subject_id
 1,SER_S1#B04#1#1,2013-01-02 19:45:15 UTC,S1/B04/B04_R1/S1_B04_R1_PICT0001.JPG,,consensus,R1,S1,B04,2010-07-18T16:26:14-05:00,ASG0002kjh
 ```
 

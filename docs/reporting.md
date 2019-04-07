@@ -154,9 +154,9 @@ The following file contains one record per capture event and species detection. 
 |capture_date_local | local date (YYYY-MM-DD) of the capture
 |capture_time_local | local time (HH:MM:SS) of the capture
 |subject_id | Zooniverse subject_id (unique per capture)
-|retirement_reason | Zooniverse retirement reason
-|created_at | Zooniverse date when the capture was uploaded
-|retired_at | Zooniverse date when the capture was retired
+|zooniverse_retirement_reason | Zooniverse retirement reason
+|zooniverse_created_at | Zooniverse date when the capture was uploaded
+|zooniverse_retired_at | Zooniverse date when the capture was retired
 |zooniverse_url_*| Zooniverse image links of the capture (if uploaded)
 |question__* | Aggregated question answers, fractions, labels or counts
 |n_users_identified_this_species | Number of users that identified 'question__species'
