@@ -115,17 +115,6 @@ def extract_raw_classification(
         stats.update({'n_duplicate_subject_by_same_user'})
         return extracted_annotations
     user_subject_tracker[user_name].add(subject_id)
-    # extract subject-level data / retirement info
-    subject_info_extracted = json.loads(cls_dict['subject_data'])
-    subject_info_raw = \
-        subject_info_extracted[classification_info['subject_id']]
-    subject_info_to_add = dict()
-    for field in flags['RETIREMENT_INFO_TO_ADD']:
-        try:
-            ret_info = subject_info_raw['retired'][field]
-            subject_info_to_add[field] = ret_info
-        except:
-            subject_info_to_add[field] = ''
     # get all annotations (list of annotations)
     annotations_list = json.loads(cls_dict['annotations'])
     # get all tasks of an annotation
@@ -147,8 +136,7 @@ def extract_raw_classification(
     classifications_deduplicated = extractor.deduplicate_answers(
             classification_answers, flags)
     for classification_answer in classifications_deduplicated:
-        record = {**classification_info, **subject_info_to_add,
-                  'annos': classification_answer}
+        record = {**classification_info, 'annos': classification_answer}
         extracted_annotations.append(record)
 
     return extracted_annotations
@@ -267,7 +255,6 @@ if __name__ == '__main__':
 
     question_stats = defaultdict(Counter)
     workflow_stats = defaultdict(Counter)
-    retirement_stats = Counter()
     general_stats = Counter()
     user_stats = Counter()
 
@@ -280,11 +267,6 @@ if __name__ == '__main__':
                     question_stats[question].update([answers])
                 else:
                     question_stats[question].update(answers)
-        # get retirement_reason stats
-        try:
-            retirement_stats.update({classification['retirement_reason']})
-        except:
-            pass
         try:
             workflow_stats[classification['workflow_id']].update(
                     {classification['workflow_version']}
@@ -330,15 +312,6 @@ if __name__ == '__main__':
         logger.info("Rank {:3} - User: {:20} - Classifications: {}".format(
             i+1, user, count))
 
-    # retirment reason stats
-    if len(retirement_stats.keys()) > 0:
-        logger.info("Retirement-Reason Stats:")
-        total = sum([x for x in retirement_stats.values()])
-        for answer, count in retirement_stats.most_common():
-            logger.info(
-                "Retirement-Reason: {:20} -- counts: {:10} / {} ({:.2f} %)".format(
-                 answer, count, total, 100*count/total))
-
     ######################################
     # Unpack Classifications into
     # Annotations
@@ -380,10 +353,7 @@ if __name__ == '__main__':
         in flags['CLASSIFICATION_INFO_MAPPER'] else x for
         x in classification_header_cols]
 
-    retirement_header_cols = flags['RETIREMENT_INFO_TO_ADD']
-
-    header = classification_header_cols + \
-        retirement_header_cols + question_header_print
+    header = classification_header_cols + question_header_print
 
     logger.info("Automatically generated output header: {}".format(
         header))
@@ -394,8 +364,6 @@ if __name__ == '__main__':
         csv_writer.writerow(header)
         tot = len(all_extracted_classifications)
         for line_no, record in enumerate(all_extracted_classifications):
-            # get retirement info data
-            retirement_data = [record[x] for x in retirement_header_cols]
             # get classification info data
             class_data = [record[x] for x in classification_header_cols]
             # get annotation info data
@@ -405,8 +373,7 @@ if __name__ == '__main__':
                 answers[x] if x in answers else '' for x
                 in question_header]
             csv_writer.writerow(
-                class_data +
-                retirement_data + answers_ordered)
+                class_data + answers_ordered)
         logger.info("Wrote {} annotations to {}".format(
             line_no, args['output_csv']))
 

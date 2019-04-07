@@ -234,9 +234,10 @@ This will produce a file containing one record per subject that can be merged wi
 
 ```
 python3 -m zooniverse_exports.extract_subjects_legacy \
---classifications_extracted /home/packerc/shared/zooniverse/Exports/SER/SER_S1_classifications_extracted.csv \
---output_csv /home/packerc/shared/zooniverse/Exports/SER/SER_S1_subjects_extracted.csv \
---log_dir /home/packerc/shared/zooniverse/Exports/SER/
+--annotations /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_annotations.csv \
+--output_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subjects_extracted_prelim.csv \
+--log_dir /home/packerc/shared/zooniverse/Exports/${SITE}/log_files/ \
+--log_filename ${SEASON}_extract_subjects_legacy_prelim
 ```
 
 
@@ -291,8 +292,10 @@ For processing with later codes the following code re-creates season capture fil
 
 ```
 python3 -m zooniverse_exports.recreate_legacy_season_captures \
---subjects_extracted /home/packerc/shared/zooniverse/Exports/SER/S1_subjects_extracted.csv \
---output_csv /home/packerc/shared/zooniverse/Exports/SER/S1_cleaned.csv
+--subjects_extracted /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subjects_extracted_prelim.csv \
+--output_csv /home/packerc/shared/season_captures/${SITE}/cleaned/${SEASON}_cleaned.csv \
+--log_dir /home/packerc/shared/zooniverse/Exports/${SITE}/log_files/ \
+--log_filename ${SEASON}_recreate_legacy_season_captures
 ```
 
 | Columns   | Description |
@@ -317,11 +320,19 @@ SER_S1#B04#1#3,S1,B04,R1,3,1,S1/B04/B04_R1/S1_B04_R1_PICT0003.JPG,2010-07-20 06:
 The following code appends the Zooniverse Urls of each subject.
 
 ```
+# Extract subjects without filename/timestamp cols
+python3 -m zooniverse_exports.extract_subjects_legacy \
+--annotations /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_annotations.csv \
+--output_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subjects_extracted.csv \
+--log_dir /home/packerc/shared/zooniverse/Exports/${SITE}/log_files/ \
+--log_filename ${SEASON}_extract_subjects_legacy \
+--exclude_colums timestamps filenames
+
 # Add subject urls to subject extracts
 python3 -m zooniverse_exports.merge_csvs \
 --base_cs /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subjects_extracted.csv \
 --to_add_cs /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subject_urls.csv \
---output_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subjects_extracted_url.csv \
+--output_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subjects_extracted.csv \
 --key subject_id \
 --add_new_cols_to_right
 ```
@@ -330,39 +341,3 @@ python3 -m zooniverse_exports.merge_csvs \
 ### Aggregations
 
 Aggregations can be created with the usual aggregation code.
-
-Additionally, the following codes append subject into:
-
-
-The following code merges the subject_url infos with the aggregtions:
-
-```
-# Add subject data to Aggregations
-python3 -m zooniverse_exports.merge_csvs \
---base_cs /home/packerc/shared/zooniverse/Aggregations/${SITE}/${SEASON}_annotations_aggregated.csv \
---to_add_cs /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subjects_extracted_url.csv \
---output_csv /home/packerc/shared/zooniverse/Aggregations/${SITE}/${SEASON}_annotations_aggregated_subject_info.csv \
---key subject_id
-```
-
-```
-# Add subject data to Aggregations (samples)
-python3 -m zooniverse_exports.merge_csvs \
---base_cs /home/packerc/shared/zooniverse/Aggregations/${SITE}/${SEASON}_annotations_aggregated_samples.csv \
---to_add_cs /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subjects_extracted_url.csv \
---output_csv /home/packerc/shared/zooniverse/Aggregations/${SITE}/${SEASON}_annotations_aggregated_subject_info_samples.csv \
---key subject_id
-```
-
-Example:
-
-```
-capture_id,season,site,roll,capture,created_at,filenames,retired_at,retirement_reason,timestamps,zooniverse_url_0,zooniverse_url_1,zooniverse_url_2,subject_id,
-question__species,question__count,question__young_present,question__standing,question__resting,question__moving,question__eating,question__interacting,n_users_
-identified_this_species,p_users_identified_this_species,n_species_ids_per_user_median,n_users_classified_this_subject,n_users_saw_a_species,n_users_saw_no_spec
-ies,p_users_saw_a_species,pielous_evenness_index,species_is_plurality_consensus
-SER_S1#K11#1#205,S1,K11,R1,205,2012-12-14 22:33:50 UTC,S1/K11/K11_R1/S1_K11_R1_PICT0611.JPG;S1/K11/K11_R1/S1_K11_R1_PICT0612.JPG;S1/K11/K11_R1/S1_K11_R1_PICT06
-13.JPG,,blank,2010-09-10T05:17:40-05:00;2010-09-10T05:17:40-05:00;2010-09-10T05:17:42-05:00,http://www.snapshotserengeti.org/subjects/standard/50c2115c8a607540
-b9011370_0.jpg,http://www.snapshotserengeti.org/subjects/standard/50c2115c8a607540b9011370_1.jpg,http://www.snapshotserengeti.org/subjects/standard/50c2115c8a6
-07540b9011370_2.jpg,ASG0001ieo,blank,,,,,,,,5,1.00,0,5,0,5,0.00,0.00,1
-```

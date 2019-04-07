@@ -80,37 +80,19 @@ subject_extractor_flags:
      - retirement_reason
      - retired_at
      - created_at
-    SUBJECT_METADATA_NAME_MAPPER:
-     '#capture': capture
-     '#roll': roll
-     '#season': season
-     '#site': site
     SUBJECT_METADATA_TO_ADD:
      - '#season'
      - '#roll'
      - '#site'
      - '#capture'
-
-###################################################
-# Flags to define the bheavior of adding
-# Subject Info
-###################################################
-
-add_subject_info_flags:
-    SUBJECT_DATA_TO_ADD:
-     - retirement_reason
-     - retired_at
-     - created_at
-    SUBJECT_INFO_MAPPER:
+    SUBJECT_DATA_NAME_MAPPER:
      '#capture': capture
      '#roll': roll
      '#season': season
      '#site': site
-    SUBJECT_METADATA_TO_ADD:
-     - season
-     - roll
-     - site
-     - capture
+     retirement_reason: zooniverse_retirement_reason
+     retired_at: zooniverse_retired_at
+     created_at: zooniverse_created_at
 
 
 ###################################################
@@ -166,10 +148,10 @@ legacy_extractor_flags:
 
     CLASSIFICATION_INFO_TO_ADD:
      - user_name
-     - created_at
+     - zooniverse_created_at
      - subject_id
      - capture_event_id
-     - retirement_reason
+     - zooniverse_retirement_reason
      - season
      - site
      - roll
@@ -179,9 +161,10 @@ legacy_extractor_flags:
     CSV_HEADER_MAPPER:
      babies: young_present
      id: classification_id
-     retire_reason: retirement_reason
+     retire_reason: zooniverse_retirement_reason
      species_count: count
      subject_zooniverse_id: subject_id
+     created_at: zooniverse_created_at
     CSV_QUESTIONS:
      - species
      - count
@@ -195,16 +178,15 @@ legacy_extractor_flags:
     QUESTION_DELIMITER: __
 
 
-
 # Subject info to add from the legacy classifications export
 add_subject_info_flags_legacy:
  - season
  - roll
  - site
  - capture
- - retirement_reason
- - retired_at
- - created_at
+ - zooniverse_retirement_reason
+ - zooniverse_retired_at
+ - zooniverse_created_at
  - filenames
  - timestamps
  - capture_id
@@ -257,9 +239,6 @@ extractor_flags:
       question: species
     QUESTION_PREFIX: question
     QUESTION_DELIMITER: __
-    RETIREMENT_INFO_TO_ADD:
-     - retirement_reason
-     - retired_at
 
 ###################################################
 # Flags for the Report Generation

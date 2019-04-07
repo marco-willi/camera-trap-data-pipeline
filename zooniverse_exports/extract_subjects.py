@@ -115,13 +115,13 @@ if __name__ == '__main__':
                     subject_info_to_add[field] = subject_data_all[field]
                 except:
                     subject_info_to_add[field] = ''
-            subject_info_to_add = extractor.rename_dict_keys(
-                subject_info_to_add, flags['SUBJECT_METADATA_NAME_MAPPER'])
             for field in flags['SUBJECT_DATA_TO_ADD']:
                 try:
                     subject_info_to_add[field] = subject_data_all[field]
                 except:
                     subject_info_to_add[field] = ''
+            subject_info_to_add = extractor.rename_dict_keys(
+                subject_info_to_add, flags['SUBJECT_DATA_NAME_MAPPER'])
             subject_data_header = subject_data_header.union(
                 subject_info_to_add.keys())
             subject_info[subject_id] = subject_info_to_add
