@@ -222,7 +222,6 @@ extractor_flags:
     CLASSIFICATION_INFO_TO_ADD:
      - user_name
      - user_id
-     - created_at
      - subject_ids
      - workflow_id
      - workflow_version
