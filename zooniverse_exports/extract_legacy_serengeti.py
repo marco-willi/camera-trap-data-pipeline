@@ -91,7 +91,7 @@ import os
 import argparse
 from collections import Counter
 import logging
-from logger import setup_logger, create_logfile_name
+from logger import setup_logger, create_log_file
 
 from zooniverse_exports import legacy_extractor
 from utils import print_nested_dict, set_file_permission
@@ -137,6 +137,11 @@ if __name__ == '__main__':
         '--split_raw_file', action='store_true',
         help="Split the raw file according to seasons. If not specified, the \
               script assumes those files exist already.")
+    parser.add_argument(
+        "--log_dir", type=str, default=None)
+    parser.add_argument(
+        "--log_filename", type=str,
+        default='extract_legacy_serengeti')
 
     args = vars(parser.parse_args())
     s_id = args['season_to_process']
@@ -162,10 +167,11 @@ if __name__ == '__main__':
     ######################################
 
     # logging
-    log_file_name = create_logfile_name(
-        'extract_legacy_classifications_{}'.format(s_id))
-    log_file_path = os.path.join(args['output_path'], log_file_name)
-    setup_logger(log_file_path)
+    if args['log_dir'] is not None:
+        log_file_path = create_log_file(args['log_dir'], args['log_filename'])
+        setup_logger(log_file_path)
+    else:
+        setup_logger()
     logger = logging.getLogger(__name__)
 
     for k, v in args.items():

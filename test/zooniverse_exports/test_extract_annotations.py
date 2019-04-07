@@ -45,6 +45,36 @@ class ExtractClassificationsTests(unittest.TestCase):
     def orderListofSingleKeyDicts(self, dict_list):
         return sorted(dict_list, key=lambda x: list(x.keys())[0])
 
+    def testWorfklowEligibility(self):
+        self.assertTrue(
+            extractor.is_eligible_workflow(
+                {'workflow_id': '1', 'workflow_version': '2'},
+                workflow_id='1',
+                workflow_version_min=None))
+        self.assertTrue(
+            extractor.is_eligible_workflow(
+                {'workflow_id': '1', 'workflow_version': '2'},
+                workflow_id='1',
+                workflow_version_min='2'))
+
+        self.assertTrue(
+            extractor.is_eligible_workflow(
+                {'workflow_id': '1', 'workflow_version': '2'},
+                workflow_id=None,
+                workflow_version_min='2'))
+
+        self.assertTrue(
+            extractor.is_eligible_workflow(
+                {'workflow_id': '1', 'workflow_version': '1'},
+                workflow_id=None,
+                workflow_version_min='2'))
+
+        self.assertFalse(
+            extractor.is_eligible_workflow(
+                {'workflow_id': '1', 'workflow_version': '2'},
+                workflow_id='2',
+                workflow_version_min='2'))
+
     def testMultiAnswerExtraction(self):
         # multi-answer tasks
         multi_behavior_task = {
@@ -126,7 +156,7 @@ class ExtractClassificationsTests(unittest.TestCase):
 
         self.assertEqual(
             len([x for x in self.extracted_classifications
-                if x['user_name'] == 'invalid_worfklow_id']), 0)
+                if x['user_name'] == 'invalid_workflow_id']), 0)
 
         self.assertEqual(
             len([x for x in self.extracted_classifications

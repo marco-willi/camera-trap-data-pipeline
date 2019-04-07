@@ -224,8 +224,8 @@ def is_eligible_workflow(
             return True
         else:
             return False
-    raise ValueError(
-        "Unexpected Issue in 'is_eligible_workflow', input {}".format(cls_dict))
+    else:
+        return True
 
 
 # build question_answer pairs
