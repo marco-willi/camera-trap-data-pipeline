@@ -14,7 +14,7 @@ import pandas as pd
 import argparse
 import logging
 
-from logger import setup_logger
+from logger import setup_logger, create_log_file
 
 
 def unpackNames(names):
@@ -43,6 +43,11 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("--subjects_extracted", type=str, required=True)
     parser.add_argument("--output_csv", type=str, required=True)
+    parser.add_argument(
+        "--log_dir", type=str, default=None)
+    parser.add_argument(
+        "--log_filename", type=str,
+        default='recreate_legacy_season_captures')
 
     args = vars(parser.parse_args())
 
@@ -52,8 +57,12 @@ if __name__ == '__main__':
             "subjects_extracted {} does not exist -- must be a file".format(
                 args['subjects_extracted']))
 
-    # Logging
-    setup_logger()
+    # logging
+    if args['log_dir'] is not None:
+        log_file_path = create_log_file(args['log_dir'], args['log_filename'])
+        setup_logger(log_file_path)
+    else:
+        setup_logger()
     logger = logging.getLogger(__name__)
 
     output_header = [

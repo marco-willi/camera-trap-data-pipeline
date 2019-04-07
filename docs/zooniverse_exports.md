@@ -172,10 +172,16 @@ To run the code use the following command:
 ```
 cd $HOME/camera-trap-data-pipeline
 
+SITE=SER
+SEASON=SER_S3
+SEASON_STRING=S3
+
 python3 -m zooniverse_exports.extract_legacy_serengeti \
 --classification_csv '/home/packerc/shared/zooniverse/Exports/SER/2019-01-27_serengeti_classifications.csv' \
 --output_path '/home/packerc/shared/zooniverse/Exports/SER/' \
---season_to_process 'S3'
+--season_to_process ${SEASON_STRING} \
+--log_dir /home/packerc/shared/zooniverse/Exports/${SITE}/log_files/ \
+--log_filename ${SEASON}_extract_legacy_serengeti
 ```
 
 Specify the following to split the raw file into seasons (otherwise, the script assumes this was done):
@@ -183,7 +189,7 @@ Specify the following to split the raw file into seasons (otherwise, the script 
 --split_raw_file
 ```
 
-Available seasons:
+Available seasons (season_string):
 ```
 'S1', 'S2', 'S3', 'S4', 'S5', 'S6',
 'S7', 'S8', 'S9', '10', 'WF1', 'tutorial'
