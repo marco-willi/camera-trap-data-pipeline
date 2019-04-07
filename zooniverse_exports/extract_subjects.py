@@ -20,7 +20,7 @@ import logging
 import argparse
 from collections import OrderedDict
 
-from logger import setup_logger, create_logfile_name
+from logger import setup_logger, create_log_file
 from utils import print_nested_dict, set_file_permission
 from zooniverse_exports import extractor
 from config.cfg import cfg
@@ -34,6 +34,8 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("--subject_csv", type=str, required=True)
     parser.add_argument("--output_csv", type=str, required=True)
+    parser.add_argument("--log_dir", type=str, default=None)
+    parser.add_argument("--log_filename", type=str, default='extract_subjects')
 
     args = vars(parser.parse_args())
 
@@ -49,14 +51,13 @@ if __name__ == '__main__':
     # Configuration
     ######################################
 
-    log_file_name = create_logfile_name('extract_subjects')
-    log_file_path = os.path.join(
-        os.path.dirname(args['output_csv']), log_file_name)
-    setup_logger(log_file_path)
+    # logging
+    if args['log_dir'] is not None:
+        log_file_path = create_log_file(args['log_dir'], args['log_filename'])
+        setup_logger(log_file_path)
+    else:
+        setup_logger()
     logger = logging.getLogger(__name__)
-
-    for k, v in args.items():
-        logger.info("Argument {}: {}".format(k, v))
 
     # logging flags
     print_nested_dict('', flags)

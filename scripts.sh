@@ -408,7 +408,9 @@ python3 -m zooniverse_exports.extract_annotations \
 --classification_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_classifications.csv \
 --output_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_annotations.csv \
 --workflow_id $WORKFLOW_ID \
---workflow_version_min $WORKFLOW_VERSION_MIN
+--workflow_version_min $WORKFLOW_VERSION_MIN \
+--log_dir /home/packerc/shared/zooniverse/Exports/${SITE}/log_files/ \
+--log_filename ${SEASON}_extract_annotations
 
 # Extract Subject Data
 python3 -m zooniverse_exports.extract_subjects \
@@ -549,21 +551,26 @@ module load python3
 
 cd $HOME/camera-trap-data-pipeline
 SITE=SER
-SEASON=SER_S10
-SEASON_STRING='10'
+SEASON=SER_S1
+SEASON_STRING='S1'
 
 # Extract Annotations
 python3 -m zooniverse_exports.extract_legacy_serengeti \
 --classification_csv '/home/packerc/shared/zooniverse/Exports/SER/2019-01-27_serengeti_classifications.csv' \
 --output_path '/home/packerc/shared/zooniverse/Exports/SER/' \
---season_to_process ${SEASON_STRING}
+--season_to_process ${SEASON_STRING} \
+--log_dir /home/packerc/shared/zooniverse/Exports/${SITE}/log_files/ \
+--log_filename ${SEASON}_extract_legacy_serengeti
 
 extract_zooniverse_data_legacy () {
 # Extract Subjects from Classifications
 python3 -m zooniverse_exports.extract_subjects_legacy \
 --annotations /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_annotations.csv \
 --output_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subjects_extracted_prelim.csv \
---log_dir /home/packerc/shared/zooniverse/Exports/${SITE}/
+--log_dir /home/packerc/shared/zooniverse/Exports/${SITE}/log_files/ \
+--log_filename ${SEASON}_extract_subjects_legacy_prelim
+
+
 
 # # Get Subject URLs from Zooniverse API (warning - takes a long time)
 # python3 -m zooniverse_exports.get_legacy_ouroboros_data \
@@ -578,11 +585,23 @@ python3 -m zooniverse_exports.extract_subjects_legacy \
 # Re-Create Season Captures
 python3 -m zooniverse_exports.recreate_legacy_season_captures \
 --subjects_extracted /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subjects_extracted_prelim.csv \
---output_csv /home/packerc/shared/season_captures/${SITE}/cleaned/${SEASON}_cleaned.csv
+--output_csv /home/packerc/shared/season_captures/${SITE}/cleaned/${SEASON}_cleaned.csv \
+--log_dir /home/packerc/shared/zooniverse/Exports/${SITE}/log_files/ \
+--log_filename ${SEASON}_recreate_legacy_season_captures
+
+
+# Extract Subjects from Classifications without timestamps
+python3 -m zooniverse_exports.extract_subjects_legacy \
+--annotations /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_annotations.csv \
+--output_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subjects_extracted.csv \
+--log_dir /home/packerc/shared/zooniverse/Exports/${SITE}/log_files/ \
+--log_filename ${SEASON}_extract_subjects_legacy \
+--exclude_colums timestamps filenames
+
 
 # Add subject urls to subject extracts
 python3 -m zooniverse_exports.merge_csvs \
---base_cs /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subjects_extracted_prelim.csv \
+--base_cs /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subjects_extracted.csv \
 --to_add_cs /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subject_urls.csv \
 --output_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subjects_extracted.csv \
 --key subject_id \
