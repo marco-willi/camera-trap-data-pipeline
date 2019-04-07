@@ -316,7 +316,7 @@ def extract_raw_classification(
     classification_info['capture_id'] = capture_id
     classification_info['capture'] = capture
     # get answers
-    answers = {x: cls_dict[x] for x in flags['CSV_QUESTIONS']}
+    answers = OrderedDict((x, cls_dict[x]) for x in flags['CSV_QUESTIONS'])
 
     # map answers
     map_answers(answers, flags)
