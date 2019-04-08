@@ -52,7 +52,7 @@ def aggregate_species(
             question_type = question_type_map[question]
             if question_type == 'count':
                 # generate multiple count aggregations
-                for agg_type in ['median', 'min', 'max']:
+                for agg_type in flags['COUNT_AGGREGATION_MODES']:
                     agg = aggregator.count_aggregator(
                         stats[question], flags, mode=agg_type)
                     agg_name = '{}_{}'.format(question, agg_type)
@@ -62,7 +62,6 @@ def aggregate_species(
                 species_aggs[species][question] = agg
             elif question_type == 'main':
                 continue
-
         # add overall species stats
         species_aggs[species]['n_users_identified_this_species'] = \
             len(stats['classification_id'])
@@ -277,6 +276,13 @@ if __name__ == '__main__':
                 **subject_agg_data['aggregation_info'],
                 'species_is_plurality_consensus': species_is_plurality_consensus}
             subject_identificatons.append(record)
+
+    # extract all questions
+    questions = set()
+    for row in subject_identificatons:
+        questions.add(
+            [x for x in row.keys()
+             if x.startswith(question_column_prefix)])
 
     ######################################
     # Generate Stats

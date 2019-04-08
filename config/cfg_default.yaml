@@ -160,6 +160,10 @@ plurality_aggregation_flags:
      - horns_count
     QUESTION_MAIN: species
     QUESTION_MAIN_EMPTY: blank
+    COUNT_AGGREGATION_MODES:
+      - median
+      - min
+      - max
 
 
 ###################################################
