@@ -4,7 +4,7 @@ import logging
 import csv
 from collections import Counter
 
-from logger import setup_logger
+from utils.logger import setup_logger
 
 from zooniverse_exports.extract_annotations import extract_raw_classification
 

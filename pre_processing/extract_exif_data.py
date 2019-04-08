@@ -13,10 +13,10 @@ import exiftool
 import pandas as pd
 
 from config.cfg import cfg
-from logger import setup_logger, create_log_file
+from utils.logger import setup_logger, create_log_file
 from pre_processing.utils import (
     export_inventory_to_csv, read_image_inventory, image_check_stats)
-from utils import (
+from utils.utils import (
     slice_generator, estimate_remaining_time, set_file_permission)
 
 

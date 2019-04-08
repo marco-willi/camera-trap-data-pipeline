@@ -10,7 +10,7 @@ import hashlib
 import argparse
 import logging
 
-from logger import setup_logger, create_log_file
+from utils.logger import setup_logger, create_log_file
 
 
 def chunk_reader(fobj, chunk_size=1024):

@@ -6,8 +6,8 @@ import argparse
 from collections import OrderedDict
 import logging
 
-from logger import setup_logger, create_log_file
-from utils import (
+from utils.logger import setup_logger, create_log_file
+from utils.utils import (
     export_dict_to_json_with_newlines,
     read_cleaned_season_file_df, file_path_generator, set_file_permission)
 

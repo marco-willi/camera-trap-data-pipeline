@@ -5,8 +5,8 @@ import logging
 
 from panoptes_client import Project, Panoptes
 
-from utils import read_config_file, set_file_permission
-from logger import setup_logger, create_log_file
+from utils.utils import read_config_file, set_file_permission
+from utils.logger import setup_logger, create_log_file
 
 
 if __name__ == '__main__':

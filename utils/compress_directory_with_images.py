@@ -10,10 +10,10 @@ from PIL import Image
 from collections import OrderedDict
 import time
 
-from utils import estimate_remaining_time
+from utils.utils import estimate_remaining_time
 
 
-# python3 -m image_compression.compress_directory_with_images \
+# python3 -m utils.compress_directory_with_images \
 # --input_image_dir '/home/packerc/shared/snapshot_websites/SpeciesImages_Master/' \
 # --output_image_dir '/home/packerc/shared/snapshot_websites/SpeciesImages_Master_Compressed/' \
 # --max_image_pixel_side 1200 \

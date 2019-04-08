@@ -6,9 +6,9 @@ import os
 import argparse
 import logging
 
-from logger import setup_logger, create_log_file
+from utils.logger import setup_logger, create_log_file
 from config.cfg import cfg
-from utils import (
+from utils.utils import (
     set_file_permission, balanced_sample_best_effort, print_nested_dict)
 
 

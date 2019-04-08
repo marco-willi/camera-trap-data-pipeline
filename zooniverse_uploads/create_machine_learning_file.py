@@ -7,8 +7,8 @@ import csv
 import argparse
 import logging
 
-from logger import setup_logger, create_log_file
-from utils import file_path_splitter, file_path_generator, set_file_permission
+from utils.logger import setup_logger, create_log_file
+from utils.utils import file_path_splitter, file_path_generator, set_file_permission
 
 #For Testing
 # args = dict()

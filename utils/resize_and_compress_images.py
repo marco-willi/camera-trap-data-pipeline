@@ -9,7 +9,7 @@ import traceback
 from multiprocessing import Process, Manager
 import io
 
-from utils import slice_generator
+from utils.utils import slice_generator
 
 
 def aspect_preserving_max_side_resize(img, max_side):

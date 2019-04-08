@@ -4,7 +4,7 @@ import argparse
 import logging
 from collections import OrderedDict
 
-from logger import setup_logger, create_log_file
+from utils.logger import setup_logger, create_log_file
 from config.cfg import cfg
 from pre_processing.utils import (
     read_image_inventory, export_inventory_to_csv, image_check_stats)

@@ -9,11 +9,11 @@ import traceback
 from multiprocessing import Process, Manager
 from PIL import Image
 
-from logger import setup_logger, create_log_file
+from utils.logger import setup_logger, create_log_file
 from pre_processing.utils import (
     file_creation_date, image_check_stats, p_pixels_above_threshold,
     p_pixels_below_threshold, export_inventory_to_csv, read_image_inventory)
-from utils import slice_generator, estimate_remaining_time
+from utils.utils import slice_generator, estimate_remaining_time
 from config.cfg import cfg
 
 

@@ -13,7 +13,7 @@ import traceback
 import textwrap
 import logging
 
-from utils import correct_image_name
+from utils.utils import correct_image_name
 from zooniverse_exports import extractor
 
 logger = logging.getLogger(__name__)

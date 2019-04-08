@@ -3,27 +3,9 @@ import os
 import logging
 import argparse
 
-from logger import setup_logger
-from utils import merge_csvs, sort_df_by_capture_id, set_file_permission
+from utils.logger import setup_logger
+from utils.utils import merge_csvs, sort_df_by_capture_id, set_file_permission
 
-# args = dict()
-# args['subject_csv'] = '/home/packerc/shared/zooniverse/Exports/CC/CC_S1_subjects_extracted.csv'
-# args['input_csv'] = '/home/packerc/shared/zooniverse/Exports/CC/CC_S1_classifications_aggregated.csv'
-# args['output_csv'] = '/home/packerc/shared/zooniverse/Exports/CC/CC_S1_classifications_aggregated_subject_info.csv'
-
-# args = dict()
-# args['base_csv'] = '/home/packerc/shared/zooniverse/Exports/GRU/GRU_S1_annotations.csv'
-# args['to_add_csv'] = '/home/packerc/shared/zooniverse/Exports/GRU/GRU_S1_subjects_extracted.csv'
-# args['output_csv'] = ''
-# args['key'] = 'subject_id'
-
-
-# args = dict()
-# args['base_csv'] = '/home/packerc/shared/zooniverse/Aggregations/MTZ/MTZ_S1_annotations_aggregated_plurality.csv'
-# args['to_add_csv'] = '/home/packerc/shared/zooniverse/Exports/MTZ/MTZ_S1_subjects_extracted.csv'
-# args['output_csv'] = ''
-# args['key'] = 'subject_id'
-# args['add_new_cols_to_right'] = False
 
 if __name__ == '__main__':
 

@@ -236,12 +236,13 @@ for LOC in MTZ KAR PLN NIA GON APN GRU SER RUA; do
 done
 
 # Loop over all seasons (Legacy)
-for season in 1 2 3 4 5 6 7 8 9 10; do
+for season in 1 2 3 4 5 6 7 8 9; do
   SITE=SER
   SEASON=SER_S${season}
-  #extract_zooniverse_data_legacy
+  SEASON_STRING=S${season}
+  extract_zooniverse_data_legacy
   #aggregate_annotations
-  create_reports
+  #create_reports
 done
 
 
@@ -415,7 +416,9 @@ python3 -m zooniverse_exports.extract_annotations \
 # Extract Subject Data
 python3 -m zooniverse_exports.extract_subjects \
 --subject_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subjects.csv \
---output_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subjects_extracted.csv
+--output_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subjects_extracted.csv \
+--log_dir /home/packerc/shared/zooniverse/Exports/${SITE}/log_files/ \
+--log_filename ${SEASON}_extract_subjects
 }
 
 ###################################
@@ -423,20 +426,20 @@ python3 -m zooniverse_exports.extract_subjects \
 ####################################
 
 aggregate_annotations () {
-# Aggregate Classifications with plurality algorithm
-python3 -m zooniverse_aggregations.aggregate_annotations_plurality \
+
+python3 -m aggregations.aggregate_annotations_plurality \
 --annotations /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_annotations.csv \
---output_csv /home/packerc/shared/zooniverse/Aggregations/${SITE}/${SEASON}_annotations_aggregated_plurality.csv \
---log_dir /home/packerc/shared/zooniverse/Aggregations/${SITE}/
+--output_csv /home/packerc/shared/zooniverse/Aggregations/${SITE}/${SEASON}_aggregated_plurality_raw.csv \
+--log_dir /home/packerc/shared/zooniverse/Aggregations/${SITE}/log_files/ \
+--log_filename ${SEASON}_aggregate_annotations_plurality
 
-# Add subject data to Aggregations
 python3 -m zooniverse_exports.merge_csvs \
---base_csv /home/packerc/shared/zooniverse/Aggregations/${SITE}/${SEASON}_annotations_aggregated_plurality.csv \
+--base_csv /home/packerc/shared/zooniverse/Aggregations/${SITE}/${SEASON}_aggregated_plurality_raw.csv \
 --to_add_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subjects_extracted.csv \
---output_csv /home/packerc/shared/zooniverse/Aggregations/${SITE}/${SEASON}_annotations_aggregated_plurality_info.csv \
+--output_csv /home/packerc/shared/zooniverse/Aggregations/${SITE}/${SEASON}_aggregated_plurality.csv \
 --key subject_id
-}
 
+}
 
 ###################################
 # Reporting
@@ -447,7 +450,7 @@ create_reports () {
 # Create report
 python3 -m reporting.create_zooniverse_report \
 --season_captures_csv /home/packerc/shared/season_captures/${SITE}/cleaned/${SEASON}_cleaned.csv \
---aggregated_csv /home/packerc/shared/zooniverse/Aggregations/${SITE}/${SEASON}_annotations_aggregated_plurality_info.csv \
+--aggregated_csv /home/packerc/shared/zooniverse/Aggregations/${SITE}/${SEASON}_aggregated_plurality.csv \
 --output_csv /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/${SEASON}_report_all.csv \
 --default_season_id ${SEASON} \
 --log_dir /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/log_files/ \
@@ -465,7 +468,7 @@ python3 -m reporting.create_report_stats \
 # Create species consensus only report
 python3 -m reporting.create_zooniverse_report \
 --season_captures_csv /home/packerc/shared/season_captures/${SITE}/cleaned/${SEASON}_cleaned.csv \
---aggregated_csv /home/packerc/shared/zooniverse/Aggregations/${SITE}/${SEASON}_annotations_aggregated_plurality_info.csv \
+--aggregated_csv /home/packerc/shared/zooniverse/Aggregations/${SITE}/${SEASON}_aggregated_plurality.csv \
 --output_csv /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/${SEASON}_report_species.csv \
 --log_dir /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/log_files/ \
 --log_filename ${SEASON}_create_zooniverse_report \
@@ -495,7 +498,7 @@ python3 -m reporting.sample_report \
 # Create species only report (consensus and non-consensus)
 python3 -m reporting.create_zooniverse_report \
 --season_captures_csv /home/packerc/shared/season_captures/${SITE}/cleaned/${SEASON}_cleaned.csv \
---aggregated_csv /home/packerc/shared/zooniverse/Aggregations/${SITE}/${SEASON}_annotations_aggregated_plurality_info.csv \
+--aggregated_csv /home/packerc/shared/zooniverse/Aggregations/${SITE}/${SEASON}_aggregated_plurality.csv \
 --output_csv /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/${SEASON}_report.csv \
 --log_dir /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/log_files/ \
 --log_filename ${SEASON}_create_zooniverse_report \
@@ -552,17 +555,19 @@ module load python3
 cd $HOME/camera-trap-data-pipeline
 SITE=SER
 SEASON=SER_S1
-SEASON_STRING='S1'
+SEASON_STRING=S1
+
+extract_zooniverse_data_legacy () {
 
 # Extract Annotations
 python3 -m zooniverse_exports.extract_legacy_serengeti \
 --classification_csv '/home/packerc/shared/zooniverse/Exports/SER/2019-01-27_serengeti_classifications.csv' \
---output_path '/home/packerc/shared/zooniverse/Exports/SER/' \
+--output_path /home/packerc/shared/zooniverse/Exports/SER/ \
 --season_to_process ${SEASON_STRING} \
 --log_dir /home/packerc/shared/zooniverse/Exports/${SITE}/log_files/ \
 --log_filename ${SEASON}_extract_legacy_serengeti
 
-extract_zooniverse_data_legacy () {
+
 # Extract Subjects from Classifications
 python3 -m zooniverse_exports.extract_subjects_legacy \
 --annotations /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_annotations.csv \

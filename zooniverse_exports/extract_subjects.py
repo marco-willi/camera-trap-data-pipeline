@@ -20,8 +20,8 @@ import logging
 import argparse
 from collections import OrderedDict
 
-from logger import setup_logger, create_log_file
-from utils import print_nested_dict, set_file_permission
+from utils.logger import setup_logger, create_log_file
+from utils.utils import print_nested_dict, set_file_permission
 from zooniverse_exports import extractor
 from config.cfg import cfg
 

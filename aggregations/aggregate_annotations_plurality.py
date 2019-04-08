@@ -11,10 +11,10 @@ import logging
 
 import pandas as pd
 
-from logger import setup_logger, create_log_file
+from utils.logger import setup_logger, create_log_file
 from config.cfg import cfg
-from zooniverse_aggregations import aggregator
-from utils import (
+from aggregations import aggregator
+from utils.utils import (
     print_nested_dict, set_file_permission)
 
 

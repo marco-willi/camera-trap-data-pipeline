@@ -8,10 +8,10 @@ import traceback
 from datetime import datetime
 from collections import OrderedDict
 
-from logger import setup_logger, create_log_file
+from utils.logger import setup_logger, create_log_file
 from pre_processing.utils import read_image_inventory
 from config.cfg import cfg
-from utils import set_file_permission
+from utils.utils import set_file_permission
 
 
 flags = cfg['pre_processing_flags']

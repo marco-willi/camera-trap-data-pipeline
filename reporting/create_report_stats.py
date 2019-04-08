@@ -7,8 +7,8 @@ import os
 import pandas as pd
 
 from config.cfg import cfg
-from logger import setup_logger, create_log_file
-from utils import set_file_permission
+from utils.logger import setup_logger, create_log_file
+from utils.utils import set_file_permission
 
 
 flags = cfg['global_processing_flags']

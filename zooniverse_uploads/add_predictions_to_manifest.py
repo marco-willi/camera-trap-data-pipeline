@@ -4,8 +4,8 @@ import os
 import argparse
 import logging
 
-from logger import setup_logger, create_log_file
-from utils import (
+from utils.logger import setup_logger, create_log_file
+from utils.utils import (
     export_dict_to_json_with_newlines, file_path_splitter,
     file_path_generator, set_file_permission)
 from machine_learning.flatten_preds import (

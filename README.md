@@ -4,7 +4,7 @@ This repository contains code to process camera trap images, specifically:
 1. [Pre-Processing Camera-Trap Images](docs/pre_processing.md)
 2. [Upload Data to Zooniverse](docs/zooniverse_uploads.md)
 3. [Download & Extract Data from Zooniverse](docs/zooniverse_exports.md)
-4. [Aggregate Data from Zooniverse](docs/zooniverse_aggregations.md)
+4. [Aggregate Annotations](docs/aggregations.md)
 5. [Merge Data into Reports](docs/reporting.md)
 
 The code was developed for the [Snapshot Safari](http://www.snapshotsafari.org) project but is generally usable for camera trap projects. The code allows for organizing and processing camera trap images, classifying images with machine learning models, uploading images to [Zooniverse](https://www.zooniverse.org) for classification by citzien scientists, and allows for aggregating and consolidating data exports from Zooniverse into reports.
@@ -29,7 +29,7 @@ These need to be adjusted, for example:
 
 ## Executing the Scripts
 
-The recommended way is to use parameters and then run the scripts as shown here: [Scripts](scripts.sh)
+The recommended way is to use parameters and then run the scripts as shown here: [Scripts](utils/scripts.sh)
 
 Alternatively, copy & paste the commands to a text editor, adjust the parameters, and copy & paste them to the command line.
 
@@ -113,9 +113,10 @@ tar xvzf exiftool.tar.gz
 
 ### Testing the Code
 
-Some pre-processing tests:
+Some tests:
 ```
 python -m unittest discover test/pre_processing
+python -m unittest discover test/zooniverse_exports
 ```
 
 Set log-level befor running the code:

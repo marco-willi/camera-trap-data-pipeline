@@ -4,7 +4,7 @@ import logging
 import csv
 from collections import Counter
 
-from logger import setup_logger
+from utils.logger import setup_logger
 
 from zooniverse_exports import legacy_extractor
 from config.cfg import cfg
@@ -74,8 +74,9 @@ class ExtractLegacyClassificationsTests(unittest.TestCase):
 
     def testMapAnswers(self):
 
-        input_map = {'ANSWER_TYPE_MAPPER':
-            {'species': {'NOTHING': 'nothinghere'}}}
+        input_map = {
+            'ANSWER_TYPE_MAPPER':
+                {'species': {'NOTHING': 'nothinghere'}}}
         answers1 = {'species': 'NOTHING'}
         answers2 = {'species': 'nada'}
 
@@ -135,9 +136,9 @@ class ExtractLegacyClassificationsTests(unittest.TestCase):
         self.assertEqual(len(consolidated_classifications['cl_5']), 1)
 
         expected = {'species': 'elephant', 'count': '2', 'resting': 1,
-                      'moving': 0, 'interacting': 0,
-                      'young_present': 0,
-                      'eating': 0, 'standing': 1}
+                    'moving': 0, 'interacting': 0,
+                    'young_present': 0,
+                    'eating': 0, 'standing': 1}
         actual = consolidated_classifications['cl_5'][0]
         self.assertTrue(
             set(expected.items()).issubset(set(actual.items())))

@@ -22,9 +22,9 @@ import logging
 import textwrap
 import json
 
-from logger import setup_logger, create_log_file
+from utils.logger import setup_logger, create_log_file
 from zooniverse_exports import extractor
-from utils import print_nested_dict, set_file_permission
+from utils.utils import print_nested_dict, set_file_permission
 from config.cfg import cfg
 
 

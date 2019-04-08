@@ -13,7 +13,7 @@ from pre_processing.utils import (
     plot_site_roll_timelines, read_image_inventory,
     image_check_stats,
     export_inventory_to_csv)
-from logger import create_log_file, setup_logger
+from utils.logger import create_log_file, setup_logger
 from config.cfg import cfg
 
 

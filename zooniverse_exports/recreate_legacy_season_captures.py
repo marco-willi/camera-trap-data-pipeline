@@ -14,7 +14,7 @@ import pandas as pd
 import argparse
 import logging
 
-from logger import setup_logger, create_log_file
+from utils.logger import setup_logger, create_log_file
 
 
 def unpackNames(names):

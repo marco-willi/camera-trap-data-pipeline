@@ -1,6 +1,5 @@
- # Aggregate Zooniverse Classifications
-
-The following codes aggregate extracted annotations (essentially species identifications made by individual users).
+ # Aggregate Annotations
+The following codes aggregate extracted annotations to calculate 'consensus' species identifications from multiple volunteers.
 
 The general aggregation logic (plurality algorithm) is as follows:
 
@@ -31,17 +30,13 @@ SITE=RUA
 SEASON=RUA_S1
 ```
 
-
 ## Output Fields
+
+The primary key is: subject_id + the main task (question__species).
 
 | Columns   | Description |
 | --------- | ----------- |
-|season, roll, site, capture  | internal identifiers of the capture
-|subject_id | Zooniverse subject_id (per capture)
-|retirement_reason | Zooniverse retirement reason
-|created_at | Zooniverse date when the capture was uploaded
-|retired_at | Zooniverse date when the capture was retired
-|zooniverse_url_*| Zooniverse image links of the capture (if uploaded)
+|subject_id | Zooniverse subject_id (unique identifier of a crowd task)
 |question__* | Aggregated question answers, fractions, labels or counts
 |n_users_identified_this_species | Number of users that identified 'question__species'
 |p_users_identified_this_species | Proportion of users that identified 'question__species'
@@ -58,20 +53,21 @@ SEASON=RUA_S1
 This is an example to aggregate annotations using the plurality algorithm.
 
 ```
-python3 -m zooniverse_aggregations.aggregate_annotations_plurality \
+python3 -m aggregations.aggregate_annotations_plurality \
 --annotations /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_annotations.csv \
---output_csv /home/packerc/shared/zooniverse/Aggregations/${SITE}/${SEASON}_annotations_aggregated_plurality.csv \
---log_dir /home/packerc/shared/zooniverse/Aggregations/${SITE}/
+--output_csv /home/packerc/shared/zooniverse/Aggregations/${SITE}/${SEASON}_aggregated_plurality_raw.csv \
+--log_dir /home/packerc/shared/zooniverse/Aggregations/${SITE}/log_files/ \
+--log_filename ${SEASON}_aggregate_annotations_plurality
 ```
 
 ## Add subject data to Aggregations
 
-This scripts adds subject data to the export.
+This scripts adds subject data to the export to join it later for report generation.
 
 ```
 python3 -m zooniverse_exports.merge_csvs \
---base_csv /home/packerc/shared/zooniverse/Aggregations/${SITE}/${SEASON}_annotations_aggregated_plurality.csv \
+--base_csv /home/packerc/shared/zooniverse/Aggregations/${SITE}/${SEASON}_aggregated_plurality_raw.csv \
 --to_add_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subjects_extracted.csv \
---output_csv /home/packerc/shared/zooniverse/Aggregations/${SITE}/${SEASON}_annotations_aggregated_plurality_info.csv \
+--output_csv /home/packerc/shared/zooniverse/Aggregations/${SITE}/${SEASON}_aggregated_plurality.csv \
 --key subject_id
 ```

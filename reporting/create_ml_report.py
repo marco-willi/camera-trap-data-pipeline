@@ -4,8 +4,8 @@ import os
 import argparse
 import pandas as pd
 
-from logger import setup_logger, create_log_file
-from utils import (
+from utils.logger import setup_logger, create_log_file
+from utils.utils import (
     read_cleaned_season_file_df, set_file_permission, sort_df_by_capture_id)
 from reporting.create_zooniverse_report import create_season_dict
 

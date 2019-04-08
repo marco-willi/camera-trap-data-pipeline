@@ -7,8 +7,8 @@ import pandas as pd
 from datetime import datetime
 from collections import OrderedDict
 
-from logger import setup_logger, create_log_file
-from utils import set_file_permission, read_cleaned_season_file_df
+from utils.logger import setup_logger, create_log_file
+from utils.utils import set_file_permission, read_cleaned_season_file_df
 from config.cfg import cfg
 
 

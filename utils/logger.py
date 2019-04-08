@@ -4,7 +4,7 @@ import sys
 import os
 import getpass
 
-from utils import set_file_permission
+from utils.utils import set_file_permission
 
 
 def create_logfile_name(_id):

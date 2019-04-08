@@ -4,7 +4,7 @@ import argparse
 import logging
 from datetime import datetime, timedelta
 
-from logger import setup_logger, create_log_file
+from utils.logger import setup_logger, create_log_file
 from pre_processing.utils import read_image_inventory, export_inventory_to_csv
 from config.cfg import cfg
 

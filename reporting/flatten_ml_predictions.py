@@ -6,8 +6,8 @@ import pandas as pd
 import argparse
 from collections import OrderedDict
 
-from logger import setup_logger, create_log_file
-from utils import set_file_permission, sort_df_by_capture_id
+from utils.logger import setup_logger, create_log_file
+from utils.utils import set_file_permission, sort_df_by_capture_id
 from machine_learning.flatten_preds import (
     flatten_ml_empty_preds, flatten_ml_species_preds
 )
