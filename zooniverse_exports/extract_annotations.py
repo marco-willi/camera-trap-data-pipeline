@@ -331,12 +331,11 @@ if __name__ == '__main__':
 
     # order questions if possible
     try:
-        question_header = sorted(
-            question_header,
-            key=lambda x: '{}_{}'.format(
-                flags['QUESTIONS_OUTPUT_ORDER'].index(
-                 [q for q in flags['QUESTIONS_OUTPUT_ORDER'] if q in x][0]),
-                x))
+        question_header_first = [
+            x for x in flags['QUESTIONS_OUTPUT_ORDER'] if x in question_header]
+        question_header_last = [
+            x for x in question_header if x not in question_header_first]
+        question_header = question_header_first + question_header_last
     except:
         pass
 

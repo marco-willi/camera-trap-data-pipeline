@@ -127,6 +127,8 @@ extractor_flags:
      - eating
      - interacting
      - young_present
+     - horns_count
+     - antlers_visible
 
 ###################################################
 # Subject Extractor
