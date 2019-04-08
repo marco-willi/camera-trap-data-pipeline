@@ -329,6 +329,17 @@ if __name__ == '__main__':
     question_header = extractor.build_question_header(
         question_answer_pairs, question_types)
 
+    # order questions if possible
+    try:
+        question_header = sorted(
+            question_header,
+            key=lambda x: '{}_{}'.format(
+                flags['QUESTIONS_OUTPUT_ORDER'].index(
+                 [q for q in flags['QUESTIONS_OUTPUT_ORDER'] if q in x][0]),
+                x))
+    except:
+        pass
+
     # modify question column names as specified
     question_header_print = list()
     for question in question_header:

@@ -118,7 +118,15 @@ extractor_flags:
       question: species
     QUESTION_PREFIX: question
     QUESTION_DELIMITER: __
-
+    QUESTIONS_OUTPUT_ORDER:
+     - species
+     - count
+     - standing
+     - resting
+     - moving
+     - eating
+     - interacting
+     - young_present
 
 ###################################################
 # Subject Extractor
