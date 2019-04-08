@@ -1,7 +1,7 @@
 #!/bin/bash -l
-#PBS -l walltime=120:00:00,nodes=1:ppn=4
+#PBS -l walltime=24:00:00,nodes=1:ppn=4
 #PBS -j oe
-#PBS -q lab-long
+#PBS -q lab
 #PBS -N upload_manifest
 #PBS -o ${HOME}/upload_manifest_${PBS_JOBID}.log
 #PBS -e ${HOME}/upload_manifest_error_${PBS_JOBID}.log
