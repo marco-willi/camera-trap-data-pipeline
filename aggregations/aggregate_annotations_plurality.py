@@ -277,12 +277,20 @@ if __name__ == '__main__':
                 'species_is_plurality_consensus': species_is_plurality_consensus}
             subject_identificatons.append(record)
 
-    # extract all questions
-    questions = set()
+    # extract all questions and order them by the original ordering
+    questions_original = questions
+    questions_found = set()
     for row in subject_identificatons:
-        questions.add(
-            [x for x in row.keys()
-             if x.startswith(question_column_prefix)])
+        row_questions = list(row.keys())
+        questions_found = questions_found.union(
+            {x for x in row_questions
+             if x.startswith(question_column_prefix)})
+    questions = list(questions_found)
+    questions = sorted(
+        questions,
+        key=lambda x: '{}_{}'.format(
+            questions_original.index(
+                [q for q in questions_original if x.startswith(q)][0]), x))
 
     ######################################
     # Generate Stats
