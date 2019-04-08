@@ -7,7 +7,7 @@
 import json
 import copy
 import logging
-from collections import defaultdict, Counter
+from collections import defaultdict, Counter, OrderedDict
 
 logger = logging.getLogger(__name__)
 
@@ -284,16 +284,38 @@ def find_question_answer_pairs(all_records):
           'young_present': ['yes', 'no'],
           }
     """
-    pairs = defaultdict(Counter)
+    question_answer_pairs = OrderedDict()
     for record in all_records:
         annos = record['annos']
         for anno in annos:
             for question, answers in anno.items():
-                if isinstance(answers, list):
-                    pairs[question].update(answers)
-                else:
-                    pairs[question].update({answers})
-    return {k: list(v.keys()) for k, v in pairs.items()}
+                if question not in question_answer_pairs:
+                    question_answer_pairs[question] = set()
+                if isinstance(answers, str):
+                    question_answer_pairs[question].add(answers)
+                elif isinstance(answers, list):
+                    for answer in answers:
+                        question_answer_pairs[question].add(answer)
+    return OrderedDict({(k, list(v)) for k, v in question_answer_pairs.items()})
+
+
+# def find_question_answer_pairs(all_records):
+#     """ Analyze annotations to determine question and answer mappings
+#         Output:
+#          {'species': ['vulture', 'zebra', 'nyala', ...],
+#           'young_present': ['yes', 'no'],
+#           }
+#     """
+#     pairs = defaultdict(Counter)
+#     for record in all_records:
+#         annos = record['annos']
+#         for anno in annos:
+#             for question, answers in anno.items():
+#                 if isinstance(answers, list):
+#                     pairs[question].update(answers)
+#                 else:
+#                     pairs[question].update({answers})
+#     return {k: list(v.keys()) for k, v in pairs.items()}
 
 
 def build_question_header(question_answer_pairs, question_types):
