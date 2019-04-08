@@ -1,4 +1,4 @@
- # Aggregate Annotations
+# Aggregate Annotations
 The following codes aggregate extracted annotations to calculate 'consensus' species identifications from multiple volunteers.
 
 The general aggregation logic (plurality algorithm) is as follows:

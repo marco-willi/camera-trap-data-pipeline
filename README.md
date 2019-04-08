@@ -2,10 +2,11 @@
 This repository contains code to process camera trap images, specifically:
 
 1. [Pre-Processing Camera-Trap Images](docs/pre_processing.md)
-2. [Upload Data to Zooniverse](docs/zooniverse_uploads.md)
-3. [Download & Extract Data from Zooniverse](docs/zooniverse_exports.md)
-4. [Aggregate Annotations](docs/aggregations.md)
-5. [Merge Data into Reports](docs/reporting.md)
+2. [Machine Learning](docs/machine_learning.md)
+3. [Upload Data to Zooniverse](docs/zooniverse_uploads.md)
+4. [Download & Extract Data from Zooniverse](docs/zooniverse_exports.md)
+5. [Aggregate Annotations](docs/aggregations.md)
+6. [Merge Data into Reports](docs/reporting.md)
 
 The code was developed for the [Snapshot Safari](http://www.snapshotsafari.org) project but is generally usable for camera trap projects. The code allows for organizing and processing camera trap images, classifying images with machine learning models, uploading images to [Zooniverse](https://www.zooniverse.org) for classification by citzien scientists, and allows for aggregating and consolidating data exports from Zooniverse into reports.
 
