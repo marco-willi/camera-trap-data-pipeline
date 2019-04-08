@@ -17,11 +17,12 @@ def create_question_type_map(questions, flags):
     return question_type_map
 
 
-def count_aggregator_median(count_stats, flags):
+def count_aggregator(count_stats, flags, mode='median'):
     """ Special count aggregator
     Input:
         - count_stats: {'11-50': 3, '1': 5, '2': 3}
         - counts_mapper: {'11-50': 11, '51+': 12}
+        - mode: one of median, max, min
     Output:
         - '2'
     """
@@ -36,13 +37,20 @@ def count_aggregator_median(count_stats, flags):
             pass
     if len(count_values) == 0:
         return ''
-    med = median_high(count_values)
-    # unmap value if it was mapped in the first place
-    if med in counts_mapper.values():
-        counts_unmapping = {v: k for k, v in counts_mapper.items()}
-        return counts_unmapping[med]
+    if mode == 'median':
+        agg_val = median_high(count_values)
+    elif mode == 'min':
+        agg_val = min(count_values)
+    elif mode == 'max':
+        agg_val = max(count_values)
     else:
-        return str(med)
+        raise ValueError("mode {} not allowed".format(mode))
+    # unmap value if it was mapped in the first place
+    if agg_val in counts_mapper.values():
+        counts_unmapping = {v: k for k, v in counts_mapper.items()}
+        return counts_unmapping[agg_val]
+    else:
+        return str(agg_val)
 
 
 def proportion_affirmative(question_stats):

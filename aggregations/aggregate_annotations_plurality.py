@@ -51,8 +51,8 @@ def aggregate_species(
         for question in questions:
             question_type = question_type_map[question]
             if question_type == 'count':
-                agg = aggregator.count_aggregator_median(
-                    stats[question], flags)
+                agg = aggregator.count_aggregator(
+                    stats[question], flags, mode='median')
             elif question_type == 'prop':
                 agg = aggregator.proportion_affirmative(stats[question])
             elif question_type == 'main':
@@ -193,6 +193,12 @@ if __name__ == '__main__':
                 median_high(stat_species_only['user_name'].values()))
         except StatisticsError:
             n_species_ids_per_user_median = 0
+        # get the max number of species identified by any user
+        try:
+            n_species_ids_per_user_max = int(
+                max(stat_species_only['user_name'].values()))
+        except StatisticsError:
+            n_species_ids_per_user_max = 0
         # Calculate some statistics
         n_subject_classifications = len(stat_all['classification_id'])
         n_subject_users = len(stat_all['user_name'])
@@ -239,6 +245,7 @@ if __name__ == '__main__':
         # collect information to be added to the export
         agg_info = {
             'n_species_ids_per_user_median': n_species_ids_per_user_median,
+            'n_species_ids_per_user_max': n_species_ids_per_user_max,
             'n_users_classified_this_subject': n_subject_users,
             'n_users_saw_a_species': n_users_id_species,
             'n_users_saw_no_species': n_users_id_empty,
