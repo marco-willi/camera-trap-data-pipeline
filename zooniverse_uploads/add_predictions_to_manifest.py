@@ -160,8 +160,11 @@ if __name__ == "__main__":
             data['info']['machine_learning'] = True
         # add species predictions
         if capture_id in preds_species:
-            flat_species = flatten_ml_species_preds(preds_species[capture_id])
-            flat_species = {'#{}'.format(k): v for k, v in flat_species.items()}
+            flat_species = flatten_ml_species_preds(
+                preds_species[capture_id],
+                only_top=args['add_all_species_scores'])
+            flat_species = {
+                '#{}'.format(k): v for k, v in flat_species.items()}
             meta_data.update(flat_species)
             data['info']['machine_learning'] = True
         if data['info']['machine_learning']:

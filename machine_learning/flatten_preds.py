@@ -6,11 +6,14 @@ def flatten_ml_empty_preds(preds_empty):
     return _flatten_ml_empty_confidences(preds_empty)
 
 
-def flatten_ml_species_preds(preds_species):
+def flatten_ml_species_preds(preds_species, only_top=False):
     """ Flatten Empty and Species preds """
-    flat_species_conf = _flatten_ml_confidences(preds_species)
-    flat_species_top = _flatten_ml_toppreds(preds_species)
-    return {**flat_species_top, **flat_species_conf}
+    if only_top:
+        return _flatten_ml_toppreds(preds_species)
+    else:
+        flat_species_conf = _flatten_ml_confidences(preds_species)
+        flat_species_top = _flatten_ml_toppreds(preds_species)
+        return {**flat_species_top, **flat_species_conf}
 
 
 def _is_binary_label(preds):
