@@ -202,7 +202,7 @@ if __name__ == '__main__':
         try:
             n_species_ids_per_user_max = int(
                 max(stat_species_only['user_name'].values()))
-        except StatisticsError:
+        except ValueError:
             n_species_ids_per_user_max = 0
         # Calculate some statistics
         n_subject_classifications = len(stat_all['classification_id'])
