@@ -13,7 +13,6 @@ from utils.utils import set_file_permission
 
 flags = cfg['global_processing_flags']
 
-#report_path = '/home/packerc/shared/zooniverse/ConsensusReports/SER/SER_S1_report_species.csv'
 
 if __name__ == '__main__':
 

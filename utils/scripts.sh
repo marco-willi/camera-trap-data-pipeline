@@ -530,7 +530,7 @@ python3 -m reporting.sample_report \
 ####################################
 
 # Create Flattened ML Predictions
-python3 -m reporting.flatten_ml_predictions \
+python3 -m machine_learning.flatten_ml_predictions \
 --predictions_empty /home/packerc/shared/zooniverse/Manifests/${SITE}/${SEASON}__complete__predictions_empty_or_not.json \
 --predictions_species /home/packerc/shared/zooniverse/Manifests/${SITE}/${SEASON}__complete__predictions_species.json \
 --output_csv /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/${SEASON}_ml_preds_flat.csv \

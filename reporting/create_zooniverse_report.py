@@ -16,16 +16,6 @@ flags = cfg['plurality_aggregation_flags']
 flags_global = cfg['global_processing_flags']
 flags_report = cfg['report_flags']
 
-# args = dict()
-# args['season_captures_csv'] = '/home/packerc/shared/season_captures/GRU/cleaned/GRU_S1_cleaned.csv'
-# args['aggregated_csv'] = '/home/packerc/shared/zooniverse/Aggregations/GRU/GRU_S1_annotations_aggregated_subject_info.csv'
-# args['output_csv'] = '/home/packerc/shared/zooniverse/ConsensusReports/GRU/GRU_S1_report_all.csv'
-# args['log_dir'] = '/home/packerc/shared/zooniverse/ConsensusReports/GRU/'
-# args['default_season_id'] = 'GRU_S1'
-# args['deduplicate_subjects'] = True
-# args['export_only_species'] = False
-# args['export_only_with_aggregations'] = True
-
 
 def deduplicate_captures(df_aggregated):
     """ De-Duplicate Captures with multiple subjects """
