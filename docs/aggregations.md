@@ -41,6 +41,7 @@ The primary key is: subject_id + the main task (question__species).
 |n_users_identified_this_species | Number of users that identified 'question__species'
 |p_users_identified_this_species | Proportion of users that identified 'question__species'
 |n_species_ids_per_user_median | Median number of different species identified among users who identified at least one species for this capture
+|n_species_ids_per_user_max | Max number of different species identified among any users who identified at least one species for this capture
 |n_users_saw_a_species| Number of users who saw/id'd at least one species.
 |n_users_saw_no_species| Number of users who saw/id'd no species.
 |p_users_saw_a_species| Proportion of users who saw/id'd a species.

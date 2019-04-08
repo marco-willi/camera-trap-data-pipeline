@@ -30,7 +30,7 @@ These need to be adjusted, for example:
 
 ## Executing the Scripts
 
-The recommended way is to use parameters and then run the scripts as shown here: [Scripts](utils/scripts.sh)
+The recommended way is to use parameters and then run the scripts as shown here: [Scripts](utils/scripts.sh) (these may not be up-to-date!).
 
 Alternatively, copy & paste the commands to a text editor, adjust the parameters, and copy & paste them to the command line.
 

@@ -154,14 +154,15 @@ The following file contains one record per capture event and species detection. 
 |capture_date_local | local date (YYYY-MM-DD) of the capture
 |capture_time_local | local time (HH:MM:SS) of the capture
 |subject_id | Zooniverse subject_id (unique per capture)
-|zooniverse_retirement_reason | Zooniverse retirement reason
-|zooniverse_created_at | Zooniverse date when the capture was uploaded
-|zooniverse_retired_at | Zooniverse date when the capture was retired
-|zooniverse_url_*| Zooniverse image links of the capture (if uploaded)
+|zooniverse_retirement_reason | Zooniverse retirement reason (empty if none/not retired)
+|zooniverse_created_at | Zooniverse datetime of when the capture was uploaded
+|zooniverse_retired_at | Zooniverse datetime of when the capture was retired (empty if not)
+|zooniverse_url_*| Zooniverse image links of the capture (if uploaded else empty)
 |question__* | Aggregated question answers, fractions, labels or counts
 |n_users_identified_this_species | Number of users that identified 'question__species'
 |p_users_identified_this_species | Proportion of users that identified 'question__species'
 |n_species_ids_per_user_median | Median number of different species identified among users who identified at least one species for this capture
+|n_species_ids_per_user_max | Max number of different species identified among any users who identified at least one species for this capture
 |n_users_saw_a_species| Number of users who saw/id'd at least one species.
 |n_users_saw_no_species| Number of users who saw/id'd no species.
 |p_users_saw_a_species| Proportion of users who saw/id'd a species.

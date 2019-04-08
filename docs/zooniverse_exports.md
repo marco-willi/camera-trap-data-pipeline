@@ -48,7 +48,7 @@ Example:
 
 We refer to an identification/answer by a volunteer as an annotation.
 
-To extract the classification data use the following code:
+To donwload the classification data from Zooniverse use the following code:
 ```
 python3 -m zooniverse_exports.get_zooniverse_export \
 --password_file ~/keys/passwords.ini \
@@ -135,6 +135,17 @@ python3 -m zooniverse_exports.extract_subjects \
 --log_dir /home/packerc/shared/zooniverse/Exports/${SITE}/log_files/ \
 --log_filename ${SEASON}_extract_subjects
 ```
+
+The resulting file may have the following column headers:
+
+| Columns   | Description |
+| --------- | ----------- |
+|capture,roll,season,site | internal id's of the capture (uploaded to Zooniverse)
+|subject_id | zooniverse unique id of the capture (a subject)
+|zooniverse_created_at| Datetime of when the subject was created/uploaded on/to Zooniverse
+|zooniverse_retired_at| Datetime of when the subject was retired on Zooniverse (empty if not)
+|zooniverse_retirement_reason| Zooniverse system-generated retirement-reason (empty if none / not)
+|zooniverse_url_*| Zooniverse URLs to images of the capture / subject
 
 
 ## Processing Snapshot Serengeti S1-S10 data (legacy format)
