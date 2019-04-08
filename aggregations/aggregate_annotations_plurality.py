@@ -51,13 +51,18 @@ def aggregate_species(
         for question in questions:
             question_type = question_type_map[question]
             if question_type == 'count':
-                agg = aggregator.count_aggregator(
-                    stats[question], flags, mode='median')
+                # generate multiple count aggregations
+                for agg_type in ['median', 'min', 'max']:
+                    agg = aggregator.count_aggregator(
+                        stats[question], flags, mode=agg_type)
+                    agg_name = '{}_{}'.format(question, agg_type)
+                    species_aggs[species][agg_name] = agg
             elif question_type == 'prop':
                 agg = aggregator.proportion_affirmative(stats[question])
+                species_aggs[species][question] = agg
             elif question_type == 'main':
                 continue
-            species_aggs[species][question] = agg
+
         # add overall species stats
         species_aggs[species]['n_users_identified_this_species'] = \
             len(stats['classification_id'])
