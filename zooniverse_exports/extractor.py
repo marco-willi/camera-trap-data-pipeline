@@ -296,7 +296,7 @@ def find_question_answer_pairs(all_records):
                 elif isinstance(answers, list):
                     for answer in answers:
                         question_answer_pairs[question].add(answer)
-    return OrderedDict({(k, list(v)) for k, v in question_answer_pairs.items()})
+    return OrderedDict([(k, list(v)) for k, v in question_answer_pairs.items()])
 
 
 # def find_question_answer_pairs(all_records):
