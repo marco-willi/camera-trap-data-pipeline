@@ -3,8 +3,8 @@
 ####################################
 
 # Create paths
-for LOC in MTZ KAR PLN NIA GON APN GRU SER RUA; do
-  mkdir -m 770 -p {ConsensusReports,Exports,Aggregations,Manifests}/${LOC}/log_files
+for LOC in MTZ KAR PLN NIA GON APN GRU SER RUA MAD KRU ENO; do
+  mkdir -m 770 -p {ConsensusReports,Exports,Aggregations,Manifests,MachineLearning}/${LOC}/log_files
 done
 
 
@@ -338,6 +338,17 @@ python3 -m pre_processing.create_action_list \
 --action_list_csv /home/packerc/shared/season_captures/${SITE}/captures/${SEASON}_action_list2.csv \
 --log_dir /home/packerc/shared/season_captures/${SITE}/log_files/ \
 --log_filename ${SEASON}_create_action_list
+
+
+###################################
+# Machine Learning
+####################################
+
+python3 -m machine_learning.create_machine_learning_file \
+--cleaned_csv /home/packerc/shared/season_captures/${SITE}/cleaned/${SEASON}_cleaned.csv \
+--output_csv /home/packerc/shared/zooniverse/MachineLearning/${SITE}/${SEASON}_machine_learning_input.csv \
+--log_dir /home/packerc/shared/zooniverse/MachineLearning/${SITE}/log_files/ \
+--log_filename ${SEASON}_create_machine_learning_file
 
 ###################################
 # Zooniverse Uploads

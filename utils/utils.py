@@ -134,6 +134,10 @@ def hash_string(value, constant=""):
     return hashed
 
 
+def create_capture_id(season, site, roll, capture):
+    return '{}#{}#{}#{}'.format(season, site, roll, capture)
+
+
 def assign_hash_to_zero_one(value):
     """ Assign a md5 string to a value between 0 and 1 """
     assert type(value) == str, \
@@ -233,12 +237,16 @@ def _append_season_to_image_path(path, season):
 def read_cleaned_season_file_df(path):
     df = pd.read_csv(path, dtype='str', index_col=None)
     df.fillna('', inplace=True)
-    required_header_cols = ('season', 'site', 'roll', 'capture',
+    required_header_cols = ('capture_id', 'season', 'site', 'roll', 'capture',
                             'path', 'invalid')
     if 'path' not in df.columns:
         if 'image_path_rel' in df.columns:
             df['path'] = df[['image_path_rel', 'season']].apply(
                 lambda x: _append_season_to_image_path(*x), axis=1)
+
+    if 'capture_id' not in df.columns:
+        df['capture_id'] = df[['season', 'site', 'roll', 'capture']].apply(
+                        lambda x: create_capture_id(*x), axis=1)
 
     for col in required_header_cols:
         if col not in df.columns:
