@@ -350,6 +350,15 @@ python3 -m machine_learning.create_machine_learning_file \
 --log_dir /home/packerc/shared/zooniverse/MachineLearning/${SITE}/log_files/ \
 --log_filename ${SEASON}_create_machine_learning_file
 
+
+INPUT_FILE=/home/packerc/shared/zooniverse/MachineLearning/${SITE}/${SEASON}_machine_learning_input.csv
+OUTPUT_FILE_EMPTY=/home/packerc/shared/zooniverse/MachineLearning/${SITE}/${SEASON}_predictions_empty_or_not.json
+OUTPUT_FILE_SPECIES=/home/packerc/shared/zooniverse/MachineLearning/${SITE}/${SEASON}_predictions_species.json
+IMAGES_ROOT=/home/packerc/shared/albums/${SITE}/
+
+qsub -v INPUT_FILE=${INPUT_FILE},OUTPUT_FILE=${OUTPUT_FILE_EMPTY},IMAGES_ROOT=${IMAGES_ROOT} ctc_predict_empty_file.pbs
+qsub -v INPUT_FILE=${INPUT_FILE},OUTPUT_FILE=${OUTPUT_FILE_SPECIES},IMAGES_ROOT=${IMAGES_ROOT} ctc_predict_species_file.pbs
+
 ###################################
 # Zooniverse Uploads
 ####################################
