@@ -56,7 +56,17 @@ if __name__ == '__main__':
 
     for _id, pred_data in df.iterrows():
         subject_id = pred_data['capture_id']
+        # try to infer whether this prediction is empty
+        # and exclude all other columns if so
+        try:
+            empty_pred = pred_data['machine_topprediction_is_empty']
+            is_empty = (empty_pred in ['empty', 'blank'])
+        except:
+            is_empty = False
         for pred_col in toppred_cols:
+            if is_empty:
+                if pred_col != 'machine_topprediction_is_empty':
+                    continue
             pred = pred_data[pred_col]
             pred_stats[pred_col].update({pred})
 
@@ -68,7 +78,7 @@ if __name__ == '__main__':
         total = sum([x for x in preds_data.values()])
         for answer, count in preds_data.most_common():
             logger.info(
-                "Answer: {:20} -- counts: {:10} / {} ({:.2f} %)".format(
+                "Prediction: {:20} -- counts: {:10} / {} ({:.2f} %)".format(
                  answer, count, total, 100*count/total))
             stats_list.append(
                 [pred, answer, count, total, round(100*count/total, 1)])
