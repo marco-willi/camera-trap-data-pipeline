@@ -4,7 +4,7 @@ The following codes can be used to generate predictions for season captures.
 
 ```
 ssh lab
-qsub -I -l walltime=02:00:00,nodes=1:ppn=4,mem=8gb
+qsub -I -l walltime=02:00:00,nodes=1:ppn=4,mem=16gb
 module load python3
 cd ~/camera-trap-data-pipeline
 ```
@@ -62,3 +62,19 @@ To run the 'Species' model execute the following command:
 ```
 qsub -v INPUT_FILE=${INPUT_FILE},OUTPUT_FILE=${OUTPUT_FILE_SPECIES},IMAGES_ROOT=${IMAGES_ROOT} ctc_predict_species_file.pbs
 ```
+
+## Flatten ML Predictions (convert JSON to a CSV)
+
+Generate a csv with all machine learning predictions, one record per capture-id.
+
+```
+# Create Flattened ML Predictions
+python3 -m machine_learning.flatten_ml_predictions \
+--predictions_empty /home/packerc/shared/zooniverse/MachineLearning/${SITE}/${SEASON}_predictions_empty_or_not.json \
+--predictions_species /home/packerc/shared/zooniverse/MachineLearning/${SITE}/${SEASON}_predictions_species.json \
+--output_csv /home/packerc/shared/zooniverse/MachineLearning/${SITE}/${SEASON}_ml_preds_flat.csv \
+--log_dir /home/packerc/shared/zooniverse/MachineLearning/${SITE}/log_files/ \
+--log_filename ${SEASON}_flatten_ml_predictions
+```
+
+This script may require a lot of memory if the .json files are very large. 
