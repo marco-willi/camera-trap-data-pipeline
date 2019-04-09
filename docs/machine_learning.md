@@ -94,3 +94,14 @@ python3 -m reporting.create_ml_report \
 --log_dir /home/packerc/shared/zooniverse/MachineLearning/${SITE}/log_files/ \
 --log_filename ${SEASON}_create_ml_report
 ```
+
+
+Create statistics of current predictions:
+```
+# Create statistics file
+python3 -m reporting.create_ml_report_stats \
+--report_path /home/packerc/shared/zooniverse/MachineLearning/${SITE}/${SEASON}_report_ml.csv \
+--output_csv /home/packerc/shared/zooniverse/MachineLearning/${SITE}/${SEASON}_report_ml_stats.csv \
+--log_dir /home/packerc/shared/zooniverse/MachineLearning/${SITE}/log_files/ \
+--log_filename ${SEASON}_create_ml_report_stats
+```

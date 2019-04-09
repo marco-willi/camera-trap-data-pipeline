@@ -207,3 +207,14 @@ The following file contains one record per capture event. Primary key is 'captur
 |machine_confidence_count_(num) | Confidence of the model of (num) species being present in the image.
 |machine_confidence_(behavior) | Confidence of predicted behavior (0-1)
 |machine_confidence_species_(species)| Confidence of (species) being present in the image (0-1)
+
+
+Create statistics of current predictions:
+```
+# Create statistics file
+python3 -m reporting.create_ml_report_stats \
+--report_path /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/${SEASON}_report_ml.csv \
+--output_csv /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/${SEASON}_report_ml_stats.csv \
+--log_dir /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/log_files/ \
+--log_filename ${SEASON}_create_ml_report_stats
+```
