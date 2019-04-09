@@ -10,10 +10,15 @@ import pandas as pd
 from hashlib import md5
 import logging
 import configparser
-from collections import Counter
+from collections import Counter, OrderedDict
 
 
 logger = logging.getLogger(__name__)
+
+
+class OrderedCounter(Counter, OrderedDict):
+    """ Counter that keeps insert order """
+    pass
 
 
 def print_progress(count, total):

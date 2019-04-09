@@ -15,7 +15,7 @@ from utils.logger import setup_logger, create_log_file
 from config.cfg import cfg
 from aggregations import aggregator
 from utils.utils import (
-    print_nested_dict, set_file_permission)
+    print_nested_dict, set_file_permission, OrderedCounter)
 
 
 flags = cfg['plurality_aggregation_flags']
@@ -85,6 +85,100 @@ def calculate_pielou(votes_list):
     plnplist = [n * math.log(n) for n in plist]
     sumplnp = -sum(plnplist)
     return sumplnp/lnS
+
+
+def aggregate_subject_annotations(
+        subject_data,
+        questions,
+        question_type_map,
+        question_main_id,
+        annotation_id_to_name_mapper):
+    """ Aggregate subject annotations """
+    # initialize Counter objects
+    stat_all = defaultdict(OrderedCounter)
+    stat_species_only = defaultdict(OrderedCounter)
+    # extract and add annotations to stats counters
+    for annotation in subject_data:
+        anno_dict = {annotation_id_to_name_mapper[i]: x for
+                     i, x in enumerate(annotation)}
+        for k, v in anno_dict.items():
+            stat_all[k].update({v})
+        # store species only answers
+        main_answer = anno_dict[question_main_id]
+        if main_answer != flags['QUESTION_MAIN_EMPTY']:
+            for k, v in anno_dict.items():
+                stat_species_only[k].update({v})
+    # median number of species identifications per user
+    # if nobody ids a species, set this to 0
+    try:
+        n_species_ids_per_user_median = int(
+            median_high(stat_species_only['user_name'].values()))
+    except StatisticsError:
+        n_species_ids_per_user_median = 0
+    # get the max number of species identified by any user
+    try:
+        n_species_ids_per_user_max = int(
+            max(stat_species_only['user_name'].values()))
+    except ValueError:
+        n_species_ids_per_user_max = 0
+    # Calculate some statistics
+    n_subject_classifications = len(stat_all['classification_id'])
+    n_subject_users = len(stat_all['user_name'])
+    n_users_id_species = len(stat_species_only['user_name'])
+    n_users_id_empty = n_subject_users - n_users_id_species
+    p_users_id_species = n_users_id_species / n_subject_users
+    # order species by frequency of identifications
+    # ties are ordered arbitrarily
+    # (according to which species was detected first)
+    species_by_frequency = stat_all[question_main_id].most_common()
+    species_names_by_frequency = [x[0] for x in species_by_frequency]
+    # calc stats for all species
+    species_stats = aggregator.stats_for_species(
+            species_names_by_frequency, subject_data,
+            annotation_id_to_name_mapper,
+            species_field=question_main_id
+            )
+    # define empty capture if more volunteers saw nothing
+    # than saw something
+    is_empty = n_users_id_empty > n_users_id_species
+    if is_empty:
+        species_aggs = aggregate_species(
+                species_names_by_frequency, species_stats,
+                questions, question_type_map,
+                n_subject_classifications)
+        consensus_species = [flags['QUESTION_MAIN_EMPTY']]
+        pielou = 0
+    else:
+        species_names_no_empty = [
+            x for x in species_names_by_frequency
+            if x != flags['QUESTION_MAIN_EMPTY']]
+        species_aggs = aggregate_species(
+                species_names_no_empty, species_stats,
+                questions, question_type_map,
+                n_users_id_species)
+        # calculate pielou
+        pielou = calculate_pielou(
+            [x['n_users_identified_this_species']
+             for x in species_aggs.values()])
+        # Determine top / consensus species based on the median number of
+        # different species identified by the volunteers
+        consensus_species = [species_names_no_empty[i] for i in
+                             range(n_species_ids_per_user_median)]
+    # collect information to be added to the export
+    agg_info = {
+        'n_species_ids_per_user_median': n_species_ids_per_user_median,
+        'n_species_ids_per_user_max': n_species_ids_per_user_max,
+        'n_users_classified_this_subject': n_subject_users,
+        'n_users_saw_a_species': n_users_id_species,
+        'n_users_saw_no_species': n_users_id_empty,
+        'p_users_saw_a_species': '{:.2f}'.format(p_users_id_species),
+        'pielous_evenness_index': '{:.2f}'.format(pielou)
+         }
+    record = {
+        'species_aggregations': species_aggs,
+        'aggregation_info': agg_info,
+        'consensus_species': consensus_species}
+    return record
 
 
 if __name__ == '__main__':
@@ -176,90 +270,12 @@ if __name__ == '__main__':
         # print status
         if ((num % 10000) == 0) and (num > 0):
             print("Aggregated {:,} subjects".format(num))
-        # initialize Counter objects
-        stat_all = defaultdict(Counter)
-        stat_species_only = defaultdict(Counter)
-        # extract and add annotations to stats counters
-        for annotation in subject_data:
-            anno_dict = {annotation_id_to_name_mapper[i]: x for
-                         i, x in enumerate(annotation)}
-            for k, v in anno_dict.items():
-                stat_all[k].update({v})
-            # store species only answers
-            main_answer = anno_dict[question_main_id]
-            if main_answer != flags['QUESTION_MAIN_EMPTY']:
-                for k, v in anno_dict.items():
-                    stat_species_only[k].update({v})
-        # median number of species identifications per user
-        # if nobody ids a species, set this to 0
-        try:
-            n_species_ids_per_user_median = int(
-                median_high(stat_species_only['user_name'].values()))
-        except StatisticsError:
-            n_species_ids_per_user_median = 0
-        # get the max number of species identified by any user
-        try:
-            n_species_ids_per_user_max = int(
-                max(stat_species_only['user_name'].values()))
-        except ValueError:
-            n_species_ids_per_user_max = 0
-        # Calculate some statistics
-        n_subject_classifications = len(stat_all['classification_id'])
-        n_subject_users = len(stat_all['user_name'])
-        n_users_id_species = len(stat_species_only['user_name'])
-        n_users_id_empty = n_subject_users - n_users_id_species
-        p_users_id_species = n_users_id_species / n_subject_users
-        # order species by frequency of identifications
-        # ties are ordered arbitrarily
-        # (according to which species was detected first)
-        species_by_frequency = stat_all[question_main_id].most_common()
-        species_names_by_frequency = [x[0] for x in species_by_frequency]
-        # calc stats for all species
-        species_stats = aggregator.stats_for_species(
-                species_names_by_frequency, subject_data,
-                annotation_id_to_name_mapper,
-                species_field=question_main_id
-                )
-        # define empty capture if more volunteers saw nothing
-        # than saw something
-        is_empty = n_users_id_empty > n_users_id_species
-        if is_empty:
-            species_aggs = aggregate_species(
-                    species_names_by_frequency, species_stats,
-                    questions, question_type_map,
-                    n_subject_classifications)
-            consensus_species = [flags['QUESTION_MAIN_EMPTY']]
-            pielou = 0
-        else:
-            species_names_no_empty = [
-                x for x in species_names_by_frequency
-                if x != flags['QUESTION_MAIN_EMPTY']]
-            species_aggs = aggregate_species(
-                    species_names_no_empty, species_stats,
-                    questions, question_type_map,
-                    n_users_id_species)
-            # calculate pielou
-            pielou = calculate_pielou(
-                [x['n_users_identified_this_species']
-                 for x in species_aggs.values()])
-            # Determine top / consensus species based on the median number of
-            # different species identified by the volunteers
-            consensus_species = [species_names_no_empty[i] for i in
-                                 range(n_species_ids_per_user_median)]
-        # collect information to be added to the export
-        agg_info = {
-            'n_species_ids_per_user_median': n_species_ids_per_user_median,
-            'n_species_ids_per_user_max': n_species_ids_per_user_max,
-            'n_users_classified_this_subject': n_subject_users,
-            'n_users_saw_a_species': n_users_id_species,
-            'n_users_saw_no_species': n_users_id_empty,
-            'p_users_saw_a_species': '{:.2f}'.format(p_users_id_species),
-            'pielous_evenness_index': '{:.2f}'.format(pielou)
-             }
-        record = {
-            'species_aggregations': species_aggs,
-            'aggregation_info': agg_info,
-            'consensus_species': consensus_species}
+        record = aggregate_subject_annotations(
+                    subject_data,
+                    questions,
+                    question_type_map,
+                    question_main_id,
+                    annotation_id_to_name_mapper)
         subject_species_aggregations[subject_id] = record
 
     # Create one record per identification
