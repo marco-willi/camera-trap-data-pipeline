@@ -30,7 +30,7 @@ if __name__ == "__main__":
         help="Path to the file with predictions from the empty model \
               (.json). Default is to generate the name based on the manifest.")
     parser.add_argument(
-        "--predictions_species", type=str, drequired=True,
+        "--predictions_species", type=str, required=True,
         help="Path to the file with predictions from the species model \
               (.json). Default is to generate the name based on the manifest.")
     parser.add_argument(

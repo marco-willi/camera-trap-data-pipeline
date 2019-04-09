@@ -59,15 +59,15 @@ The 'image_root_path' has to be specified if the 'captures_csv' contains relativ
 
 ### Cleaned Captures File
 
-The 'captures_csv' input is a csv file with (at least) the following columns:
+The 'captures_csv' input is a csv file with one row per image and with (at least) the following columns:
 
 | Column   | Description |
 | --------- | ----------- |
-|season | season identifier
+|season | season identifier (typically identical for the whole file)
 |site | site/camera identifier
 |roll | roll identifier (SD card of a camera)
-|capture | capture identifier
-|path | Absolute or relative path of the image
+|capture | capture number (e.g. '1' for the first capture in a specific roll)
+|path or image_path_rel | Absolute or relative path of the image
 |invalid| (legacy column) -- excludes images from the manifest if value is '1' or '2'
 
 It is expected that the input is ordered by: season, site, roll, capture, image (ordered by sequence in the capture).
