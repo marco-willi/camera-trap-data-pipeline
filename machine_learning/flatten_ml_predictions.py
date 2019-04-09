@@ -13,10 +13,10 @@ from machine_learning.flatten_preds import (
 )
 
 # args = dict()
-# args['predictions_empty'] = '/home/packerc/shared/zooniverse/Manifests/GRU/GRU_S1_predictions_empty_or_not.json'
-# args['predictions_species'] = '/home/packerc/shared/zooniverse/Manifests/GRU/GRU_S1_predictions_species.json'
-# args['output_csv'] = '/home/packerc/shared/zooniverse/ConsensusReports/GRU/GRU_S1_ml_preds_flat.csv'
-#
+# args['predictions_empty'] = '/home/packerc/shared/zooniverse/MachineLearning/GRU/GRU_S1_predictions_empty_or_not.json'
+# args['predictions_species'] = '/home/packerc/shared/zooniverse/MachineLearning/GRU/GRU_S1_predictions_species.json'
+# args['output_csv'] = '/home/packerc/shared/zooniverse/MachineLearning/GRU/GRU_S1_ml_preds_flat.csv'
+
 
 if __name__ == '__main__':
 

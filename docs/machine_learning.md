@@ -63,6 +63,8 @@ To run the 'Species' model execute the following command:
 qsub -v INPUT_FILE=${INPUT_FILE},OUTPUT_FILE=${OUTPUT_FILE_SPECIES},IMAGES_ROOT=${IMAGES_ROOT} ctc_predict_species_file.pbs
 ```
 
+NOTE: The script has a walltime of 24h. This was enough to calculate predictions for 187k captures. Should significantly more predictions be required increase the walltime paramter in the script accordingly.
+
 ## Flatten ML Predictions (convert JSON to a CSV)
 
 Generate a csv with all machine learning predictions, one record per capture-id.
@@ -77,4 +79,4 @@ python3 -m machine_learning.flatten_ml_predictions \
 --log_filename ${SEASON}_flatten_ml_predictions
 ```
 
-This script may require a lot of memory if the .json files are very large. 
+This script may require a lot of memory if the .json files are very large.

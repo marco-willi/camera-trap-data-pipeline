@@ -6,7 +6,7 @@ def order_dict(d):
     """ Order dict by keys """
     keys = list(d.keys())
     keys.sort()
-    return OrderedDict((d[x], x) for x in keys)
+    return OrderedDict((x, d[x]) for x in keys)
 
 
 def flatten_ml_empty_preds(preds_empty):
@@ -22,10 +22,9 @@ def flatten_ml_species_preds(preds_species, only_top=False):
     else:
         flat_species_conf = _flatten_ml_confidences(preds_species)
         flat_species_top = _flatten_ml_toppreds(preds_species)
-        second = order_dict(flat_species_conf)
-        first = order_dict(flat_species_top)
-        first.update(second)
-        return first
+        res = flat_species_top
+        res.update(flat_species_conf)
+        return res
 
 
 def _is_binary_label(preds):
