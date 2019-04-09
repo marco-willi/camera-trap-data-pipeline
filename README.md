@@ -118,6 +118,7 @@ Some tests:
 ```
 python -m unittest discover test/pre_processing
 python -m unittest discover test/zooniverse_exports
+python -m unittest discover test/aggregations
 ```
 
 Set log-level befor running the code:
