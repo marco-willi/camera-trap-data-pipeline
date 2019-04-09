@@ -1,4 +1,12 @@
 """ Functions to Flatten Predictions """
+from collections import OrderedDict
+
+
+def order_dict(d):
+    """ Order dict by keys """
+    keys = list(d.keys())
+    keys.sort()
+    return OrderedDict((d[x], x) for x in keys)
 
 
 def flatten_ml_empty_preds(preds_empty):
@@ -9,11 +17,15 @@ def flatten_ml_empty_preds(preds_empty):
 def flatten_ml_species_preds(preds_species, only_top=False):
     """ Flatten Empty and Species preds """
     if only_top:
-        return _flatten_ml_toppreds(preds_species)
+        res = _flatten_ml_toppreds(preds_species)
+        return order_dict(res)
     else:
         flat_species_conf = _flatten_ml_confidences(preds_species)
         flat_species_top = _flatten_ml_toppreds(preds_species)
-        return {**flat_species_top, **flat_species_conf}
+        second = order_dict(flat_species_conf)
+        first = order_dict(flat_species_top)
+        first.update(second)
+        return first
 
 
 def _is_binary_label(preds):
@@ -42,7 +54,7 @@ def _flatten_ml_confidences(preds):
                 key = 'machine_confidence_{}_{}'.format(
                     label_name, pred_label)
                 res[key] = conf
-    return res
+    return order_dict(res)
 
 
 def _flatten_ml_toppreds(preds):
@@ -52,7 +64,7 @@ def _flatten_ml_toppreds(preds):
     for pred_label, pred_value in top_preds.items():
         key = 'machine_topprediction_%s' % pred_label
         res[key] = pred_value
-    return res
+    return order_dict(res)
 
 
 def _flatten_ml_empty_confidences(preds):
