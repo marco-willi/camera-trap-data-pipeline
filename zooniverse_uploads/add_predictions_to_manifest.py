@@ -107,7 +107,7 @@ if __name__ == "__main__":
         if capture_id in preds_species:
             flat_species = flatten_ml_species_preds(
                 preds_species[capture_id],
-                only_top=args['add_all_species_scores'])
+                only_top=(not args['add_all_species_scores']))
             flat_species = {
                 '#{}'.format(k): v for k, v in flat_species.items()}
             meta_data.update(flat_species)
