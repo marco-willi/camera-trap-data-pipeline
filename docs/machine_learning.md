@@ -80,3 +80,17 @@ python3 -m machine_learning.flatten_ml_predictions \
 ```
 
 This script may require a lot of memory if the .json files are very large.
+
+
+## Reporting of Machine Learning Predictions
+
+The following script merges the season captures with the ml predictions.
+```
+python3 -m reporting.create_ml_report \
+--season_captures_csv /home/packerc/shared/season_captures/${SITE}/cleaned/${SEASON}_cleaned.csv \
+--predictions_csv /home/packerc/shared/zooniverse/MachineLearning/${SITE}/${SEASON}_ml_preds_flat.csv \
+--export_only_with_predictions \
+--output_csv /home/packerc/shared/zooniverse/MachineLearning/${SITE}/${SEASON}_report_ml.csv \
+--log_dir /home/packerc/shared/zooniverse/MachineLearning/${SITE}/log_files/ \
+--log_filename ${SEASON}_create_ml_report
+```
