@@ -71,7 +71,7 @@ def _flatten_ml_empty_confidences(preds):
         key = 'machine_confidence_is_empty'
         res[key] = is_blank_conf
         # top prediction empty
-        key = 'machine_prediction_is_empty'
+        key = 'machine_topprediction_is_empty'
         top_empty_pred = preds['predictions_top']['is_blank']
         res[key] = top_empty_pred
     else:
