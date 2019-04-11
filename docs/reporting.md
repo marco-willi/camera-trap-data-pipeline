@@ -164,4 +164,4 @@ python3 -m reporting.sample_report \
 
 ## Machine Learning Reports
 
-See here: [Machine Learning](docs/machine_learning.md)
+See here: [Machine Learning](../docs/machine_learning.md)
