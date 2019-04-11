@@ -11,8 +11,8 @@ from reporting.create_zooniverse_report import create_season_dict
 
 # args = dict()
 # args['season_captures_csv'] = '/home/packerc/shared/season_captures/GRU/cleaned/GRU_S1_cleaned.csv'
-# args['predictions_csv'] = '/home/packerc/shared/zooniverse/ConsensusReports/GRU/GRU_S1_ml_preds_flat.csv'
-# args['output_csv'] = '/home/packerc/shared/zooniverse/ConsensusReports/GRU/GRU_S1_report_ml.csv'
+# args['predictions_csv'] = '/home/packerc/shared/zooniverse/SpeciesReports/GRU/GRU_S1_ml_preds_flat.csv'
+# args['output_csv'] = '/home/packerc/shared/zooniverse/SpeciesReports/GRU/GRU_S1_report_ml.csv'
 # args['export_only_with_predictions'] = False
 
 if __name__ == '__main__':

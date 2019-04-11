@@ -90,8 +90,8 @@ python3 -m reporting.create_ml_report \
 --season_captures_csv /home/packerc/shared/season_captures/${SITE}/cleaned/${SEASON}_cleaned.csv \
 --predictions_csv /home/packerc/shared/zooniverse/MachineLearning/${SITE}/${SEASON}_ml_preds_flat.csv \
 --export_only_with_predictions \
---output_csv /home/packerc/shared/zooniverse/MachineLearning/${SITE}/${SEASON}_report_ml.csv \
---log_dir /home/packerc/shared/zooniverse/MachineLearning/${SITE}/log_files/ \
+--output_csv /home/packerc/shared/zooniverse/SpeciesReports/${SITE}/${SEASON}_report_ml.csv \
+--log_dir /home/packerc/shared/zooniverse/SpeciesReports/${SITE}/log_files/ \
 --log_filename ${SEASON}_create_ml_report
 ```
 
@@ -100,9 +100,9 @@ Create statistics of current predictions:
 ```
 # Create statistics file
 python3 -m reporting.create_ml_report_stats \
---report_path /home/packerc/shared/zooniverse/MachineLearning/${SITE}/${SEASON}_report_ml.csv \
---output_csv /home/packerc/shared/zooniverse/MachineLearning/${SITE}/${SEASON}_report_ml_stats.csv \
---log_dir /home/packerc/shared/zooniverse/MachineLearning/${SITE}/log_files/ \
+--report_path /home/packerc/shared/zooniverse/SpeciesReports/${SITE}/${SEASON}_report_machine_learning.csv \
+--output_csv /home/packerc/shared/zooniverse/SpeciesReports/${SITE}/${SEASON}_report_ml_overview.csv \
+--log_dir /home/packerc/shared/zooniverse/SpeciesReports/${SITE}/log_files/ \
 --log_filename ${SEASON}_create_ml_report_stats
 ```
 

@@ -75,9 +75,9 @@ This report contains everything: blanks, consensus, non-consensus, captures with
 python3 -m reporting.create_zooniverse_report \
 --season_captures_csv /home/packerc/shared/season_captures/${SITE}/cleaned/${SEASON}_cleaned.csv \
 --aggregated_csv /home/packerc/shared/zooniverse/Aggregations/${SITE}/${SEASON}_aggregated_plurality.csv \
---output_csv /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/${SEASON}_report_complete.csv \
+--output_csv /home/packerc/shared/zooniverse/SpeciesReports/${SITE}/${SEASON}_report_complete.csv \
 --default_season_id ${SEASON} \
---log_dir /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/log_files/ \
+--log_dir /home/packerc/shared/zooniverse/SpeciesReports/${SITE}/log_files/ \
 --log_filename ${SEASON}_create_zooniverse_report
 ```
 
@@ -85,9 +85,9 @@ Create an overview file:
 ```
 # Create statistics file
 python3 -m reporting.create_report_stats \
---report_path /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/${SEASON}_report_complete.csv \
---output_csv /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/${SEASON}_report_complete_overview.csv \
---log_dir /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/log_files/ \
+--report_path /home/packerc/shared/zooniverse/SpeciesReports/${SITE}/${SEASON}_report_complete.csv \
+--output_csv /home/packerc/shared/zooniverse/SpeciesReports/${SITE}/${SEASON}_report_complete_overview.csv \
+--log_dir /home/packerc/shared/zooniverse/SpeciesReports/${SITE}/log_files/ \
 --log_filename ${SEASON}_create_report_stats
 ```
 
@@ -101,8 +101,8 @@ This report contains only consensus species identifications and a reduced number
 python3 -m reporting.create_zooniverse_report \
 --season_captures_csv /home/packerc/shared/season_captures/${SITE}/cleaned/${SEASON}_cleaned.csv \
 --aggregated_csv /home/packerc/shared/zooniverse/Aggregations/${SITE}/${SEASON}_aggregated_plurality.csv \
---output_csv /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/${SEASON}_report_consensus.csv \
---log_dir /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/log_files/ \
+--output_csv /home/packerc/shared/zooniverse/SpeciesReports/${SITE}/${SEASON}_report_consensus.csv \
+--log_dir /home/packerc/shared/zooniverse/SpeciesReports/${SITE}/log_files/ \
 --log_filename ${SEASON}_create_zooniverse_report \
 --default_season_id ${SEASON} \
 --exclude_blanks \
@@ -116,19 +116,19 @@ python3 -m reporting.create_zooniverse_report \
 ```
 # Create statistics file
 python3 -m reporting.create_report_stats \
---report_path /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/${SEASON}_report_consensus.csv \
---output_csv /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/${SEASON}_report_consensus_overview.csv \
---log_dir /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/log_files/ \
+--report_path /home/packerc/shared/zooniverse/SpeciesReports/${SITE}/${SEASON}_report_consensus.csv \
+--output_csv /home/packerc/shared/zooniverse/SpeciesReports/${SITE}/${SEASON}_report_consensus_overview.csv \
+--log_dir /home/packerc/shared/zooniverse/SpeciesReports/${SITE}/log_files/ \
 --log_filename ${SEASON}_create_report_stats
 ```
 
 ```
 # Create a small sample report
 python3 -m reporting.sample_report \
---report_csv /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/${SEASON}_report_consensus.csv \
---output_csv /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/${SEASON}_report_consensus_samples.csv \
+--report_csv /home/packerc/shared/zooniverse/SpeciesReports/${SITE}/${SEASON}_report_consensus.csv \
+--output_csv /home/packerc/shared/zooniverse/SpeciesReports/${SITE}/${SEASON}_report_consensus_samples.csv \
 --sample_size 300 \
---log_dir /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/log_files/ \
+--log_dir /home/packerc/shared/zooniverse/SpeciesReports/${SITE}/log_files/ \
 --log_filename ${SEASON}_sample_report
 ```
 
