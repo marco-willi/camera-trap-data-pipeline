@@ -105,3 +105,24 @@ python3 -m reporting.create_ml_report_stats \
 --log_dir /home/packerc/shared/zooniverse/MachineLearning/${SITE}/log_files/ \
 --log_filename ${SEASON}_create_ml_report_stats
 ```
+
+## Report Columns
+
+| Columns   | Description |
+| --------- | ----------- |
+|capture_id | internal identifier of the capture
+|season | season id of the capture
+|site| site/camera id of the capture
+|roll| roll number of the capture
+|capture| capture number of the roll
+|capture_date_local | local date (YYYY-MM-DD) of the capture
+|capture_time_local | local time (HH:MM:SS) of the capture
+|machine_topprediction_is_empty| whether the model indicates the image is empty 'empty' or not 'not_empty'
+|machine_confidence_is_empty| confidence of the image being empty / blank (0-1)
+|machine_topprediction_(label)| the models top prediction for (label), e.g., '5' for the 'count' label
+|machine_confidence_count_(num) | Confidence of the model of (num) species being present in the image.
+|machine_confidence_(behavior) | Confidence of predicted behavior (0-1)
+|machine_confidence_species_(species)| Confidence of (species) being present in the image (0-1)
+
+
+Note: The report is comprised of two models an 'empty or not' model and a 'species' model. Even if the 'empty or not' model classifies the capture as being empty, the 'species' model has to predict a 'species'. Therefore, always consider the species predictions in conjuntion with the 'empty or not' prediction.

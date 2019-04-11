@@ -39,7 +39,7 @@ The primary key is: subject_id + the main task (question__species).
 |subject_id | Zooniverse subject_id (unique identifier of a crowd task)
 |question__* | Aggregated question answers, fractions, labels or counts
 |n_users_identified_this_species | Number of users that identified 'question__species'
-|p_users_identified_this_species | Proportion of users that identified 'question__species'
+|p_users_identified_this_species | Proportion of users that identified 'question__species' among users who identified at least one species for this capture
 |n_species_ids_per_user_median | Median number of different species identified among users who identified at least one species for this capture
 |n_species_ids_per_user_max | Max number of different species identified among any users who identified at least one species for this capture
 |n_users_saw_a_species| Number of users who saw/id'd at least one species.
@@ -47,7 +47,7 @@ The primary key is: subject_id + the main task (question__species).
 |p_users_saw_a_species| Proportion of users who saw/id'd a species.
 |pielous_evenness_index| The Pielou Evenness Index or 0 for unanimous vote
 |n_users_classified_this_subject | Number of users that classified this subject
-|species_is_plurality_consensus | Flag indicating a plurality consensus for this species (normally only species with a 1 are relevant)
+|species_is_plurality_consensus | Flag indicating a plurality consensus for this species -- a value of 0 indicates a minority vote (meaning a different species is more likely)
 
 ## Aggregate Annotations (plurality algorithm)
 

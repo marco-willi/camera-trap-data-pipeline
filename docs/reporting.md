@@ -135,7 +135,6 @@ python3 -m reporting.sample_report \
 
 ### Output Fields
 
-The following file contains one record per capture event and species detection. Primary-key is 'subject_id' and 'question__species'.
 
 | Columns   | Description |
 | --------- | ----------- |
@@ -161,53 +160,8 @@ The following file contains one record per capture event and species detection. 
 |p_users_saw_a_species| Proportion of users who saw/id'd a species.
 |pielous_evenness_index| The Pielou Evenness Index or 0 for unanimous vote
 |n_users_classified_this_subject | Number of users that classified this subject
-|species_is_plurality_consensus | Flag indicating a plurality consensus for this species -- a value of 0 indicates a minority vote (meaning a different species is more likely)
+|species_is_plurality_consensus | Flag (=1) indicating a plurality consensus for this species -- a value of 0 indicates a minority vote (meaning a different species is more likely but is reported to investigate uncertain cases)
 
-## Merge Season Captures with Machine Predictions
+## Machine Learning Reports
 
-Generate a csv with all machine learning predictions, one record per capture-id.
-
-```
-# Create Flattened ML Predictions
-python3 -m machine_learning.flatten_ml_predictions \
---predictions_empty /home/packerc/shared/zooniverse/Manifests/${SITE}/${SEASON}__complete__predictions_empty_or_not.json \
---predictions_species /home/packerc/shared/zooniverse/Manifests/${SITE}/${SEASON}__complete__predictions_species.json \
---output_csv /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/${SEASON}_ml_preds_flat.csv \
---log_dir /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/
-```
-
-Merge the machine learning predictions with the season captures.
-```
-# Reporting of Machine Learning Predictions
-python3 -m reporting.create_ml_report \
---season_captures_csv /home/packerc/shared/season_captures/${SITE}/cleaned/${SEASON}_cleaned.csv \
---predictions_csv /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/${SEASON}_ml_preds_flat.csv \
---output_csv /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/${SEASON}_report_ml.csv \
---log_dir /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/ \
---export_only_with_predictions
-```
-
-The following file contains one record per capture event. Primary key is 'capture_id'.
-
-| Columns   | Description |
-| --------- | ----------- |
-|capture_id, season, roll, site, capture | internal identifiers of the capture
-|capture_date_local | local date (YYYY-MM-DD) of the capture
-|capture_time_local | local time (HH:MM:SS) of the capture
-|machine_confidence_empty| confidence of the image being empty / blank
-|machine_confidence_species| confidence of the image containing a species
-|machine_topprediction_(label)| the models top prediction for (label), e.g., '5' for the 'count' label
-|machine_confidence_count_(num) | Confidence of the model of (num) species being present in the image.
-|machine_confidence_(behavior) | Confidence of predicted behavior (0-1)
-|machine_confidence_species_(species)| Confidence of (species) being present in the image (0-1)
-
-
-Create statistics of current predictions:
-```
-# Create statistics file
-python3 -m reporting.create_ml_report_stats \
---report_path /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/${SEASON}_report_ml.csv \
---output_csv /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/${SEASON}_report_ml_stats.csv \
---log_dir /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/log_files/ \
---log_filename ${SEASON}_create_ml_report_stats
-```
+See here: [Machine Learning](docs/machine_learning.md)
