@@ -6,7 +6,7 @@ import os
 import argparse
 import math
 from statistics import median_high, StatisticsError
-from collections import Counter, defaultdict
+from collections import Counter, defaultdict, OrderedDict
 import logging
 
 import pandas as pd
@@ -44,7 +44,7 @@ def aggregate_species(
         species_names, species_stats,
         questions, question_type_map, n_users_total):
     """ Aggregate species stats """
-    species_aggs = {x: dict() for x in species_names}
+    species_aggs = {x: OrderedDict() for x in species_names}
     for species, stats in species_stats.items():
         if species not in species_names:
             continue

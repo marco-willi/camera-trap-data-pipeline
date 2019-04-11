@@ -574,8 +574,8 @@ module load python3
 
 cd $HOME/camera-trap-data-pipeline
 SITE=SER
-SEASON=SER_S6
-SEASON_STRING=S6
+SEASON=SER_S1
+SEASON_STRING=S1
 
 extract_zooniverse_data_legacy () {
 
