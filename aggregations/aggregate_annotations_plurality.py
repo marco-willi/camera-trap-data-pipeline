@@ -105,7 +105,7 @@ def aggregate_subject_annotations(
             stat_all[k].update({v})
         # store species only answers
         main_answer = anno_dict[question_main_id]
-        if main_answer != flags['QUESTION_MAIN_EMPTY']:
+        if main_answer != flags_global['QUESTION_MAIN_EMPTY']:
             for k, v in anno_dict.items():
                 stat_species_only[k].update({v})
     # median number of species identifications per user
@@ -146,12 +146,12 @@ def aggregate_subject_annotations(
                 species_names_by_frequency, species_stats,
                 questions, question_type_map,
                 n_subject_classifications)
-        consensus_species = [flags['QUESTION_MAIN_EMPTY']]
+        consensus_species = [flags_global['QUESTION_MAIN_EMPTY']]
         pielou = 0
     else:
         species_names_no_empty = [
             x for x in species_names_by_frequency
-            if x != flags['QUESTION_MAIN_EMPTY']]
+            if x != flags_global['QUESTION_MAIN_EMPTY']]
         species_aggs = aggregate_species(
                 species_names_no_empty, species_stats,
                 questions, question_type_map,
@@ -259,7 +259,7 @@ if __name__ == '__main__':
         v: k for k, v in row_name_to_id_mapper.items()}
 
     question_type_map = aggregator.create_question_type_map(
-        questions, flags)
+        questions, flags, flags_global)
 
     ######################################
     # Aggregate Annotations

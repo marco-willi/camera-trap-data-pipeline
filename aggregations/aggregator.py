@@ -4,13 +4,13 @@ from collections import Counter, defaultdict
 
 
 # question type mapper
-def create_question_type_map(questions, flags):
+def create_question_type_map(questions, flags, flags_global):
     """ Map Question Types """
     question_type_map = dict()
     for question in questions:
         if any([x in question for x in flags['QUESTION_COUNTS']]):
             question_type_map[question] = 'count'
-        elif flags['QUESTION_MAIN'] in question:
+        elif flags_global['QUESTION_MAIN'] in question:
             question_type_map[question] = 'main'
         else:
             question_type_map[question] = 'prop'

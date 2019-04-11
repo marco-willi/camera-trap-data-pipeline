@@ -419,7 +419,7 @@ def consolidate_all_classifications(classifications, flags):
     return consolidated_classifications
 
 
-def export_cleaned_annotations(path, classifications, header, flags):
+def export_cleaned_annotations(path, classifications, header, flags, flags_global):
     """ Export Cleaned Annotation """
 
     # map questions if necessary
@@ -427,8 +427,8 @@ def export_cleaned_annotations(path, classifications, header, flags):
     for col in header:
         if col in flags['CSV_QUESTIONS']:
             header_to_print.append(
-                flags['QUESTION_DELIMITER'].join(
-                    [flags['QUESTION_PREFIX'], col]))
+                flags_global['QUESTION_DELIMITER'].join(
+                    [flags_global['QUESTION_PREFIX'], col]))
         else:
             header_to_print.append(col)
 

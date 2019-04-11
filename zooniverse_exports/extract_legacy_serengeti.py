@@ -99,6 +99,7 @@ from config.cfg import cfg
 
 
 flags = cfg['legacy_extractor_flags']
+flags_global = cfg['global_processing_flags']
 
 # To Test
 # args = dict()
@@ -310,7 +311,7 @@ if __name__ == '__main__':
         for k in all_seasons.keys()}
 
     legacy_extractor.export_cleaned_annotations(
-        output_paths[s_id], classifications, header, flags)
+        output_paths[s_id], classifications, header, flags, flags_global)
 
     # change permmissions to read/write for group
     set_file_permission(output_paths[s_id])

@@ -3,10 +3,10 @@
 ###################################################
 
 global_processing_flags:
-    EMPTY_ANNOTATION: blank
     QUESTION_DELIMITER: __
     QUESTION_PREFIX: question
     QUESTION_MAIN: species
+    QUESTION_MAIN_EMPTY: blank
 
 ###################################################
 # Pre-Processing Flags
@@ -76,6 +76,16 @@ pre_processing_flags:
 ###################################################
 
 extractor_flags:
+    QUESTION_NAME_MAPPER:
+      arethereanyyoungpresent: young_present
+      choice: species
+      doyouseeanyantlers: antlers_visible
+      doyouseeanyhorns: horns_visible
+      howmany: count
+      howmanyanimalscanyouseethathavehorns: horns_count
+      question: species
+    QUESTIONS_TO_IGNORE:
+     - dontcare
     ANSWER_MAPPER:
       0: '0'
       n: '0'
@@ -96,8 +106,6 @@ extractor_flags:
       horns_count:
         '1150': '11-50'
         '51': '51+'
-    CLASSIFICATION_INFO_MAPPER:
-      subject_ids: subject_id
     CLASSIFICATION_INFO_TO_ADD:
      - user_name
      - user_id
@@ -106,18 +114,8 @@ extractor_flags:
      - workflow_id
      - workflow_version
      - classification_id
-    QUESTIONS_TO_IGNORE:
-     - dontcare
-    QUESTION_NAME_MAPPER:
-      arethereanyyoungpresent: young_present
-      choice: species
-      doyouseeanyantlers: antlers_visible
-      doyouseeanyhorns: horns_visible
-      howmany: count
-      howmanyanimalscanyouseethathavehorns: horns_count
-      question: species
-    QUESTION_PREFIX: question
-    QUESTION_DELIMITER: __
+    CLASSIFICATION_INFO_MAPPER:
+      subject_ids: subject_id
     QUESTIONS_OUTPUT_ORDER:
      - species
      - count
@@ -168,8 +166,6 @@ plurality_aggregation_flags:
     QUESTION_COUNTS:
      - count
      - horns_count
-    QUESTION_MAIN: species
-    QUESTION_MAIN_EMPTY: blank
     COUNT_AGGREGATION_MODES:
       - median
       - min
@@ -236,9 +232,6 @@ legacy_extractor_flags:
      - eating
      - interacting
      - young_present
-    QUESTION_PREFIX: question
-    QUESTION_DELIMITER: __
-
 
 # Subject info to add from the legacy classifications export
 add_subject_info_flags_legacy:
@@ -261,3 +254,40 @@ add_subject_info_flags_legacy:
 report_flags:
   identify_humans_for_exclusion:
     - human
+  # group report columns to select them when creating reports
+  capture_cols:
+    - capture_id
+    - subject_id
+    - season
+    - site
+    - roll
+    - capture_date_local
+    - capture_time_local
+  zooniverse_cols:
+    - zooniverse_created_at
+    - zooniverse_retirement_reason
+    - zooniverse_retired_at
+  zooniverse_urls_cols:
+    - zooniverse_url_
+  plurality_algo_cols:
+    - n_users_classified_this_subject
+    - n_users_identified_this_species
+    - p_users_identified_this_species
+    - n_species_ids_per_user_median
+    - n_species_ids_per_user_max
+    - n_users_saw_a_species
+    - n_users_saw_no_species
+    - p_users_saw_a_species
+    - pielous_evenness_index
+    - species_is_plurality_consensus
+  plurality_algo_cols_simple:
+    - p_users_identified_this_species
+    - pielous_evenness_index
+  plurality_algo_cols_extended:
+    - n_users_classified_this_subject
+    - n_species_ids_per_user_median
+    - n_species_ids_per_user_max
+    - n_users_saw_a_species
+    - n_users_saw_no_species
+    - p_users_saw_a_species
+    - species_is_plurality_consensus

@@ -11,7 +11,7 @@ from utils.logger import setup_logger, create_log_file
 from utils.utils import set_file_permission
 
 
-flags = cfg['global_processing_flags']
+flags_global = cfg['global_processing_flags']
 
 
 if __name__ == '__main__':
@@ -48,8 +48,8 @@ if __name__ == '__main__':
         logger.info("Argument {}: {}".format(k, v))
 
     question_column_prefix = '{}{}'.format(
-        flags['QUESTION_PREFIX'],
-        flags['QUESTION_DELIMITER'])
+        flags_global['QUESTION_PREFIX'],
+        flags_global['QUESTION_DELIMITER'])
 
     df = pd.read_csv(args['report_path'], dtype='str')
     df.fillna('', inplace=True)

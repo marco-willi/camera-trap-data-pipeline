@@ -29,6 +29,7 @@ from config.cfg import cfg
 
 
 flags = cfg['extractor_flags']
+flags_global = cfg['global_processing_flags']
 logger = logging.getLogger(__name__)
 
 # # Cedar Creek
@@ -343,8 +344,8 @@ if __name__ == '__main__':
     question_header_print = list()
     for question in question_header:
         question_header_print.append(
-            flags['QUESTION_DELIMITER'].join(
-                [flags['QUESTION_PREFIX'], question]))
+            flags_global['QUESTION_DELIMITER'].join(
+                [flags_global['QUESTION_PREFIX'], question]))
 
     logger.info("Automatically generated question header: {}".format(
         question_header))

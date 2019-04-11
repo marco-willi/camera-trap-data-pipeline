@@ -12,7 +12,6 @@ from utils.utils import set_file_permission, read_cleaned_season_file_df
 from config.cfg import cfg
 
 
-flags = cfg['plurality_aggregation_flags']
 flags_global = cfg['global_processing_flags']
 flags_report = cfg['report_flags']
 
@@ -108,6 +107,14 @@ def _extract_datetime(image_record):
     return res
 
 
+def _exclude_cols(cols, not_in):
+    """ Remove any element of 'cols' that has elements in 'not_in' that
+        start with elements in 'cols'
+        Example: ['abc', 'def'] and ['ab'] -> ['def']
+    """
+    return [c for c in cols if not any([c.startswith(n) for n in not_in])]
+
+
 def create_season_dict(season_data_df):
     """ Create Dict of Season Data """
     season_dict = OrderedDict()
@@ -152,6 +159,13 @@ if __name__ == '__main__':
     parser.add_argument("--exclude_humans", action="store_true")
     parser.add_argument("--exclude_blanks", action="store_true")
     parser.add_argument("--exclude_captures_without_data", action="store_true")
+    parser.add_argument("--exclude_zooniverse_cols", action="store_true")
+    parser.add_argument("--exclude_zooniverse_cols", action="store_true")
+    parser.add_argument(
+        "--exclude_additional_plurality_infos", action="store_true")
+    parser.add_argument(
+        "--exclude_cols", nargs='+', default=[],
+        help="Specifiy column names to exclude from the export.")
     parser.add_argument(
         "--log_dir", type=str, default=None)
     parser.add_argument(
@@ -240,7 +254,7 @@ if __name__ == '__main__':
                 continue
         # Exclude blanks
         if args['exclude_blanks']:
-            if main_answer == flags['QUESTION_MAIN_EMPTY']:
+            if main_answer == flags_global['QUESTION_MAIN_EMPTY']:
                 logger.debug("Exclude capture {} because it is blank".format(
                     capture_id))
                 n_blanks_excluded += 1
@@ -318,6 +332,38 @@ if __name__ == '__main__':
     # build df
     df_report = pd.DataFrame(report_list)
     df_report.columns = season_header + agg_data_to_add
+
+    # determine which columns to export
+    cols_to_export = list(df_report.columns)
+    if args['exclude_zooniverse_cols']:
+        try:
+            cols_to_export = _exclude_cols(
+                cols_to_export, flags_report['zooniverse_cols'])
+        except:
+            logging.debug(
+                "Failed to exclude 'exclude_zooniverse_cols': {}".format(
+                 args['exclude_zooniverse_cols']))
+            pass
+    if args['exclude_additional_plurality_infos']:
+        try:
+            cols_to_export = _exclude_cols(
+                cols_to_export, flags_report['plurality_algo_cols_extended'])
+        except:
+            logging.debug(
+                "Failed to exclude 'exclude_additional_plurality_infos': {}".format(
+                 args['exclude_additional_plurality_infos']))
+            pass
+    if len(args['exclude_cols']) > 0:
+        try:
+            cols_to_export = [
+                x for x in cols_to_export if x not in args['exclude_cols']]
+        except:
+            logging.debug("Failed to exclude 'exclude_cols': {}".format(
+                args['exclude_cols']))
+            pass
+
+    logging.info("Exporting columns: {}".format(cols_to_export))
+    df_report = df_report[cols_to_export]
 
     # export df
     df_report.to_csv(args['output_csv'], index=False)

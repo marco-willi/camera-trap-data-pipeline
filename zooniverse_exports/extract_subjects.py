@@ -20,12 +20,19 @@ import logging
 import argparse
 from collections import OrderedDict
 
+import pandas as pd
+
 from utils.logger import setup_logger, create_log_file
 from utils.utils import print_nested_dict, set_file_permission
 from zooniverse_exports import extractor
 from config.cfg import cfg
 
 flags = cfg['subject_extractor_flags']
+
+# # test
+# args = dict()
+# args['subject_csv'] = '/home/packerc/shared/zooniverse/Exports/MAD/MAD_S1_subjects.csv'
+# args['output_csv'] = '/home/packerc/shared/zooniverse/Exports/MAD/MAD_S1_subjects_extracted.csv'
 
 
 if __name__ == '__main__':
@@ -123,33 +130,29 @@ if __name__ == '__main__':
                     subject_info_to_add[field] = ''
             subject_info_to_add = extractor.rename_dict_keys(
                 subject_info_to_add, flags['SUBJECT_DATA_NAME_MAPPER'])
-            subject_data_header = subject_data_header.union(
-                subject_info_to_add.keys())
             subject_info[subject_id] = subject_info_to_add
 
-    subject_data_header = list(subject_data_header)
-    subject_data_header.sort()
+    # Export Data as CSV
+    df_out = pd.DataFrame.from_dict(subject_info, orient='index')
 
-    # Output all combined records
-    with open(args['output_csv'], 'w') as f:
-        csv_writer = csv.writer(f, delimiter=',')
-        logger.info("Writing output to {}".format(args['output_csv']))
-        csv_writer.writerow(subject_data_header)
-        tot = len(subject_info.keys())
-        for line_no, subject_data in enumerate(subject_info.values()):
-            # Arrange subject data in a list and use '' for missing data
-            to_write = list()
-            for x in subject_data_header:
-                try:
-                    to_write.append(subject_data[x])
-                except:
-                    to_write.append('')
-            csv_writer.writerow(to_write)
-            # print status
-            if ((line_no % 10000) == 0) and (line_no > 0):
-                print("Wrote {:,} records".format(line_no))
-        logger.info("Wrote {} records to {}".format(
-            line_no, args['output_csv']))
+    # order columns
+    df_out_cols = list(df_out.columns)
+    df_out_cols.sort()
+    first_cols_if_available = [
+        'subject_id', 'capture_id', 'season', 'site', 'roll', 'capture']
+    first_cols = [x for x in first_cols_if_available if x in df_out_cols]
+    last_cols = [x for x in df_out_cols if x not in first_cols]
+    cols_ordered = first_cols + last_cols
+    df_out = df_out[cols_ordered]
+
+    df_out.fillna('', inplace=True)
+
+    logger.info("Writing output to {}".format(args['output_csv']))
+
+    df_out.to_csv(args['output_csv'], index=False)
+
+    logger.info("Wrote {} records to {}".format(
+        df_out.shape[0], args['output_csv']))
 
     # change permmissions to read/write for group
     set_file_permission(args['output_csv'])

@@ -236,13 +236,13 @@ for LOC in MTZ KAR PLN NIA GON APN GRU SER RUA; do
 done
 
 # Loop over all seasons (Legacy)
-for season in 1 2 3 4 5 6 7 8 9; do
+for season in 7 8 9; do
   SITE=SER
   SEASON=SER_S${season}
   SEASON_STRING=S${season}
-  extract_zooniverse_data_legacy
+  #extract_zooniverse_data_legacy
   #aggregate_annotations
-  #create_reports
+  create_reports
 done
 
 
@@ -485,63 +485,63 @@ python3 -m reporting.create_report_stats \
 --log_filename ${SEASON}_create_report_stats
 
 
-# Create species consensus only report
-python3 -m reporting.create_zooniverse_report \
---season_captures_csv /home/packerc/shared/season_captures/${SITE}/cleaned/${SEASON}_cleaned.csv \
---aggregated_csv /home/packerc/shared/zooniverse/Aggregations/${SITE}/${SEASON}_aggregated_plurality.csv \
---output_csv /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/${SEASON}_report_species.csv \
---log_dir /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/log_files/ \
---log_filename ${SEASON}_create_zooniverse_report \
---default_season_id ${SEASON} \
---exclude_blanks \
---exclude_humans \
---exclude_non_consensus \
---exclude_captures_without_data
-
-
-# Create statistics file
-python3 -m reporting.create_report_stats \
---report_path /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/${SEASON}_report_species.csv \
---output_csv /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/${SEASON}_report_species_stats.csv \
---log_dir /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/log_files/ \
---log_filename ${SEASON}_create_report_stats
-
-
-# Create a small sample report
-python3 -m reporting.sample_report \
---report_csv /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/${SEASON}_report_species.csv \
---output_csv /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/${SEASON}_report_species_samples.csv \
---sample_size 300 \
---log_dir /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/log_files/ \
---log_filename ${SEASON}_sample_report
-
-# Create species only report (consensus and non-consensus)
-python3 -m reporting.create_zooniverse_report \
---season_captures_csv /home/packerc/shared/season_captures/${SITE}/cleaned/${SEASON}_cleaned.csv \
---aggregated_csv /home/packerc/shared/zooniverse/Aggregations/${SITE}/${SEASON}_aggregated_plurality.csv \
---output_csv /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/${SEASON}_report.csv \
---log_dir /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/log_files/ \
---log_filename ${SEASON}_create_zooniverse_report \
---default_season_id ${SEASON} \
---exclude_blanks \
---exclude_humans \
---exclude_captures_without_data
-
-
-# Create statistics file
-python3 -m reporting.create_report_stats \
---report_path /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/${SEASON}_report.csv \
---output_csv /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/${SEASON}_report_stats.csv \
---log_dir /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/log_files/ \
---log_filename ${SEASON}_create_report_stats
-
-# Create a small sample report
-python3 -m reporting.sample_report \
---report_csv /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/${SEASON}_report.csv \
---output_csv /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/${SEASON}_report_samples.csv \
---sample_size 300 \
---log_dir /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/log_files/ \
---log_filename ${SEASON}_sample_report
+# # Create species consensus only report
+# python3 -m reporting.create_zooniverse_report \
+# --season_captures_csv /home/packerc/shared/season_captures/${SITE}/cleaned/${SEASON}_cleaned.csv \
+# --aggregated_csv /home/packerc/shared/zooniverse/Aggregations/${SITE}/${SEASON}_aggregated_plurality.csv \
+# --output_csv /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/${SEASON}_report_species.csv \
+# --log_dir /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/log_files/ \
+# --log_filename ${SEASON}_create_zooniverse_report \
+# --default_season_id ${SEASON} \
+# --exclude_blanks \
+# --exclude_humans \
+# --exclude_non_consensus \
+# --exclude_captures_without_data
+#
+#
+# # Create statistics file
+# python3 -m reporting.create_report_stats \
+# --report_path /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/${SEASON}_report_species.csv \
+# --output_csv /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/${SEASON}_report_species_stats.csv \
+# --log_dir /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/log_files/ \
+# --log_filename ${SEASON}_create_report_stats
+#
+#
+# # Create a small sample report
+# python3 -m reporting.sample_report \
+# --report_csv /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/${SEASON}_report_species.csv \
+# --output_csv /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/${SEASON}_report_species_samples.csv \
+# --sample_size 300 \
+# --log_dir /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/log_files/ \
+# --log_filename ${SEASON}_sample_report
+#
+# # Create species only report (consensus and non-consensus)
+# python3 -m reporting.create_zooniverse_report \
+# --season_captures_csv /home/packerc/shared/season_captures/${SITE}/cleaned/${SEASON}_cleaned.csv \
+# --aggregated_csv /home/packerc/shared/zooniverse/Aggregations/${SITE}/${SEASON}_aggregated_plurality.csv \
+# --output_csv /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/${SEASON}_report.csv \
+# --log_dir /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/log_files/ \
+# --log_filename ${SEASON}_create_zooniverse_report \
+# --default_season_id ${SEASON} \
+# --exclude_blanks \
+# --exclude_humans \
+# --exclude_captures_without_data
+#
+#
+# # Create statistics file
+# python3 -m reporting.create_report_stats \
+# --report_path /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/${SEASON}_report.csv \
+# --output_csv /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/${SEASON}_report_stats.csv \
+# --log_dir /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/log_files/ \
+# --log_filename ${SEASON}_create_report_stats
+#
+# # Create a small sample report
+# python3 -m reporting.sample_report \
+# --report_csv /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/${SEASON}_report.csv \
+# --output_csv /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/${SEASON}_report_samples.csv \
+# --sample_size 300 \
+# --log_dir /home/packerc/shared/zooniverse/ConsensusReports/${SITE}/log_files/ \
+# --log_filename ${SEASON}_sample_report
 
 }
 
@@ -574,8 +574,8 @@ module load python3
 
 cd $HOME/camera-trap-data-pipeline
 SITE=SER
-SEASON=SER_S1
-SEASON_STRING=S1
+SEASON=SER_S6
+SEASON_STRING=S6
 
 extract_zooniverse_data_legacy () {
 
