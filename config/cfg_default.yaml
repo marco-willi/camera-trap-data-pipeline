@@ -285,6 +285,7 @@ report_flags:
     - pielous_evenness_index
   plurality_algo_cols_extended:
     - n_users_classified_this_subject
+    - n_users_identified_this_species
     - n_species_ids_per_user_median
     - n_species_ids_per_user_max
     - n_users_saw_a_species
