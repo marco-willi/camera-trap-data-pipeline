@@ -160,7 +160,6 @@ if __name__ == '__main__':
     parser.add_argument("--exclude_blanks", action="store_true")
     parser.add_argument("--exclude_captures_without_data", action="store_true")
     parser.add_argument("--exclude_zooniverse_cols", action="store_true")
-    parser.add_argument("--exclude_zooniverse_cols", action="store_true")
     parser.add_argument(
         "--exclude_additional_plurality_infos", action="store_true")
     parser.add_argument(
