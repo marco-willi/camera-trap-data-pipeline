@@ -83,14 +83,21 @@ def correct_image_name(name):
     OLD: S1/G12/G12_R1/PICT3981.JPG
     NEW: S1/G12/G12_R1/S1_G12_R1_PICT3981.JPG
 
-    OLD: S8/O09/O09_R3/S8_O09_R3_S8_O09_R3_IMAG9279.JPG
-    NEW: S8/O09/O09_R3/S8_O09_R3_S8_O09_R3_IMAG9279.JPG
+    OLD: S8/O09/O09_R3/S8_O09_R3_IMAG9279.JPG
+    NEW: S8/O09/O09_R3/S8_O09_R3_IMAG9279.JPG
+
+    OLD: S4/J12/J12_R2/IMG_6068.JPG
+    NEW: S4/J12/J12_R2/S4_J12_R2_IMG6068.JPG
     """
     if '/' not in name:
         return name
     name_splits = name.split('/')
     if '_' in name_splits[-1]:
-        return name
+        n_ = len(name_splits[-1].split('_'))
+        if n_ == 4:
+            return name
+        elif n_ == 2:
+            name_splits[-1] = ''.join(name_splits[-1].split('_'))
     path = '/'.join(name_splits[0:-1])
     file_name_new = '_'.join([name_splits[0], name_splits[2], name_splits[3]])
     return path + '/' + file_name_new
