@@ -32,7 +32,7 @@ class AggregateAnnotationsPluralityTests(unittest.TestCase):
             [flags_global['QUESTION_PREFIX'], flags_global['QUESTION_MAIN']])
 
         self.question_type_map = aggregator.create_question_type_map(
-            self.questions, flags)
+            self.questions, flags, flags_global)
 
         self.test_subjects = {
             'test_standard': [

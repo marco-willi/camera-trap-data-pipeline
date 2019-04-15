@@ -85,7 +85,8 @@ class GenerateActionsTests(unittest.TestCase):
                 'ok')
         self.assertEqual(
                 self.captures_updated['APN_S2_A1_R1_IMAG0003.JPG']['status'],
-                'timechanged')
+                'ok')
+
 
 if __name__ == '__main__':
     unittest.main()
