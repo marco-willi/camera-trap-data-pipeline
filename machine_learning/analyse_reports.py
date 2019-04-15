@@ -2,14 +2,14 @@
 import pandas as pd
 
 from config.cfg import cfg
-from utils import set_file_permission
+from utils.utils import set_file_permission
 from machine_learning.utils import find_all_reports, get_question_stats
 
 plurality_aggregation_flags = cfg['plurality_aggregation_flags']
 
 
 output_csv = '/home/packerc/shared/machine_learning/data/meta_data/label_overview_all.csv'
-root_path = '/home/packerc/shared/zooniverse/ConsensusReports/'
+root_path = '/home/packerc/shared/zooniverse/SpeciesReports/'
 
 counts_questions = plurality_aggregation_flags['QUESTION_COUNTS']
 non_binary_questions = counts_questions + [plurality_aggregation_flags['QUESTION_MAIN']]

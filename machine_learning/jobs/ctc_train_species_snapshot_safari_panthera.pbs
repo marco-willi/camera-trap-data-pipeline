@@ -65,3 +65,24 @@ singularity exec --nv -B /home/packerc/shared:/home/packerc/shared ./camera-trap
   -max_epochs 70 \
   -reduce_lr_on_plateau_patience 4 \
   -early_stopping_patience 6
+
+
+# # old with dropping full batches < 3:00 hours, 1 CPU 90>, 2nd unstable
+#
+# python3 train.py \
+#   -train_tfr_path $TFR_FILES \
+#   -val_tfr_path $TFR_FILES \
+#   -test_tfr_path $TFR_FILES \
+#   -class_mapping_json  $LABEL_MAPPINGS \
+#   -run_outputs_dir $RUN_OUTPUT \
+#   -model_save_dir $MODEL_SAVE \
+#   -model ResNet18 \
+#   -labels species count standing resting moving eating interacting young_present \
+#   -batch_size 256 \
+#   -n_cpus 22 \
+#   -n_gpus 2 \
+#   -buffer_size 512 \
+#   -max_epochs 70 \
+#   -reduce_lr_on_plateau_patience 4 \
+#   -early_stopping_patience 6 \
+#   -color_augmentation full_fast
