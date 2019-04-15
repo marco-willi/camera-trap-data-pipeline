@@ -16,7 +16,6 @@ from utils.utils import set_file_permission
 
 flags = cfg['pre_processing_flags']
 msg_width = 150
-valid_actions = ('delete', 'ok', 'invalidate', 'timechange')
 
 # args = dict()
 # args['action_list'] = '/home/packerc/shared/season_captures/APN/captures/APN_S2_TEST_canBeDeleted_action_list_TEST1.csv'
@@ -106,10 +105,10 @@ def check_datetime_format(action, date_format):
 
 
 def check_action_is_valid(action):
-    if action['action_to_take'] not in valid_actions:
+    if action['action_to_take'] not in flags['allowed_actions_to_take']:
         msg = textwrap.shorten(
                 "action {} not a valid action, valid actions are {}".format(
-                 action['action_to_take'], valid_actions),
+                 action['action_to_take'], flags['allowed_actions_to_take']),
                 width=msg_width)
         raise ImportError(msg)
     if action['action_to_take'] == 'timechange':

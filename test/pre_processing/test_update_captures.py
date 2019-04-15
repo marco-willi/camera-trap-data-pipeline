@@ -79,6 +79,13 @@ class GenerateActionsTests(unittest.TestCase):
         with self.assertRaises(KeyError):
             self.captures_updated['APN_S2_A1_R2_IMAG0006.JPG']
 
+    def testStatusChanges(self):
+        self.assertEqual(
+                self.captures_updated['APN_S2_A1_R2_IMAG0008.JPG']['status'],
+                'ok')
+        self.assertEqual(
+                self.captures_updated['APN_S2_A1_R1_IMAG0003.JPG']['status'],
+                'timechanged')
 
 if __name__ == '__main__':
     unittest.main()

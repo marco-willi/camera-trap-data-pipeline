@@ -108,8 +108,8 @@ if __name__ == '__main__':
     try:
         apply_actions(actions, captures, logger)
         logger.info("Successfully applied actions")
-    except:
-        logger.error("Failed to apply actions")
+    except Exception:
+        logger.error("Failed to apply actions", exc_info=True)
 
     export_inventory_to_csv(captures, args['captures'])
 

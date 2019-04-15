@@ -3,6 +3,8 @@
 ###################################################
 
 global_processing_flags:
+    # how to flag /handle extracted question data from Zooniverse -- default
+    # is to convert to: 'question__<question_on_zooniverse>'
     QUESTION_DELIMITER: __
     QUESTION_PREFIX: question
     QUESTION_MAIN: species
@@ -13,6 +15,8 @@ global_processing_flags:
 ###################################################
 
 pre_processing_flags:
+    # Order of EXIF timestamp data to consider for the 'datetime'
+    # attribute of the image (first non-empty)
     exif_data_timestamps:
      - DateTime
      - DateTimeOriginal
@@ -25,23 +29,29 @@ pre_processing_flags:
     exif_tags_to_exclude:
      - EXIF:ThumbnailImage
      - MakerNotes:PreviewImage
-    general:
-     capture_delta_seconds: 5
     image_check_parameters:
+     # Percentage 'percent' of all pixels of an image
+     # that need to be above / blow 'thresh' to fail the check
      all_black:
        percent: 0.8
        thresh: 30
      all_white:
        percent: 0.8
        thresh: 200
+     # captures with more than x images fail check
      captures_with_too_many_images:
        max_images: 3
+     # images equal and less than N seconds apart will be grouped into the
+     # same capture (X1, X2, X3, X4 -- if each difference is <= N)
+     capture_delta_max_seconds: 5
+     # max allowed consequetive days without captures
      time_lapse_days:
        max_days: 30
+     # general time window (years) -- typically specified via paramters
      time_too_new:
-       max_year: 2018
+       max_year: 9999
      time_too_old:
-       min_year: 2012
+       min_year: 1970
     image_checks:
      - all_black
      - all_white
@@ -69,6 +79,24 @@ pre_processing_flags:
       output_date_format: '%Y-%m-%d'
       output_datetime_format: '%Y-%m-%d %H:%M:%S'
       output_time_format: '%H:%M:%S'
+    # only these actions are valid
+    allowed_actions_to_take:
+      - delete
+      - invalidate
+      - timechange
+      - ok
+    # after applying actions these status are assigend
+    action_to_status_map:
+      delete: deleted
+      invalidate: invalid
+      timechange: ok
+      ok: ok
+      '': ok
+    # images with the following actions are removed from the final/cleaned
+    # file
+    actions_to_remove_from_cleaned:
+      - delete
+      - invalidate
 
 ###################################################
 # Flags to define the bheavior of the

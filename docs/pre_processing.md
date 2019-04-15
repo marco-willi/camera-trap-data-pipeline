@@ -262,7 +262,7 @@ python3 -m pre_processing.apply_actions \
 
 ## Generate Updated Captures
 
-This code generates an updated captures file after applying actions. Deleted images are excluded and a few more columns added.
+This code generates an updated captures file after applying actions. Deleted / invalidated images are excluded and a few more columns added.
 
 ```
 python3 -m pre_processing.update_captures \
@@ -271,6 +271,7 @@ python3 -m pre_processing.update_captures \
 --log_dir /home/packerc/shared/season_captures/${SITE}/log_files/ \
 --log_filename ${SEASON}_update_captures
 ```
+
 
 ## Finalize (create cleaned captures) or Iterate (go back to creating action list)
 
@@ -290,3 +291,34 @@ python3 -m pre_processing.create_action_list \
 ```
 
 This code can be run in any case to check if further actions need to be taken if the output of the previous code (update_captures) was not clear.
+
+## Columns of Cleaned Captures (Default)
+
+
+| Column   | Description |
+| --------- | ----------- |
+|capture_id | identifier of the capture the image belongs to
+|season | season identifier
+|site | site/camera identifier
+|roll | roll identifier (SD card of a camera)
+|capture | capture number (e.g. '1' for the first capture in a specific roll)
+|image_rank_in_capture| rank of image in a capture (usually between 1 and 3)
+|image_rank_in_roll| rank of image in a roll
+|invalid| action taken on image (timechange, ok) -- this column is included due to legacy reasons (no invalidated / deleted images are in the cleaned captures file)
+|status| replaces 'invalid' column -- status of the image (default is one of: ok, timechanged, deleted, invalidate -- deleted/invalidated are not in the cleaned capture file)
+|image_path| full path of re-named image
+|image_name| image name after re-naming
+|image_path_rel| relative image name after re-naming  
+|image_name_original | original image name
+|image_path_original| full path of original image
+|image_path_original_rel| relative path of original image
+|datetime| datetime of image (default Y-m-d H:M:S) -- after any datetime corrections applied
+|date| date of image (default Y-m-d) -- after any datetime corrections applied
+|time| time of image (defualt H:M:S) -- after any datetime corrections applied
+|file_creation_date| file creation date (default Y-m-d H:M:S)
+|image_check__()| image check flag of check (), 1 if check failed
+|seconds_to_next_image_taken| seconds to the next image taken
+|seconds_to_last_image_taken| seconds to the last/previous image taken
+|days_to_last_image_taken| days to the next image taken
+|days_to_next_image_taken| days to the last/previous image taken
+|exif__()| EXIF tag () extracted from the image
