@@ -54,6 +54,10 @@ if __name__ == '__main__':
     for k, v in args.items():
         logger.info("Argument {}: {}".format(k, v))
 
+    ######################################
+    # Read Data
+    ######################################
+
     season_data_df = read_cleaned_season_file_df(args['season_captures_csv'])
     season_dict = create_season_dict(season_data_df)
 
@@ -63,6 +67,10 @@ if __name__ == '__main__':
         index_col='capture_id')
     df_preds.fillna('', inplace=True)
     df_preds.index.name = 'capture_id'
+
+    ######################################
+    # Join and Export Data
+    ######################################
 
     # Join season captures with preds
     season_df = pd.DataFrame.from_dict(season_dict, orient='index')
