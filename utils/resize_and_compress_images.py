@@ -3,7 +3,6 @@
     - list of images
     - multiprocessing
 """
-import os
 from PIL import Image
 import traceback
 from multiprocessing import Process, Manager
@@ -115,17 +114,3 @@ def process_images_list_multiprocess(
         results_list.append(results_dict[image_source])
 
     return results_list
-
-#
-# if __name__ == '__main__':
-#     image_root = 'D:\\Studium_GD\\Zooniverse\\Data\\snapshot_serengeti\\test_images\\'
-#     img_names = os.listdir(image_root)
-#     image_path_list = [os.path.join(image_root, x) for x in img_names]
-#     max_pixel_of_largest_side = 1440
-#     save_quality = None
-#
-#     tt = process_images_list_multiprocess(
-#             image_path_list,
-#             resize_and_compress_list_of_images,
-#             max_pixel_of_largest_side=max_pixel_of_largest_side,
-#             save_quality=save_quality)

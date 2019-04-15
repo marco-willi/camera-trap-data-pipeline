@@ -145,7 +145,9 @@ if __name__ == '__main__':
                 try:
                     tags = et.execute_json(img_path)[0]
                 except Exception:
-                    print(traceback.format_exc())
+                    logger.warning(
+                        "Failed to extract EXIF data from {}".format(img_path),
+                         exc_info=True)
                     tags = None
                 results[img_path] = tags
                 if (img_no % 100) == 0:
