@@ -4,44 +4,13 @@ import os
 import argparse
 import logging
 
-from logger import setup_logger, create_log_file
-from utils import (
-    export_dict_to_json_with_newlines, file_path_splitter,
-    file_path_generator, set_file_permission)
+from utils.logger import setup_logger, create_log_file
+from utils.utils import (
+    export_dict_to_json_with_newlines, set_file_permission)
 from machine_learning.flatten_preds import (
     flatten_ml_empty_preds, flatten_ml_species_preds)
 
 # # For Testing
-# args = dict()
-# args['manifest'] = "/home/packerc/shared/zooniverse/Manifests/KAR/KAR_S1__complete__manifest.json"
-# args['predictions_empty'] = None
-# args['predictions_species'] = None
-# args['add_all_species_scores'] = True
-# args['output_file'] = None
-#
-# args = dict()
-# args['manifest'] = "/home/packerc/shared/zooniverse/Manifests/MTZ/MTZ_S1__complete__manifest.json"
-# args['predictions_empty'] = None
-# args['predictions_species'] = None
-# args['add_all_species_scores'] = True
-# args['output_file'] = None
-#
-#
-# args = dict()
-# args['manifest'] = "/home/packerc/shared/zooniverse/Manifests/PLN/PLN_S1__complete__manifest.json"
-# args['predictions_empty'] = None
-# args['predictions_species'] = None
-# args['add_all_species_scores'] = True
-# args['output_file'] = None
-#
-#
-# args = dict()
-# args['manifest'] = "/home/packerc/shared/zooniverse/Manifests/KAR/KAR_S1__complete__manifest.json"
-# args['predictions_empty'] = "/home/packerc/shared/zooniverse/Manifests/KAR/KAR_S1__complete__predictions_empty_or_not.json"
-# args['predictions_species'] = "/home/packerc/shared/zooniverse/Manifests/KAR/KAR_S1__complete__predictions_species.json"
-# args['output_file'] = "/home/packerc/shared/zooniverse/Manifests/KAR/KAR_S1__complete__manifest_TEST.json"
-# args['add_all_species_scores'] = True
-
 # args = dict()
 # args['manifest'] = "/home/packerc/shared/zooniverse/Manifests/GRU/GRU_S1__complete__manifest.json"
 # args['predictions_empty'] = "/home/packerc/shared/zooniverse/Manifests/GRU/GRU_S1__complete__predictions_empty_or_not.json"
@@ -57,11 +26,11 @@ if __name__ == "__main__":
         "--manifest", type=str, required=True,
         help="Path to manifest file (.json)")
     parser.add_argument(
-        "--predictions_empty", type=str, default=None,
+        "--predictions_empty", type=str, required=True,
         help="Path to the file with predictions from the empty model \
               (.json). Default is to generate the name based on the manifest.")
     parser.add_argument(
-        "--predictions_species", type=str, default=None,
+        "--predictions_species", type=str, required=True,
         help="Path to the file with predictions from the species model \
               (.json). Default is to generate the name based on the manifest.")
     parser.add_argument(
@@ -101,30 +70,6 @@ if __name__ == "__main__":
         logger.info("Updating {} with machine scores".format(
             args['output_file']))
 
-    file_name_parts = file_path_splitter(args['manifest'])
-    if args['predictions_empty'] is None:
-        args['predictions_empty'] = file_path_generator(
-            dir=os.path.dirname(args['manifest']),
-            id=file_name_parts['id'],
-            name='predictions_empty_or_not',
-            batch=file_name_parts['batch'],
-            file_delim=file_name_parts['file_delim'],
-            file_ext='json'
-        )
-        logger.info("Reading empty predictions from {}".format(
-            args['predictions_empty']))
-    if args['predictions_species'] is None:
-        args['predictions_species'] = file_path_generator(
-            dir=os.path.dirname(args['manifest']),
-            id=file_name_parts['id'],
-            name='predictions_species',
-            batch=file_name_parts['batch'],
-            file_delim=file_name_parts['file_delim'],
-            file_ext='json'
-        )
-        logger.info("Reading species predictions from {}".format(
-              args['predictions_species']))
-
     if not os.path.exists(args['predictions_species']):
         raise FileNotFoundError("predictions: %s not found" %
                                 args['predictions_species'])
@@ -160,8 +105,11 @@ if __name__ == "__main__":
             data['info']['machine_learning'] = True
         # add species predictions
         if capture_id in preds_species:
-            flat_species = flatten_ml_species_preds(preds_species[capture_id])
-            flat_species = {'#{}'.format(k): v for k, v in flat_species.items()}
+            flat_species = flatten_ml_species_preds(
+                preds_species[capture_id],
+                only_top=(not args['add_all_species_scores']))
+            flat_species = {
+                '#{}'.format(k): v for k, v in flat_species.items()}
             meta_data.update(flat_species)
             data['info']['machine_learning'] = True
         if data['info']['machine_learning']:

@@ -4,15 +4,15 @@ import os
 import argparse
 import pandas as pd
 
-from logger import setup_logger, create_log_file
-from utils import (
+from utils.logger import setup_logger, create_log_file
+from utils.utils import (
     read_cleaned_season_file_df, set_file_permission, sort_df_by_capture_id)
 from reporting.create_zooniverse_report import create_season_dict
 
 # args = dict()
 # args['season_captures_csv'] = '/home/packerc/shared/season_captures/GRU/cleaned/GRU_S1_cleaned.csv'
-# args['predictions_csv'] = '/home/packerc/shared/zooniverse/ConsensusReports/GRU/GRU_S1_ml_preds_flat.csv'
-# args['output_csv'] = '/home/packerc/shared/zooniverse/ConsensusReports/GRU/GRU_S1_report_ml.csv'
+# args['predictions_csv'] = '/home/packerc/shared/zooniverse/SpeciesReports/GRU/GRU_S1_ml_preds_flat.csv'
+# args['output_csv'] = '/home/packerc/shared/zooniverse/SpeciesReports/GRU/GRU_S1_report_ml.csv'
 # args['export_only_with_predictions'] = False
 
 if __name__ == '__main__':
@@ -57,10 +57,7 @@ if __name__ == '__main__':
     season_data_df = read_cleaned_season_file_df(args['season_captures_csv'])
     season_dict = create_season_dict(season_data_df)
 
-    random_record = season_dict[list(season_dict.keys())[0]]
-    season_header = list(random_record.keys())
-
-    # Import Flatt Predictions
+    # Import Flat Predictions
     df_preds = pd.read_csv(
         args['predictions_csv'], dtype='str',
         index_col='capture_id')

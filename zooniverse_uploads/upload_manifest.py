@@ -12,12 +12,12 @@ from panoptes_client import Project, Panoptes, SubjectSet
 from panoptes_client.panoptes import PanoptesAPIException
 from redo import retry
 
-from logger import setup_logger, create_log_file
+from utils.logger import setup_logger, create_log_file
 from zooniverse_uploads import uploader
-from image_compression.resize_and_compress_images import (
+from utils.resize_and_compress_images import (
     process_images_list_multiprocess,
     resize_and_compress_list_of_images)
-from utils import (
+from utils.utils import (
     read_config_file, estimate_remaining_time,
     current_time_str, export_dict_to_json_with_newlines,
     file_path_splitter, file_path_generator, set_file_permission)

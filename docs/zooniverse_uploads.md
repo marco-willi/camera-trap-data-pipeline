@@ -59,15 +59,15 @@ The 'image_root_path' has to be specified if the 'captures_csv' contains relativ
 
 ### Cleaned Captures File
 
-The 'captures_csv' input is a csv file with (at least) the following columns:
+The 'captures_csv' input is a csv file with one row per image and with (at least) the following columns:
 
 | Column   | Description |
 | --------- | ----------- |
-|season | season identifier
+|season | season identifier (typically identical for the whole file)
 |site | site/camera identifier
 |roll | roll identifier (SD card of a camera)
-|capture | capture identifier
-|path | Absolute or relative path of the image
+|capture | capture number (e.g. '1' for the first capture in a specific roll)
+|path or image_path_rel | Absolute or relative path of the image
 |invalid| (legacy column) -- excludes images from the manifest if value is '1' or '2'
 
 It is expected that the input is ordered by: season, site, roll, capture, image (ordered by sequence in the capture).
@@ -79,69 +79,18 @@ GRU_S1,J05,1,14,1,GRU_S1/J05/J05_R1/GRU_S1_J05_R1_IMAG0036.JPG,2017:06:06 03:56:
 GRU_S1,J06,1,17,1,GRU_S1/J06/J06_R1/GRU_S1_J06_R1_IMAG0043.JPG,2017:06:09 22:28:38,2017:06:09 22:28:38,J06_R1,GRU_S1_J06_R1_IMAG0043.JPG,0,,
 ```
 
-## Create Machine Learning File for Model Input (Optional)
+## Machine Learning (Optional)
 
-This code creates a 'machine learning file' that has the correct format for the machine learning models to classify the images in the manifest.
-
-```
-python3 -m zooniverse_uploads.create_machine_learning_file \
---manifest /home/packerc/shared/zooniverse/Manifests/${SITE}/${SEASON}__complete__manifest.json
-```
-
-The default settings create the following file:
-```
-${SEASON}__complete__machine_learning_input.csv
-```
-
-## Generate new Predictions (Optional)
-
-The following steps describe how to run the machine learning models. We run two separate models: one to predict the presence of an animal (empty or not) and one to predict the animal species. The scripts process approximately 300 capture events / minute on a CPU so it can take several hours for large manifests to process. Please note that the following codes will create a file in your home directory 'camera-trap-classifier-latest-cpu.simg', you can safely delete that after the scripts have finished (it contains the machine learning software).
-
-### Define the Parameters
-
-Run / Define the following commands / parameters:
-```
-ssh mesabi
-cd $HOME/camera-trap-data-pipeline/machine_learning/jobs/
-
-SITE=RUA
-SEASON=RUA_S1
-BATCH=complete
-```
-
-Optionally -- if choosing a specific batch to create predictions for, also adapt the batch name (derived from the manifest file name, default is 'complete', could be 'batch_1'):
-```
-BATCH=batch_1
-```
-
-### Submit the Machine Learning Jobs
-
-Both of the following commands can be run in parallel.
-
-To run the 'Empty or Not' model execute the following command:
-```
-qsub -v SITE=${SITE},SEASON=${SEASON},BATCH=${BATCH} ctc_predict_empty.pbs
-```
-
-To run the 'Species' model execute the following command:
-```
-qsub -v SITE=${SITE},SEASON=${SEASON},BATCH=${BATCH} ctc_predict_species.pbs
-```
-
-The default settings create the following file:
-```
-${SEASON}__complete__predictions_empty_or_not.json
-${SEASON}__complete__predictions_species.json
-```
-
-### Add Model Predictions to Manifest (Optional)
-
-This code adds the aggregated predictions into the manifest.
+It is assumed that the machine predictions have already been created using: [Machine Learning](docs/machine_learning.md).
 
 ```
 cd $HOME/camera-trap-data-pipeline
 python3 -m zooniverse_uploads.add_predictions_to_manifest \
---manifest /home/packerc/shared/zooniverse/Manifests/${SITE}/${SEASON}__complete__manifest.json
+--manifest /home/packerc/shared/zooniverse/Manifests/${SITE}/${SEASON}__complete__manifest.json \
+--predictions_empty /home/packerc/shared/zooniverse/MachineLearning/${SITE}/${SEASON}_predictions_empty_or_not.json \
+--predictions_species /home/packerc/shared/zooniverse/MachineLearning/${SITE}/${SEASON}_predictions_species.json \
+--log_dir /home/packerc/shared/zooniverse/Manifests/${SITE}/log_files/ \
+--log_filename ${SEASON}_add_predictions_to_manifest
 ```
 
 Note: If the script is 'killed' the most likely reason is memory usage. In that case use this command to launch a session with more memory and try again:

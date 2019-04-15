@@ -13,10 +13,10 @@ import exiftool
 import pandas as pd
 
 from config.cfg import cfg
-from logger import setup_logger, create_log_file
+from utils.logger import setup_logger, create_log_file
 from pre_processing.utils import (
     export_inventory_to_csv, read_image_inventory, image_check_stats)
-from utils import (
+from utils.utils import (
     slice_generator, estimate_remaining_time, set_file_permission)
 
 
@@ -145,7 +145,9 @@ if __name__ == '__main__':
                 try:
                     tags = et.execute_json(img_path)[0]
                 except Exception:
-                    print(traceback.format_exc())
+                    logger.warning(
+                        "Failed to extract EXIF data from {}".format(img_path),
+                        exc_info=True)
                     tags = None
                 results[img_path] = tags
                 if (img_no % 100) == 0:
@@ -210,6 +212,7 @@ if __name__ == '__main__':
                     try:
                         time_info = _extract_time_info_from_exif(
                             selected_exif, flags)
+                        time_info['datetime_exif'] = time_info['datetime']
                         current_data.update(time_info)
                     except:
                         logger.warning(

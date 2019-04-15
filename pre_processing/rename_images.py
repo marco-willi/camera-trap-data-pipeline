@@ -4,7 +4,7 @@ import argparse
 import logging
 
 from pre_processing.utils import (read_image_inventory)
-from logger import create_log_file, setup_logger
+from utils.logger import create_log_file, setup_logger
 
 
 def rename_files(source_paths, dest_paths, logger):

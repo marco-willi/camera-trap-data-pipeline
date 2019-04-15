@@ -4,7 +4,7 @@ import argparse
 import logging
 from collections import OrderedDict
 
-from logger import setup_logger, create_log_file
+from utils.logger import setup_logger, create_log_file
 from config.cfg import cfg
 from pre_processing.utils import (
     read_image_inventory, export_inventory_to_csv, image_check_stats)
@@ -29,7 +29,7 @@ flags = cfg['pre_processing_flags']
 def include_image(image_data):
     """ Rule to include only certain images """
     if 'action_taken' in image_data:
-        if image_data['action_taken'] in ('delete', 'invalidate'):
+        if image_data['action_taken'] in flags['actions_to_remove_from_cleaned']:
             return False
     return True
 
@@ -40,10 +40,17 @@ def select_valid_images(captures):
     for image_name, image_data in captures.items():
         if not include_image(image_data):
             continue
+        # update 'invalid' column (legacy)
         try:
             image_data['invalid'] = image_data['action_taken']
         except:
-            image_data['invalid'] = ''
+            image_data['invalid'] = 'ok'
+        # update image status
+        try:
+            status = flags['action_to_status_map'][image_data['action_taken']]
+            image_data['status'] = status
+        except:
+            image_data['status'] = 'ok'
         captures_updated[image_name] = {k: v for k, v in image_data.items()}
     return captures_updated
 

@@ -4,7 +4,7 @@ import argparse
 import logging
 from datetime import datetime, timedelta
 
-from logger import setup_logger, create_log_file
+from utils.logger import setup_logger, create_log_file
 from pre_processing.utils import read_image_inventory, export_inventory_to_csv
 from config.cfg import cfg
 
@@ -108,8 +108,8 @@ if __name__ == '__main__':
     try:
         apply_actions(actions, captures, logger)
         logger.info("Successfully applied actions")
-    except:
-        logger.error("Failed to apply actions")
+    except Exception:
+        logger.error("Failed to apply actions", exc_info=True)
 
     export_inventory_to_csv(captures, args['captures'])
 

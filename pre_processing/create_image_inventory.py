@@ -5,7 +5,7 @@ import logging
 from collections import OrderedDict
 
 
-from logger import setup_logger, create_log_file
+from utils.logger import setup_logger, create_log_file
 from pre_processing.utils import (
     image_check_stats, export_inventory_to_csv)
 from config.cfg import cfg

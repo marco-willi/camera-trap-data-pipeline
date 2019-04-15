@@ -7,6 +7,7 @@
 import json
 import copy
 import logging
+from collections import defaultdict, Counter, OrderedDict
 
 logger = logging.getLogger(__name__)
 
@@ -52,18 +53,15 @@ def extract_key_from_json(line, key, mapper):
 
 def extract_survey_task(survey_task, flags):
     """ Extract Identification from Survey Task
-    Input: {'task': 'T0', 'value':
-            [{'choice': 'GAZELLEGRANTS',
-              'answers': {'HOWMANY': '1',
-                          'WHATBEHAVIORSDOYOUSEE': ['STANDING'],
-                          'ARETHEREANYYOUNGPRESENT': 'NO'},
-              'filters': {}
-              }
+    Input: {"choice": "GIRAFFE",
+                       "answers":{"HOWMANY":"5",
+                              "WHATBEHAVIORSDOYOUSEE":["EATING", "MOVING"],
+                              "ARETHEREANYYOUNGPRESENT":"NO"}}
     Output:
-        [[{'howmany': '1'},
-          {'whatbehaviorsdoyousee': ['standing']},
-          {'arethereanyyoungpresent': 'no'},
-          {'choice': 'gazellegrants'}]]
+        [{'howmany': '5'},
+         {'whatbehaviorsdoyousee': ['eating', 'moving']},
+         {'arethereanyyoungpresent': 'no'},
+         {'choice': 'giraffe'}]
     """
     results = list()
     choice = survey_task['choice'].lower()
@@ -75,7 +73,7 @@ def extract_survey_task(survey_task, flags):
                 res = {question.lower(): list()}
                 for answer in answers:
                     res[question.lower()].append(answer.lower())
-                    results.append(res)
+                results.append(res)
             else:
                 res = {question.lower(): answers.lower()}
                 results.append(res)
@@ -191,43 +189,43 @@ def get_workflow_major_version(workflow_version):
 
 
 def is_eligible_workflow(
-        line, mapper,
+        cls_dict,
         workflow_id=None,
-        workflow_version=None,
         workflow_version_min=None):
     """ Check whether classification is in an eligible workflow
         For the workflow version, only the major version is checked, e.g.,
         586.16, only 586 is checked for
     Input:
-        line: list of classification information
-        mapper: dict mapping row_name to row_id
+        cls_dict: dict of classification
         workflow_id: str indicating the workflow
         workflow_version_min: str indicating the minimum workflow_version
-        workflow_version: str indicating the workflow_version
     """
     # Return True if no workflow_id specified
     if workflow_id is None:
+        if workflow_version_min is not None:
+            logger.warning(
+                "Specified workflow_version_min but no workflow_id")
         return True
-    # extract data from line
-    workflow_id_line = line[mapper['workflow_id']]
-    workflow_version_line = get_workflow_major_version(
-        line[mapper['workflow_version']])
+
+    # extract data
+    actual_workflow_version = get_workflow_major_version(
+        cls_dict['workflow_version'])
+    actual_workflow_id = cls_dict['workflow_id']
+
     # check workflow id
-    if workflow_id != workflow_id_line:
+    if actual_workflow_id != workflow_id:
         return False
-    # check workflow version
-    if workflow_version is not None:
-        if workflow_version_line != workflow_version:
-            return False
+
     # check workflow version min
     if workflow_version_min is not None:
-        workflow_version_min = get_workflow_major_version(workflow_version_min)
-        if int(workflow_version_line) >= int(workflow_version_min):
+        workflow_version_min = get_workflow_major_version(
+            workflow_version_min)
+        if int(actual_workflow_version) >= int(workflow_version_min):
             return True
         else:
             return False
-    raise ValueError(
-        "Unexpected Issue in 'is_eligible_workflow', input {}".format(line))
+    else:
+        return True
 
 
 # build question_answer pairs
@@ -264,25 +262,41 @@ def deduplicate_answers(classification_answers, flags):
         primary_question = flags['QUESTION_NAME_MAPPER']['choice']
     except:
         primary_question = 'choice'
-    deduplicated_all = list()
+    deduplicated = list()
     primary_used = set()
     for i, task_answers in enumerate(classification_answers):
-        deduplicated_all.append(list())
-        for answer in task_answers:
-            # add to final if non-primary question
-            if primary_question not in answer:
-                deduplicated_all[i].append(answer)
-            # add primary answer to output and add to used list
-            elif answer[primary_question] not in primary_used:
-                deduplicated_all[i].append(answer)
-                primary_used.add(answer[primary_question])
-            # if duplicate don't add to final list
-            else:
-                logger.debug("Removed duplicate answer: {}".format(
-                    classification_answers))
-    # remove any empty answers
-    deduplicated_final = [x for x in deduplicated_all if len(x) > 0]
-    return deduplicated_final
+        # get primary answer of current choice
+        primary_current = [x for x in task_answers if primary_question in x]
+        primary_answer = primary_current[0][primary_question]
+        if primary_answer not in primary_used:
+            deduplicated.append(task_answers)
+            primary_used.add(primary_answer)
+        else:
+            logger.debug("Removed duplicate answer: {}".format(
+                classification_answers))
+    return deduplicated
+
+
+# def find_question_answer_pairs(all_records):
+#     """ Analyze annotations to determine question and answer mappings
+#         Output:
+#          {'species': ['vulture', 'zebra', 'nyala', ...],
+#           'young_present': ['yes', 'no'],
+#           }
+#     """
+#     question_answer_pairs = OrderedDict()
+#     for record in all_records:
+#         annos = record['annos']
+#         for anno in annos:
+#             for question, answers in anno.items():
+#                 if question not in question_answer_pairs:
+#                     question_answer_pairs[question] = set()
+#                 if isinstance(answers, str):
+#                     question_answer_pairs[question].add(answers)
+#                 elif isinstance(answers, list):
+#                     for answer in answers:
+#                         question_answer_pairs[question].add(answer)
+#     return OrderedDict([(k, list(v)) for k, v in question_answer_pairs.items()])
 
 
 def find_question_answer_pairs(all_records):
@@ -292,19 +306,16 @@ def find_question_answer_pairs(all_records):
           'young_present': ['yes', 'no'],
           }
     """
-    question_answer_pairs = dict()
+    pairs = defaultdict(Counter)
     for record in all_records:
         annos = record['annos']
         for anno in annos:
             for question, answers in anno.items():
-                if question not in question_answer_pairs:
-                    question_answer_pairs[question] = set()
-                if isinstance(answers, str):
-                    question_answer_pairs[question].add(answers)
-                elif isinstance(answers, list):
-                    for answer in answers:
-                        question_answer_pairs[question].add(answer)
-    return {k: list(v) for k, v in question_answer_pairs.items()}
+                if isinstance(answers, list):
+                    pairs[question].update(answers)
+                else:
+                    pairs[question].update({answers})
+    return {k: list(v.keys()) for k, v in pairs.items()}
 
 
 def build_question_header(question_answer_pairs, question_types):
@@ -367,3 +378,24 @@ def rename_dict_keys(input, map):
         else:
             output[k] = v
     return output
+
+
+def classification_is_valid(cls_dict):
+    """ Check all required fields are available """
+    required = [
+        'user_name', 'subject_ids', 'subject_data', 'annotations',
+        'workflow_id', 'workflow_version']
+    if not all([x in cls_dict for x in required]):
+        return False
+    else:
+        return True
+
+
+def subject_already_seen(subject_metadata):
+    """ Determine if subject was already seen """
+    if 'see_before' in subject_metadata:
+        return subject_metadata['seen_before']
+    elif 'subject_selection_state' in subject_metadata:
+        return subject_metadata['subject_selection_state']['already_seen']
+    else:
+        return False

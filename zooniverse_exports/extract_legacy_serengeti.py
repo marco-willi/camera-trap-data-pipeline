@@ -91,14 +91,15 @@ import os
 import argparse
 from collections import Counter
 import logging
-from logger import setup_logger, create_logfile_name
+from utils.logger import setup_logger, create_log_file
 
 from zooniverse_exports import legacy_extractor
-from utils import print_nested_dict
+from utils.utils import print_nested_dict, set_file_permission
 from config.cfg import cfg
 
 
 flags = cfg['legacy_extractor_flags']
+flags_global = cfg['global_processing_flags']
 
 # To Test
 # args = dict()
@@ -137,6 +138,11 @@ if __name__ == '__main__':
         '--split_raw_file', action='store_true',
         help="Split the raw file according to seasons. If not specified, the \
               script assumes those files exist already.")
+    parser.add_argument(
+        "--log_dir", type=str, default=None)
+    parser.add_argument(
+        "--log_filename", type=str,
+        default='extract_legacy_serengeti')
 
     args = vars(parser.parse_args())
     s_id = args['season_to_process']
@@ -162,10 +168,11 @@ if __name__ == '__main__':
     ######################################
 
     # logging
-    log_file_name = create_logfile_name(
-        'extract_legacy_classifications_{}'.format(s_id))
-    log_file_path = os.path.join(args['output_path'], log_file_name)
-    setup_logger(log_file_path)
+    if args['log_dir'] is not None:
+        log_file_path = create_log_file(args['log_dir'], args['log_filename'])
+        setup_logger(log_file_path)
+    else:
+        setup_logger()
     logger = logging.getLogger(__name__)
 
     for k, v in args.items():
@@ -252,13 +259,18 @@ if __name__ == '__main__':
 
     retirement_reasons = list()
     seasons = list()
-    answers = {k: list() for k in flags['QUESTIONS']}
+    answers = {k: list() for k in flags['CSV_QUESTIONS']}
+
+    try:
+        retirement_reason = flags['CSV_HEADER_MAPPER']['retire_reason']
+    except:
+        retirement_reason = 'retire_reason'
 
     for c_id, annotations in classifications.items():
         if not isinstance(annotations, list):
             logger.info(annotations)
         for annotation in annotations:
-            retirement_reasons.append(annotation['retirement_reason'])
+            retirement_reasons.append(annotation[retirement_reason])
             seasons.append(annotation['season'])
             for question, _answers_list in answers.items():
                 _answers_list.append(annotation[question])
@@ -299,7 +311,7 @@ if __name__ == '__main__':
         for k in all_seasons.keys()}
 
     legacy_extractor.export_cleaned_annotations(
-        output_paths[s_id], classifications, header, flags)
+        output_paths[s_id], classifications, header, flags, flags_global)
 
     # change permmissions to read/write for group
-    os.chmod(output_paths[s_id], 0o660)
+    set_file_permission(output_paths[s_id])

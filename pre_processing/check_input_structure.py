@@ -17,7 +17,7 @@ import argparse
 import logging
 import textwrap
 
-from logger import setup_logger, create_log_file
+from utils.logger import setup_logger, create_log_file
 
 
 # args = dict()

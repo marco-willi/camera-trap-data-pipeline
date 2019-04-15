@@ -10,10 +10,15 @@ import pandas as pd
 from hashlib import md5
 import logging
 import configparser
-from collections import Counter
+from collections import Counter, OrderedDict
 
 
 logger = logging.getLogger(__name__)
+
+
+class OrderedCounter(Counter, OrderedDict):
+    """ Counter that keeps insert order """
+    pass
 
 
 def print_progress(count, total):
@@ -78,14 +83,21 @@ def correct_image_name(name):
     OLD: S1/G12/G12_R1/PICT3981.JPG
     NEW: S1/G12/G12_R1/S1_G12_R1_PICT3981.JPG
 
-    OLD: S8/O09/O09_R3/S8_O09_R3_S8_O09_R3_IMAG9279.JPG
-    NEW: S8/O09/O09_R3/S8_O09_R3_S8_O09_R3_IMAG9279.JPG
+    OLD: S8/O09/O09_R3/S8_O09_R3_IMAG9279.JPG
+    NEW: S8/O09/O09_R3/S8_O09_R3_IMAG9279.JPG
+
+    OLD: S4/J12/J12_R2/IMG_6068.JPG
+    NEW: S4/J12/J12_R2/S4_J12_R2_IMG6068.JPG
     """
     if '/' not in name:
         return name
     name_splits = name.split('/')
     if '_' in name_splits[-1]:
-        return name
+        n_ = len(name_splits[-1].split('_'))
+        if n_ == 4:
+            return name
+        elif n_ == 2:
+            name_splits[-1] = ''.join(name_splits[-1].split('_'))
     path = '/'.join(name_splits[0:-1])
     file_name_new = '_'.join([name_splits[0], name_splits[2], name_splits[3]])
     return path + '/' + file_name_new
@@ -132,6 +144,10 @@ def hash_string(value, constant=""):
     to_hash = str(value) + str(constant)
     hashed = md5(to_hash.encode('ascii')).hexdigest()
     return hashed
+
+
+def create_capture_id(season, site, roll, capture):
+    return '{}#{}#{}#{}'.format(season, site, roll, capture)
 
 
 def assign_hash_to_zero_one(value):
@@ -233,12 +249,16 @@ def _append_season_to_image_path(path, season):
 def read_cleaned_season_file_df(path):
     df = pd.read_csv(path, dtype='str', index_col=None)
     df.fillna('', inplace=True)
-    required_header_cols = ('season', 'site', 'roll', 'capture',
+    required_header_cols = ('capture_id', 'season', 'site', 'roll', 'capture',
                             'path', 'invalid')
     if 'path' not in df.columns:
         if 'image_path_rel' in df.columns:
             df['path'] = df[['image_path_rel', 'season']].apply(
                 lambda x: _append_season_to_image_path(*x), axis=1)
+
+    if 'capture_id' not in df.columns:
+        df['capture_id'] = df[['season', 'site', 'roll', 'capture']].apply(
+                        lambda x: create_capture_id(*x), axis=1)
 
     for col in required_header_cols:
         if col not in df.columns:

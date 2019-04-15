@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import csv
 
 from collections import defaultdict, Counter, OrderedDict
-from utils import set_file_permission
+from utils.utils import set_file_permission
 
 plt.switch_backend('agg')
 

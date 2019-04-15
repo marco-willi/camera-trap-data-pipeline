@@ -2,10 +2,11 @@
 This repository contains code to process camera trap images, specifically:
 
 1. [Pre-Processing Camera-Trap Images](docs/pre_processing.md)
-2. [Upload Data to Zooniverse](docs/zooniverse_uploads.md)
-3. [Download & Extract Data from Zooniverse](docs/zooniverse_exports.md)
-4. [Aggregate Data from Zooniverse](docs/zooniverse_aggregations.md)
-5. [Merge Data into Reports](docs/reporting.md)
+2. [Machine Learning](docs/machine_learning.md)
+3. [Upload Data to Zooniverse](docs/zooniverse_uploads.md)
+4. [Download & Extract Data from Zooniverse](docs/zooniverse_exports.md)
+5. [Aggregate Annotations](docs/aggregations.md)
+6. [Merge Data into Reports](docs/reporting.md)
 
 The code was developed for the [Snapshot Safari](http://www.snapshotsafari.org) project but is generally usable for camera trap projects. The code allows for organizing and processing camera trap images, classifying images with machine learning models, uploading images to [Zooniverse](https://www.zooniverse.org) for classification by citzien scientists, and allows for aggregating and consolidating data exports from Zooniverse into reports.
 
@@ -20,7 +21,7 @@ An overview of how the scripts are connected can be found here:
 
 ## Configuration
 
-Parameters that define the behavior of some codes are defined here: [config/cfg.yaml](config/cfg.yaml)
+Default parameters that define the behavior of some codes are defined here: [config/cfg_default.yaml](config/cfg_default.yaml). To use a custom cfg create a 'cfg.yaml' file in [config/](config/) and it will be used instead.
 
 These need to be adjusted, for example:
 1. if a new question answer needs to be mapped to 'empty', e.g., 'no animal is here'
@@ -29,7 +30,7 @@ These need to be adjusted, for example:
 
 ## Executing the Scripts
 
-The recommended way is to use parameters and then run the scripts as shown here: [Scripts](scripts.sh)
+The recommended way is to use parameters and then run the scripts as shown here: [Scripts](utils/scripts.sh) (these may not be up-to-date!).
 
 Alternatively, copy & paste the commands to a text editor, adjust the parameters, and copy & paste them to the command line.
 
@@ -113,9 +114,11 @@ tar xvzf exiftool.tar.gz
 
 ### Testing the Code
 
-Some pre-processing tests:
+Some tests:
 ```
 python -m unittest discover test/pre_processing
+python -m unittest discover test/zooniverse_exports
+python -m unittest discover test/aggregations
 ```
 
 Set log-level befor running the code:

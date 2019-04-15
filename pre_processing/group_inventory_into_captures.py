@@ -9,7 +9,7 @@ from pre_processing.utils import (
     image_check_stats, read_image_inventory,
     export_inventory_to_csv, update_time_checks)
 from config.cfg import cfg
-from logger import create_log_file, setup_logger
+from utils.logger import create_log_file, setup_logger
 
 
 flags = cfg['pre_processing_flags']
@@ -157,7 +157,8 @@ def group_images_into_captures(inventory, flags):
         # (starting with the delta between first and second)
         for i, (img_name, rank) in enumerate(images_sorted[1:]):
             delta = float(inventory[img_name]['seconds_to_last_image_taken'])
-            if delta <= flags['general']['capture_delta_seconds']:
+            max_delta = flags['image_check_parameters']['capture_delta_max_seconds']
+            if delta <= max_delta:
                 current_rank_in_capture += 1
             else:
                 current_rank_in_capture = 1

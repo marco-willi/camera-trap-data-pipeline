@@ -8,8 +8,8 @@ import logging
 
 import pandas as pd
 
-from utils import set_file_permission
-from logger import create_log_file, setup_logger
+from utils.utils import set_file_permission
+from utils.logger import create_log_file, setup_logger
 
 
 # args = dict()

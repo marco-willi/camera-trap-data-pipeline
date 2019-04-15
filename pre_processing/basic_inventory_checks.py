@@ -9,11 +9,11 @@ import traceback
 from multiprocessing import Process, Manager
 from PIL import Image
 
-from logger import setup_logger, create_log_file
+from utils.logger import setup_logger, create_log_file
 from pre_processing.utils import (
     file_creation_date, image_check_stats, p_pixels_above_threshold,
     p_pixels_below_threshold, export_inventory_to_csv, read_image_inventory)
-from utils import slice_generator, estimate_remaining_time
+from utils.utils import slice_generator, estimate_remaining_time
 from config.cfg import cfg
 
 
@@ -39,7 +39,7 @@ if __name__ == '__main__':
         "--log_filename", type=str,
         default='basic_inventory_checks')
     args = vars(parser.parse_args())
-    
+
     ######################################
     # Check Input
     ######################################
@@ -88,12 +88,20 @@ if __name__ == '__main__':
             except:
                 img = None
                 current_data['image_check__corrupt_file'] = 1
+                logger.debug(
+                    "Failed to open file {}".format(
+                     image_path))
             # get file creation date
-            img_creation_date = file_creation_date(image_path)
-            img_creation_date_str = time.strftime(
-                flags['time_formats']['output_datetime_format'],
-                time.gmtime(img_creation_date))
-            current_data['file_creation_date'] = img_creation_date_str
+            try:
+                img_creation_date = file_creation_date(image_path)
+                img_creation_date_str = time.strftime(
+                    flags['time_formats']['output_datetime_format'],
+                    time.gmtime(img_creation_date))
+                current_data['file_creation_date'] = img_creation_date_str
+            except Exception:
+                logger.error(
+                    "Failed to read file creation date for {}".format(
+                     image_path), exc_info=True)
             # check for uniformly colored images
             black_percent = \
                 flags['image_check_parameters']['all_black']['percent']
@@ -116,6 +124,9 @@ if __name__ == '__main__':
                 if is_white:
                     current_data['image_check__all_white'] = 1
             except:
+                logger.debug(
+                    "Failed to check all_white/all_black for {}".format(
+                     image_path))
                 pass
             results[image_path] = current_data
             if (img_no % 100) == 0:

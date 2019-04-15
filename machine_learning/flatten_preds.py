@@ -1,4 +1,12 @@
 """ Functions to Flatten Predictions """
+from collections import OrderedDict
+
+
+def order_dict(d):
+    """ Order dict by keys """
+    keys = list(d.keys())
+    keys.sort()
+    return OrderedDict((x, d[x]) for x in keys)
 
 
 def flatten_ml_empty_preds(preds_empty):
@@ -6,11 +14,17 @@ def flatten_ml_empty_preds(preds_empty):
     return _flatten_ml_empty_confidences(preds_empty)
 
 
-def flatten_ml_species_preds(preds_species):
+def flatten_ml_species_preds(preds_species, only_top=False):
     """ Flatten Empty and Species preds """
-    flat_species_conf = _flatten_ml_confidences(preds_species)
-    flat_species_top = _flatten_ml_toppreds(preds_species)
-    return {**flat_species_top, **flat_species_conf}
+    if only_top:
+        res = _flatten_ml_toppreds(preds_species)
+        return order_dict(res)
+    else:
+        flat_species_conf = _flatten_ml_confidences(preds_species)
+        flat_species_top = _flatten_ml_toppreds(preds_species)
+        res = flat_species_top
+        res.update(flat_species_conf)
+        return res
 
 
 def _is_binary_label(preds):
@@ -39,7 +53,7 @@ def _flatten_ml_confidences(preds):
                 key = 'machine_confidence_{}_{}'.format(
                     label_name, pred_label)
                 res[key] = conf
-    return res
+    return order_dict(res)
 
 
 def _flatten_ml_toppreds(preds):
@@ -49,20 +63,28 @@ def _flatten_ml_toppreds(preds):
     for pred_label, pred_value in top_preds.items():
         key = 'machine_topprediction_%s' % pred_label
         res[key] = pred_value
-    return res
+    return order_dict(res)
 
 
 def _flatten_ml_empty_confidences(preds):
     """ Add Empty/or Not predictions """
+    res = {}
     if 'empty' in preds['aggregated_pred']:
         empty_preds = preds['aggregated_pred']['empty']
-        res = {}
         for empty_cat, conf in empty_preds.items():
             key = 'machine_confidence_{}'.format(empty_cat)
             res[key] = conf
     elif 'is_blank' in preds['aggregated_pred']:
+        # top prediction empty
+        key = 'machine_topprediction_is_empty'
+        top_empty_pred = preds['predictions_top']['is_blank']
+        if top_empty_pred == '0':
+            top_empty_pred = 'not_empty'
+        elif top_empty_pred == '1':
+            top_empty_pred = 'empty'
+        res[key] = top_empty_pred
+        # confidence empty
         empty_preds = preds['aggregated_pred']['is_blank']
-        res = {}
         is_blank_conf = empty_preds['1']
         key = 'machine_confidence_is_empty'
         res[key] = is_blank_conf

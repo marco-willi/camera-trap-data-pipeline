@@ -1,4 +1,4 @@
-""" Create Statistics Over all Questions """
+""" Create Statistics Over all TopPredictions """
 from collections import Counter, defaultdict
 import logging
 import argparse
@@ -6,12 +6,8 @@ import os
 
 import pandas as pd
 
-from config.cfg import cfg
 from utils.logger import setup_logger, create_log_file
 from utils.utils import set_file_permission
-
-
-flags_global = cfg['global_processing_flags']
 
 
 if __name__ == '__main__':
@@ -24,7 +20,7 @@ if __name__ == '__main__':
         "--log_dir", type=str, default=None)
     parser.add_argument(
         "--log_filename", type=str,
-        default='create_report_stats')
+        default='create_ml_report_stats')
 
     args = vars(parser.parse_args())
 
@@ -47,45 +43,45 @@ if __name__ == '__main__':
     for k, v in args.items():
         logger.info("Argument {}: {}".format(k, v))
 
-    question_column_prefix = '{}{}'.format(
-        flags_global['QUESTION_PREFIX'],
-        flags_global['QUESTION_DELIMITER'])
-
     df = pd.read_csv(args['report_path'], dtype='str')
     df.fillna('', inplace=True)
 
-    ##############################
+    #####################################
     # Generate Stats
     ######################################
 
-    question_stats = defaultdict(Counter)
+    pred_stats = defaultdict(Counter)
     cols_all = df.columns.tolist()
-    question_cols = [x for x in cols_all if
-                     x.startswith(question_column_prefix)]
-    for _id, identification in df.iterrows():
-        subject_id = identification['capture_id']
-        for question in question_cols:
-            try:
-                if 'count' in question:
-                    answer = identification[question]
-                else:
-                    answer = int(round(float(identification[question]), 0))
-            except:
-                answer = identification[question]
-            question_stats[question].update({answer})
+    toppred_cols = [x for x in cols_all if 'topprediction' in x]
+
+    for _id, pred_data in df.iterrows():
+        subject_id = pred_data['capture_id']
+        # try to infer whether this prediction is empty
+        # and exclude all other columns if so
+        try:
+            empty_pred = pred_data['machine_topprediction_is_empty']
+            is_empty = (empty_pred in ['empty', 'blank'])
+        except:
+            is_empty = False
+        for pred_col in toppred_cols:
+            if is_empty:
+                if pred_col != 'machine_topprediction_is_empty':
+                    continue
+            pred = pred_data[pred_col]
+            pred_stats[pred_col].update({pred})
 
     # Print Stats per Question - All Answers
     stats_list = []
-    for question, answer_data in question_stats.items():
+    for pred, preds_data in pred_stats.items():
         logger.info(
-            "Stats for: {} - All annotations per subject".format(question))
-        total = sum([x for x in answer_data.values()])
-        for answer, count in answer_data.most_common():
+            "Stats for: {}".format(pred))
+        total = sum([x for x in preds_data.values()])
+        for answer, count in preds_data.most_common():
             logger.info(
-                "Answer: {:20} -- counts: {:10} / {} ({:.2f} %)".format(
+                "Prediction: {:20} -- counts: {:10} / {} ({:.2f} %)".format(
                  answer, count, total, 100*count/total))
             stats_list.append(
-                [question, answer, count, total, round(100*count/total, 1)])
+                [pred, answer, count, total, round(100*count/total, 1)])
 
     # build df
     df_stats = pd.DataFrame(stats_list)

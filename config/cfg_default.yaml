@@ -1,0 +1,322 @@
+###################################################
+# GLobal Processing Flags
+###################################################
+
+global_processing_flags:
+    # how to flag /handle extracted question data from Zooniverse -- default
+    # is to convert to: 'question__<question_on_zooniverse>'
+    QUESTION_DELIMITER: __
+    QUESTION_PREFIX: question
+    QUESTION_MAIN: species
+    QUESTION_MAIN_EMPTY: blank
+
+###################################################
+# Pre-Processing Flags
+###################################################
+
+pre_processing_flags:
+    # Order of EXIF timestamp data to consider for the 'datetime'
+    # attribute of the image (first non-empty)
+    exif_data_timestamps:
+     - DateTime
+     - DateTimeOriginal
+     - EXIF:DateTime
+     - EXIF:DateTimeOriginal
+    exif_tag_groups_to_extract:
+     - EXIF
+     - MakerNotes
+     - Composite
+    exif_tags_to_exclude:
+     - EXIF:ThumbnailImage
+     - MakerNotes:PreviewImage
+    image_check_parameters:
+     # Percentage 'percent' of all pixels of an image
+     # that need to be above / blow 'thresh' to fail the check
+     all_black:
+       percent: 0.8
+       thresh: 30
+     all_white:
+       percent: 0.8
+       thresh: 200
+     # captures with more than x images fail check
+     captures_with_too_many_images:
+       max_images: 3
+     # images equal and less than N seconds apart will be grouped into the
+     # same capture (X1, X2, X3, X4 -- if each difference is <= N)
+     capture_delta_max_seconds: 5
+     # max allowed consequetive days without captures
+     time_lapse_days:
+       max_days: 30
+     # general time window (years) -- typically specified via paramters
+     time_too_new:
+       max_year: 9999
+     time_too_old:
+       min_year: 1970
+    image_checks:
+     - all_black
+     - all_white
+     - corrupt_file
+     - corrupt_exif
+     - empty_exif
+     - time_lapse
+     - time_too_new
+     - time_too_old
+     - captures_with_too_many_images
+    image_checks_invalidate:
+     - all_black
+     - all_white
+     - corrupt_exif
+     - empty_exif
+    image_checks_delete:
+     - corrupt_file
+    image_checks_time:
+     - time_lapse
+     - time_too_new
+     - time_too_old
+     - captures_with_too_many_images
+    time_formats:
+      exif_input_datetime_format: '%Y:%m:%d %H:%M:%S'
+      output_date_format: '%Y-%m-%d'
+      output_datetime_format: '%Y-%m-%d %H:%M:%S'
+      output_time_format: '%H:%M:%S'
+    # only these actions are valid
+    allowed_actions_to_take:
+      - delete
+      - invalidate
+      - timechange
+      - ok
+    # after applying actions these status are assigend
+    action_to_status_map:
+      delete: deleted
+      invalidate: invalid
+      timechange: ok
+      ok: ok
+      '': ok
+    # images with the following actions are removed from the final/cleaned
+    # file
+    actions_to_remove_from_cleaned:
+      - delete
+      - invalidate
+
+###################################################
+# Flags to define the bheavior of the
+# Classification Extractor
+###################################################
+
+extractor_flags:
+    QUESTION_NAME_MAPPER:
+      arethereanyyoungpresent: young_present
+      choice: species
+      doyouseeanyantlers: antlers_visible
+      doyouseeanyhorns: horns_visible
+      howmany: count
+      howmanyanimalscanyouseethathavehorns: horns_count
+      question: species
+    QUESTIONS_TO_IGNORE:
+     - dontcare
+    ANSWER_MAPPER:
+      0: '0'
+      n: '0'
+      'no': '0'
+      1: '1'
+      y: '1'
+      'yes': '1'
+    ANSWER_TYPE_MAPPER:
+      species:
+        no animals present: blank
+        noanimalspresent: blank
+        nothing: blank
+        nothinghere: blank
+        nothingthere: blank
+      count:
+        '1150': '11-50'
+        '51': '51+'
+      horns_count:
+        '1150': '11-50'
+        '51': '51+'
+    CLASSIFICATION_INFO_TO_ADD:
+     - user_name
+     - user_id
+     - created_at
+     - subject_ids
+     - workflow_id
+     - workflow_version
+     - classification_id
+    CLASSIFICATION_INFO_MAPPER:
+      subject_ids: subject_id
+    QUESTIONS_OUTPUT_ORDER:
+     - species
+     - count
+     - standing
+     - resting
+     - moving
+     - eating
+     - interacting
+     - young_present
+     - horns_count
+     - antlers_visible
+
+###################################################
+# Subject Extractor
+###################################################
+
+subject_extractor_flags:
+    SUBJECT_ADD_LOCATION_DATA: true
+    SUBJECT_DATA_TO_ADD:
+     - retirement_reason
+     - retired_at
+     - created_at
+    SUBJECT_METADATA_TO_ADD:
+     - '#season'
+     - '#roll'
+     - '#site'
+     - '#capture'
+    SUBJECT_DATA_NAME_MAPPER:
+     '#capture': capture
+     '#roll': roll
+     '#season': season
+     '#site': site
+     retirement_reason: zooniverse_retirement_reason
+     retired_at: zooniverse_retired_at
+     created_at: zooniverse_created_at
+
+
+###################################################
+# Flags to define the bheavior of the
+# Plurality Aggregator
+###################################################
+
+plurality_aggregation_flags:
+    COUNTS_TO_ORDINAL_MAPPER:
+      '': 0
+      '11-50': 11
+      '51+': 12
+    QUESTION_COUNTS:
+     - count
+     - horns_count
+    COUNT_AGGREGATION_MODES:
+      - median
+      - min
+      - max
+
+
+###################################################
+# Flags to define the bheavior of the
+# Legacy Classification Extractor
+###################################################
+
+legacy_extractor_flags:
+    ANSWER_TYPE_MAPPER:
+      eating:
+       'false': 0
+       'true': 1
+      interacting:
+       'false': 0
+       'true': 1
+      eating:
+       'false': 0
+       'true': 1
+      moving:
+       'false': 0
+       'true': 1
+      resting:
+       'false': 0
+       'true': 1
+      species:
+        no animals present: blank
+        nothing: blank
+        '': blank
+      standing:
+       'false': 0
+       'true': 1
+      young_present:
+       'false': 0
+       'true': 1
+    CLASSIFICATION_INFO_TO_ADD:
+     - user_name
+     - created_at
+     - subject_id
+     - capture_event_id
+     - zooniverse_retirement_reason
+     - season
+     - site
+     - roll
+     - filenames
+     - timestamps
+     - classification_id
+    CSV_HEADER_MAPPER:
+     babies: young_present
+     id: classification_id
+     retire_reason: zooniverse_retirement_reason
+     species_count: count
+     subject_zooniverse_id: subject_id
+     created_at: created_at
+    CSV_QUESTIONS:
+     - species
+     - count
+     - standing
+     - resting
+     - moving
+     - eating
+     - interacting
+     - young_present
+
+# Subject info to add from the legacy classifications export
+add_subject_info_flags_legacy:
+ - season
+ - roll
+ - site
+ - capture
+ - zooniverse_retirement_reason
+ - zooniverse_retired_at
+ - zooniverse_created_at
+ - filenames
+ - timestamps
+ - capture_id
+
+
+###################################################
+# Flags for the Report Generation
+###################################################
+
+report_flags:
+  identify_humans_for_exclusion:
+    - human
+  # group report columns to select them when creating reports
+  capture_cols:
+    - capture_id
+    - subject_id
+    - season
+    - site
+    - roll
+    - capture_date_local
+    - capture_time_local
+  zooniverse_cols:
+    - zooniverse_created_at
+    - zooniverse_retirement_reason
+    - zooniverse_retired_at
+  zooniverse_urls_cols:
+    - zooniverse_url_
+  plurality_algo_cols:
+    - n_users_classified_this_subject
+    - n_users_identified_this_species
+    - p_users_identified_this_species
+    - n_species_ids_per_user_median
+    - n_species_ids_per_user_max
+    - n_users_saw_a_species
+    - n_users_saw_no_species
+    - p_users_saw_a_species
+    - pielous_evenness_index
+    - species_is_plurality_consensus
+  plurality_algo_cols_simple:
+    - p_users_identified_this_species
+    - pielous_evenness_index
+  plurality_algo_cols_extended:
+    - n_users_classified_this_subject
+    - n_users_identified_this_species
+    - n_species_ids_per_user_median
+    - n_species_ids_per_user_max
+    - n_users_saw_a_species
+    - n_users_saw_no_species
+    - p_users_saw_a_species
+    - species_is_plurality_consensus

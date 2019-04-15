@@ -10,8 +10,8 @@ import logging
 import argparse
 from collections import OrderedDict
 
-from logger import setup_logger, create_log_file
-from utils import set_file_permission
+from utils.logger import setup_logger, create_log_file
+from utils.utils import set_file_permission
 from zooniverse_exports.legacy_extractor import build_img_path
 
 from config.cfg import cfg
@@ -31,6 +31,7 @@ if __name__ == '__main__':
     parser.add_argument("--output_csv", type=str, required=True)
     parser.add_argument("--log_dir", type=str, default=None)
     parser.add_argument("--log_filename", type=str, default='extract_subjects_legacy')
+    parser.add_argument("--exclude_colums", nargs='+', type=str, default=[])
 
     args = vars(parser.parse_args())
 
@@ -117,7 +118,11 @@ if __name__ == '__main__':
         'capture', 'subject_id']
     first_cols = [x for x in first_cols if x in cols]
     cols_rearranged = first_cols + [x for x in cols if x not in first_cols]
-    df = df[cols_rearranged]
+
+    # exclude cols if specified
+    cols_final = [x for x in cols_rearranged if x not in args['exclude_colums']]
+
+    df = df[cols_final]
 
     # export
     df.to_csv(args['output_csv'], index=False)

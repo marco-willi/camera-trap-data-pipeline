@@ -11,7 +11,7 @@ import textwrap
 import argparse
 import math
 
-from utils import (
+from utils.utils import (
     slice_generator,
     estimate_remaining_time, set_file_permission)
 
