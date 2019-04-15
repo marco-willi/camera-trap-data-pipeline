@@ -6,7 +6,7 @@ import datetime
 from collections import Counter, OrderedDict
 import argparse
 
-from utils import (
+from utils.utils import (
     correct_image_name, id_to_zero_one,
     assign_zero_one_to_split)
 from config.cfg import cfg
