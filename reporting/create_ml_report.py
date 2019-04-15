@@ -57,10 +57,7 @@ if __name__ == '__main__':
     season_data_df = read_cleaned_season_file_df(args['season_captures_csv'])
     season_dict = create_season_dict(season_data_df)
 
-    random_record = season_dict[list(season_dict.keys())[0]]
-    season_header = list(random_record.keys())
-
-    # Import Flatt Predictions
+    # Import Flat Predictions
     df_preds = pd.read_csv(
         args['predictions_csv'], dtype='str',
         index_col='capture_id')

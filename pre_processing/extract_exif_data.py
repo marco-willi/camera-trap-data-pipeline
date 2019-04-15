@@ -147,7 +147,7 @@ if __name__ == '__main__':
                 except Exception:
                     logger.warning(
                         "Failed to extract EXIF data from {}".format(img_path),
-                         exc_info=True)
+                        exc_info=True)
                     tags = None
                 results[img_path] = tags
                 if (img_no % 100) == 0:
@@ -212,6 +212,7 @@ if __name__ == '__main__':
                     try:
                         time_info = _extract_time_info_from_exif(
                             selected_exif, flags)
+                        time_info['datetime_exif'] = time_info['datetime']
                         current_data.update(time_info)
                     except:
                         logger.warning(
