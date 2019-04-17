@@ -95,9 +95,9 @@ def _extract_datetime(image_record):
         except:
             pass
     # handle file creation date only
-    elif 'file_creation_date' in image_record:
+    elif 'datetime_file_creation' in image_record:
         try:
-            time_obj = _get_datetime_obj(image_record['file_creation_date'])
+            time_obj = _get_datetime_obj(image_record['datetime_file_creation'])
             res['date'] = time_obj.strftime("%Y-%m-%d")
             res['time'] = time_obj.strftime("%H:%M:%S")
         except:

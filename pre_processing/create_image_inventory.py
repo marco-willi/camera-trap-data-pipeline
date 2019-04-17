@@ -34,7 +34,7 @@ if __name__ == '__main__':
         "--log_filename", type=str, default='create_image_inventory')
     args = vars(parser.parse_args())
 
-    # image check paramters
+    # image check parameters
     msg_width = 99
 
     # check existence of root dir
@@ -91,7 +91,7 @@ if __name__ == '__main__':
                     'datetime': '',
                     'date': '',
                     'time': '',
-                    'file_creation_date': '',
+                    'datetime_file_creation': '',
                     **{'image_check__{}'.format(k):
                         0 for k in flags['image_checks']}}
 

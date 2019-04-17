@@ -80,7 +80,7 @@ def calculate_time_deltas(inventory, flags):
         for image_id, image_data in site_roll_data.items():
             # if exif time not available take file creation time
             if image_data['datetime'] == '':
-                img_time = image_data['file_creation_date']
+                img_time = image_data['datetime_file_creation']
             else:
                 img_time = image_data['datetime']
             times.append(img_time)
@@ -223,7 +223,7 @@ if __name__ == '__main__':
         "--log_filename", type=str, default='group_inventory_into_captures')
     args = vars(parser.parse_args())
 
-    # image check paramters
+    # image check parameters
     msg_width = 99
 
     # logging

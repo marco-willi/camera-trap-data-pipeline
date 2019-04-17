@@ -24,7 +24,7 @@ module load python3
 cd ~/camera-trap-data-pipeline
 ```
 
-The following examples were run with the following paramters:
+The following examples were run with the following parameters:
 ```
 SITE=RUA
 SEASON=RUA_S1

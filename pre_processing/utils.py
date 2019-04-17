@@ -12,7 +12,7 @@ from utils.utils import set_file_permission
 plt.switch_backend('agg')
 
 
-def file_creation_date(path_to_file):
+def datetime_file_creation(path_to_file):
     """
     Try to get the date that a file was created, falling back to when it was
     last modified if that isn't possible.

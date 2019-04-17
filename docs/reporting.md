@@ -17,7 +17,7 @@ module load python3
 cd ~/camera-trap-data-pipeline
 ```
 
-The following examples were run with the following paramters (non-legacy):
+The following examples were run with the following parameters (non-legacy):
 ```
 SITE=GRU
 SEASON=GRU_S1

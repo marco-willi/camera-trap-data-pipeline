@@ -155,7 +155,7 @@ if __name__ == '__main__':
                   'image_name']
     info_cols = [
      'days_to_last_image_taken', 'days_to_next_image_taken',
-     'datetime', 'date', 'time',	'file_creation_date',
+     'datetime', 'date', 'time',	'datetime_file_creation',
      'image_path', 'image_path_rel']
 
     first_cols += action_cols

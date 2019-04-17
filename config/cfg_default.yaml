@@ -47,7 +47,7 @@ pre_processing_flags:
      # max allowed consequetive days without captures
      time_lapse_days:
        max_days: 30
-     # general time window (years) -- typically specified via paramters
+     # general time window (years) -- typically specified via parameters
      time_too_new:
        max_year: 9999
      time_too_old:

@@ -316,10 +316,10 @@ This code can be run in any case to check if further actions need to be taken if
 |date| date of image (default Y-m-d) -- derived from 'datetime'
 |time| time of image (defualt H:M:S) -- derived from 'datetime'
 |datetime_exif| datetime as extrated from EXIF data (default Y-m-d H:M:S, '' if none)
-|file_creation_date| file creation date (default Y-m-d H:M:S)
-conds_to_next_image_taken| seconds to the next image taken
+|datetime_file_creation| file creation date (default Y-m-d H:M:S)
+|seconds_to_next_image_taken| seconds to the next image taken
 |seconds_to_last_image_taken| seconds to the last/previous image taken
-|days_to_last_image_taken| days to the next image taken
-|days_to_next_image_taken| days to the last/previous image taken
+|days_to_last_image_taken| days to the last/previous image taken
+|days_to_next_image_taken| days to the next image taken
 |image_check__()| image check flag of check () -- '1' if check failed
 |exif__()| EXIF tag () extracted from the image

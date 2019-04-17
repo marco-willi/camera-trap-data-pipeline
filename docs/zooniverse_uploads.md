@@ -18,7 +18,7 @@ module load python3
 cd ~/camera-trap-data-pipeline
 ```
 
-The following examples were run with the following paramters:
+The following examples were run with the following parameters:
 ```
 SITE=RUA
 SEASON=RUA_S1
@@ -81,7 +81,7 @@ GRU_S1,J06,1,17,1,GRU_S1/J06/J06_R1/GRU_S1_J06_R1_IMAG0043.JPG,2017:06:09 22:28:
 
 ## Machine Learning (Optional)
 
-It is assumed that the machine predictions have already been created using: [Machine Learning](docs/machine_learning.md).
+It is assumed that the machine predictions have already been created using: [Machine Learning](docs/machine_learning.md). The following script adds machine learning predictions to the manifest.
 
 ```
 cd $HOME/camera-trap-data-pipeline
@@ -102,7 +102,7 @@ module load python3
 
 ## Split/Batch Manifest (Optional)
 
-This codes splits the manifest into several batches that can be uploaded separately. Additionally, the machine scores can be updated for individual batches (usually batches that have not yet been uploaded). Either the number of batches 'number_of_batches' or the 'max_batch_size' can be specified. Default is to randomly split the manifest into the batches.
+This codes splits the manifest into several batches that can be uploaded separately. How to split can be specified by either the number of batches 'number_of_batches' or the 'max_batch_size' parameters. Default is to randomly split the manifest.
 
 ```
 cd $HOME/camera-trap-data-pipeline
@@ -119,6 +119,8 @@ ${SEASON}__batch_1__manifest.json
 ${SEASON}__batch_2__manifest.json
 ...
 ```
+
+Note: Machine learning predictions can be updated for specific batches by adding/updating the machine scores.
 
 ## Upload Manifest
 
@@ -179,7 +181,7 @@ RUA_S1__batch_1__upload_tracker_file.txt
 
 ### Image Compression Options
 
-Per default the images are being compressed during the upload process. Use the following paramters to change that behavior:
+Per default the images are being compressed during the upload process. Use the following parameters to change that behavior:
 
 ```
 --save_quality 50 \

@@ -11,7 +11,7 @@ from PIL import Image
 
 from utils.logger import setup_logger, create_log_file
 from pre_processing.utils import (
-    file_creation_date, image_check_stats, p_pixels_above_threshold,
+    datetime_file_creation, image_check_stats, p_pixels_above_threshold,
     p_pixels_below_threshold, export_inventory_to_csv, read_image_inventory)
 from utils.utils import slice_generator, estimate_remaining_time
 from config.cfg import cfg
@@ -93,11 +93,11 @@ if __name__ == '__main__':
                      image_path))
             # get file creation date
             try:
-                img_creation_date = file_creation_date(image_path)
+                img_creation_date = datetime_file_creation(image_path)
                 img_creation_date_str = time.strftime(
                     flags['time_formats']['output_datetime_format'],
                     time.gmtime(img_creation_date))
-                current_data['file_creation_date'] = img_creation_date_str
+                current_data['datetime_file_creation'] = img_creation_date_str
             except Exception:
                 logger.error(
                     "Failed to read file creation date for {}".format(
