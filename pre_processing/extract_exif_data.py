@@ -233,14 +233,16 @@ if __name__ == '__main__':
         # Update Image Inventory with EXIF data
         for img_name in image_paths_all:
             current_data = copy.deepcopy(image_inventory[img_name])
-            if img_name not in exif_data:
+            try:
+                exif_data = exif_extracted[img_name]
+                if exif_data is None:
+                    current_data.update({'image_check__corrupt_exif': 1})
+                elif len(exif_data.keys()) == 0:
+                    current_data.update({'image_check__empty_exif': 1})
+                else:
+                    current_data.update(exif_data)
+            except KeyError:
                 current_data.update({'image_check__corrupt_exif': 1})
-            elif exif_data is None:
-                current_data.update({'image_check__corrupt_exif': 1})
-            elif len(exif_data.keys()) == 0:
-                current_data.update({'image_check__empty_exif': 1})
-            else:
-                current_data.update(exif_data)
             # update datetime - EXIF datetime or File Creation
             best_datetime = _create_datetime(current_data)
             current_data.update({'datetime': best_datetime})
@@ -252,7 +254,7 @@ if __name__ == '__main__':
 
     # Export EXIF Data separately
     if args['output_csv'] is not None:
-        df = pd.DataFrame.from_dict(exif_all, orient='index')
+        df = pd.DataFrame.from_dict(exif_extracted, orient='index')
         # export
         df.to_csv(args['output_csv'], index=False)
         # change permmissions to read/write for group
