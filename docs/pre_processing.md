@@ -94,8 +94,6 @@ python3 -m pre_processing.create_image_inventory \
 --log_filename ${SEASON}_create_image_inventory
 ```
 
-File columns:
-
 | Column   | Description |
 | --------- | ----------- |
 |season | season identifier
@@ -108,7 +106,7 @@ File columns:
 
 ## Perform Basic Checks
 
-The following script performs some basic checks. The code is parallelized to speed up the checks -- use the following options to make the most of the parallelization (it still takes roughly 1 hour per 60k images).
+The following script performs some basic checks. It opens each image to verify it's integrity and to perform pixel-based checks. The code is parallelized -- use the following options to make the most of the parallelization (it still takes roughly 1 hour per 60k images).
 
 ```
 ssh lab
@@ -147,7 +145,6 @@ Check the status of the job by:
 qstat
 ```
 
-File columns:
 
 | Column   | Description |
 | --------- | ----------- |
@@ -174,8 +171,6 @@ python3 -m pre_processing.extract_exif_data \
 --log_dir /home/packerc/shared/season_captures/${SITE}/log_files/ \
 --log_filename ${SEASON}_extract_exif_data
 ```
-
-File columns (updated inventory):
 
 | Column   | Description |
 | --------- | ----------- |
@@ -206,7 +201,6 @@ python3 -m pre_processing.group_inventory_into_captures \
 --log_filename ${SEASON}_group_inventory_into_captures
 ```
 
-File columns:
 
 | Column   | Description |
 | --------- | ----------- |
@@ -338,22 +332,21 @@ python3 -m pre_processing.apply_actions \
 --log_filename ${SEASON}_apply_actions
 ```
 
-File columns:
 
 | Column   | Description |
 | --------- | ----------- |
 | .... | previous columns in captures file
 |action_taken| the action that was applied to the image, separated by '#' if multiple
 |action_taken_reason| the reason for the action that was applied to the image, separated by '#' if multiple
-|image_is_invalid| flag if image was invalidated (=1) (only if at least one image was invalidated)
-|image_was_deleted| flag if image was deleted (=1) (only if at least one image was invalidated)
-|image_no_upload| flag if image was marked for no upload (=1) (only if at least one image was marked)
-|image_uncertain_datetime| flag if image was marked for uncertain datetime (=1) (only if at least one image was marked)
+|image_is_invalid| flag if image was invalidated (1, '' otherwise)
+|image_was_deleted| flag if image was deleted (1, '' otherwise)
+|image_no_upload| flag if image was marked for no upload (1, '' otherwise)
+|image_uncertain_datetime| flag if image was marked for uncertain datetime (1, '' otherwise)
 
 
 ## Generate Updated Captures
 
-This code generates an updated captures file after applying actions. Deleted images are excluded.
+This code generates an updated captures file after applying actions. This is mainly to remove deleted images and to re-group images into captures if timechanges were specified.
 
 ```
 python3 -m pre_processing.update_captures \
@@ -395,8 +388,12 @@ This code can be run in any case to check if further actions need to be taken if
 |capture | capture number (e.g. '1' for the first capture in a specific roll)
 |image_rank_in_capture| (temporal) rank of image in a capture
 |image_rank_in_roll| (temporal) rank of image in a roll
-|invalid | action taken on image (timechange, ok) -- this column is included due to legacy reasons (no invalidated / deleted images are in the cleaned captures file)
-|status | analogue to 'invalid' column -- status of the image (default is one of: ok, deleted, invalidated -- deleted/invalidated are not in the cleaned capture file)
+|action_taken| the action that was applied to the image, separated by '#' if multiple
+|action_taken_reason| the reason for the action that was applied to the image, separated by '#' if multiple
+|image_is_invalid| flag if image was invalidated (1, '' otherwise)
+|image_was_deleted| flag if image was deleted (1, '' otherwise)
+|image_no_upload| flag if image was marked for no upload (1, '' otherwise)
+|image_uncertain_datetime| flag if image was marked for uncertain datetime (1, '' otherwise)
 |image_name | image name after re-naming
 |image_path_rel| relative (to season root) image path after re-naming
 |image_path | full path of re-named image  
@@ -404,8 +401,6 @@ This code can be run in any case to check if further actions need to be taken if
 |image_path_original | full path of original image
 |image_path_original_rel| relative path of original image
 |datetime| datetime of image (default Y-m-d H:M:S) -- after any datetime corrections applied
-|date| date of image (default Y-m-d) -- derived from 'datetime'
-|time| time of image (defualt H:M:S) -- derived from 'datetime'
 |datetime_exif| datetime as extrated from EXIF data (default Y-m-d H:M:S, '' if none)
 |datetime_file_creation| file creation date (default Y-m-d H:M:S)
 |seconds_to_next_image_taken| seconds to the next image taken
