@@ -218,8 +218,8 @@ if __name__ == '__main__':
             try:
                 time_info = _extract_time_info_from_exif(
                     selected_exif, flags)
-                time_info['datetime_exif'] = time_info['datetime']
-                current_extracted.update(time_info)
+                current_extracted.update({
+                    'datetime_exif': time_info['datetime']})
             except:
                 logger.warning(
                     "Failed to extract datetime info from {}".format(
@@ -245,6 +245,10 @@ if __name__ == '__main__':
                 current_data.update({'image_check__corrupt_exif': 1})
             # update datetime - EXIF datetime or File Creation
             best_datetime = _create_datetime(current_data)
+            if best_datetime == '':
+                logger.warning(
+                    "Datetime for image {} empty -- this is unexpected".format(
+                        img_name))
             current_data.update({'datetime': best_datetime})
             image_inventory[img_name] = current_data
 
