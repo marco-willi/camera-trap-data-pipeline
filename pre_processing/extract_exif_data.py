@@ -33,11 +33,12 @@ flags = cfg['pre_processing_flags']
 def _create_datetime(image_data):
     """ Create best possible datetime """
     if 'datetime_exif' in image_data:
-        return image_data['datetime_exif']
-    elif 'datetime_file_creation' in image_data:
-        return image_data['datetime_file_creation']
-    else:
-        return ''
+        if image_data['datetime_exif'] != '':
+            return image_data['datetime_exif']
+    if 'datetime_file_creation' in image_data:
+        if image_data['datetime_file_creation'] != '':
+            return image_data['datetime_file_creation']
+    return ''
 
 
 def _extract_meta_data(tags, groups=['EXIF', 'MakerNotes', 'Composite']):
