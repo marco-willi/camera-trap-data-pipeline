@@ -32,6 +32,22 @@ def generate_check_string(image_data, check_columns, checks_to_find):
             checks_to_find if x in check_columns and float(image_data[x]) == 1]
 
 
+def _issue_is_resolved(image_data):
+    """ Determine if issue was already resolved """
+    # Issue resolved if image is invalid
+    try:
+        invalid = image_data['image_is_invalid']
+    except KeyError:
+        invalid = ''
+    if invalid == '1':
+        return True
+    # Issue resolved if image was flagged as ok
+    try:
+        last_action = image_data['action_taken'].split('#')[-1]
+        return (last_action == 'ok')
+    except KeyError:
+        return False
+
 # args = dict()
 #
 # args['captures'] = '/home/packerc/shared/season_captures/ENO/captures/ENO_S1_captures_grouped.csv'
@@ -84,11 +100,14 @@ if __name__ == '__main__':
     # check columns
     check_columns = [x for x in header if x.startswith('image_check__')]
     to_delete_checks = \
-        ['image_check__{}'.format(x) for x in flags['image_checks_delete']]
+        ['image_check__{}'.format(x)
+         for x in flags['image_checks_propose_delete']]
     to_invalidate_checks = \
-        ['image_check__{}'.format(x) for x in flags['image_checks_invalidate']]
+        ['image_check__{}'.format(x)
+         for x in flags['image_checks_propose_invalidate']]
     time_checks = \
-        ['image_check__{}'.format(x) for x in flags['image_checks_time']]
+        ['image_check__{}'.format(x)
+         for x in flags['image_checks_propose_time']]
 
     # Action columns
     action_cols = [
@@ -134,16 +153,12 @@ if __name__ == '__main__':
         automatic_status['action_from_image'] = image_data['image_name']
         automatic_status['action_to_image'] = image_data['image_name']
         image_data.update(automatic_status)
-        
+
         # check if image was in previous action lists and was flagged as ok
-        try:
-            previous_action_is_ok = \
-                (image_data['action_taken'] == 'ok')
-        except:
-            previous_action_is_ok = False
+        issue_is_resolved = _issue_is_resolved(image_data)
         # export problematic cases only
         has_issue = (has_deletion or has_invalidation or has_time_check)
-        if has_issue and not previous_action_is_ok:
+        if has_issue and not issue_is_resolved:
             inventory_with_issues[image_path_original] = image_data
 
     # Export cases with issues

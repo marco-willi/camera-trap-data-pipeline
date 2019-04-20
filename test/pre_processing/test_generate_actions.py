@@ -1,115 +1,253 @@
+""" Test Generation of Action Items """
 import unittest
 import logging
 from collections import OrderedDict
 
-from pre_processing.group_inventory_into_captures import (
-        calculate_time_deltas, group_images_into_captures,
-        update_inventory_with_capture_id, update_inventory_with_image_names,
-        update_inventory_with_capture_data)
 from pre_processing.generate_actions import (
-    generate_actions, check_action_is_valid, check_datetime_format)
-from pre_processing.utils import read_image_inventory
-from utils.logger import setup_logger
+    generate_actions, check_action_is_valid,
+    _check_datetime_format)
 from config.cfg import cfg_default as cfg
 
-setup_logger()
+
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.ERROR)
+logger.setLevel(logging.CRITICAL)
 
 
 flags = cfg['pre_processing_flags']
 
 
 class GenerateActionsTests(unittest.TestCase):
-    """ Test Import from CSV """
-
+    """ Test Action Generation """
     def setUp(self):
-        file_inventory = './test/files/test_inventory.csv'
-        file = './test/files/test_action_list.csv'
-        self.inventory = read_image_inventory(file_inventory)
-        time_deltas = calculate_time_deltas(self.inventory, flags)
-        update_inventory_with_capture_data(self.inventory, time_deltas)
-        image_to_capture = group_images_into_captures(self.inventory, flags)
-        update_inventory_with_capture_data(self.inventory, image_to_capture)
-        update_inventory_with_capture_id(self.inventory)
-        update_inventory_with_image_names(self.inventory)
-        self.action_list = read_image_inventory(file, unique_id=None)
-        self.captures = OrderedDict()
-        for v in self.inventory.values():
-            self.captures[v['image_name']] = v
-        self.actions = generate_actions(self.action_list, self.captures, logger)
+        self.dummy_action = {
+              'image_name': '1.JPG',
+              'action_roll': '',
+              'action_site': '',
+              'datetime_current': '',
+              'datetime_new': '',
+              'action_from_image': '1.JPG',
+              'action_to_image': '1.JPG',
+              'action_to_take': 'invalidate',
+              'action_to_take_reason': 'lala'}
 
-    def testTimechanges(self):
-        self.assertEqual(
-                self.actions['APN_S2_A1_R1_IMAG0001.JPG']['action_to_take'],
-                'timechange')
-        self.assertEqual(
-                self.actions['APN_S2_A1_R1_IMAG0002.JPG']['action_to_take'],
-                'timechange')
-        self.assertEqual(
-                self.actions['APN_S2_A1_R1_IMAG0003.JPG']['action_to_take'],
-                'timechange')
-        self.assertEqual(
-                int(self.actions['APN_S2_A1_R1_IMAG0003.JPG']['action_shift_time_by_seconds']),
-                int(86400))
-        self.assertEqual(
-                int(self.actions['APN_S2_A1_R2_IMAG0010.JPG']['action_shift_time_by_seconds']),
-                int(-60))
+    def testSimpleAction(self):
+        """ Test Normal Action """
+        captures = {
+                '1.JPG': {'site': 'a'}}
+        action_list = {
+          0: {
+              'action_roll': '',
+              'action_site': 'a',
+              'datetime_current': '',
+              'datetime_new': '',
+              'action_from_image': '',
+              'action_to_image': '',
+              'action_to_take': 'mark_no_upload',
+              'action_to_take_reason': 'lala'}}
 
-    def testPrioritizactions(self):
-        self.assertNotEqual(
-                self.actions['APN_S2_A1_R2_IMAG0005.JPG']['action_to_take'],
-                'timechange')
-        self.assertEqual(
-                self.actions['APN_S2_A1_R2_IMAG0011.JPG']['action_to_take'],
-                'delete')
+        actions = generate_actions(action_list, captures)
+        self.assertEqual(actions[0].action, 'mark_no_upload')
+
+    def testInvalidAction(self):
+        """ Invalid Action """
+        captures = {
+                '1.JPG': {'site': 'a'}}
+        action_list = {
+          0: {
+              'action_roll': '1',
+              'action_site': 'a',
+              'datetime_current': '',
+              'datetime_new': '',
+              'action_from_image': '',
+              'action_to_image': '',
+              'action_to_take': 'dummy',
+              'action_to_take_reason': 'lala'}}
+
+        with self.assertRaises(ImportError):
+            generate_actions(action_list, captures)
+
+    def testMultipleActions(self):
+        """ Multiple Actions Possible """
+        captures = {
+                '1.JPG': {'site': 'a'},
+                '2.JPG': {'site': 'a'}}
+        action_list = {
+          0: self.dummy_action,
+          1: self.dummy_action}
+        actions = generate_actions(action_list, captures)
+        self.assertEqual(len(actions), 2)
+        self.assertEqual([x for x in actions[0]],
+                         [x for x in actions[1]])
+
+    def testMultipleTimechanges(self):
+        """ RaiseError for Multiple Timechanges """
+        captures = {
+                '1.JPG': {'site': 'a'},
+                '2.JPG': {'site': 'a'}}
+        action = {k: v for k, v in self.dummy_action.items()}
+        action['action_to_take'] = 'timechange'
+        action['datetime_current'] = '2000-01-01 00:00:00'
+        action['datetime_new'] = '2000-01-01 00:01:00'
+        action_list = {
+          0: action,
+          1: action}
+        with self.assertRaises(ValueError):
+            generate_actions(action_list, captures)
+
+    def testTimechangePositive(self):
+        captures = {
+            '1.JPG': {'site': 'a'}}
+        action = {k: v for k, v in self.dummy_action.items()}
+        action['action_to_take'] = 'timechange'
+        action['datetime_current'] = '2017-10-26 10:38:31'
+        action['datetime_new'] = '2017-10-27 10:38:31'
+        action_list = {
+          0: action}
+        actions = generate_actions(action_list, captures)
+        self.assertEqual(actions[0].shift_time_by_seconds, int(86400))
+
+    def testTimechangeNegative(self):
+        captures = {
+            '1.JPG': {'site': 'a'}}
+        action = {k: v for k, v in self.dummy_action.items()}
+        action['action_to_take'] = 'timechange'
+        action['datetime_current'] = '2000-01-01 00:01:00'
+        action['datetime_new'] = '2000-01-01 00:00:00'
+        action_list = {
+          0: action}
+        actions = generate_actions(action_list, captures)
+        self.assertEqual(actions[0].shift_time_by_seconds, int(-60))
 
     def testRollSelection(self):
-        self.assertEqual(
-                self.actions['APN_S2_A1_R2_IMAG0001.JPG']['action_to_take'],
-                'timechange')
-        self.assertEqual(
-                self.actions['APN_S2_A1_R2_IMAG0012.JPG']['action_to_take'],
-                'delete')
-        self.assertEqual(
-                self.actions['APN_S2_A1_R2_IMAG0001.JPG']['action_to_take_reason'],
-                'one_hour_too_late')
-        self.assertEqual(
-                self.actions['APN_S2_A1_R2_IMAG0012.JPG']['action_to_take_reason'],
-                'test_delete')
+        captures = {
+            '1.JPG': {'site': 'a', 'roll': '1'},
+            '2.JPG': {'site': 'a', 'roll': '2'},
+            '3.JPG': {'site': 'a', 'roll': '1'},
+            '4.JPG': {'site': 'b', 'roll': '1'}}
+        action_list = {
+          0: {
+              'action_roll': '1',
+              'action_site': 'a',
+              'datetime_current': '',
+              'datetime_new': '',
+              'action_from_image': '',
+              'action_to_image': '',
+              'action_to_take': 'delete',
+              'action_to_take_reason': 'lala'}}
+        actions = generate_actions(action_list, captures)
+        expected_in = ['1.JPG', '3.JPG']
+        actual = [a.image for a in actions]
+        self.assertEqual(set(actual), set(expected_in))
+
+    def testSiteSelection(self):
+        captures = {
+            '1.JPG': {'site': 'a', 'roll': '1'},
+            '2.JPG': {'site': 'a', 'roll': '2'},
+            '3.JPG': {'site': 'a', 'roll': '1'},
+            '4.JPG': {'site': 'b', 'roll': '1'}}
+        action_list = {
+          0: {
+              'action_roll': '',
+              'action_site': 'a',
+              'datetime_current': '',
+              'datetime_new': '',
+              'action_from_image': '',
+              'action_to_image': '',
+              'action_to_take': 'delete',
+              'action_to_take_reason': 'lala'}}
+        actions = generate_actions(action_list, captures)
+        expected_in = ['1.JPG', '2.JPG', '3.JPG']
+        actual = [a.image for a in actions]
+        self.assertEqual(set(actual), set(expected_in))
+
+    def testImageRangeSelection(self):
+        captures = OrderedDict([
+            ('1.JPG', {'site': 'a', 'roll': '1'}),
+            ('3.JPG', {'site': 'a', 'roll': '2'}),
+            ('5.JPG', {'site': 'a', 'roll': '1'}),
+            ('4.JPG', {'site': 'b', 'roll': '1'}),
+            ('6.JPG', {'site': 'b', 'roll': '1'})])
+        action_list = {
+          0: {
+              'action_roll': '',
+              'action_site': '',
+              'datetime_current': '',
+              'datetime_new': '',
+              'action_from_image': '3.JPG',
+              'action_to_image': '4.JPG',
+              'action_to_take': 'delete',
+              'action_to_take_reason': 'lala'}}
+        actions = generate_actions(action_list, captures)
+        expected_in = ['3.JPG', '5.JPG', '4.JPG']
+        actual = [a.image for a in actions]
+        self.assertEqual(set(actual), set(expected_in))
+
+    def testImageRangeAndSiteSelectionIsInvalid(self):
+        captures = OrderedDict([
+            ('1.JPG', {'site': 'a', 'roll': '1'}),
+            ('3.JPG', {'site': 'a', 'roll': '2'}),
+            ('4.JPG', {'site': 'b', 'roll': '1'}),
+            ('6.JPG', {'site': 'b', 'roll': '1'})])
+        action_list = {
+          0: {
+              'action_roll': '',
+              'action_site': 'a',
+              'datetime_current': '',
+              'datetime_new': '',
+              'action_from_image': '3.JPG',
+              'action_to_image': '4.JPG',
+              'action_to_take': 'delete',
+              'action_to_take_reason': 'lala'}}
+        with self.assertRaises(ImportError):
+            generate_actions(action_list, captures)
 
     def testActionIsValid(self):
         test_wrong_action_if_datetime = {
          'action_to_take': 'ok',
+         'action_to_take_reason': 'dummy',
+         'action_roll': '',
+         'action_site': 'dummy',
+         'action_from_image': '',
+         'action_to_image': '',
          'datetime_current': '2000-01-01 00:00:00',
          'datetime_new': '2000-01-01 00:00:01'
          }
         with self.assertRaises(AssertionError):
-            check_action_is_valid(test_wrong_action_if_datetime)
+            check_action_is_valid(test_wrong_action_if_datetime, flags)
         test_correct_action_if_datetime = {
          'action_to_take': 'timechange',
+         'action_to_take_reason': 'dummy',
+         'action_roll': '',
+         'action_site': 'dummy',
+         'action_from_image': '',
+         'action_to_image': '',
          'datetime_current': '2000-01-01 00:00:00',
          'datetime_new': '2000-01-01 00:00:01'
          }
-        check_action_is_valid(test_correct_action_if_datetime)
+        check_action_is_valid(test_correct_action_if_datetime, flags)
         test_invalid_action = {
          'action_to_take': 'dummy',
+         'action_to_take_reason': 'dummy',
+         'action_roll': '',
+         'action_site': 'dummy',
+         'action_from_image': '',
+         'action_to_image': '',
          'datetime_current': '',
          'datetime_new': ''
          }
         with self.assertRaises(ImportError):
-            check_action_is_valid(test_invalid_action)
+            check_action_is_valid(test_invalid_action, flags)
 
     def testTimeFormatIsValid(self):
         test_wrong_format = {
             'datetime_current': '2000-01-01 00:00:00 PM',
             'datetime_new': '2000-01-01 00:00:01 AM'}
         with self.assertRaises(ImportError):
-            check_datetime_format(test_wrong_format, '%Y-%m-%d %H:%M:%S')
+            _check_datetime_format(test_wrong_format, '%Y-%m-%d %H:%M:%S')
         test_correct_format = {
             'datetime_current': '2000-01-01 00:00:00',
             'datetime_new': '2000-01-01 00:00:01'}
-        check_datetime_format(test_correct_format, '%Y-%m-%d %H:%M:%S')
+        _check_datetime_format(test_correct_format, '%Y-%m-%d %H:%M:%S')
 
 
 if __name__ == '__main__':

@@ -87,13 +87,7 @@ if __name__ == '__main__':
                     'roll': roll,
                     'image_name_original': image_file_name,
                     'image_path_original': image_path,
-                    'image_path_original_rel': image_path_rel,
-                    'datetime': '',
-                    'date': '',
-                    'time': '',
-                    'datetime_file_creation': '',
-                    **{'image_check__{}'.format(k):
-                        0 for k in flags['image_checks']}}
+                    'image_path_original_rel': image_path_rel}
 
     image_check_stats(image_inventory, logger)
 

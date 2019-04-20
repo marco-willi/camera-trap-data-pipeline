@@ -4,18 +4,19 @@ import argparse
 import logging
 import pandas as pd
 import textwrap
-import traceback
 from datetime import datetime
-from collections import OrderedDict
 
 from utils.logger import setup_logger, create_log_file
 from pre_processing.utils import read_image_inventory
+from pre_processing.actions import Action
 from config.cfg import cfg
 from utils.utils import set_file_permission
 
 
 flags = cfg['pre_processing_flags']
 msg_width = 150
+
+logger = logging.getLogger(__name__)
 
 # args = dict()
 # args['action_list'] = '/home/packerc/shared/season_captures/APN/captures/APN_S2_TEST_canBeDeleted_action_list_TEST1.csv'
@@ -24,17 +25,22 @@ msg_width = 150
 # args['log_dir'] = '/home/packerc/shared/season_captures/APN/log_files/'
 
 
-def check_site_specified_if_roll_action(action):
+###############################
+# Define Validity Checks
+###############################
+
+def _check_site_specified_if_roll_action(action):
     """ Check that site is specified if roll is """
     if action['action_roll'] != '':
         if action['action_site'] == '':
             msg = textwrap.shorten(
                     "if action_roll is specified so must action_site",
                     width=msg_width)
+            logger.error(msg)
             raise ImportError(msg)
 
 
-def check_action_has_action_item(action):
+def _check_action_has_action_item(action):
     """ Check that action has an item to act on """
     if action['action_site'] == '':
         if action['action_roll'] == '':
@@ -43,10 +49,11 @@ def check_action_has_action_item(action):
                         "any of action_site, action_roll, \
                          action_from_image must be specified",
                         width=msg_width)
+                logger.error(msg)
                 raise ImportError(msg)
 
 
-def check_site_roll_not_specified_if_image(action):
+def _check_site_roll_not_specified_if_image(action):
     """ Check that site and roll not specified if image is specified """
     if action['action_from_image'] != '':
         if any([x != '' for x in [action['action_roll'], action['action_site']]]):
@@ -54,10 +61,11 @@ def check_site_roll_not_specified_if_image(action):
                     "if action_from_image specified, action_roll \
                      and action_site must be empty",
                     width=msg_width)
+            logger.error(msg)
             raise ImportError(msg)
 
 
-def check_image_to_if_image_from(action):
+def _check_image_to_if_image_from(action):
     """ Check if image_to is specified if image_from is """
     if action['action_from_image'] != '':
         if action['action_to_image'] == '':
@@ -65,10 +73,11 @@ def check_image_to_if_image_from(action):
                     "action_from_image is specified, therefore \
                     action_to_image must not be empty",
                     width=msg_width)
+            logger.error(msg)
             raise ImportError(msg)
 
 
-def check_image_from_if_image_to(action):
+def _check_image_from_if_image_to(action):
     """ Check that image_from is specified if image_to is """
     if action['action_to_image'] != '':
         if action['action_from_image'] == '':
@@ -76,10 +85,11 @@ def check_image_from_if_image_to(action):
                     "action_to_image is specified, therefore \
                      action_from_image must not be empty",
                     width=msg_width)
+            logger.error(msg)
             raise ImportError(msg)
 
 
-def check_datetime_format(action, date_format):
+def _check_datetime_format(action, date_format):
     print_date = datetime.strptime('2000-01-01', '%Y-%m-%d')
     print_date_format = print_date.strftime(date_format)
     if action['datetime_current'] != '':
@@ -91,6 +101,7 @@ def check_datetime_format(action, date_format):
                      must be {}, is {}".format(
                      print_date_format, action['datetime_current']),
                     width=msg_width)
+            logger.error(msg)
             raise ImportError(msg)
     if action['datetime_new'] != '':
         try:
@@ -101,16 +112,23 @@ def check_datetime_format(action, date_format):
                      must be {}, is {}".format(
                      print_date_format, action['datetime_new']),
                     width=msg_width)
+            logger.error(msg)
             raise ImportError(msg)
 
 
-def check_action_is_valid(action):
+def _check_action_is_allowed(action):
+    """ Check if action is allowed """
     if action['action_to_take'] not in flags['allowed_actions_to_take']:
         msg = textwrap.shorten(
                 "action {} not a valid action, valid actions are {}".format(
                  action['action_to_take'], flags['allowed_actions_to_take']),
                 width=msg_width)
+        logger.error(msg)
         raise ImportError(msg)
+
+
+def _check_timechange_action_is_correct(action):
+    """ Check if timechange action is correctly specified """
     if action['action_to_take'] == 'timechange':
         assert ((action['datetime_current'] != '') and
                 (action['datetime_new'] != '')), \
@@ -118,6 +136,10 @@ def check_action_is_valid(action):
                 "if action_to_take is 'timechange' \
                 datetime_current \
                 and datetime_new must be specified", width=msg_width)
+
+
+def _check_datetime_fields(action):
+    """ Check datetime_current / datetime_new """
     if any([x != '' for x in [action['datetime_current'],
                               action['datetime_new']]]):
         assert action['action_to_take'] == 'timechange', \
@@ -127,12 +149,35 @@ def check_action_is_valid(action):
                 width=msg_width).format(action['action_to_take'])
 
 
-def check_action_reason_given(action):
+def _check_action_reason_is_valid(action):
     if action['action_to_take_reason'] == '':
         msg = textwrap.shorten(
                 "action_to_take_reason must be specified",
                 width=msg_width)
+        logger.error(msg)
         raise ImportError(msg)
+    elif '#' in action['action_to_take_reason']:
+        msg = textwrap.shorten(
+                " '#' in action_to_take_reason not allowed",
+                width=msg_width)
+        logger.error(msg)
+        raise ImportError(msg)
+
+
+def check_action_is_valid(action, flags):
+    """ Check action format """
+    _check_action_is_allowed(action)
+    _check_timechange_action_is_correct(action)
+    _check_datetime_fields(action)
+    _check_action_reason_is_valid(action)
+    _check_datetime_format(
+        action,
+        flags['time_formats']['output_datetime_format'])
+    _check_site_specified_if_roll_action(action)
+    _check_action_has_action_item(action)
+    _check_site_roll_not_specified_if_image(action)
+    _check_image_from_if_image_to(action)
+    _check_image_to_if_image_from(action)
 
 
 def get_action_scope(action):
@@ -170,21 +215,20 @@ def calculate_time_difference_seconds(from_time, to_time, format):
 
 def generate_actions_for_images(action, image_list):
     """ Generate Actions for a list of images """
-    actions = OrderedDict()
+    actions_list = list()
     for image in image_list:
-        current_action = {
-            'image_name': image,
-            'action_to_take_reason': action['action_to_take_reason'],
-            'action_to_take': action['action_to_take'],
-            'action_shift_time_by_seconds': 0
-            }
+        time_diff = 0
         if action['action_to_take'] == 'timechange':
             time_diff = calculate_time_difference_seconds(
                 action['datetime_current'], action['datetime_new'],
                 flags['time_formats']['output_datetime_format'])
-            current_action['action_shift_time_by_seconds'] = time_diff
-        actions[image] = current_action
-    return actions
+        current_action = Action(
+            image,
+            action['action_to_take'],
+            action['action_to_take_reason'],
+            time_diff)
+        actions_list.append(current_action)
+    return actions_list
 
 
 def find_all_images_for_start_end_image(
@@ -226,26 +270,18 @@ def find_images_for_site(site, inventory):
     return images_list
 
 
-def generate_actions(action_list, captures, logger):
+def generate_actions(action_list, captures):
     """ Generate individual actions from action list """
-    actions_inventory = OrderedDict()
+    actions_inventory = list()
+    image_to_action = set()
     for _id, action in action_list.items():
         # check action file
         try:
-            check_site_specified_if_roll_action(action)
-            check_action_has_action_item(action)
-            check_site_roll_not_specified_if_image(action)
-            check_image_to_if_image_from(action)
-            check_image_from_if_image_to(action)
-            check_action_is_valid(action)
-            check_action_reason_given(action)
-            check_datetime_format(
-                action,
-                flags['time_formats']['output_datetime_format'])
-        except Exception:
-            print(traceback.format_exc())
-            logger.error("error in row {}".format(_id+1))
-            raise ValueError("error in row {}".format(_id+1))
+            check_action_is_valid(action, flags)
+        except Exception as e:
+            logger.error("error in row {} of action list".format(
+                _id+1))
+            raise
         # determine the scope of the current action
         action_scope = get_action_scope(action)
         # get all images to perform actions on and
@@ -273,38 +309,24 @@ def generate_actions(action_list, captures, logger):
             raise ValueError(
                 "action_scope {} not recognized".format(action_scope))
         # generate actions for all images
-        actions_dict = generate_actions_for_images(action, images)
-        for img, img_action in actions_dict.items():
-            # handle case where multiple actions have been selected for the
-            # same image, prioritize delete > timechange > others
-            if img in actions_inventory:
-                existing_action = actions_inventory[img]['action_to_take']
+        actions_list = generate_actions_for_images(action, images)
+        for img_action in actions_list:
+            action_key = '{}#{}'.format(img_action.image, img_action.action)
+            if action_key in image_to_action:
+                if img_action.action == 'timechange':
+                    logger.error(
+                        "Multiple timechanges for image {} - " +
+                        "this can lead to unintended consequences".format(
+                         img_action.image))
+                    raise ValueError(
+                        "Multiple timechanges defined for image {}".format(
+                            img_action.image))
                 logger.warning(
-                    textwrap.shorten(
-                        "image {} has more than one action, \
-                         found action {}, additional action {} \
-                         prioritizing deletion > timechange > \
-                         others".format(
-                         img,
-                         existing_action,
-                         img_action['action_to_take']
-                        ), width=msg_width))
-                # if new action is delete accept and update
-                if img_action['action_to_take'] == 'delete':
-                    actions_inventory[img].update(img_action)
-                # if action is invalidate accept if no deletion exists
-                elif img_action['action_to_take'] == 'invalidate':
-                    if existing_action not in ('delete'):
-                        actions_inventory[img].update(img_action)
-                # if action is invalidate accept if no deletion or
-                # invalidation exists
-                elif img_action['action_to_take'] == 'timechange':
-                    if existing_action not in ('delete', 'invalidate'):
-                        actions_inventory[img].update(img_action)
-                else:
-                    actions_inventory[img].update(img_action)
-            else:
-                actions_inventory[img] = img_action
+                    "image {} has identical action type {} twice".format(
+                         img_action.image,
+                         img_action.action))
+            actions_inventory.append(img_action)
+            image_to_action.add(action_key)
     return actions_inventory
 
 
@@ -345,9 +367,9 @@ if __name__ == '__main__':
     action_list = read_image_inventory(
         args['action_list'], unique_id=None)
 
-    actions_inventory = generate_actions(action_list, captures, logger)
+    actions_inventory = generate_actions(action_list, captures)
 
     # Export actions list
-    df = pd.DataFrame.from_dict(actions_inventory, orient='index')
+    df = pd.DataFrame.from_records(actions_inventory, columns=Action._fields)
     df.to_csv(args['actions_to_perform_csv'], index=False)
     set_file_permission(args['actions_to_perform_csv'])

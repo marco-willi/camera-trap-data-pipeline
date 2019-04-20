@@ -6,11 +6,16 @@ import argparse
 from collections import OrderedDict
 import logging
 
+from config.cfg import cfg
 from utils.logger import setup_logger, create_log_file
 from utils.utils import (
     export_dict_to_json_with_newlines,
     read_cleaned_season_file_df, file_path_generator, set_file_permission)
 
+logger = logging.getLogger(__name__)
+
+flags = cfg['zooniverse_flags']
+flags_preprocessing = cfg['pre_processing_flags']
 
 # For Testing
 # args = dict()
@@ -29,6 +34,30 @@ from utils.utils import (
 # args['csv_quotechar'] = '"'
 # args['attribution'] = 'University of Minnesota Lion Center + Snapshot Safari + Singita Grumeti + Tanzania'
 # args['license'] =  'Snapshot Safari + Singita Grumeti'
+
+
+def _include_in_manifest(row):
+    """ Whether to include the record in the manifest """
+    if 'invalid' in row:
+        if row.invalid in flags['legacy_invalid_codes']:
+            logger.debug("image {} excluded due to 'invalid'".format(row.path))
+            return False
+    if 'image_is_invalid' in row:
+        if row.image_is_invalid == '1':
+            logger.debug(
+                "image {} excluded due to 'image_is_invalid'".format(row.path))
+            return False
+    if 'image_was_deleted' in row:
+        if row.image_was_deleted == '1':
+            logger.debug(
+                "image {} excluded due to 'image_was_deleted'".format(row.path))
+            return False
+    if 'image_no_upload' in row:
+        if row.image_no_upload == '1':
+            logger.debug(
+                "image {} excluded due to 'image_no_upload'".format(row.path))
+            return False
+    return True
 
 
 if __name__ == "__main__":
@@ -113,25 +142,19 @@ if __name__ == "__main__":
     manifest = OrderedDict()
     omitted_images_counter = 0
     images_not_found_counter = 0
-    invalid_codes = ('1', '2')
     n_records_total = cleaned_captures.shape[0]
     for row_no, row in cleaned_captures.iterrows():
+        # check if record is eligible for inclusion
+        if not _include_in_manifest(row):
+            omitted_images_counter += 1
+            continue
         # Extract important fields
         season = row.season
         site = row.site
         roll = row.roll
         capture = row.capture
         image_path = row.path
-        invalid = row.invalid
-        # unique capture id
-        try:
-            capture_id = row.capture_id
-        except:
-            capture_id = '#'.join([season, site, roll, capture])
-        # Skip image if code indicates invalid code
-        if invalid in invalid_codes:
-            omitted_images_counter += 1
-            continue
+        capture_id = row.capture_id
         # Skip if image is not on disk
         image_path_full = os.path.join(args['images_root_path'], image_path)
         if not os.path.isfile(image_path_full):
@@ -165,7 +188,7 @@ if __name__ == "__main__":
             logger.info("Processed {}/{} records".format(
                 row_no, n_records_total))
 
-    logger.info("Omitted %s images due to invalid code in 'invalid' column" %
+    logger.info("Omitted %s images due to invalid/no_upload flags" %
                 omitted_images_counter)
     logger.info("Number of images not found in images folder %s" %
                 images_not_found_counter)

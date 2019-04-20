@@ -250,7 +250,7 @@ def read_cleaned_season_file_df(path):
     df = pd.read_csv(path, dtype='str', index_col=None)
     df.fillna('', inplace=True)
     required_header_cols = ('capture_id', 'season', 'site', 'roll', 'capture',
-                            'path', 'invalid')
+                            'path')
     if 'path' not in df.columns:
         if 'image_path_rel' in df.columns:
             df['path'] = df[['image_path_rel', 'season']].apply(
@@ -264,26 +264,6 @@ def read_cleaned_season_file_df(path):
         if col not in df.columns:
             print("Column {} not found in cleaned_season_file".format(col))
     return df
-
-
-def read_cleaned_season_file(path, quotechar='"'):
-    """ Check the input file """
-    cleaned_captures = list()
-    required_header_cols = ('season', 'site', 'roll', 'capture',
-                            'path', 'invalid')
-    with open(path, newline='') as csvfile:
-        csv_reader = csv.reader(csvfile, delimiter=',', quotechar=quotechar)
-        header = next(csv_reader)
-        name_to_id_mapper = {x: i for i, x in enumerate(header)}
-        # check header
-        if not all([x in header for x in required_header_cols]):
-            print("Missing columns -- found %s, require %s" %
-                  (header, required_header_cols))
-
-        for _id, row in enumerate(csv_reader):
-            cleaned_captures.append(row)
-
-    return cleaned_captures, name_to_id_mapper
 
 
 def print_nested_dict(key, dic):

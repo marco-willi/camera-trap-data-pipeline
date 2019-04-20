@@ -73,6 +73,12 @@ if __name__ == '__main__':
         args['inventory'],
         unique_id='image_path_original')
 
+    # add check flags
+    for image, image_data in image_inventory.items():
+        image_data.update(
+            {'image_check__{}'.format(k): 0
+             for k in flags['image_checks']})
+
     ######################################
     # Process Inventory Images
     ######################################
@@ -102,6 +108,7 @@ if __name__ == '__main__':
                 logger.error(
                     "Failed to read file creation date for {}".format(
                      image_path), exc_info=True)
+                current_data['datetime_file_creation'] = ''
             # check for uniformly colored images
             black_percent = \
                 flags['image_check_parameters']['all_black']['percent']

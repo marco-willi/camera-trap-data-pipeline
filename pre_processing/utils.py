@@ -180,7 +180,7 @@ def update_time_checks(image_data, flags):
     # perform time checks
     time_checks = {
         'image_check__{}'.format(x): 0
-        for x in flags['image_checks_time']}
+        for x in flags['image_checks_propose_time']}
     # check for timelapse
     if 'image_check__time_lapse' in time_checks:
         max_days = \

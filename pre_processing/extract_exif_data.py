@@ -30,6 +30,16 @@ from utils.utils import (
 flags = cfg['pre_processing_flags']
 
 
+def _create_datetime(image_data):
+    """ Create best possible datetime """
+    if 'datetime_exif' in image_data:
+        return image_data['datetime_exif']
+    elif 'datetime_file_creation' in image_data:
+        return image_data['datetime_file_creation']
+    else:
+        return ''
+
+
 def _extract_meta_data(tags, groups=['EXIF', 'MakerNotes', 'Composite']):
     """ Specify which group of image meta-data to extract """
     return {k: v for k, v in tags.items()
@@ -185,43 +195,55 @@ if __name__ == '__main__':
     # copy the shared dictionary
     exif_all = {k: v for k, v in results.items()}
 
+    # Extract relevant EXIF tags
+    exif_extracted = dict()
+    for img_name, exif_data in exif_all.items():
+        current_extracted = {}
+        if exif_data is None:
+            current_extracted = None
+            logger.info(
+                "could not read exif data for image: {}".format(
+                    img_name))
+        elif len(exif_data.keys()) == 0:
+            logger.info(
+                "exif data for image: {} empty".format(
+                    img_name))
+        else:
+            selected_exif = _extract_meta_data(
+                exif_data,
+                flags['exif_tag_groups_to_extract'])
+            excluded_exif = _exclude_specific_tags(
+                selected_exif, flags['exif_tags_to_exclude'])
+            prefixed_exif = _prefix_meta_data(excluded_exif)
+            try:
+                time_info = _extract_time_info_from_exif(
+                    selected_exif, flags)
+                time_info['datetime_exif'] = time_info['datetime']
+                current_extracted.update(time_info)
+            except:
+                logger.warning(
+                    "Failed to extract datetime info from {}".format(
+                        img_name
+                    ))
+            current_extracted.update(prefixed_exif)
+        exif_extracted[img_name] = current_extracted
+
     # Update Image Inventory
     if args['update_inventory']:
         # Update Image Inventory with EXIF data
         for img_name in image_paths_all:
             current_data = copy.deepcopy(image_inventory[img_name])
-            try:
-                exif_data = exif_all[img_name]
-                if exif_data is None:
-                    current_data.update({'image_check__corrupt_exif': 1})
-                    logger.info(
-                        "could not read exif data for image: {}".format(
-                            img_name))
-                elif len(exif_data.keys()) == 0:
-                    logger.info(
-                        "exif data for image: {} empty".format(
-                            img_name))
-                    current_data.update({'image_check__empty_exif': 1})
-                else:
-                    selected_exif = _extract_meta_data(
-                        exif_data,
-                        flags['exif_tag_groups_to_extract'])
-                    excluded_exif = _exclude_specific_tags(
-                        selected_exif, flags['exif_tags_to_exclude'])
-                    prefixed_exif = _prefix_meta_data(excluded_exif)
-                    try:
-                        time_info = _extract_time_info_from_exif(
-                            selected_exif, flags)
-                        time_info['datetime_exif'] = time_info['datetime']
-                        current_data.update(time_info)
-                    except:
-                        logger.warning(
-                            "Failed to extract datetime info from {}".format(
-                                img_name
-                            ))
-                    current_data.update(prefixed_exif)
-            except:
+            if img_name not in exif_data:
                 current_data.update({'image_check__corrupt_exif': 1})
+            elif exif_data is None:
+                current_data.update({'image_check__corrupt_exif': 1})
+            elif len(exif_data.keys()) == 0:
+                current_data.update({'image_check__empty_exif': 1})
+            else:
+                current_data.update(exif_data)
+            # update datetime - EXIF datetime or File Creation
+            best_datetime = _create_datetime(current_data)
+            current_data.update({'datetime': best_datetime})
             image_inventory[img_name] = current_data
 
         export_inventory_to_csv(image_inventory, args['inventory'])

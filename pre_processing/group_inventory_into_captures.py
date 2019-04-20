@@ -78,11 +78,7 @@ def calculate_time_deltas(inventory, flags):
         paths = list()
         # iterate over each image in a roll
         for image_id, image_data in site_roll_data.items():
-            # if exif time not available take file creation time
-            if image_data['datetime'] == '':
-                img_time = image_data['datetime_file_creation']
-            else:
-                img_time = image_data['datetime']
+            img_time = image_data['datetime']
             times.append(img_time)
             paths.append(image_id)
         # Define the order of the images by 1) time and 2) by name

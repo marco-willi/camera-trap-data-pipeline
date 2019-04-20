@@ -3,7 +3,7 @@
 ###################################################
 
 global_processing_flags:
-    # how to flag /handle extracted question data from Zooniverse -- default
+    # how to flag / handle extracted question data from Zooniverse -- default
     # is to convert to: 'question__<question_on_zooniverse>'
     QUESTION_DELIMITER: __
     QUESTION_PREFIX: question
@@ -15,6 +15,15 @@ global_processing_flags:
 ###################################################
 
 pre_processing_flags:
+    # Input / Output Timeformats
+    time_formats:
+      exif_input_datetime_format: '%Y:%m:%d %H:%M:%S'
+      output_date_format: '%Y-%m-%d'
+      output_datetime_format: '%Y-%m-%d %H:%M:%S'
+      output_time_format: '%H:%M:%S'
+    #############################
+    # EXIF Data Extraction
+    #############################
     # Order of EXIF timestamp data to consider for the 'datetime'
     # attribute of the image (first non-empty)
     exif_data_timestamps:
@@ -29,6 +38,19 @@ pre_processing_flags:
     exif_tags_to_exclude:
      - EXIF:ThumbnailImage
      - MakerNotes:PreviewImage
+    #############################
+    # Checks
+    #############################
+    image_checks:
+     - all_black
+     - all_white
+     - corrupt_file
+     - corrupt_exif
+     - empty_exif
+     - time_lapse
+     - time_too_new
+     - time_too_old
+     - captures_with_too_many_images
     image_check_parameters:
      # Percentage 'percent' of all pixels of an image
      # that need to be above / blow 'thresh' to fail the check
@@ -52,51 +74,60 @@ pre_processing_flags:
        max_year: 9999
      time_too_old:
        min_year: 1970
-    image_checks:
-     - all_black
-     - all_white
-     - corrupt_file
-     - corrupt_exif
-     - empty_exif
-     - time_lapse
-     - time_too_new
-     - time_too_old
-     - captures_with_too_many_images
-    image_checks_invalidate:
+    # Group the different checks to define propose automatic checks
+    image_checks_propose_invalidate:
      - all_black
      - all_white
      - corrupt_exif
      - empty_exif
-    image_checks_delete:
+    image_checks_propose_delete:
      - corrupt_file
-    image_checks_time:
+    image_checks_propose_time:
      - time_lapse
      - time_too_new
      - time_too_old
      - captures_with_too_many_images
-    time_formats:
-      exif_input_datetime_format: '%Y:%m:%d %H:%M:%S'
-      output_date_format: '%Y-%m-%d'
-      output_datetime_format: '%Y-%m-%d %H:%M:%S'
-      output_time_format: '%H:%M:%S'
+    #############################
+    # Actions
+    #############################
     # only these actions are valid
     allowed_actions_to_take:
       - delete
       - invalidate
       - timechange
+      - mark_no_upload
+      - mark_datetime_uncertain
       - ok
-    # after applying actions these status are assigend
-    action_to_status_map:
-      delete: deleted
-      invalidate: invalid
-      timechange: ok
-      ok: ok
-      '': ok
-    # images with the following actions are removed from the final/cleaned
-    # file
-    actions_to_remove_from_cleaned:
-      - delete
-      - invalidate
+    # flags to create -- can be set by actions
+    image_flags_to_create:
+      - image_was_deleted
+      - image_is_invalid
+      - image_no_upload
+      - image_uncertain_datetime
+    # create a flag for the following actions
+    map_actions_to_flags:
+      delete:
+        - image_was_deleted
+      invalidate:
+        - image_is_invalid
+        - image_no_upload
+      mark_no_upload:
+        - image_no_upload
+      mark_datetime_uncertain:
+        - image_uncertain_datetime
+    # remove images from final cleaned file with the following flags
+    flags_to_remove_from_cleaned:
+      - image_was_deleted
+
+###################################################
+# Zooniverse Uploads
+###################################################
+
+zooniverse_flags:
+  legacy_invalid_codes:
+    - '1'
+    - '2'
+
 
 ###################################################
 # Flags to define the bheavior of the
@@ -280,6 +311,10 @@ add_subject_info_flags_legacy:
 ###################################################
 
 report_flags:
+  images_to_remove_from_report:
+    - image_was_deleted
+    - image_is_invalid
+    - image_uncertain_datetime
   identify_humans_for_exclusion:
     - human
   # group report columns to select them when creating reports
