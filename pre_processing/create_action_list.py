@@ -13,7 +13,7 @@ from pre_processing.utils import (
     plot_site_roll_timelines, read_image_inventory,
     image_check_stats,
     export_inventory_to_csv)
-from utils.logger import create_log_file, setup_logger
+from utils.logger import set_logging
 from config.cfg import cfg
 
 
@@ -83,11 +83,7 @@ if __name__ == '__main__':
                 args['captures']))
 
     # logging
-    if args['log_dir'] is not None:
-        log_file_path = create_log_file(args['log_dir'], args['log_filename'])
-        setup_logger(log_file_path)
-    else:
-        setup_logger()
+    set_logging(args['log_dir'], args['log_filename'])
     logger = logging.getLogger(__name__)
 
     # read grouped data

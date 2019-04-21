@@ -86,7 +86,8 @@ def _create_flag(image_data, action, flags):
     get_flag_cols_list = flags['map_actions_to_flags'][action.action]
     for flag_col in get_flag_cols_list:
         image_data[flag_col] = '1'
-        logging.info("Reason: {:20} Action: set flag: {} to '1'".format(
+        logging.info("Image: {:20} - Reason: {:15} - Action set: {} to '1'".format(
+            action.image,
             action.reason,
             flag_col
         ))
