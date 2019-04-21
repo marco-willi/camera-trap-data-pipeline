@@ -252,4 +252,17 @@ if __name__ == '__main__':
 
     image_check_stats(inventory)
 
-    export_inventory_to_csv(inventory, args['output_csv'])
+    first_cols_to_export = [
+        'capture_id', 'season', 'site', 'roll', 'capture',
+        'image_rank_in_capture', 'image_rank_in_roll',
+        'image_name', 'image_path_rel', 'image_path',
+        'datetime', 'seconds_to_next_image_taken',
+        'seconds_to_last_image_taken', 'days_to_last_image_taken',
+        'days_to_next_image_taken',
+        'image_name_original', 'image_path_original',
+        'image_path_original_rel']
+
+    export_inventory_to_csv(
+            inventory,
+            args['output_csv'],
+            first_cols=first_cols_to_export)
