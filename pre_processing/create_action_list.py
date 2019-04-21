@@ -140,7 +140,7 @@ if __name__ == '__main__':
         # generate check-string
         all_checks_list = generate_check_string(
             image_data, check_columns, check_columns)
-        all_check_string = '#'.join(all_checks_list)
+        all_check_string = '|'.join(all_checks_list)
         if has_deletion:
             automatic_status['action_to_take'] = 'delete'
         elif has_invalidation:
