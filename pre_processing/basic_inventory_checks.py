@@ -174,6 +174,6 @@ if __name__ == '__main__':
     for image_path, image_data in image_inventory.items():
         image_inventory[image_path] = results[image_path]
 
-    image_check_stats(image_inventory, logger)
+    image_check_stats(image_inventory)
 
     export_inventory_to_csv(image_inventory, args['output_csv'])

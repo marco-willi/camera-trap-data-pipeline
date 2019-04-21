@@ -13,19 +13,12 @@ import exiftool
 import pandas as pd
 
 from config.cfg import cfg
-from utils.logger import setup_logger, create_log_file
+from utils.logger import set_logging
 from pre_processing.utils import (
     export_inventory_to_csv, read_image_inventory, image_check_stats)
 from utils.utils import (
     slice_generator, estimate_remaining_time, set_file_permission)
 
-
-# args = dict()
-# args['inventory'] = '/home/packerc/will5448/data/pre_processing_tests/ENO_S1_inventory.csv'
-# args['update_inventory'] = True
-# args['output_csv'] = '/home/packerc/will5448/data/pre_processing_tests/ENO_S1_captures_TEST_EXIF.csv'
-# args['exiftool_path'] = '/home/packerc/will5448/software/Image-ExifTool-11.31/exiftool'
-# args['n_processes'] = 4
 
 flags = cfg['pre_processing_flags']
 
@@ -123,11 +116,8 @@ if __name__ == '__main__':
     msg_width = 99
 
     # logging
-    if args['log_dir'] is not None:
-        log_file_path = create_log_file(args['log_dir'], args['log_filename'])
-        setup_logger(log_file_path)
-    else:
-        setup_logger()
+    set_logging(args['log_dir'], args['log_filename'])
+
     logger = logging.getLogger(__name__)
 
     for k, v in args.items():
@@ -255,7 +245,7 @@ if __name__ == '__main__':
 
         export_inventory_to_csv(image_inventory, args['inventory'])
         logger.info("Updated inventory at {} stats:".format(args['inventory']))
-        image_check_stats(image_inventory, logger)
+        image_check_stats(image_inventory)
 
     # Export EXIF Data separately
     if args['output_csv'] is not None:

@@ -77,6 +77,6 @@ if __name__ == '__main__':
                     'image_path_original': image_path,
                     'image_path_original_rel': image_path_rel}
 
-    image_check_stats(image_inventory, logger)
+    image_check_stats(image_inventory)
 
     export_inventory_to_csv(image_inventory, args['output_csv'])

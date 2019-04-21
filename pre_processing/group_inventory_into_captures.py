@@ -9,7 +9,7 @@ from pre_processing.utils import (
     image_check_stats, read_image_inventory,
     export_inventory_to_csv, update_time_checks)
 from config.cfg import cfg
-from utils.logger import create_log_file, setup_logger
+from utils.logger import set_logging
 
 
 flags = cfg['pre_processing_flags']
@@ -223,11 +223,8 @@ if __name__ == '__main__':
     msg_width = 99
 
     # logging
-    if args['log_dir'] is not None:
-        log_file_path = create_log_file(args['log_dir'], args['log_filename'])
-        setup_logger(log_file_path)
-    else:
-        setup_logger()
+    set_logging(args['log_dir'], args['log_filename'])
+
     logger = logging.getLogger(__name__)
 
     # update time checks
@@ -245,7 +242,6 @@ if __name__ == '__main__':
 
     # group images into captures
     image_to_capture = group_images_into_captures(inventory, flags)
-
     update_inventory_with_capture_data(inventory, image_to_capture)
 
     update_inventory_with_capture_id(inventory)
@@ -254,6 +250,6 @@ if __name__ == '__main__':
 
     update_time_checks_inventory(inventory, flags)
 
-    image_check_stats(inventory, logger)
+    image_check_stats(inventory)
 
     export_inventory_to_csv(inventory, args['output_csv'])

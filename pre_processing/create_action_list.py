@@ -163,7 +163,7 @@ if __name__ == '__main__':
 
     # Export cases with issues
     logger.info("Images with potential issues")
-    image_check_stats(inventory_with_issues, logger)
+    image_check_stats(inventory_with_issues)
 
     first_cols = ['season', 'site', 'roll', 'image_rank_in_roll',
                   'capture', 'image_rank_in_capture',

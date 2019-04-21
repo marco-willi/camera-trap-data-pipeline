@@ -96,7 +96,7 @@ if __name__ == '__main__':
 
     update_time_checks_inventory(captures_updated, flags)
 
-    image_check_stats(captures_updated, logger)
+    image_check_stats(captures_updated)
 
     # first columns in exported file
     first_cols_to_export = [
