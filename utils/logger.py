@@ -39,3 +39,12 @@ def create_log_file(log_dir, log_file_name):
     log_file_name = create_logfile_name(log_file_name)
     log_file_path = os.path.join(log_dir, log_file_name)
     return log_file_path
+
+
+def set_logging(log_dir=None, log_filename=None):
+    """ Small wrapper to setup logging """
+    if log_dir is not None:
+        log_file_path = create_log_file(log_dir, log_filename)
+        setup_logger(log_file_path)
+    else:
+        setup_logger()

@@ -1,4 +1,5 @@
 import os
+import logging
 import platform
 from datetime import datetime
 import numpy as np
@@ -8,6 +9,8 @@ import csv
 
 from collections import defaultdict, Counter, OrderedDict
 from utils.utils import set_file_permission
+
+logger = logging.getLogger(__name__)
 
 plt.switch_backend('agg')
 
@@ -31,7 +34,7 @@ def datetime_file_creation(path_to_file):
             return stat.st_mtime
 
 
-def image_check_stats(image_inventory, logger):
+def image_check_stats(image_inventory):
     """ Create and print image stats """
     image_check_stats = defaultdict(Counter)
     season_site_roll_stats = Counter()
@@ -83,6 +86,11 @@ def p_pixels_below_threshold(pixel_data, pixel_threshold):
     n_pixels_below_threshold = np.sum(pixels_2D == 3)
     p_pixels_below_threshold = n_pixels_below_threshold / n_pixels_total
     return p_pixels_below_threshold
+
+
+def get_rollnum_from_roll_directory(roll_dir_name):
+    """ Extract roll number from roll directory """
+    return roll_dir_name.split('_')[1].split('R')[1]
 
 
 def plot_site_roll_timelines(

@@ -9,11 +9,12 @@ import traceback
 from multiprocessing import Process, Manager
 from PIL import Image
 
-from utils.logger import setup_logger, create_log_file
+from utils.logger import set_logging
 from pre_processing.utils import (
     datetime_file_creation, image_check_stats, p_pixels_above_threshold,
     p_pixels_below_threshold, export_inventory_to_csv, read_image_inventory)
-from utils.utils import slice_generator, estimate_remaining_time
+from utils.utils import (
+    slice_generator, estimate_remaining_time)
 from config.cfg import cfg
 
 
@@ -25,6 +26,27 @@ flags = cfg['pre_processing_flags']
 # #args['output_csv'] = '/home/packerc/will5448/image_inventory_overview.csv'
 # args['season_id'] = ''
 # args['n_processes'] = 16
+
+
+def _image_is_black(pixel_data, flags):
+    black_percent = \
+        flags['image_check_parameters']['all_black']['percent']
+    black_thresh = \
+        flags['image_check_parameters']['all_black']['thresh']
+    p_pixels_black = p_pixels_below_threshold(
+        pixel_data, black_thresh)
+    return (p_pixels_black > black_percent)
+
+
+def _image_is_white(pixel_data, flags):
+    white_percent = \
+        flags['image_check_parameters']['all_white']['percent']
+    white_thresh = \
+        flags['image_check_parameters']['all_white']['thresh']
+    p_pixels_white = p_pixels_above_threshold(
+        pixel_data, white_thresh)
+    return (p_pixels_white > white_percent)
+
 
 if __name__ == '__main__':
 
@@ -55,11 +77,8 @@ if __name__ == '__main__':
     msg_width = 99
 
     # logging
-    if args['log_dir'] is not None:
-        log_file_path = create_log_file(args['log_dir'], args['log_filename'])
-        setup_logger(log_file_path)
-    else:
-        setup_logger()
+    set_logging(args['log_dir'], args['log_filename'])
+
     logger = logging.getLogger(__name__)
 
     for k, v in args.items():
@@ -110,31 +129,16 @@ if __name__ == '__main__':
                      image_path), exc_info=True)
                 current_data['datetime_file_creation'] = ''
             # check for uniformly colored images
-            black_percent = \
-                flags['image_check_parameters']['all_black']['percent']
-            white_percent = \
-                flags['image_check_parameters']['all_white']['percent']
-            black_thresh = \
-                flags['image_check_parameters']['all_black']['thresh']
-            white_thresh = \
-                flags['image_check_parameters']['all_white']['thresh']
             try:
                 pixel_data = np.asarray(img)
-                p_pixels_white = p_pixels_above_threshold(
-                    pixel_data, white_thresh)
-                p_pixels_black = p_pixels_below_threshold(
-                    pixel_data, black_thresh)
-                is_black = (p_pixels_black > black_percent)
-                is_white = (p_pixels_white > white_percent)
-                if is_black:
+                if _image_is_black(pixel_data, flags):
                     current_data['image_check__all_black'] = 1
-                if is_white:
+                if _image_is_white(pixel_data, flags):
                     current_data['image_check__all_white'] = 1
             except:
                 logger.debug(
                     "Failed to check all_white/all_black for {}".format(
                      image_path))
-                pass
             results[image_path] = current_data
             if (img_no % 100) == 0:
                 est_t = estimate_remaining_time(
@@ -166,6 +170,7 @@ if __name__ == '__main__':
     except Exception:
         print(traceback.format_exc())
 
+    # update data
     for image_path, image_data in image_inventory.items():
         image_inventory[image_path] = results[image_path]
 

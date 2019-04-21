@@ -1,7 +1,6 @@
 """ Util Functions """
 import sys
 import os
-import csv
 import time
 import datetime
 import json
@@ -19,6 +18,13 @@ logger = logging.getLogger(__name__)
 class OrderedCounter(Counter, OrderedDict):
     """ Counter that keeps insert order """
     pass
+
+
+def check_dir_existence(dir):
+    if not os.path.isdir(dir):
+        raise FileNotFoundError(
+            "path {} does not exist -- must be a directory".format(
+                dir))
 
 
 def print_progress(count, total):

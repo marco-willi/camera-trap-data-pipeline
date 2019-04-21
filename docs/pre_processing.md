@@ -269,7 +269,7 @@ ok | do nothing
 mark_no_upload | flag/mark images as not to upload (example: images with sensitive species not intended for publication)
 mark_datetime_uncertain | flag/mark images if datetime is uncertain (example: images with only vague datetime info)
 
-4. To add new actions simply create a new row in the csv.
+4. To add new actions simply create a new row in the csv. Multiple actions can be specified for a single image if necessary (with the excpetion of timechanges).
 
 WARNING: be careful in using the correct datetime format for the columns 'datetime_current' and 'datetime_new' (YYYY-MM-DD HH:MM:SS) when specifying timechanges. Opening the file in Excel may change this format.
 
@@ -293,7 +293,7 @@ action_site	| action_roll | action_from_image |	action_to_image	| action_to_take
  | | |ENO_S1__B03_R1_IMAG0100.JPG	|ENO_S1__B03_R1_IMAG0103.JPG	|mark_no_upload	|rhino	||
 
 6. For each row specify: 'action_to_take' and 'action_to_take_reason'
-7. For 'timechange' in 'action_to_take' specify 'datetime_current' and 'datetime_new'. This will apply the difference between these two dates to all selected images.
+7. For 'timechange' in 'action_to_take' specify 'datetime_current' and 'datetime_new'. This will apply the difference (!) between these two dates to all selected images. For example: 'datetime_current'='2000-01-01 00:00:00' and 'datetime_new'=2000-01-01 00:05:00 will shift the time by +5 minutes.
 8. All rows with 'action_to_take' equal 'inspect' must be resolved and replaced with values as specified above.
 8. Upload the modified csv and proceed.
 
