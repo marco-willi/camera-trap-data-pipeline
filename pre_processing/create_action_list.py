@@ -169,8 +169,8 @@ if __name__ == '__main__':
                   'capture', 'image_rank_in_capture',
                   'image_name']
     info_cols = [
+     'datetime', 'datetime_exif', 'datetime_file_creation',
      'days_to_last_image_taken', 'days_to_next_image_taken',
-     'datetime', 'datetime_file_creation',
      'image_path', 'image_path_rel']
 
     first_cols += action_cols
