@@ -316,6 +316,7 @@ def read_cleaned_season_file_df(path):
     # sort df
     try:
         sort_df(df)
+        df.reset_index(inplace=True)
     except Exception as e:
         logger.warning("Failed to sort dataframe")
         logger.warning(e, exc_info=True)
