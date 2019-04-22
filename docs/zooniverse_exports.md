@@ -153,4 +153,4 @@ The resulting file may have the following column headers:
 
 ## Processing Snapshot Serengeti S1-S10 data (legacy format)
 
-See [Legacy Extractions](docs/zooniverse_exports_legacy.md)
+See [Legacy Extractions](../docs/zooniverse_exports_legacy.md)
