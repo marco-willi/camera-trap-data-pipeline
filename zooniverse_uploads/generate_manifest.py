@@ -6,11 +6,18 @@ import argparse
 from collections import OrderedDict
 import logging
 
+from config.cfg import cfg
 from utils.logger import setup_logger, create_log_file
 from utils.utils import (
     export_dict_to_json_with_newlines,
-    read_cleaned_season_file_df, file_path_generator, set_file_permission)
+    read_cleaned_season_file_df,
+    remove_images_from_df,
+    file_path_generator, set_file_permission)
 
+logger = logging.getLogger(__name__)
+
+flags_preprocessing = cfg['pre_processing_flags']
+flags_uploads = cfg['upload_flags']
 
 # For Testing
 # args = dict()
@@ -105,15 +112,22 @@ if __name__ == "__main__":
 
     # Read Season Captures CSV
     cleaned_captures = read_cleaned_season_file_df(args['captures_csv'])
+    n_read_from_cleaned = cleaned_captures.shape[0]
 
     logger.info("Found %s images in %s" %
                 (cleaned_captures.shape[0], args['captures_csv']))
 
+    cleaned_captures = remove_images_from_df(
+        cleaned_captures,
+        flags_uploads['images_to_remove_from_upload'])
+    n_omitted_images = n_read_from_cleaned - cleaned_captures.shape[0]
+
+    logger.info("Found {} images for upload - excluded {} images".format(
+        cleaned_captures.shape[0], n_omitted_images))
+
     # Create the manifest
     manifest = OrderedDict()
-    omitted_images_counter = 0
     images_not_found_counter = 0
-    invalid_codes = ('1', '2')
     n_records_total = cleaned_captures.shape[0]
     for row_no, row in cleaned_captures.iterrows():
         # Extract important fields
@@ -122,16 +136,7 @@ if __name__ == "__main__":
         roll = row.roll
         capture = row.capture
         image_path = row.path
-        invalid = row.invalid
-        # unique capture id
-        try:
-            capture_id = row.capture_id
-        except:
-            capture_id = '#'.join([season, site, roll, capture])
-        # Skip image if code indicates invalid code
-        if invalid in invalid_codes:
-            omitted_images_counter += 1
-            continue
+        capture_id = row.capture_id
         # Skip if image is not on disk
         image_path_full = os.path.join(args['images_root_path'], image_path)
         if not os.path.isfile(image_path_full):
@@ -165,8 +170,8 @@ if __name__ == "__main__":
             logger.info("Processed {}/{} records".format(
                 row_no, n_records_total))
 
-    logger.info("Omitted %s images due to invalid code in 'invalid' column" %
-                omitted_images_counter)
+    logger.info("Omitted %s images due to invalid/no_upload flags" %
+                n_omitted_images)
     logger.info("Number of images not found in images folder %s" %
                 images_not_found_counter)
     logger.info("Writing %s captures to %s" %

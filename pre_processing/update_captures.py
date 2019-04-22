@@ -28,9 +28,10 @@ flags = cfg['pre_processing_flags']
 
 def include_image(image_data):
     """ Rule to include only certain images """
-    if 'action_taken' in image_data:
-        if image_data['action_taken'] in flags['actions_to_remove_from_cleaned']:
-            return False
+    for remove_flag in flags['flags_to_remove_from_cleaned']:
+        if remove_flag in image_data:
+            if image_data[remove_flag] == '1':
+                return False
     return True
 
 
@@ -40,17 +41,6 @@ def select_valid_images(captures):
     for image_name, image_data in captures.items():
         if not include_image(image_data):
             continue
-        # update 'invalid' column (legacy)
-        try:
-            image_data['invalid'] = image_data['action_taken']
-        except:
-            image_data['invalid'] = 'ok'
-        # update image status
-        try:
-            status = flags['action_to_status_map'][image_data['action_taken']]
-            image_data['status'] = status
-        except:
-            image_data['status'] = 'ok'
         captures_updated[image_name] = {k: v for k, v in image_data.items()}
     return captures_updated
 
@@ -98,7 +88,7 @@ if __name__ == '__main__':
     time_deltas = calculate_time_deltas(captures_updated, flags)
     update_inventory_with_capture_data(captures_updated, time_deltas)
 
-    # update image to capture association
+    # update grouping of images into captures
     image_to_capture = group_images_into_captures(captures_updated, flags)
     update_inventory_with_capture_data(captures_updated, image_to_capture)
 
@@ -106,13 +96,13 @@ if __name__ == '__main__':
 
     update_time_checks_inventory(captures_updated, flags)
 
-    image_check_stats(captures_updated, logger)
+    image_check_stats(captures_updated)
 
     # first columns in exported file
     first_cols_to_export = [
         'capture_id', 'season', 'site', 'roll', 'capture',
-        'image_rank_in_capture', 'image_path', 'image_path_rel',
-        'invalid', 'date', 'time']
+        'image_rank_in_capture', 'image_name', 'image_path', 'image_path_rel',
+        'datetime']
 
     export_inventory_to_csv(
             captures_updated,

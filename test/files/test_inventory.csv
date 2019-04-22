@@ -21,3 +21,4 @@ APN_S2,A1,2,normal_19.JPG,/my_images/orig/19.JPG,/orig/19.JPG,2017-10-28 10:40:2
 APN_S2,A1,2,to_delete_20.JPG,/my_images/orig/20.JPG,/orig/20.JPG,2017-10-28 10:40:30,20,11,to_delete,4,APN_S2_A1_R2_IMAG0011.JPG
 APN_S2,A1,2,to_delete_21.JPG,/my_images/orig/21.JPG,/orig/21.JPG,2017-10-28 10:40:31,21,12,to_delete,4,APN_S2_A1_R2_IMAG0012.JPG
 APN_S2,A1,2,to_delete_22.JPG,/my_images/orig/22.JPG,/orig/22.JPG,2017-10-28 10:40:32,22,13,to_delete,4,APN_S2_A1_R2_IMAG0013.JPG
+APN_S2,B1,1,sensitive_23.JPG,/my_images/orig/23.JPG,/orig/23.JPG,2017-10-29 10:40:32,22,13,set_sensitive,1,APN_S2_B1_R1_IMAG0001.JPG

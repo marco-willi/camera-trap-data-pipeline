@@ -94,10 +94,19 @@ python3 -m pre_processing.create_image_inventory \
 --log_filename ${SEASON}_create_image_inventory
 ```
 
+| Column   | Description |
+| --------- | ----------- |
+|season | season identifier
+|site | site/camera identifier
+|roll | roll identifier (SD card of a camera)
+|image_name_original| name of original image file
+|image_path_original_rel| relative path of image file
+|image_path_original| full path of image file
+
 
 ## Perform Basic Checks
 
-The following script performs some basic checks. The code is parallelized to speed up the checks -- use the following options to make the most of the parallelization (it still takes roughly 1 hour per 60k images).
+The following script performs some basic checks. It opens each image to verify it's integrity and to perform pixel-based checks. The code is parallelized -- use the following options to make the most of the parallelization (it still takes roughly 1 hour per 60k images).
 
 ```
 ssh lab
@@ -137,6 +146,18 @@ qstat
 ```
 
 
+| Column   | Description |
+| --------- | ----------- |
+|season | season identifier
+|site | site/camera identifier
+|roll | roll identifier (SD card of a camera)
+|image_name_original| name of original image file
+|image_path_original_rel| relative path of image file
+|image_path_original| full path of image file
+|datetime_file_creation| file creation date (default Y-m-d H:M:S)
+|image_check__()| image check flag of check () -- '1' if check failed
+
+
 ## Extract EXIF data
 
 The following script extracts EXIF data from all images.
@@ -150,6 +171,20 @@ python3 -m pre_processing.extract_exif_data \
 --log_dir /home/packerc/shared/season_captures/${SITE}/log_files/ \
 --log_filename ${SEASON}_extract_exif_data
 ```
+
+| Column   | Description |
+| --------- | ----------- |
+|season | season identifier
+|site | site/camera identifier
+|roll | roll identifier (SD card of a camera)
+|image_name_original| name of original image file
+|image_path_original_rel| relative path of image file
+|image_path_original| full path of image file
+|datetime_file_creation| file creation date (default Y-m-d H:M:S)
+|image_check__()| image check flag of check () -- '1' if check failed
+|datetime_exif| datetime as extrated from EXIF data (default Y-m-d H:M:S, '' if none)
+|datetime| datetime_exif if available, else datetime_file_creation
+|exif__()| EXIF tag () extracted from the image
 
 
 ## Group Images into Captures
@@ -165,6 +200,33 @@ python3 -m pre_processing.group_inventory_into_captures \
 --log_dir /home/packerc/shared/season_captures/${SITE}/log_files/ \
 --log_filename ${SEASON}_group_inventory_into_captures
 ```
+
+
+| Column   | Description |
+| --------- | ----------- |
+|capture_id | identifier of the capture the image belongs to
+|season | season identifier
+|site | site/camera identifier
+|roll | roll identifier (SD card of a camera)
+|image_name_original| name of original image file
+|image_path_original_rel| relative path of image file
+|image_path_original| full path of image file
+|datetime_file_creation| file creation date (default Y-m-d H:M:S)
+|image_check__()| image check flag of check () -- '1' if check failed
+|datetime_exif| datetime as extrated from EXIF data (default Y-m-d H:M:S, '' if none)
+|exif__()| EXIF tag () extracted from the image
+|capture | capture number (e.g. '1' for the first capture in a specific roll)
+|image_rank_in_capture| (temporal) rank of image in a capture
+|image_rank_in_roll| (temporal) rank of image in a roll
+|image_name | image name after re-naming
+|image_path_rel| relative (to season root) image path after re-naming
+|image_path | full path of re-named image  
+|seconds_to_next_image_taken| seconds to the next image taken
+|seconds_to_last_image_taken| seconds to the last/previous image taken
+|days_to_last_image_taken| days to the last/previous image taken
+|days_to_next_image_taken| days to the next image taken
+
+
 
 ## Rename all images
 
@@ -200,12 +262,14 @@ The option '--plot_timelines' creates a pdf in the '--action_list_csv' directory
 
 action_to_take | meaning
 ------------ | -------------
-delete | the selected images will be deleted
+delete | the selected images will be deleted (example: corrupt files)
+invalidate | remove the image from further processing (but do not delete) -- this is for images that can't be used for ecological analyses (example: images that have bad quality / images with humans / excess images)
 timechange | the time of the selected images will be changed (see below)
 ok | do nothing
-invalidate | remove the image from further processing (but do not delete)
+mark_no_upload | flag/mark images as not to upload (example: images with sensitive species not intended for publication)
+mark_datetime_uncertain | flag/mark images if datetime is uncertain (example: images with only vague datetime info)
 
-4. To add new actions simply create a new row in the csv.
+4. To add new actions simply create a new row in the csv. Multiple actions can be specified for a single image if necessary (with the excpetion of timechanges).
 
 WARNING: be careful in using the correct datetime format for the columns 'datetime_current' and 'datetime_new' (YYYY-MM-DD HH:MM:SS) when specifying timechanges. Opening the file in Excel may change this format.
 
@@ -226,10 +290,10 @@ action_site	| action_roll | action_from_image |	action_to_image	| action_to_take
  | | |ENO_S1__B02_R1_IMAG1012.JPG	| ENO_S1__B02_R1_IMAG1012.JPG	|invalidate	|all_white		||
  | | |ENO_S1__B02_R1_IMAG0054.JPG	| ENO_S1__B02_R1_IMAG0054.JPG	|invalidate	|all_black||
  | | |ENO_S1__B02_R1_IMAG0990.JPG	|ENO_S1__B02_R1_IMAG0999.JPG	|delete	|human	||
-
+ | | |ENO_S1__B03_R1_IMAG0100.JPG	|ENO_S1__B03_R1_IMAG0103.JPG	|mark_no_upload	|rhino	||
 
 6. For each row specify: 'action_to_take' and 'action_to_take_reason'
-7. For 'timechange' in 'action_to_take' specify 'datetime_current' and 'datetime_new'. This will apply the difference between these two dates to all selected images.
+7. For 'timechange' in 'action_to_take' specify 'datetime_current' and 'datetime_new'. This will apply the difference (!) between these two dates to all selected images. For example: 'datetime_current'='2000-01-01 00:00:00' and 'datetime_new'=2000-01-01 00:05:00 will shift the time by +5 minutes.
 8. All rows with 'action_to_take' equal 'inspect' must be resolved and replaced with values as specified above.
 8. Upload the modified csv and proceed.
 
@@ -248,6 +312,14 @@ python3 -m pre_processing.generate_actions \
 ```
 This file can be checked to ensure if everything is correct.
 
+| Column   | Description |
+| --------- | ----------- |
+|image | image name
+|action| action to take
+|reason| reason for the action to take
+|shift_time_by_seconds| number of seconds to shift time by
+
+
 ## Apply Actions
 
 This code applies the actions. It updates the captures file and deletes specific images if requested.
@@ -260,9 +332,21 @@ python3 -m pre_processing.apply_actions \
 --log_filename ${SEASON}_apply_actions
 ```
 
+
+| Column   | Description |
+| --------- | ----------- |
+| .... | previous columns in captures file
+|action_taken| the action that was applied to the image, separated by '#' if multiple
+|action_taken_reason| the reason for the action that was applied to the image, separated by '#' if multiple
+|image_is_invalid| flag if image was invalidated (1, '' otherwise)
+|image_was_deleted| flag if image was deleted (1, '' otherwise)
+|image_no_upload| flag if image was marked for no upload (1, '' otherwise)
+|image_uncertain_datetime| flag if image was marked for uncertain datetime (1, '' otherwise)
+
+
 ## Generate Updated Captures
 
-This code generates an updated captures file after applying actions. Deleted / invalidated images are excluded and a few more columns added.
+This code generates an updated captures file after applying actions. This is mainly to remove deleted images and to re-group images into captures if timechanges were specified.
 
 ```
 python3 -m pre_processing.update_captures \
@@ -304,8 +388,12 @@ This code can be run in any case to check if further actions need to be taken if
 |capture | capture number (e.g. '1' for the first capture in a specific roll)
 |image_rank_in_capture| (temporal) rank of image in a capture
 |image_rank_in_roll| (temporal) rank of image in a roll
-|invalid | action taken on image (timechange, ok) -- this column is included due to legacy reasons (no invalidated / deleted images are in the cleaned captures file)
-|status | analogue to 'invalid' column -- status of the image (default is one of: ok, deleted, invalidated -- deleted/invalidated are not in the cleaned capture file)
+|action_taken| the action that was applied to the image, separated by '#' if multiple
+|action_taken_reason| the reason for the action that was applied to the image, separated by '#' if multiple
+|image_is_invalid| flag if image was invalidated (1, '' otherwise)
+|image_was_deleted| flag if image was deleted (1, '' otherwise)
+|image_no_upload| flag if image was marked for no upload (1, '' otherwise)
+|image_uncertain_datetime| flag if image was marked for uncertain datetime (1, '' otherwise)
 |image_name | image name after re-naming
 |image_path_rel| relative (to season root) image path after re-naming
 |image_path | full path of re-named image  
@@ -313,8 +401,6 @@ This code can be run in any case to check if further actions need to be taken if
 |image_path_original | full path of original image
 |image_path_original_rel| relative path of original image
 |datetime| datetime of image (default Y-m-d H:M:S) -- after any datetime corrections applied
-|date| date of image (default Y-m-d) -- derived from 'datetime'
-|time| time of image (defualt H:M:S) -- derived from 'datetime'
 |datetime_exif| datetime as extrated from EXIF data (default Y-m-d H:M:S, '' if none)
 |datetime_file_creation| file creation date (default Y-m-d H:M:S)
 |seconds_to_next_image_taken| seconds to the next image taken

@@ -1,6 +1,7 @@
 import unittest
 import logging
 from collections import OrderedDict
+from unittest.mock import patch
 
 from pre_processing.group_inventory_into_captures import (
         calculate_time_deltas, group_images_into_captures,
@@ -10,9 +11,13 @@ from pre_processing.group_inventory_into_captures import (
 from pre_processing.generate_actions import generate_actions
 from pre_processing.utils import read_image_inventory
 from pre_processing.update_captures import select_valid_images
-from pre_processing.apply_actions import apply_actions
-from utils.logger import setup_logger
+from pre_processing.actions import apply_action
+from pre_processing.create_action_list import _issue_is_resolved
 from config.cfg import cfg_default as cfg
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.ERROR)
+
 
 flags = cfg['pre_processing_flags']
 
@@ -23,9 +28,6 @@ class GenerateActionsTests(unittest.TestCase):
         # test files
         file_inventory = './test/files/test_inventory.csv'
         file = './test/files/test_action_list.csv'
-        setup_logger()
-        self.logger = logging.getLogger(__name__)
-        self.logger.setLevel(logging.ERROR)
         self.inventory = read_image_inventory(file_inventory)
         time_deltas = calculate_time_deltas(self.inventory, flags)
         update_inventory_with_capture_data(self.inventory, time_deltas)
@@ -39,15 +41,14 @@ class GenerateActionsTests(unittest.TestCase):
         for v in self.inventory.values():
             self.captures[v['image_name']] = v
         self.actions = generate_actions(
-            self.action_list, self.captures, self.logger)
-        self.actions_no_deletions = OrderedDict()
+            self.action_list, self.captures)
 
-        for img, action in self.actions.items():
-            self.actions_no_deletions[img] = action
-            if action['action_to_take'] == 'delete':
-                self.actions_no_deletions[img]['action_to_take'] = 'invalidate'
+        @patch('pre_processing.actions.os.remove')
+        def mock_apply_action(image_data, action_dict, flags, mock_remove):
+            apply_action(image_data, action_dict, flags)
 
-        apply_actions(self.actions_no_deletions, self.captures, self.logger)
+        for action_obj in self.actions:
+            mock_apply_action(self.captures[action_obj.image], action_obj, flags)
 
         self.captures_updated = select_valid_images(self.captures)
 
@@ -73,19 +74,29 @@ class GenerateActionsTests(unittest.TestCase):
                 self.captures_updated['APN_S2_A1_R1_IMAG0001.JPG']['capture'],
                 4)
 
-    def testNoInvalidImagesInUpdatedCaptures(self):
+    def testNoDeletedImagesInUpdatedCaptures(self):
         with self.assertRaises(KeyError):
             self.captures_updated['APN_S2_A1_R2_IMAG0011.JPG']
         with self.assertRaises(KeyError):
-            self.captures_updated['APN_S2_A1_R2_IMAG0006.JPG']
+            self.captures_updated['APN_S2_A1_R2_IMAG0012.JPG']
+        with self.assertRaises(KeyError):
+            self.captures_updated['APN_S2_A1_R2_IMAG0013.JPG']
+
+    def testInvalidImagesFlaggedInUpdatedCaptures(self):
+        self.assertEqual(
+            self.captures_updated['APN_S2_A1_R2_IMAG0006.JPG']['image_is_invalid'],
+            '1'
+        )
 
     def testStatusChanges(self):
-        self.assertEqual(
-                self.captures_updated['APN_S2_A1_R2_IMAG0008.JPG']['status'],
-                'ok')
-        self.assertEqual(
-                self.captures_updated['APN_S2_A1_R1_IMAG0003.JPG']['status'],
-                'ok')
+        self.assertIn(
+            'timechange',
+            self.captures_updated['APN_S2_A1_R2_IMAG0008.JPG']['action_taken'],
+        )
+        self.assertIn(
+            'timechange',
+            self.captures_updated['APN_S2_A1_R1_IMAG0003.JPG']['action_taken'],
+        )
 
 
 if __name__ == '__main__':

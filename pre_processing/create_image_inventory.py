@@ -5,20 +5,16 @@ import logging
 from collections import OrderedDict
 
 
-from utils.logger import setup_logger, create_log_file
+from utils.logger import set_logging
+from utils.utils import check_dir_existence
 from pre_processing.utils import (
-    image_check_stats, export_inventory_to_csv)
+    image_check_stats, export_inventory_to_csv,
+    get_rollnum_from_roll_directory)
 from config.cfg import cfg
 
 
 flags = cfg['pre_processing_flags']
 
-# args = dict()
-# args['root_dir'] = '/home/packerc/shared/albums/ENO/ENO_S1'
-# args['output_csv'] = '/home/packerc/shared/season_captures/ENO/ENO_S1_captures_raw.csv'
-# #args['output_csv'] = '/home/packerc/will5448/image_inventory_overview.csv'
-# args['season_id'] = ''
-# args['n_processes'] = 16
 
 if __name__ == '__main__':
 
@@ -37,18 +33,10 @@ if __name__ == '__main__':
     # image check parameters
     msg_width = 99
 
-    # check existence of root dir
-    if not os.path.isdir(args['root_dir']):
-        raise FileNotFoundError(
-            "root_dir {} does not exist -- must be a directory".format(
-                args['root_dir']))
+    check_dir_existence(args['root_dir'])
 
-    # logging
-    if args['log_dir'] is not None:
-        log_file_path = create_log_file(args['log_dir'], args['log_filename'])
-        setup_logger(log_file_path)
-    else:
-        setup_logger()
+    set_logging(args['log_dir'], args['log_filename'])
+
     logger = logging.getLogger(__name__)
 
     last_dir = os.path.basename(os.path.normpath(args['root_dir']))
@@ -68,7 +56,7 @@ if __name__ == '__main__':
         roll_directory_names = os.listdir(current_dir_full_path)
         # Loop over roll directories
         for roll_directory_name in roll_directory_names:
-            roll = roll_directory_name.split('_')[1].split('R')[1]
+            roll = get_rollnum_from_roll_directory(roll_directory_name)
             roll_directory_path = os.path.join(
                 current_dir_full_path, roll_directory_name)
             roll_directory_path_rel = os.path.join(
@@ -87,14 +75,8 @@ if __name__ == '__main__':
                     'roll': roll,
                     'image_name_original': image_file_name,
                     'image_path_original': image_path,
-                    'image_path_original_rel': image_path_rel,
-                    'datetime': '',
-                    'date': '',
-                    'time': '',
-                    'datetime_file_creation': '',
-                    **{'image_check__{}'.format(k):
-                        0 for k in flags['image_checks']}}
+                    'image_path_original_rel': image_path_rel}
 
-    image_check_stats(image_inventory, logger)
+    image_check_stats(image_inventory)
 
     export_inventory_to_csv(image_inventory, args['output_csv'])

@@ -2,10 +2,10 @@
 import os
 import argparse
 import logging
-from datetime import datetime, timedelta
 
 from utils.logger import setup_logger, create_log_file
 from pre_processing.utils import read_image_inventory, export_inventory_to_csv
+from pre_processing.actions import apply_action
 from config.cfg import cfg
 
 # args = dict()
@@ -14,58 +14,6 @@ from config.cfg import cfg
 # args['log_dir'] = '/home/packerc/shared/season_captures/APN/log_files/'
 
 flags = cfg['pre_processing_flags']
-
-
-def change_time(captures, image_name, flags, shift_by_seconds):
-    """ Shift time by seconds """
-    image_data = captures[image_name]
-    old_time = image_data['datetime']
-    new_time = add_seconds_to_time(
-        image_data['datetime'],
-        shift_by_seconds, flags['time_formats']['output_datetime_format'])
-    image_data['datetime'] = new_time.strftime(
-        flags['time_formats']['output_datetime_format'])
-    image_data['date'] = new_time.strftime(
-        flags['time_formats']['output_date_format'])
-    image_data['time'] = new_time.strftime(
-        flags['time_formats']['output_time_format'])
-    logging.info("Changed date/time for image {} from {} to {}".format(
-        image_name, old_time, image_data['datetime']))
-
-
-def add_seconds_to_time(date_time, seconds_to_add, format):
-    """ Add seconds to time """
-    from_datetime = datetime.strptime(
-        date_time, format)
-    shifted_time = from_datetime + timedelta(seconds=float(seconds_to_add))
-    return shifted_time
-
-
-def apply_actions(actions, captures, logger):
-    """ apply actions """
-    for image_name, action in actions.items():
-        reason = action['action_to_take_reason']
-        if action['action_to_take'] == 'delete':
-            image_path = captures[image_name]['image_path']
-            try:
-                os.remove(image_path)
-                logger.info("Reason: {:20} Action: deleted image: {}".format(
-                    reason, image_path))
-            except FileNotFoundError:
-                logger.warning(
-                    "Failed to remove {} - file not found".format(image_path))
-        elif action['action_to_take'] == 'timechange':
-            change_time(
-                captures,
-                image_name, flags,
-                action['action_shift_time_by_seconds'])
-            logger.info("Reason: {:20} Action: timechange for: {}".format(
-                reason, image_name))
-        captures[image_name]['action_taken'] = \
-            action['action_to_take']
-        captures[image_name]['action_reason'] = \
-            action['action_to_take_reason']
-
 
 if __name__ == '__main__':
 
@@ -99,16 +47,17 @@ if __name__ == '__main__':
 
     logger.info("Reading actions from {}".format(args['actions_to_perform']))
     actions = read_image_inventory(
-        args['actions_to_perform'], unique_id='image_name')
+        args['actions_to_perform'], unique_id=None)
 
     logger.info("Reading captures from {}".format(args['captures']))
     captures = read_image_inventory(
         args['captures'], unique_id='image_name')
 
     try:
-        apply_actions(actions, captures, logger)
+        for _id, action in actions.items():
+            apply_action(captures[action['image']], action, flags)
         logger.info("Successfully applied actions")
-    except Exception:
+    except Exception as e:
         logger.error("Failed to apply actions", exc_info=True)
 
     export_inventory_to_csv(captures, args['captures'])

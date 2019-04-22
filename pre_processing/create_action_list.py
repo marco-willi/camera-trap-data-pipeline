@@ -13,7 +13,7 @@ from pre_processing.utils import (
     plot_site_roll_timelines, read_image_inventory,
     image_check_stats,
     export_inventory_to_csv)
-from utils.logger import create_log_file, setup_logger
+from utils.logger import set_logging
 from config.cfg import cfg
 
 
@@ -31,6 +31,22 @@ def generate_check_string(image_data, check_columns, checks_to_find):
     return [x.replace('image_check__', '') for x in
             checks_to_find if x in check_columns and float(image_data[x]) == 1]
 
+
+def _issue_is_resolved(image_data):
+    """ Determine if issue was already resolved """
+    # Issue resolved if image is invalid
+    try:
+        invalid = image_data['image_is_invalid']
+    except KeyError:
+        invalid = ''
+    if invalid == '1':
+        return True
+    # Issue resolved if image was flagged as ok
+    try:
+        last_action = image_data['action_taken'].split('#')[-1]
+        return (last_action == 'ok')
+    except KeyError:
+        return False
 
 # args = dict()
 #
@@ -67,11 +83,7 @@ if __name__ == '__main__':
                 args['captures']))
 
     # logging
-    if args['log_dir'] is not None:
-        log_file_path = create_log_file(args['log_dir'], args['log_filename'])
-        setup_logger(log_file_path)
-    else:
-        setup_logger()
+    set_logging(args['log_dir'], args['log_filename'])
     logger = logging.getLogger(__name__)
 
     # read grouped data
@@ -84,11 +96,14 @@ if __name__ == '__main__':
     # check columns
     check_columns = [x for x in header if x.startswith('image_check__')]
     to_delete_checks = \
-        ['image_check__{}'.format(x) for x in flags['image_checks_delete']]
+        ['image_check__{}'.format(x)
+         for x in flags['image_checks_propose_delete']]
     to_invalidate_checks = \
-        ['image_check__{}'.format(x) for x in flags['image_checks_invalidate']]
+        ['image_check__{}'.format(x)
+         for x in flags['image_checks_propose_invalidate']]
     time_checks = \
-        ['image_check__{}'.format(x) for x in flags['image_checks_time']]
+        ['image_check__{}'.format(x)
+         for x in flags['image_checks_propose_time']]
 
     # Action columns
     action_cols = [
@@ -121,7 +136,7 @@ if __name__ == '__main__':
         # generate check-string
         all_checks_list = generate_check_string(
             image_data, check_columns, check_columns)
-        all_check_string = '#'.join(all_checks_list)
+        all_check_string = '|'.join(all_checks_list)
         if has_deletion:
             automatic_status['action_to_take'] = 'delete'
         elif has_invalidation:
@@ -134,28 +149,24 @@ if __name__ == '__main__':
         automatic_status['action_from_image'] = image_data['image_name']
         automatic_status['action_to_image'] = image_data['image_name']
         image_data.update(automatic_status)
-        
+
         # check if image was in previous action lists and was flagged as ok
-        try:
-            previous_action_is_ok = \
-                (image_data['action_taken'] == 'ok')
-        except:
-            previous_action_is_ok = False
+        issue_is_resolved = _issue_is_resolved(image_data)
         # export problematic cases only
         has_issue = (has_deletion or has_invalidation or has_time_check)
-        if has_issue and not previous_action_is_ok:
+        if has_issue and not issue_is_resolved:
             inventory_with_issues[image_path_original] = image_data
 
     # Export cases with issues
     logger.info("Images with potential issues")
-    image_check_stats(inventory_with_issues, logger)
+    image_check_stats(inventory_with_issues)
 
     first_cols = ['season', 'site', 'roll', 'image_rank_in_roll',
                   'capture', 'image_rank_in_capture',
                   'image_name']
     info_cols = [
+     'datetime', 'datetime_exif', 'datetime_file_creation',
      'days_to_last_image_taken', 'days_to_next_image_taken',
-     'datetime', 'date', 'time',	'datetime_file_creation',
      'image_path', 'image_path_rel']
 
     first_cols += action_cols

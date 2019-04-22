@@ -13,21 +13,25 @@ import exiftool
 import pandas as pd
 
 from config.cfg import cfg
-from utils.logger import setup_logger, create_log_file
+from utils.logger import set_logging
 from pre_processing.utils import (
     export_inventory_to_csv, read_image_inventory, image_check_stats)
 from utils.utils import (
     slice_generator, estimate_remaining_time, set_file_permission)
 
 
-# args = dict()
-# args['inventory'] = '/home/packerc/will5448/data/pre_processing_tests/ENO_S1_inventory.csv'
-# args['update_inventory'] = True
-# args['output_csv'] = '/home/packerc/will5448/data/pre_processing_tests/ENO_S1_captures_TEST_EXIF.csv'
-# args['exiftool_path'] = '/home/packerc/will5448/software/Image-ExifTool-11.31/exiftool'
-# args['n_processes'] = 4
-
 flags = cfg['pre_processing_flags']
+
+
+def _create_datetime(image_data):
+    """ Create best possible datetime """
+    if 'datetime_exif' in image_data:
+        if image_data['datetime_exif'] != '':
+            return image_data['datetime_exif']
+    if 'datetime_file_creation' in image_data:
+        if image_data['datetime_file_creation'] != '':
+            return image_data['datetime_file_creation']
+    return ''
 
 
 def _extract_meta_data(tags, groups=['EXIF', 'MakerNotes', 'Composite']):
@@ -112,11 +116,8 @@ if __name__ == '__main__':
     msg_width = 99
 
     # logging
-    if args['log_dir'] is not None:
-        log_file_path = create_log_file(args['log_dir'], args['log_filename'])
-        setup_logger(log_file_path)
-    else:
-        setup_logger()
+    set_logging(args['log_dir'], args['log_filename'])
+
     logger = logging.getLogger(__name__)
 
     for k, v in args.items():
@@ -185,53 +186,72 @@ if __name__ == '__main__':
     # copy the shared dictionary
     exif_all = {k: v for k, v in results.items()}
 
+    # Extract relevant EXIF tags
+    exif_extracted = dict()
+    for img_name, exif_data in exif_all.items():
+        current_extracted = {}
+        if exif_data is None:
+            current_extracted = None
+            logger.info(
+                "could not read exif data for image: {}".format(
+                    img_name))
+        elif len(exif_data.keys()) == 0:
+            logger.info(
+                "exif data for image: {} empty".format(
+                    img_name))
+        else:
+            selected_exif = _extract_meta_data(
+                exif_data,
+                flags['exif_tag_groups_to_extract'])
+            excluded_exif = _exclude_specific_tags(
+                selected_exif, flags['exif_tags_to_exclude'])
+            prefixed_exif = _prefix_meta_data(excluded_exif)
+            try:
+                time_info = _extract_time_info_from_exif(
+                    selected_exif, flags)
+                current_extracted.update({
+                    'datetime_exif': time_info['datetime']})
+            except:
+                logger.warning(
+                    "Failed to extract datetime info from {}".format(
+                        img_name
+                    ))
+            current_extracted.update(prefixed_exif)
+        exif_extracted[img_name] = current_extracted
+
     # Update Image Inventory
     if args['update_inventory']:
         # Update Image Inventory with EXIF data
         for img_name in image_paths_all:
             current_data = copy.deepcopy(image_inventory[img_name])
             try:
-                exif_data = exif_all[img_name]
+                exif_data = exif_extracted[img_name]
                 if exif_data is None:
                     current_data.update({'image_check__corrupt_exif': 1})
-                    logger.info(
-                        "could not read exif data for image: {}".format(
-                            img_name))
                 elif len(exif_data.keys()) == 0:
-                    logger.info(
-                        "exif data for image: {} empty".format(
-                            img_name))
                     current_data.update({'image_check__empty_exif': 1})
                 else:
-                    selected_exif = _extract_meta_data(
-                        exif_data,
-                        flags['exif_tag_groups_to_extract'])
-                    excluded_exif = _exclude_specific_tags(
-                        selected_exif, flags['exif_tags_to_exclude'])
-                    prefixed_exif = _prefix_meta_data(excluded_exif)
-                    try:
-                        time_info = _extract_time_info_from_exif(
-                            selected_exif, flags)
-                        time_info['datetime_exif'] = time_info['datetime']
-                        current_data.update(time_info)
-                    except:
-                        logger.warning(
-                            "Failed to extract datetime info from {}".format(
-                                img_name
-                            ))
-                    current_data.update(prefixed_exif)
-            except:
+                    current_data.update(exif_data)
+            except KeyError:
                 current_data.update({'image_check__corrupt_exif': 1})
+            # update datetime - EXIF datetime or File Creation
+            best_datetime = _create_datetime(current_data)
+            if best_datetime == '':
+                logger.warning(
+                    "Datetime for image {} empty -- this is unexpected".format(
+                        img_name))
+            current_data.update({'datetime': best_datetime})
             image_inventory[img_name] = current_data
 
         export_inventory_to_csv(image_inventory, args['inventory'])
         logger.info("Updated inventory at {} stats:".format(args['inventory']))
-        image_check_stats(image_inventory, logger)
+        image_check_stats(image_inventory)
 
     # Export EXIF Data separately
     if args['output_csv'] is not None:
-        df = pd.DataFrame.from_dict(exif_all, orient='index')
+        df = pd.DataFrame.from_dict(exif_extracted, orient='index')
+        df.index.name = 'image_path_original'
         # export
-        df.to_csv(args['output_csv'], index=False)
+        df.to_csv(args['output_csv'], index=True)
         # change permmissions to read/write for group
         set_file_permission(args['output_csv'])

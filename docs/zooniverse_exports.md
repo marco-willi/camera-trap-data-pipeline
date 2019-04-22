@@ -55,7 +55,8 @@ python3 -m zooniverse_exports.get_zooniverse_export \
 --project_id $PROJECT_ID \
 --output_file /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_classifications.csv \
 --export_type classifications \
---log_dir /home/packerc/shared/zooniverse/Exports/${SITE}/
+--log_dir /home/packerc/shared/zooniverse/Exports/${SITE}/log_files/ \
+--log_filename ${SEASON}_get_classification_export
 ```
 
 ### Zooniverse Subject Export
@@ -68,7 +69,8 @@ python3 -m zooniverse_exports.get_zooniverse_export \
 --project_id $PROJECT_ID \
 --output_file /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subjects.csv \
 --export_type subjects \
---log_dir /home/packerc/shared/zooniverse/Exports/${SITE}/
+--log_dir /home/packerc/shared/zooniverse/Exports/${SITE}/log_files/ \
+--log_filename ${SEASON}_get_subject_export
 ```
 
 
@@ -97,7 +99,9 @@ python3 -m zooniverse_exports.extract_annotations \
 --classification_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_classifications.csv \
 --output_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_annotations.csv \
 --workflow_id $WORKFLOW_ID \
---workflow_version_min $WORKFLOW_VERSION_MIN
+--workflow_version_min $WORKFLOW_VERSION_MIN \
+--log_dir /home/packerc/shared/zooniverse/Exports/${SITE}/log_files/ \
+--log_filename ${SEASON}_extract_annotations
 ```
 
 

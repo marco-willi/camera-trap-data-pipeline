@@ -1,7 +1,6 @@
 """ Util Functions """
 import sys
 import os
-import csv
 import time
 import datetime
 import json
@@ -19,6 +18,13 @@ logger = logging.getLogger(__name__)
 class OrderedCounter(Counter, OrderedDict):
     """ Counter that keeps insert order """
     pass
+
+
+def check_dir_existence(dir):
+    if not os.path.isdir(dir):
+        raise FileNotFoundError(
+            "path {} does not exist -- must be a directory".format(
+                dir))
 
 
 def print_progress(count, total):
@@ -191,6 +197,29 @@ def sort_df_by_capture_id(df):
     df.drop('sort_id', inplace=True, axis=1)
 
 
+def sort_df(df):
+    """ Sort df by season, site, roll, capture, image """
+    sort_id = []
+    for row_id, row in df.iterrows():
+        if 'image_rank_in_capture' in row:
+            img_rank = row.image_rank_in_capture
+        elif 'image' in row:
+            img_rank = row.image
+        else:
+            img_rank = row_id
+        _id = '{}#{}#{}#{:05}#{:07}'.format(
+                row.season,
+                row.site,
+                row.roll,
+                int(row.capture),
+                int(img_rank)
+                )
+        sort_id.append(_id)
+    df['sort_id'] = sort_id
+    df.sort_values(['sort_id'], inplace=True)
+    df.drop('sort_id', inplace=True, axis=1)
+
+
 def export_dict_to_json_with_newlines(data, path):
     """ Export a dictionary to a json file with newlines between each
         dictionary entry
@@ -246,11 +275,32 @@ def _append_season_to_image_path(path, season):
         return path
 
 
+def _any_row_val_in_map(row, map):
+    for col, vals_list in map.items():
+        if col in row:
+            if row[col] in vals_list:
+                return True
+    return False
+
+
+def remove_images_from_df(
+        df, remove_col_to_vals_map):
+    """ Remove invalid / no_upload images from df """
+    i_to_include = list()
+    for row_i, row in df.iterrows():
+        if _any_row_val_in_map(row, remove_col_to_vals_map):
+            logger.debug("image {} excluded".format(row.path))
+        else:
+            i_to_include.append(row_i)
+    df = df.iloc[i_to_include]
+    return df
+
+
 def read_cleaned_season_file_df(path):
     df = pd.read_csv(path, dtype='str', index_col=None)
     df.fillna('', inplace=True)
     required_header_cols = ('capture_id', 'season', 'site', 'roll', 'capture',
-                            'path', 'invalid')
+                            'path')
     if 'path' not in df.columns:
         if 'image_path_rel' in df.columns:
             df['path'] = df[['image_path_rel', 'season']].apply(
@@ -263,27 +313,14 @@ def read_cleaned_season_file_df(path):
     for col in required_header_cols:
         if col not in df.columns:
             print("Column {} not found in cleaned_season_file".format(col))
+    # sort df
+    try:
+        sort_df(df)
+        df.reset_index(inplace=True)
+    except Exception as e:
+        logger.warning("Failed to sort dataframe")
+        logger.warning(e, exc_info=True)
     return df
-
-
-def read_cleaned_season_file(path, quotechar='"'):
-    """ Check the input file """
-    cleaned_captures = list()
-    required_header_cols = ('season', 'site', 'roll', 'capture',
-                            'path', 'invalid')
-    with open(path, newline='') as csvfile:
-        csv_reader = csv.reader(csvfile, delimiter=',', quotechar=quotechar)
-        header = next(csv_reader)
-        name_to_id_mapper = {x: i for i, x in enumerate(header)}
-        # check header
-        if not all([x in header for x in required_header_cols]):
-            print("Missing columns -- found %s, require %s" %
-                  (header, required_header_cols))
-
-        for _id, row in enumerate(csv_reader):
-            cleaned_captures.append(row)
-
-    return cleaned_captures, name_to_id_mapper
 
 
 def print_nested_dict(key, dic):

@@ -6,14 +6,18 @@ import pandas as pd
 
 from utils.logger import setup_logger, create_log_file
 from utils.utils import (
-    read_cleaned_season_file_df, set_file_permission, sort_df_by_capture_id)
+    read_cleaned_season_file_df,
+    remove_images_from_df, set_file_permission, sort_df_by_capture_id)
 from reporting.create_zooniverse_report import create_season_dict
+from config.cfg import cfg
 
 # args = dict()
 # args['season_captures_csv'] = '/home/packerc/shared/season_captures/GRU/cleaned/GRU_S1_cleaned.csv'
 # args['predictions_csv'] = '/home/packerc/shared/zooniverse/SpeciesReports/GRU/GRU_S1_ml_preds_flat.csv'
 # args['output_csv'] = '/home/packerc/shared/zooniverse/SpeciesReports/GRU/GRU_S1_report_ml.csv'
 # args['export_only_with_predictions'] = False
+
+flags_report = cfg['report_flags']
 
 if __name__ == '__main__':
 
@@ -58,7 +62,11 @@ if __name__ == '__main__':
     # Read Data
     ######################################
 
+    # read captures data
     season_data_df = read_cleaned_season_file_df(args['season_captures_csv'])
+    season_data_df = remove_images_from_df(
+        season_data_df,
+        flags_report['images_to_remove_from_report'])
     season_dict = create_season_dict(season_data_df)
 
     # Import Flat Predictions

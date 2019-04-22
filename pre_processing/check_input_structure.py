@@ -17,20 +17,16 @@ import argparse
 import logging
 import textwrap
 
-from utils.logger import setup_logger, create_log_file
-
-
-# args = dict()
-# args['root_dir'] = '/home/packerc/shared/albums/ENO/ENO_S1'
-# args['root_dir'] = '/home/packerc/shared/albums/KAR/KAR_S1'
-# args['root_dir'] = '/home/packerc/shared/albums/EFA/EFA_S1'
+from utils.logger import set_logging
+from utils.utils import check_dir_existence
 
 
 def is_ok_site_code(site):
     """ Check if site code is correct, must be alphanumerics only """
     if not site.isalnum():
         return False
-    return True
+    else:
+        return True
 
 
 def is_ok_roll_code(roll):
@@ -43,7 +39,8 @@ def is_ok_roll_code(roll):
     roll_number = roll[1:]
     if not roll_number.isnumeric():
         return False
-    return True
+    else:
+        return True
 
 
 def is_ok_roll_directory_name(roll_dir):
@@ -58,9 +55,44 @@ def is_ok_roll_directory_name(roll_dir):
     (site, roll) = roll_dir.split('_')
     if not is_ok_site_code(site):
         return False
-    if not is_ok_roll_code(roll):
+    elif not is_ok_roll_code(roll):
         return False
-    return True
+    else:
+        return True
+
+
+def _create_invalid_roll_msg(roll_dir, roll_path, msg_width=150):
+    msg = "invalid roll directory: {} at {}, must be \
+          in the format '[site_code]_R1': [site_code] and \
+          [R][one or more numerics] separated by a '_'".format(
+          roll_dir, roll_path)
+    msg_short = textwrap.shorten(msg, width=msg_width)
+    return msg_short
+
+
+def _create_invalid_site_msg(site_dir, msg_width=150):
+    msg = "site directory {} has incorrect format, \
+           must only consist of alphanumeric characters".format(
+           site_dir)
+    msg_short = textwrap.shorten(msg, width=msg_width)
+    return msg_short
+
+
+def _create_roll_site_missmatch_msg(roll_dir, site, site_dir, msg_width=150):
+    msg = "First part of roll directory {} is {}, is not \
+           identical to site directory {}: \
+           change either of them to matching names, \
+           Example: C06/C06_R1".format(
+          roll_dir, site, site_dir)
+    msg_short = textwrap.shorten(msg, width=msg_width)
+    return msg_short
+
+
+def _create_invalid_image_msg(image, roll_dir, msg_width=150):
+    msg = "File {} at {} must end in .jpg / .JPG".format(
+           image, roll_dir)
+    msg_short = textwrap.shorten(msg, width=msg_width)
+    return msg_short
 
 
 if __name__ == '__main__':
@@ -78,18 +110,10 @@ if __name__ == '__main__':
         default='check_directory_structure')
     args = vars(parser.parse_args())
 
-    # check existence of root dir
-    if not os.path.isdir(args['root_dir']):
-        raise FileNotFoundError(
-            "root_dir {} does not exist -- must be a directory".format(
-                args['root_dir']))
+    check_dir_existence(args['root_dir'])
 
-    # logging
-    if args['log_dir'] is not None:
-        log_file_path = create_log_file(args['log_dir'], args['log_filename'])
-        setup_logger(log_file_path)
-    else:
-        setup_logger()
+    set_logging(args['log_dir'], args['log_filename'])
+
     logger = logging.getLogger(__name__)
 
     msg_width = 250
@@ -105,12 +129,10 @@ if __name__ == '__main__':
                 remove file {}".format(site_directory_name, dir_full_path))
         # check site directory name
         if not is_ok_site_code(site_directory_name):
-            logger.error(
-                textwrap.shorten(
-                  "site directory {} has incorrect format, \
-                  must only consist of alphanumeric characters".format(
-                    site_directory_name),
-                  width=msg_width))
+            msg = _create_invalid_site_msg(
+                site_directory_name,
+                msg_width)
+            logger.error(msg)
     # check each roll in a site directory
     for site_directory_name in site_directory_names:
         # get all roll directories in a site directory
@@ -122,27 +144,21 @@ if __name__ == '__main__':
             roll_directory_path = os.path.join(
                 current_dir_full_path, roll_directory_name)
             if not is_ok_roll_directory_name(roll_directory_name):
-                logger.error(
-                    textwrap.shorten(
-                      "invalid roll directory: {} at {}, must be \
-                      in the format '[site_code]_R1': \
-                      [site_code] and \
-                      [R][one or more numerics] separated by a '_'".format(
-                        roll_directory_name, roll_directory_path),
-                      width=msg_width))
+                msg = _create_invalid_roll_msg(
+                    roll_directory_name,
+                    roll_directory_path,
+                    msg_width)
+                logger.error(msg)
             else:
-                # split directory name into site and roll identifiers
                 (site, roll) = roll_directory_name.split('_')
                 # site part must be idential to site directory
                 if site != site_directory_name:
-                    logger.error(
-                        textwrap.shorten(
-                          "First part of roll directory {} is {}, is not \
-                          identical to site directory {}: \
-                          change either of them to matching names, \
-                          Example: C06/C06_R1".format(
-                            roll_directory_name, site, site_directory_name,
-                            ), width=msg_width))
+                    msg = _create_roll_site_missmatch_msg(
+                        roll_directory_name,
+                        site,
+                        site_directory_name,
+                        msg_width)
+                    logger.error(msg)
                 # check each file in a roll directory
                 image_file_names = os.listdir(roll_directory_path)
                 for image_file_name in image_file_names:
@@ -150,10 +166,9 @@ if __name__ == '__main__':
                     if not image_file_name.lower().endswith('.jpg'):
                         image_path = os.path.join(
                             roll_directory_path, image_file_name)
-                        logger.error(
-                            textwrap.shorten(
-                                "File {} at {} must end in .jpg / .JPG".format(
-                                 image_file_name, roll_directory_name
-                                 ), width=msg_width))
-
+                        msg = _create_invalid_image_msg(
+                            image_file_name,
+                            roll_directory_name,
+                            msg_width)
+                        logger.error(msg)
     logger.info("Finished checking input structure")

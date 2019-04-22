@@ -68,7 +68,14 @@ The 'captures_csv' input is a csv file with one row per image and with (at least
 |roll | roll identifier (SD card of a camera)
 |capture | capture number (e.g. '1' for the first capture in a specific roll)
 |path or image_path_rel | Absolute or relative path of the image
-|invalid| (legacy column) -- excludes images from the manifest if value is '1' or '2'
+
+Optional columns:
+| Column   | Description |
+| --------- | ----------- |
+|invalid| excludes images from the manifest if value is '1' or '2'
+|image_is_invalid|  excludes images from the manifest if value is '1'
+|image_no_upload|  excludes images from the manifest if value is '1'
+|image_was_deleted|  excludes images from the manifest if value is '1'
 
 It is expected that the input is ordered by: season, site, roll, capture, image (ordered by sequence in the capture).
 
@@ -167,33 +174,6 @@ BATCH=batch_0
 qsub -v SITE=${SITE},SEASON=${SEASON},PROJECT_ID=${PROJECT_ID},BATCH=${BATCH} upload_manifest.pbs
 ```
 
-### Upload Tracker File
-
-The code creates an upload 'tracker' file that tracks which captures have already been uploaded successfully. This allows for resuming uploads upon connection failures while avoiding to upload duplicates. This file is automatically deleted after the manifest has been completely uploaded.
-
-Important: If, for some reason, one uploads a manifest incompletely, deletes the subject-set on Zooniverse, and at some point starts over with the upload, the upload-tracker file needs to be manually deleted, else it's content is inconsistent with what is already on Zooniverse.
-
-Example file:
-```
-RUA_S1__batch_1__upload_tracker_file.txt
-```
-
-
-### Image Compression Options
-
-Per default the images are being compressed during the upload process. Use the following parameters to change that behavior:
-
-```
---save_quality 50 \
---n_processes 3 \
---max_pixel_of_largest_side 1440
-```
-
-Or disable image compression with:
-```
---dont_compress_images
-```
-
 ### In case of a failure
 
 If the upload fails (which can happen if the connection to Zooniverse crashes) you can add the missing subjects to the already (partially) uploaded set by specifying the SUBJECT_SET_ID of the already created set. DO NOT specify the parameter '-subject_set_name', instead use '-subject_set_id' and use the id on the 'Subject Sets' page after clicking on the name of the set of your project on Zooniverse.
@@ -226,6 +206,8 @@ qsub -v SITE=${SITE},SEASON=${SEASON},PROJECT_ID=${PROJECT_ID},BATCH=${BATCH},SU
 
 ### Notes
 
+#### General Infos
+
 1. It is possible to add subjects to a subject-set that is linked to a workflow and is itself in an active project volunteers are currently working on.
 2. It can happen that the script crashes frequently and early. So far, such phases have been temporary hence the advise: "keep trying!". Typically, the error message for connetion issues looks similar to:
 ```
@@ -233,3 +215,31 @@ INFO:Error occurred for capture_id: PLN_S1#D05#2#3345
 INFO:Details of error: Received HTTP status code 504 from API
 ```
 The script tries to re-try on connection issues, however, it can take a long time until connection issues are detected. It is thus useful to use the 'qsub' version of the script with a long runtime and be patient until everything is uploaded.
+
+
+#### Upload Tracker File
+
+The code creates an upload 'tracker' file that tracks which captures have already been uploaded successfully. This allows for resuming uploads upon connection failures while avoiding to upload duplicates. This file is automatically deleted after the manifest has been completely uploaded.
+
+Important: If, for some reason, one uploads a manifest incompletely, deletes the subject-set on Zooniverse, and at some point starts over with the upload, the upload-tracker file needs to be manually deleted, else it's content is inconsistent with what is already on Zooniverse.
+
+Example file:
+```
+RUA_S1__batch_1__upload_tracker_file.txt
+```
+
+
+#### Image Compression Options
+
+Per default the images are being compressed during the upload process. Use the following parameters to change that behavior:
+
+```
+--save_quality 50 \
+--n_processes 3 \
+--max_pixel_of_largest_side 1440
+```
+
+Or disable image compression with:
+```
+--dont_compress_images
+```
