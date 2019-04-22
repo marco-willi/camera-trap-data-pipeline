@@ -103,7 +103,7 @@ pre_processing_flags:
       - image_was_deleted
       - image_is_invalid
       - image_no_upload
-      - image_uncertain_datetime
+      - image_datetime_uncertain
     # create a flag for the following actions
     map_actions_to_flags:
       delete:
@@ -114,20 +114,16 @@ pre_processing_flags:
       mark_no_upload:
         - image_no_upload
       mark_datetime_uncertain:
-        - image_uncertain_datetime
+        - image_datetime_uncertain
     # remove images from final cleaned file with the following flags
     flags_to_remove_from_cleaned:
       - image_was_deleted
-
-###################################################
-# Zooniverse Uploads
-###################################################
-
-zooniverse_flags:
-  legacy_invalid_codes:
-    - '1'
-    - '2'
-
+    #############################
+    # Legacy Codes
+    #############################
+    legacy_invalid_codes:
+      - '1'
+      - '2'
 
 ###################################################
 # Flags to define the bheavior of the
@@ -230,6 +226,73 @@ plurality_aggregation_flags:
       - min
       - max
 
+###################################################
+# Flags for Zooniverse Uploads
+###################################################
+
+upload_flags:
+    images_to_remove_from_upload:
+      image_was_deleted:
+        - '1'
+      image_is_invalid:
+        - '1'
+
+###################################################
+# Flags for the Report Generation
+###################################################
+
+report_flags:
+  images_to_remove_from_report:
+    image_was_deleted:
+      - '1'
+    image_is_invalid:
+      - '1'
+    image_datetime_uncertain:
+      - '1'
+    invalid:
+      - '1'
+      - '2'
+  identify_humans_for_exclusion:
+    - human
+  # group report columns to select them when creating reports
+  capture_cols:
+    - capture_id
+    - subject_id
+    - season
+    - site
+    - roll
+    - capture_date_local
+    - capture_time_local
+  zooniverse_cols:
+    - zooniverse_created_at
+    - zooniverse_retirement_reason
+    - zooniverse_retired_at
+  zooniverse_urls_cols:
+    - zooniverse_url_
+  plurality_algo_cols:
+    - n_users_classified_this_subject
+    - n_users_identified_this_species
+    - p_users_identified_this_species
+    - n_species_ids_per_user_median
+    - n_species_ids_per_user_max
+    - n_users_saw_a_species
+    - n_users_saw_no_species
+    - p_users_saw_a_species
+    - pielous_evenness_index
+    - species_is_plurality_consensus
+  plurality_algo_cols_simple:
+    - p_users_identified_this_species
+    - pielous_evenness_index
+  plurality_algo_cols_extended:
+    - n_users_classified_this_subject
+    - n_users_identified_this_species
+    - n_species_ids_per_user_median
+    - n_species_ids_per_user_max
+    - n_users_saw_a_species
+    - n_users_saw_no_species
+    - p_users_saw_a_species
+    - species_is_plurality_consensus
+
 
 ###################################################
 # Flags to define the bheavior of the
@@ -304,54 +367,3 @@ add_subject_info_flags_legacy:
  - filenames
  - timestamps
  - capture_id
-
-
-###################################################
-# Flags for the Report Generation
-###################################################
-
-report_flags:
-  images_to_remove_from_report:
-    - image_was_deleted
-    - image_is_invalid
-    - image_uncertain_datetime
-  identify_humans_for_exclusion:
-    - human
-  # group report columns to select them when creating reports
-  capture_cols:
-    - capture_id
-    - subject_id
-    - season
-    - site
-    - roll
-    - capture_date_local
-    - capture_time_local
-  zooniverse_cols:
-    - zooniverse_created_at
-    - zooniverse_retirement_reason
-    - zooniverse_retired_at
-  zooniverse_urls_cols:
-    - zooniverse_url_
-  plurality_algo_cols:
-    - n_users_classified_this_subject
-    - n_users_identified_this_species
-    - p_users_identified_this_species
-    - n_species_ids_per_user_median
-    - n_species_ids_per_user_max
-    - n_users_saw_a_species
-    - n_users_saw_no_species
-    - p_users_saw_a_species
-    - pielous_evenness_index
-    - species_is_plurality_consensus
-  plurality_algo_cols_simple:
-    - p_users_identified_this_species
-    - pielous_evenness_index
-  plurality_algo_cols_extended:
-    - n_users_classified_this_subject
-    - n_users_identified_this_species
-    - n_species_ids_per_user_median
-    - n_species_ids_per_user_max
-    - n_users_saw_a_species
-    - n_users_saw_no_species
-    - p_users_saw_a_species
-    - species_is_plurality_consensus
