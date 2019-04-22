@@ -197,6 +197,29 @@ def sort_df_by_capture_id(df):
     df.drop('sort_id', inplace=True, axis=1)
 
 
+def sort_df(df):
+    """ Sort df by season, site, roll, capture, image """
+    sort_id = []
+    for row_id, row in df.iterrows():
+        if 'image_rank_in_capture' in row:
+            img_rank = row.image_rank_in_capture
+        elif 'image' in row:
+            img_rank = row.image
+        else:
+            img_rank = row.image_name
+        _id = '{}#{}#{}#{:05}#{:02}'.format(
+                row.season,
+                row.site,
+                row.roll,
+                row.capture,
+                img_rank
+                )
+        sort_id.append(_id)
+    df['sort_id'] = sort_id
+    df.sort_values(['sort_id'], inplace=True)
+    df.drop('sort_id', inplace=True, axis=1)
+
+
 def export_dict_to_json_with_newlines(data, path):
     """ Export a dictionary to a json file with newlines between each
         dictionary entry
@@ -290,6 +313,8 @@ def read_cleaned_season_file_df(path):
     for col in required_header_cols:
         if col not in df.columns:
             print("Column {} not found in cleaned_season_file".format(col))
+    # sort df
+    sort_df(df)
     return df
 
 
