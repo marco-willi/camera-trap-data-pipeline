@@ -38,7 +38,6 @@ flags_uploads = cfg['upload_flags']
 # args['license'] =  'Snapshot Safari + Singita Grumeti'
 
 
-
 if __name__ == "__main__":
 
     # Parse command line arguments
@@ -123,8 +122,8 @@ if __name__ == "__main__":
         flags_uploads['images_to_remove_from_upload'])
     n_omitted_images = n_read_from_cleaned - cleaned_captures.shape[0]
 
-    logger.info("Found %s images for upload" %
-                (cleaned_captures.shape[0], args['captures_csv']))
+    logger.info("Found {} images for upload - excluded {} images".format(
+        cleaned_captures.shape[0], n_omitted_images))
 
     # Create the manifest
     manifest = OrderedDict()
