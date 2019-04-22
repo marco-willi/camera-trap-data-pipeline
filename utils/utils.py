@@ -206,8 +206,8 @@ def sort_df(df):
         elif 'image' in row:
             img_rank = row.image
         else:
-            img_rank = row.image_name
-        _id = '{}#{}#{}#{:05}#{:02}'.format(
+            img_rank = row_id
+        _id = '{}#{}#{}#{:05}#{:07}'.format(
                 row.season,
                 row.site,
                 row.roll,
