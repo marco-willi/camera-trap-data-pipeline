@@ -252,6 +252,27 @@ def _append_season_to_image_path(path, season):
         return path
 
 
+def _any_row_val_in_map(row, map):
+    for col, vals_list in map.items():
+        if col in row:
+            if row[col] in vals_list:
+                return True
+    return False
+
+
+def remove_images_from_df(
+        df, remove_col_to_vals_map):
+    """ Remove invalid / no_upload images from df """
+    i_to_include = list()
+    for row_i, row in df.iterrows():
+        if _any_row_val_in_map(row, remove_col_to_vals_map):
+            logger.debug("image {} excluded".format(row.path))
+        else:
+            i_to_include.append(row_i)
+    df = df.iloc[i_to_include]
+    return df
+
+
 def read_cleaned_season_file_df(path):
     df = pd.read_csv(path, dtype='str', index_col=None)
     df.fillna('', inplace=True)

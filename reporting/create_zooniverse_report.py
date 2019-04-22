@@ -6,13 +6,16 @@ import textwrap
 import pandas as pd
 
 from utils.logger import setup_logger, create_log_file
-from utils.utils import set_file_permission, read_cleaned_season_file_df
+from utils.utils import (
+    set_file_permission,
+    read_cleaned_season_file_df, remove_images_from_df)
 from reporting.utils import create_season_dict, exclude_cols
 from config.cfg import cfg
 
 
 flags_global = cfg['global_processing_flags']
 flags_report = cfg['report_flags']
+flags_preprocessing = cfg['pre_processing_flags']
 
 
 def deduplicate_captures(df_aggregated):
@@ -170,6 +173,10 @@ if __name__ == '__main__':
 
     # read captures data
     season_data_df = read_cleaned_season_file_df(args['season_captures_csv'])
+
+    season_data_df = remove_images_from_df(
+        season_data_df,
+        flags_report['images_to_remove_from_report'])
 
     # Create per Capture Data
     season_dict = create_season_dict(season_data_df)
