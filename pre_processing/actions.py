@@ -66,7 +66,8 @@ def _change_time(image_data, action, flags):
     old_time = image_data['datetime']
     new_time = _add_seconds_to_time(
         image_data['datetime'],
-        action.shift_time_by_seconds, flags['time_formats']['output_datetime_format'])
+        action.shift_time_by_seconds,
+        flags['time_formats']['output_datetime_format'])
     image_data['datetime'] = new_time.strftime(
         flags['time_formats']['output_datetime_format'])
     logging.info("Changed datetime for image {} from {} to {}".format(
@@ -86,8 +87,9 @@ def _create_flag(image_data, action, flags):
     get_flag_cols_list = flags['map_actions_to_flags'][action.action]
     for flag_col in get_flag_cols_list:
         image_data[flag_col] = '1'
-        logging.info("Image: {:20} - Reason: {:15} - Action set: {} to '1'".format(
-            action.image,
-            action.reason,
-            flag_col
-        ))
+        logging.info(
+            "Image: {:20} - Reason: {:15} - Action set: {} to '1'".format(
+                action.image,
+                action.reason,
+                flag_col
+                ))
