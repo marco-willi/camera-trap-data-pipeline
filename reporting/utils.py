@@ -78,25 +78,11 @@ def exclude_cols(cols, not_in):
     return [c for c in cols if not any([c.startswith(n) for n in not_in])]
 
 
-def _exclude_image_from_report(image_data, flags_report):
-    """ Exclude images from report """
-    for flag in flags_report['images_to_remove_from_report']:
-        if flag in image_data:
-            if image_data[flag] == '1':
-                return True
-    return False
-
-
-def create_season_dict(season_data_df, remove_invalid=True):
+def create_season_dict(season_data_df):
     """ Create Dict of Season Data """
     season_dict = OrderedDict()
     season_dict_input = season_data_df.to_dict(orient='index')
     for _id, image_record in season_dict_input.items():
-        if remove_invalid:
-            if _exclude_image_from_report(image_record):
-                logger.info("Removed image {} from report".format(
-                    image_record['path']))
-                continue
         try:
             capture_id = image_record['capture_id']
         except:
