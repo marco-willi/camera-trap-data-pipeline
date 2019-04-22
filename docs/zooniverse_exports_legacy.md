@@ -20,7 +20,7 @@ The data has been saved to MSI shared drives:
 The following codes take as input the full export from Zooniverse. Note that the data is quite large (over 6GB and more than 25 mio records).
 
 The scripts can be found here:
-[Scripts for S1-S10](zooniverse_exports/legacy/)
+[Scripts for S1-S10](../zooniverse_exports/legacy/)
 
 The script is a re-implementation of the following code:
 https://github.com/mkosmala/SnapshotSerengetiScripts/
