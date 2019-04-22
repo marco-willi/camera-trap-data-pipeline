@@ -202,9 +202,9 @@ def sort_df(df):
     sort_id = []
     for row_id, row in df.iterrows():
         if 'image_rank_in_capture' in row:
-            img_rank = row.image_rank_in_capture
+            img_rank = int(row.image_rank_in_capture)
         elif 'image' in row:
-            img_rank = row.image
+            img_rank = int(row.image)
         else:
             img_rank = row_id
         _id = '{}#{}#{}#{:05}#{:07}'.format(
@@ -314,7 +314,11 @@ def read_cleaned_season_file_df(path):
         if col not in df.columns:
             print("Column {} not found in cleaned_season_file".format(col))
     # sort df
-    sort_df(df)
+    try:
+        sort_df(df)
+    except Exception as e:
+        logger.warning("Failed to sort dataframe")
+        logger.warning(e, exc_info=True)
     return df
 
 
