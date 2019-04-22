@@ -12,7 +12,7 @@ from collections import OrderedDict
 
 from utils.logger import setup_logger, create_log_file
 from utils.utils import set_file_permission
-from zooniverse_exports.legacy_extractor import build_img_path
+from zooniverse_exports.legacy.legacy_extractor import build_img_path
 
 from config.cfg import cfg
 

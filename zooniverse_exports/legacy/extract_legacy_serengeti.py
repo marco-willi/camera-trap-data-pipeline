@@ -93,7 +93,7 @@ from collections import Counter
 import logging
 from utils.logger import setup_logger, create_log_file
 
-from zooniverse_exports import legacy_extractor
+from zooniverse_exports.legacy import legacy_extractor
 from utils.utils import print_nested_dict, set_file_permission
 from config.cfg import cfg
 
