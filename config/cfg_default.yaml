@@ -267,7 +267,7 @@ report_flags:
     - zooniverse_created_at
     - zooniverse_retirement_reason
     - zooniverse_retired_at
-  zooniverse_urls_cols:
+  zooniverse_url_cols:
     - zooniverse_url_
   plurality_algo_cols:
     - n_users_classified_this_subject

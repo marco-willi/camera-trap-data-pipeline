@@ -64,6 +64,7 @@ if __name__ == '__main__':
     parser.add_argument("--exclude_blanks", action="store_true")
     parser.add_argument("--exclude_captures_without_data", action="store_true")
     parser.add_argument("--exclude_zooniverse_cols", action="store_true")
+    parser.add_argument("--exclude_zooniverse_urls", action="store_true")
     parser.add_argument(
         "--exclude_additional_plurality_infos", action="store_true")
     parser.add_argument(
@@ -250,6 +251,9 @@ if __name__ == '__main__':
 
     # determine which columns to export
     cols_to_export = list(df_report.columns)
+    #####################################
+    # Exclude Zooniverse Columns
+    #####################################
     if args['exclude_zooniverse_cols']:
         try:
             cols_to_export = exclude_cols(
@@ -257,8 +261,11 @@ if __name__ == '__main__':
         except:
             logging.debug(
                 "Failed to exclude 'exclude_zooniverse_cols': {}".format(
-                 args['exclude_zooniverse_cols']))
+                 flags_report['zooniverse_cols']))
             pass
+    #####################################
+    # Exclude Additional Plurality infos
+    #####################################
     if args['exclude_additional_plurality_infos']:
         try:
             cols_to_export = exclude_cols(
@@ -266,8 +273,23 @@ if __name__ == '__main__':
         except:
             logging.debug(
                 "Failed to exclude 'exclude_additional_plurality_infos': {}".format(
-                 args['exclude_additional_plurality_infos']))
+                 flags_report['plurality_algo_cols_extended']))
             pass
+    #####################################
+    # Exclude Zooniverse urls
+    #####################################
+    if args['exclude_zooniverse_urls']:
+        try:
+            cols_to_export = exclude_cols(
+                cols_to_export, flags_report['zooniverse_url_cols'])
+        except:
+            logging.debug(
+                "Failed to exclude 'zooniverse_url_cols': {}".format(
+                 flags_report['zooniverse_url_cols']))
+            pass
+    #####################################
+    # Exclude Specific cols
+    #####################################
     if len(args['exclude_cols']) > 0:
         try:
             cols_to_export = [
