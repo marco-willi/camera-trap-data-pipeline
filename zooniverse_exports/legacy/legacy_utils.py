@@ -79,14 +79,15 @@ def read_lila(lila_path):
     with open(lila_path, 'r') as f:
         lila_data = json.load(f)
     species_map = {x['id']: x['name'] for x in lila_data['categories']}
-    image_to_capture = {x['id']:
-        {'image_path': x['file_name'], 'subject_id': x['seq_id'],
-         'season': x['season'], 'site': x['location'],
-         'datetime': x.get('datetime', '')} for x in lila_data['images']}
+    image_to_capture = {
+        x['id']:
+            {'image_path': x['file_name'], 'subject_id': x['seq_id'],
+             'season': x['season'], 'site': x['location'],
+             'datetime': x.get('datetime', '')} for x in lila_data['images']}
     capture_to_species = dict()
     for anno in lila_data['annotations']:
         subject_id = image_to_capture[anno['image_id']]['subject_id']
-        if not subject_id in capture_to_species:
+        if subject_id not in capture_to_species:
             capture_to_species[subject_id] = set()
         capture_to_species[subject_id].add(species_map[anno['category_id']])
     rows = list()

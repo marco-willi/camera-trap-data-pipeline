@@ -172,7 +172,7 @@ python3 -m reporting.sample_report \
 See here: [Machine Learning](../docs/machine_learning.md)
 
 
-### LILA Reports
+## LILA Reports
 
 Reports for publication on http://lila.science/datasets
 
@@ -180,8 +180,8 @@ Reports for publication on http://lila.science/datasets
 python3 -m reporting.create_zooniverse_report \
 --season_captures_csv /home/packerc/shared/season_captures/${SITE}/cleaned/${SEASON}_cleaned.csv \
 --aggregated_csv /home/packerc/shared/zooniverse/Aggregations/${SITE}/${SEASON}_aggregated_plurality.csv \
---output_csv /home/packerc/shared/zooniverse/SpeciesReports/${SITE}/${SEASON}_report_lila.csv \
---log_dir /home/packerc/shared/zooniverse/SpeciesReports/${SITE}/log_files/ \
+--output_csv /home/packerc/shared/zooniverse/LilaReports/${SITE}/${SEASON}_report_lila.csv \
+--log_dir /home/packerc/shared/zooniverse/LilaReports/${SITE}/log_files/ \
 --log_filename ${SEASON}_create_zooniverse_report \
 --default_season_id ${SEASON} \
 --exclude_non_consensus \
@@ -194,8 +194,8 @@ python3 -m reporting.create_zooniverse_report \
 ```
 # Create statistics file
 python3 -m reporting.create_report_stats \
---report_path /home/packerc/shared/zooniverse/SpeciesReports/${SITE}/${SEASON}_report_lila.csv \
---output_csv /home/packerc/shared/zooniverse/SpeciesReports/${SITE}/${SEASON}_report_lila_overview.csv \
---log_dir /home/packerc/shared/zooniverse/SpeciesReports/${SITE}/log_files/ \
+--report_path /home/packerc/shared/zooniverse/LilaReports/${SITE}/${SEASON}_report_lila.csv \
+--output_csv /home/packerc/shared/zooniverse/LilaReports/${SITE}/${SEASON}_report_lila_overview.csv \
+--log_dir /home/packerc/shared/zooniverse/LilaReports/${SITE}/log_files/ \
 --log_filename ${SEASON}_create_report_stats
 ```
