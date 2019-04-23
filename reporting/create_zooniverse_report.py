@@ -173,10 +173,18 @@ if __name__ == '__main__':
 
     # read captures data
     season_data_df = read_cleaned_season_file_df(args['season_captures_csv'])
+    n_images_in_season_data = season_data_df.shape[0]
+    logger.info("Read {} records from {}".format(
+        n_images_in_season_data, args['season_captures_csv']))
 
+    # remove ineligible images
     season_data_df = remove_images_from_df(
         season_data_df,
         flags_report['images_to_remove_from_report'])
+    n_images_removed = n_images_in_season_data - season_data_df.shape[0]
+    logger.info("Removed {} ineligible images from {} -- {} remaining".format(
+        n_images_removed, args['season_captures_csv'], season_data_df.shape[0]
+    ))
 
     # Create per Capture Data
     season_dict = create_season_dict(season_data_df)
