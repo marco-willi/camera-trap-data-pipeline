@@ -157,29 +157,36 @@ ASG0000002,http://www.snapshotserengeti.org/subjects/standard/50c210188a607540b9
 
 For processing with later codes the following code re-creates season capture files according to the new process. This file has one row per image and is normally the end-product of pre-processing camera trap images.
 
-```
-python3 -m zooniverse_exports.legacy.recreate_legacy_season_captures \
---subjects_extracted /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subjects_extracted_prelim.csv \
---output_csv /home/packerc/shared/season_captures/${SITE}/cleaned/${SEASON}_cleaned.csv \
---log_dir /home/packerc/shared/zooniverse/Exports/${SITE}/log_files/ \
---log_filename ${SEASON}_recreate_legacy_season_captures
-```
+The code relies on various input files:
+1. LILA/Dryad publication (S1-S6)
+2. MSI DB exports (S1-S8)
+3. SX_cleaned.csv files
+
+The code is suppoed to be run manually at only once. Details can be found here:
+
+[Build Cleaned CSV](../zooniverse_exports/legacy/build_cleaned_csv.py)
 
 | Columns   | Description |
 | --------- | ----------- |
-|capture,roll,season,site | internal ids of the capture (some are missing)
 |capture_id| capture-id
-|image| rank of the image in the capture (1=first image)
-|path| relative path of the image
-|timestamp| date time of when the image was taken (YYYY-MM-DD HH:MM:SS)
+|season, site, roll, capture| internal ids of the capture
+|image_rank_in_capture| rank/order of image in a capture (may be missing)
+|image_path_rel| relative (to season root) image path after re-naming
+|datetime| datetime of image (default Y-m-d H:M:S) -- after any datetime corrections applied
+|datetime_exif| datetime as extrated from EXIF data (default Y-m-d H:M:S, '' if none)
+|datetime_file_creation| file creation date (is missing - just for consistency)
+|image_is_invalid| flag if image was invalidated (1, '' otherwise) -- derived from 'invalid' column (values 1,2,3)
+|image_datetime_uncertain| flag if image was marked for uncertain datetime (1, '' otherwise) -- derived from 'invalid' column (values 1,2,3)
+|invalid| legacy column referring to timestamp status ('1' = 'Not recoverable', '2'= 'Fix is hard', '3'='Fix is hard but timestamp likely close'),
+|include| legacy flag referring whether to 'include' (='1') the image (='1' only were published)
 
 
 Examples:
 ```
-capture_id,season,site,roll,capture,image,path,timestamp
-SER_S1#B04#1#1,S1,B04,R1,1,1,S1/B04/B04_R1/S1_B04_R1_PICT0001.JPG,2010-07-18 16:26:14
-SER_S1#B04#1#2,S1,B04,R1,2,1,S1/B04/B04_R1/S1_B04_R1_PICT0002.JPG,2010-07-18 16:26:30
-SER_S1#B04#1#3,S1,B04,R1,3,1,S1/B04/B04_R1/S1_B04_R1_PICT0003.JPG,2010-07-20 06:14:06
+capture_id,season,site,roll,capture,image_rank_in_capture,image_path_rel,datetime,datetime_exif,datetime_file_creation,invalid,include,image_is_invalid,image_datetime_uncertain
+SER_S10#B03#1#1,S10,B03,1,1,1,S10/B03/B03_R1/S10_B03_R1_IMAG0001.JPG,2015-01-16 11:31:41,2015-01-16 11:31:41,,0,1,0,0
+SER_S10#B03#1#1,S10,B03,1,1,2,S10/B03/B03_R1/S10_B03_R1_IMAG0002.JPG,2015-01-16 11:31:41,2015-01-16 11:31:43,,0,1,0,0
+SER_S10#B03#1#2,S10,B03,1,2,1,S10/B03/B03_R1/S10_B03_R1_IMAG0003.JPG,2015-01-16 11:31:46,2015-01-16 11:31:46,,0,1,0,0
 ```
 
 ### Add Zooniverse URLs to subjec exports

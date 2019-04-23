@@ -263,11 +263,11 @@ The option '--plot_timelines' creates a pdf in the '--action_list_csv' directory
 action_to_take | meaning
 ------------ | -------------
 delete | the selected images will be deleted (example: corrupt files)
-invalidate | remove the image from further processing (but do not delete) -- this is for images that can't be used for ecological analyses (example: images that have bad quality / images with humans / excess images)
+invalidate | remove the image from further processing (but do not delete) -- this is for images that can't be used for ecological analyses (example: images that have bad quality / images with humans / excess images) -- per default such images are not uploaded to Zoniverse and not included in reports
 timechange | the time of the selected images will be changed (see below)
 ok | do nothing
-mark_no_upload | flag/mark images as not to upload (example: images with sensitive species not intended for publication)
-mark_datetime_uncertain | flag/mark images if datetime is uncertain (example: images with only vague datetime info)
+mark_no_upload | flag/mark images as not to upload (example: images with sensitive species not intended for publication) -- per default such images are included in reports
+mark_datetime_uncertain | flag/mark images if datetime is uncertain (example: images with only vague datetime info) -- per default such images are not included in reports but are uploaded to Zooniverse
 
 4. To add new actions simply create a new row in the csv. Multiple actions can be specified for a single image if necessary (with the excpetion of timechanges).
 
@@ -341,7 +341,7 @@ python3 -m pre_processing.apply_actions \
 |image_is_invalid| flag if image was invalidated (1, '' otherwise)
 |image_was_deleted| flag if image was deleted (1, '' otherwise)
 |image_no_upload| flag if image was marked for no upload (1, '' otherwise)
-|image_uncertain_datetime| flag if image was marked for uncertain datetime (1, '' otherwise)
+|image_datetime_uncertain| flag if image was marked for uncertain datetime (1, '' otherwise)
 
 
 ## Generate Updated Captures
@@ -364,8 +364,7 @@ If the previous code showed no further issues in the printed output, the generat
 cp -p /home/packerc/shared/season_captures/${SITE}/captures/${SEASON}_captures_updated.csv /home/packerc/shared/season_captures/${SITE}/cleaned/${SEASON}_cleaned.csv
 ```
 
-If there are further issues, we generate a new action list and start over with:
-
+If there are further issues, we verify this by running the following code:
 ```
 python3 -m pre_processing.create_action_list \
 --captures /home/packerc/shared/season_captures/${SITE}/captures/${SEASON}_captures_updated.csv \
@@ -373,6 +372,8 @@ python3 -m pre_processing.create_action_list \
 --log_dir /home/packerc/shared/season_captures/${SITE}/log_files/ \
 --log_filename ${SEASON}_create_action_list
 ```
+
+If the produced action list is not empty we can re-iterate the application of actions.
 
 This code can be run in any case to check if further actions need to be taken if the output of the previous code (update_captures) was not clear.
 
@@ -393,7 +394,7 @@ This code can be run in any case to check if further actions need to be taken if
 |image_is_invalid| flag if image was invalidated (1, '' otherwise)
 |image_was_deleted| flag if image was deleted (1, '' otherwise)
 |image_no_upload| flag if image was marked for no upload (1, '' otherwise)
-|image_uncertain_datetime| flag if image was marked for uncertain datetime (1, '' otherwise)
+|image_datetime_uncertain| flag if image was marked for uncertain datetime (1, '' otherwise)
 |image_name | image name after re-naming
 |image_path_rel| relative (to season root) image path after re-naming
 |image_path | full path of re-named image  

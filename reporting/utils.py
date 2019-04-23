@@ -73,7 +73,7 @@ def _extract_datetime(image_record):
 def exclude_cols(cols, not_in):
     """ Remove any element of 'cols' that has elements in 'not_in' that
         start with elements in 'cols'
-        Example: ['abc', 'def'] and ['ab'] -> ['def']
+        Example: cold=['abc', 'def'] and not_in=['ab'] -> ['def']
     """
     return [c for c in cols if not any([c.startswith(n) for n in not_in])]
 

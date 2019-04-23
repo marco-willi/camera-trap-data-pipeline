@@ -67,6 +67,7 @@ The 'captures_csv' input is a csv file with one row per image and with (at least
 |site | site/camera identifier
 |roll | roll identifier (SD card of a camera)
 |capture | capture number (e.g. '1' for the first capture in a specific roll)
+|image or image_rank_in_capture| order/rank of image in a capture
 |path or image_path_rel | Absolute or relative path of the image
 
 Optional columns:
@@ -77,7 +78,6 @@ Optional columns:
 |image_no_upload|  excludes images from the manifest if value is '1'
 |image_was_deleted|  excludes images from the manifest if value is '1'
 
-It is expected that the input is ordered by: season, site, roll, capture, image (ordered by sequence in the capture).
 
 Example:
 ```

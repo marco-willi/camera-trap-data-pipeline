@@ -202,17 +202,23 @@ def sort_df(df):
     sort_id = []
     for row_id, row in df.iterrows():
         if 'image_rank_in_capture' in row:
-            img_rank = row.image_rank_in_capture
+            try:
+                img_rank = int(row.image_rank_in_capture)
+            except ValueError:
+                img_rank = row_id
         elif 'image' in row:
-            img_rank = row.image
+            try:
+                img_rank = int(row.image)
+            except ValueError:
+                img_rank = row_id
         else:
-            img_rank = row_id
+            img_rank = int(row_id)
         _id = '{}#{}#{}#{:05}#{:07}'.format(
                 row.season,
                 row.site,
                 row.roll,
                 int(row.capture),
-                int(img_rank)
+                img_rank
                 )
         sort_id.append(_id)
     df['sort_id'] = sort_id
