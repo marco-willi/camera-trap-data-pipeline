@@ -287,7 +287,7 @@ def _find_and_choose_capture_id(
     image_keys = list()
     for image_name in image_names:
         img_key = '#'.join([season, site, roll, image_name])
-    image_keys.append(img_key)
+        image_keys.append(img_key)
 
     capture_ids = list()
     for img_key in image_keys:
