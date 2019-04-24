@@ -430,6 +430,58 @@ df_captures_all.to_csv(os.path.join(path_output, 'capture_events.csv'), index=Fa
 #df_captures_all = pd.read_csv(os.path.join(path_output, 'capture_events.csv'), index_col=False, dtype=str)
 
 ##################################
+# Create Subject to Cap Mapper
+##################################
+
+df_base = df_merged2[['subject_id_lila', 'subject_id', 'season', 'site', 'roll', 'capture']].copy()
+
+df_base['capture_id'] = df_base[['season', 'site', 'roll', 'capture']].apply(
+    lambda x: create_capture_id(*x), axis=1)
+
+df_subject_to_capture = pd.merge(
+    left=df_captures_all,
+    right=df_base,
+    on=['capture_id', 'season', 'site', 'roll', 'capture'],
+    how='left'
+)
+
+i_sub_missing = (df_subject_to_capture['subject_id'] == '')
+df_subject_to_capture['subject_id'].loc[i_sub_missing] = df_subject_to_capture['subject_id_lila'].loc[i_sub_missing]
+df_subject_to_capture = df_subject_to_capture.loc[df_subject_to_capture['subject_id'] != '']
+
+tt = df_subject_to_capture.groupby('capture_id').subject_id.nunique()
+multi_sub = tt[tt>1]
+assert multi_sub.shape[0] == 0
+
+df_subject_to_capture = df_subject_to_capture[['capture_id', 'subject_id']]
+df_subject_to_capture.to_csv(os.path.join(path_output, 'capture_id_to_subject_id.csv'), index=False)
+
+
+# tt = df_subject_to_capture.loc[(df_subject_to_capture['subject_id'] == '')]
+# print_stats(tt['season'].value_counts())
+#
+# tt = df_subject_to_capture.loc[(df_subject_to_capture['subject_id'] == '') | (df_subject_to_capture['subject_id_lila'] == '')]
+# print_stats(tt['season'].value_counts())
+#
+# tt = df_subject_to_capture.loc[(df_subject_to_capture['subject_id'] == '') & (df_subject_to_capture['subject_id_lila'] == '')]
+# print_stats(tt['season'].value_counts())
+#
+# tt = df_subject_to_capture.loc[
+#     (df_subject_to_capture['subject_id'] != df_subject_to_capture['subject_id_lila']) &
+#     (df_subject_to_capture['subject_id'] != '') &
+#     (df_subject_to_capture['subject_id_lila'] != '')]
+# tt.shape
+#
+#
+# tt.groupby(['season', 'include', 'invalid']).size().to_frame('count').reset_index()
+# # -> LILA data had only 'invalid' == 0 records
+#
+# # -> newtime is mostly 'TimestampAccepted' (small discrepancies for S4, S5 and S6)
+# print_stats(tt['season'].value_counts())
+
+
+
+##################################
 # Create Final DF
 ##################################
 

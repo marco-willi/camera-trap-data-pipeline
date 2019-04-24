@@ -262,8 +262,28 @@ def build_img_to_capture_map(path, flags):
     return img_to_capture
 
 
-def _find_and_choose_capture_id(img_to_capture, season, site, roll, image_names):
+def build_subject_id_to_capture_map(path):
+    """ Build Dict from File to map
+        subject_id -> capture_id
+    """
+    subject_to_capture = dict()
+    with open(path, 'r') as f:
+        csv_reader = csv.reader(f, delimiter=',', quotechar='"')
+        header = next(csv_reader)
+        row_name_to_id_mapper = {x: i for i, x in enumerate(header)}
+        for line_no, line in enumerate(csv_reader):
+            subject_id = line[row_name_to_id_mapper['subject_id']]
+            capture_id = line[row_name_to_id_mapper['capture_id']]
+            subject_to_capture[subject_id] = capture_id
+    return subject_to_capture
+
+
+def _find_and_choose_capture_id(
+        img_to_capture, subject_to_capture,
+        subject_id, season, site, roll, image_names):
     """ Find Capture ID from multiple image names """
+    if subject_id in subject_to_capture:
+        return subject_to_capture[subject_id]
     image_keys = list()
     for image_name in image_names:
         img_key = '#'.join([season, site, roll, image_name])
@@ -293,6 +313,7 @@ def _find_and_choose_capture_id(img_to_capture, season, site, roll, image_names)
 def extract_raw_classification(
         cls_dict,
         img_to_capture,
+        subject_to_capture,
         flags,
         stats,
         user_subject_tracker):
@@ -323,13 +344,15 @@ def extract_raw_classification(
     # build lookup key to get capture id
     season = build_season_id(classification_info['season'])
     site = cls_dict['site']
+    subject_id = cls_dict['subject_id']
     roll = fix_roll_id(cls_dict['roll'])
     image_names = classification_info['filenames'].split(';')
     if len(image_names[0]) == 0:
         stats.update({'n_annos_without_images'})
     try:
         capture_id = _find_and_choose_capture_id(
-            img_to_capture, season, site, roll, image_names)
+            img_to_capture, subject_to_capture,
+            subject_id, season, site, roll, image_names)
         capture = capture_id.split('#')[-1]
     except KeyError:
         not_found_key = 'season: {} site: {} roll: {} images: {}'.format(
@@ -381,7 +404,7 @@ def extract_raw_classification(
     return record
 
 
-def process_season_classifications(path, img_to_capture, flags):
+def process_season_classifications(path, img_to_capture, subject_to_capture, flags):
     """ Process season classifications """
     stats = Counter()
     user_subject_tracker = dict()
@@ -399,6 +422,7 @@ def process_season_classifications(path, img_to_capture, flags):
                 record = extract_raw_classification(
                             cls_dict,
                             img_to_capture,
+                            subject_to_capture,
                             flags,
                             stats,
                             user_subject_tracker)
