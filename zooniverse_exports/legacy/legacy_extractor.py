@@ -314,8 +314,13 @@ def _find_and_choose_capture_id(
     elif len(set(capture_ids)) > 1:
         lowest_img_nr_index = _find_lowest_img_nr(images_found)
         logger.warning(
-            "Multiple captures found for season: {} site:{} roll: {} images: {} -- choosing {}".format(
-             season, site, roll, image_names, capture_ids[lowest_img_nr_index]))
+            textwrap.shorten("Multiple captures found for \
+                season: {} site:{} roll: {} images: {} -- choosing -- \
+                image: {} capture_id: {} subject_id: {}".format(
+             season, site, roll, image_names,
+             images_found[lowest_img_nr_index],
+             capture_ids[lowest_img_nr_index],
+             subject_id), width=350))
         return capture_ids[lowest_img_nr_index]
     else:
         return capture_ids[0]
