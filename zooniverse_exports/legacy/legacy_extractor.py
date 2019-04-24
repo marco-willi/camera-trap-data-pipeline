@@ -288,11 +288,8 @@ def _find_lowest_img_nr(img_list):
 
 
 def _find_and_choose_capture_id(
-        img_to_capture, subject_to_capture,
-        subject_id, season, site, roll, image_names):
+        img_to_capture, season, site, roll, image_names):
     """ Find Capture ID from multiple image names """
-    if subject_id in subject_to_capture:
-        return subject_to_capture[subject_id]
     image_keys = list()
     for image_name in image_names:
         img_key = '#'.join([season, site, roll, image_name])
@@ -316,11 +313,10 @@ def _find_and_choose_capture_id(
         logger.warning(
             textwrap.shorten("Multiple captures found for \
                 season: {} site:{} roll: {} images: {} -- choosing -- \
-                image: {} capture_id: {} subject_id: {}".format(
+                image: {} capture_id: {}".format(
              season, site, roll, image_names,
              images_found[lowest_img_nr_index],
-             capture_ids[lowest_img_nr_index],
-             subject_id), width=350))
+             capture_ids[lowest_img_nr_index]), width=350))
         return capture_ids[lowest_img_nr_index]
     else:
         return capture_ids[0]
@@ -363,33 +359,42 @@ def extract_raw_classification(
     subject_id = cls_dict['subject_id']
     roll = fix_roll_id(cls_dict['roll'])
     image_names = classification_info['filenames'].split(';')
-    if len(image_names[0]) == 0:
-        stats.update({'n_annos_without_images'})
-    if len(image_names) > 3:
-        stats.update({'n_annos_with_too_many_images'})
-        if stats['n_annos_with_too_many_images'] < 10:
-            logger.info(
-                textwrap.shorten(
-                    "Discard annotation with subject_id: {} b/c it \
-                     contains too many images".format(subject_id), width=150))
-        return record
+
+    # get / find capture_id either via two different mapping tables
     try:
-        capture_id = _find_and_choose_capture_id(
-            img_to_capture, subject_to_capture,
-            subject_id, season, site, roll, image_names)
-        capture = capture_id.split('#')[-1]
+        capture_id = subject_to_capture[subject_id]
     except KeyError:
-        not_found_key = 'season: {} site: {} roll: {} images: {}'.format(
-            season, site, roll, image_names)
-        if stats['n_capture_id_not_found'] < 10:
-            logger.info("Did not find capture for: {}".format(not_found_key))
-        elif stats['n_capture_id_not_found'] == 10:
-            logger.info("Not printing more capture not found msgs...")
-        else:
-            logger.debug("Did not find capture for: {}".format(not_found_key))
-        stats.update({'n_capture_id_not_found'})
-        return record
+        # no images found
+        if (len(image_names) == 1) and (len(image_names[0]) == 0):
+            stats.update({'n_annos_without_images'})
+            return record
+        elif len(image_names) > 3:
+            stats.update({'n_annos_with_too_many_images'})
+            if stats['n_annos_with_too_many_images'] < 10:
+                logger.info(
+                    textwrap.shorten(
+                        "Discart annotation with subject_id: {} b/c it \
+                         contains too many images".format(subject_id),
+                        width=150))
+            return record
+        try:
+            capture_id = _find_and_choose_capture_id(
+                img_to_capture, season, site, roll, image_names)
+        except KeyError:
+            not_found_key = 'season: {} site: {} roll: {} images: {}'.format(
+                season, site, roll, image_names)
+            if stats['n_capture_id_not_found'] < 10:
+                logger.info(
+                    "Did not find capture for: {}".format(not_found_key))
+            elif stats['n_capture_id_not_found'] == 10:
+                logger.info("Not printing more capture not found msgs...")
+            else:
+                logger.debug(
+                    "Did not find capture for: {}".format(not_found_key))
+            stats.update({'n_capture_id_not_found'})
+            return record
     # Add capture id
+    capture = capture_id.split('#')[-1]
     classification_info['capture_id'] = capture_id
     classification_info['capture'] = capture
     # get answers
