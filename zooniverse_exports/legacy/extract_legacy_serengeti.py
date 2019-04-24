@@ -91,7 +91,7 @@ import os
 import argparse
 from collections import Counter
 import logging
-from utils.logger import setup_logger, create_log_file
+from utils.logger import set_logging
 
 from zooniverse_exports.legacy import legacy_extractor
 from utils.utils import print_nested_dict, set_file_permission
@@ -101,18 +101,15 @@ from config.cfg import cfg
 flags = cfg['legacy_extractor_flags']
 flags_global = cfg['global_processing_flags']
 
-# To Test
+# # To Test
 # args = dict()
 # args['classification_csv'] = '/home/packerc/shared/zooniverse/Exports/SER/2019-01-27_serengeti_classifications.csv'
 # args['output_path'] = '/home/packerc/shared/zooniverse/Exports/SER/'
 # args['season_captures_path'] = '/home/packerc/shared/season_captures/SER/captures/'
 # args['season_to_process'] = 'S2'
 # args['split_raw_file'] = False
-
-# python3 -m zooniverse_exports.extract_legacy_serengeti \
-# --classification_csv '/home/packerc/shared/zooniverse/Exports/SER/2019-01-27_serengeti_classifications.csv' \
-# --output_path '/home/packerc/shared/zooniverse/Exports/SER/' \
-# --season_to_process 'S1'
+# args['log_dir'] = None
+# args['log_filename'] = None
 
 ######################################
 # Parameters
@@ -168,11 +165,8 @@ if __name__ == '__main__':
     ######################################
 
     # logging
-    if args['log_dir'] is not None:
-        log_file_path = create_log_file(args['log_dir'], args['log_filename'])
-        setup_logger(log_file_path)
-    else:
-        setup_logger()
+    set_logging(args['log_dir'], args['log_filename'])
+
     logger = logging.getLogger(__name__)
 
     for k, v in args.items():
