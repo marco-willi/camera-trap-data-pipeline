@@ -262,6 +262,34 @@ def build_img_to_capture_map(path, flags):
     return img_to_capture
 
 
+def _find_and_choose_capture_id(img_to_capture, season, site, roll, image_names):
+    """ Find Capture ID from multiple image names """
+    image_keys = list()
+    for image_name in image_names:
+        img_key = '#'.join([season, site, roll, image_name])
+    image_keys.append(img_key)
+
+    capture_ids = list()
+    for img_key in image_keys:
+        try:
+            capture_ids.append(img_to_capture[img_key])
+        except KeyError:
+            logger.debug("img_key {} not found".format(img_key))
+    # if not found raise KeyError
+    if len(capture_ids) == 0:
+        raise KeyError("no capture found")
+
+    # verify uniqueness of capture_id -> image mapping
+    elif len(set(capture_ids)) > 1:
+        logger.warning(
+            "Multiple captures found for season: {} site:{} roll: {}" +
+            "images: {} -- choosing first".format(
+             season, site, roll, image_names))
+        return capture_ids[0]
+    else:
+        return capture_ids[0]
+
+
 def extract_raw_classification(
         cls_dict,
         img_to_capture,
@@ -294,24 +322,26 @@ def extract_raw_classification(
 
     # build lookup key to get capture id
     season = build_season_id(classification_info['season'])
-    image_name = classification_info['filenames'].split(';')[0]
     site = cls_dict['site']
     roll = fix_roll_id(cls_dict['roll'])
-    img_key = '#'.join([season, site, roll, image_name])
-
+    image_names = classification_info['filenames'].split(';')
+    if len(image_names[0]) == 0:
+        stats.update({'n_annos_without_images'})
     try:
-        # add full capture_id and capture num
-        capture_id = img_to_capture[img_key]
+        capture_id = _find_and_choose_capture_id(
+            img_to_capture, season, site, roll, image_names)
         capture = capture_id.split('#')[-1]
-    except:
+    except KeyError:
+        not_found_key = 'season: {} site: {} roll: {} images: {}'.format(
+            season, site, roll, image_names)
         if stats['n_capture_id_not_found'] < 10:
-            logger.info("Did not find img_key: {}".format(img_key))
+            logger.info("Did not find capture for: {}".format(not_found_key))
         elif stats['n_capture_id_not_found'] == 10:
-            logger.info("Not printing more not found img_key msgs...")
+            logger.info("Not printing more capture not found msgs...")
+        else:
+            logger.debug("Did not find capture for: {}".format(not_found_key))
         stats.update({'n_capture_id_not_found'})
         return record
-    if len(image_name) == 0:
-        stats.update({'n_annos_without_images'})
     # Add capture id
     classification_info['capture_id'] = capture_id
     classification_info['capture'] = capture
