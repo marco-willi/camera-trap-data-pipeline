@@ -302,8 +302,7 @@ def _find_and_choose_capture_id(
     # verify uniqueness of capture_id -> image mapping
     elif len(set(capture_ids)) > 1:
         logger.warning(
-            "Multiple captures found for season: {} site:{} roll: {}" +
-            "images: {} -- choosing first".format(
+            "Multiple captures found for season: {} site:{} roll: {} images: {} -- choosing first".format(
              season, site, roll, image_names))
         return capture_ids[0]
     else:
