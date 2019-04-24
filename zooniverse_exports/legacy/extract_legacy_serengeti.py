@@ -233,8 +233,11 @@ if __name__ == '__main__':
         season_capture_files[s_id], flags)
 
     if os.path.isfile(args['subject_to_capture_path']):
+        logging.info("Reading subject_to_capture mapping: {}".format(
+            args['subject_to_capture_path']))
         subject_to_capture = legacy_extractor.build_subject_id_to_capture_map(
             args['subject_to_capture_path'])
+        logging.info("Found {} records".format(len(subject_to_capture.keys())))
     else:
         subject_to_capture = dict()
 
