@@ -365,6 +365,14 @@ def extract_raw_classification(
     image_names = classification_info['filenames'].split(';')
     if len(image_names[0]) == 0:
         stats.update({'n_annos_without_images'})
+    if len(image_names) > 3:
+        stats.update({'n_annos_with_too_many_images'})
+        if stats['n_annos_with_too_many_images'] < 10:
+            logger.info(
+                textwrap.shorten(
+                    "Discard annotation with subject_id: {} b/c it \
+                     contains too many images".format(subject_id), width=150))
+        return record
     try:
         capture_id = _find_and_choose_capture_id(
             img_to_capture, subject_to_capture,
@@ -464,7 +472,12 @@ def process_season_classifications(path, img_to_capture, subject_to_capture, fla
      but different classification id".format(
      stats['n_duplicate_subject_classifications'])
     logger.info(textwrap.shorten(msg, width=150))
-
+    msg = "Removed {} annotations - with too many images".format(
+     stats['n_annos_with_too_many_images'])
+    logger.info(textwrap.shorten(msg, width=150))
+    msg = "Removed {} annotations - without images".format(
+     stats['n_annos_without_images'])
+    logger.info(textwrap.shorten(msg, width=150))
     return classifications
 
 
