@@ -131,14 +131,14 @@ if __name__ == '__main__':
         '--season_captures_path', type=str,
         default='/home/packerc/shared/season_captures/SER/captures/',
         help="Path to dir with captures.csvs")
-    # parser.add_argument(
-    #     '--subject_to_capture_path', type=str,
-    #     default='/home/packerc/shared/season_captures/SER/legacy_S1_S10_data/cleaned/capture_id_to_subject_id.csv',
-    #     help="Path to subject to capture map")
     parser.add_argument(
         '--subject_to_capture_path', type=str,
-        default='',
+        default='/home/packerc/shared/season_captures/SER/legacy_S1_S10_data/cleaned/capture_id_to_subject_id.csv',
         help="Path to subject to capture map")
+    # parser.add_argument(
+    #     '--subject_to_capture_path', type=str,
+    #     default='',
+    #     help="Path to subject to capture map")
     parser.add_argument(
         '--split_raw_file', action='store_true',
         help="Split the raw file according to seasons. If not specified, the \

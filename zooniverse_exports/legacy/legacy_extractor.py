@@ -278,6 +278,15 @@ def build_subject_id_to_capture_map(path):
     return subject_to_capture
 
 
+def _find_lowest_img_nr(img_list):
+    """ find position of image name with lowest image number """
+    numbers = list()
+    for img in img_list:
+        (first, last) = img.split(".JPG")
+        numbers.append(int(first[-4:]))
+    return numbers.index(min(numbers))
+
+
 def _find_and_choose_capture_id(
         img_to_capture, subject_to_capture,
         subject_id, season, site, roll, image_names):
@@ -290,9 +299,11 @@ def _find_and_choose_capture_id(
         image_keys.append(img_key)
 
     capture_ids = list()
-    for img_key in image_keys:
+    images_found = list()
+    for i, img_key in enumerate(image_keys):
         try:
             capture_ids.append(img_to_capture[img_key])
+            images_found.append(image_names[i])
         except KeyError:
             logger.debug("img_key {} not found".format(img_key))
     # if not found raise KeyError
@@ -301,10 +312,11 @@ def _find_and_choose_capture_id(
 
     # verify uniqueness of capture_id -> image mapping
     elif len(set(capture_ids)) > 1:
+        lowest_img_nr_index = _find_lowest_img_nr(images_found)
         logger.warning(
             "Multiple captures found for season: {} site:{} roll: {} images: {} -- choosing first".format(
              season, site, roll, image_names))
-        return capture_ids[0]
+        return capture_ids[lowest_img_nr_index]
     else:
         return capture_ids[0]
 
