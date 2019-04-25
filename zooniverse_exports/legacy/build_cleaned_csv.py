@@ -285,10 +285,30 @@ for i in range(0, 10):
 df_final = pd.concat(season_dfs)
 df_final.fillna('', inplace=True)
 
+# remove any images for S1-S8 that are not in either the db export or LILA
+# it turned out that some of these are faulty captures, for security reasons
+# we just remove all that are not in the DB and/or LILA
+i_only_in_cleaned_s1_s8 = \
+    (df_final['season'].isin(['S1', 'S2', 'S3', 'S4', 'S5', 'S6', 'S7', 'S8'])) & \
+    (df_final['invalid'] == '')
+
+before = df_final.shape[0]
+df_final = df_final.loc[~i_only_in_cleaned_s1_s8]
+print("Removed {} only in cleaned for S1-S8".format(before - df_final.shape[0]))
+
 # final checks
 print_stats(df_final['season'].value_counts())
 df_final.groupby(['season', 'include', 'invalid']).size().to_frame('count').reset_index()
 df_final.groupby(['season', 'invalid']).size().to_frame('count').reset_index()
+
+# 'SER_S5#G07#3#44', 'SER_S5#G07#3#129'
+should_be_excluded = df_final[
+    (df_final['season'] == 'S5') &
+    (df_final['site'] == 'G07') &
+    (df_final['roll'] == '3') &
+    (df_final['capture'].isin(['44', '129']))]
+assert len(should_be_excluded) == 0
+
 
 ##########################
 # check with LILA data
@@ -395,6 +415,9 @@ sort_df_by_capture_id(df_captures_all)
 # checks
 ###########
 
+# wrong capture from S5 should not be included
+assert sum(df_captures_all['capture_id'].isin(['SER_S5#G07#3#44', 'SER_S5#G07#3#129'])) == 0
+
 tt = pd.merge(left=df_captures_all, right=df_final[['season', 'site', 'roll', 'capture', 'datetime_lila']],
  on=['season', 'site', 'roll', 'capture'],
  how='outer')
@@ -408,7 +431,7 @@ assert tt_diff.shape[0] == 0
 assert df_captures_all[df_captures_all['capture_id'] == ''].shape[0] == 0
 assert df_captures_all[df_captures_all['capture_id'].isna()].shape[0] == 0
 
-# 10k captures without datetime_clean
+# 6 captures without datetime_clean
 no_datetime = df_captures_all[df_captures_all['datetime_clean'] == '']
 no_datetime.shape
 
@@ -561,6 +584,9 @@ df_final_cols['image_datetime_uncertain'].loc[i_to_exclude] = '1'
 df_final_cols['image_is_invalid'].loc[i_to_include] = '0'
 df_final_cols['image_datetime_uncertain'].loc[i_to_include] = '0'
 
+# re-create dummy columns
+df_final_cols['image_was_deleted'] = ''
+df_final_cols['image_no_upload'] = ''
 
 df_final_cols = pd.merge(
     left=df_final_cols, right=df_captures_all,
@@ -592,7 +618,8 @@ df_final_cols.groupby(['invalid', 'image_datetime_uncertain']).size().to_frame('
 order_cols = ['capture_id', 'season', 'site',
  'roll', 'capture', 'image_rank_in_capture',
  'image_path_rel', 'datetime', 'datetime_exif', 'datetime_file_creation',
- 'invalid', 'include', 'image_is_invalid', 'image_datetime_uncertain']
+ 'invalid', 'include', 'image_is_invalid', 'image_datetime_uncertain',
+ 'image_was_deleted', 'image_no_upload']
 
 df_final_cols = df_final_cols[order_cols]
 
@@ -618,11 +645,14 @@ all_seasons = df_final_cols['season'].value_counts()
 # tt.groupby(['invalid', 'include']).size().to_frame('count').reset_index()
 
 for season in all_seasons.index:
+    print("Starting with Season {}".format(season))
     output_path_season = os.path.join(path_output, 'SER_{}_cleaned.csv'.format(season))
     i_season = df_final_cols['season'].isin([season])
     df_season = df_final_cols.copy()
     df_season = df_season.loc[i_season]
+    print("Sorting Season {}".format(season))
     sort_df(df_season)
+    print("Writing Season {}".format(season))
     df_season.to_csv(output_path_season, index=False)
     print("Wrote Season {}".format(season))
 

@@ -4,8 +4,13 @@
 
 # Create paths
 for LOC in MTZ KAR PLN NIA GON APN GRU SER RUA MAD KRU ENO; do
-  mkdir -m 770 -p {SpeciesReports,Exports,Aggregations,Manifests,MachineLearning}/${LOC}/log_files
+  mkdir -m 770 -p {SpeciesReports,Exports,Aggregations,Manifests,MachineLearning,LilaReports}/${LOC}/log_files
 done
+
+for LOC in SER; do
+  mkdir -m 770 -p {LilaReports,SpeciesReports}/${LOC}/log_files
+done
+
 
 
 ###################################
@@ -236,13 +241,20 @@ for LOC in MTZ KAR PLN NIA GON APN GRU SER RUA; do
 done
 
 # Loop over all seasons (Legacy)
-for season in 7 8 9; do
+for season in 1 2 3 4 5 6 7 8 9 10; do
   SITE=SER
   SEASON=SER_S${season}
-  SEASON_STRING=S${season}
-  #extract_zooniverse_data_legacy
-  #aggregate_annotations
+  if [ $season -eq 10 ]
+  then
+    SEASON_STRING=${season}
+  else
+    SEASON_STRING=S${season}
+  fi
+  echo "season string: ${SEASON_STRING}"
+  extract_zooniverse_data_legacy
+  aggregate_annotations
   create_reports
+  create_lila_reports
 done
 
 
@@ -483,14 +495,6 @@ python3 -m reporting.create_report_stats \
 --log_dir /home/packerc/shared/zooniverse/SpeciesReports/${SITE}/log_files/ \
 --log_filename ${SEASON}_create_report_stats
 
-# Create a small sample report
-python3 -m reporting.sample_report \
---report_csv /home/packerc/shared/zooniverse/SpeciesReports/${SITE}/${SEASON}_report_complete.csv \
---output_csv /home/packerc/shared/zooniverse/SpeciesReports/${SITE}/${SEASON}_report_complete_samples.csv \
---sample_size 300 \
---log_dir /home/packerc/shared/zooniverse/SpeciesReports/${SITE}/log_files/ \
---log_filename ${SEASON}_sample_report
-
 # Create Consensus Report
 python3 -m reporting.create_zooniverse_report \
 --season_captures_csv /home/packerc/shared/season_captures/${SITE}/cleaned/${SEASON}_cleaned.csv \
@@ -520,6 +524,27 @@ python3 -m reporting.sample_report \
 --sample_size 300 \
 --log_dir /home/packerc/shared/zooniverse/SpeciesReports/${SITE}/log_files/ \
 --log_filename ${SEASON}_sample_report
+}
+
+create_lila_reports () {
+python3 -m reporting.create_zooniverse_report \
+--season_captures_csv /home/packerc/shared/season_captures/${SITE}/cleaned/${SEASON}_cleaned.csv \
+--aggregated_csv /home/packerc/shared/zooniverse/Aggregations/${SITE}/${SEASON}_aggregated_plurality.csv \
+--output_csv /home/packerc/shared/zooniverse/LilaReports/${SITE}/${SEASON}_report_lila.csv \
+--log_dir /home/packerc/shared/zooniverse/LilaReports/${SITE}/log_files/ \
+--log_filename ${SEASON}_create_zooniverse_report \
+--default_season_id ${SEASON} \
+--exclude_non_consensus \
+--exclude_captures_without_data \
+--exclude_zooniverse_cols \
+--exclude_additional_plurality_infos \
+--exclude_zooniverse_urls
+
+python3 -m reporting.create_report_stats \
+--report_path /home/packerc/shared/zooniverse/LilaReports/${SITE}/${SEASON}_report_lila.csv \
+--output_csv /home/packerc/shared/zooniverse/LilaReports/${SITE}/${SEASON}_report_lila_overview.csv \
+--log_dir /home/packerc/shared/zooniverse/LilaReports/${SITE}/log_files/ \
+--log_filename ${SEASON}_create_report_stats
 }
 
 
@@ -558,7 +583,7 @@ SEASON_STRING=S1
 extract_zooniverse_data_legacy () {
 
 # Extract Annotations
-python3 -m zooniverse_exports.extract_legacy_serengeti \
+python3 -m zooniverse_exports.legacy.extract_legacy_serengeti \
 --classification_csv '/home/packerc/shared/zooniverse/Exports/SER/2019-01-27_serengeti_classifications.csv' \
 --output_path /home/packerc/shared/zooniverse/Exports/SER/ \
 --season_to_process ${SEASON_STRING} \
@@ -567,12 +592,11 @@ python3 -m zooniverse_exports.extract_legacy_serengeti \
 
 
 # Extract Subjects from Classifications
-python3 -m zooniverse_exports.extract_subjects_legacy \
+python3 -m zooniverse_exports.legacy.extract_subjects_legacy \
 --annotations /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_annotations.csv \
 --output_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subjects_extracted_prelim.csv \
 --log_dir /home/packerc/shared/zooniverse/Exports/${SITE}/log_files/ \
 --log_filename ${SEASON}_extract_subjects_legacy_prelim
-
 
 
 # # Get Subject URLs from Zooniverse API (warning - takes a long time)
@@ -585,22 +609,21 @@ python3 -m zooniverse_exports.extract_subjects_legacy \
 # --oruboros_export /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subjects_ouroboros.json \
 # --output_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subject_urls.csv
 
-# Re-Create Season Captures
-python3 -m zooniverse_exports.recreate_legacy_season_captures \
---subjects_extracted /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subjects_extracted_prelim.csv \
---output_csv /home/packerc/shared/season_captures/${SITE}/cleaned/${SEASON}_cleaned.csv \
---log_dir /home/packerc/shared/zooniverse/Exports/${SITE}/log_files/ \
---log_filename ${SEASON}_recreate_legacy_season_captures
-
+# DO NOT RUN - SEASON CAPTURES ARE CREATED DIFFERENTLY
+# # Re-Create Season Captures
+# python3 -m zooniverse_exports.recreate_legacy_season_captures \
+# --subjects_extracted /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subjects_extracted_prelim.csv \
+# --output_csv /home/packerc/shared/season_captures/${SITE}/cleaned/${SEASON}_cleaned.csv \
+# --log_dir /home/packerc/shared/zooniverse/Exports/${SITE}/log_files/ \
+# --log_filename ${SEASON}_recreate_legacy_season_captures
 
 # Extract Subjects from Classifications without timestamps
-python3 -m zooniverse_exports.extract_subjects_legacy \
+python3 -m zooniverse_exports.legacy.extract_subjects_legacy \
 --annotations /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_annotations.csv \
 --output_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subjects_extracted.csv \
 --log_dir /home/packerc/shared/zooniverse/Exports/${SITE}/log_files/ \
 --log_filename ${SEASON}_extract_subjects_legacy \
 --exclude_colums timestamps filenames
-
 
 # Add subject urls to subject extracts
 python3 -m zooniverse_exports.merge_csvs \
