@@ -4,7 +4,7 @@ import os
 import argparse
 import pandas as pd
 
-from utils.logger import setup_logger, create_log_file
+from utils.logger import set_logging
 from utils.utils import (
     read_cleaned_season_file_df,
     remove_images_from_df, set_file_permission, sort_df_by_capture_id)
@@ -48,11 +48,7 @@ if __name__ == '__main__':
                                 args['predictions_csv']))
 
     # logging
-    if args['log_dir'] is not None:
-        log_file_path = create_log_file(args['log_dir'], args['log_filename'])
-        setup_logger(log_file_path)
-    else:
-        setup_logger()
+    set_logging(args['log_dir'], args['log_filename'])
     logger = logging.getLogger(__name__)
 
     for k, v in args.items():

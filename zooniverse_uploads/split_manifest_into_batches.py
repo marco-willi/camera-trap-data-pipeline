@@ -8,7 +8,7 @@ import random
 from collections import OrderedDict
 import logging
 
-from utils.logger import setup_logger, create_log_file
+from utils.logger import set_logging
 from utils.utils import (
     slice_generator, export_dict_to_json_with_newlines,
     file_path_splitter, file_path_generator, set_file_permission)
@@ -60,11 +60,7 @@ if __name__ == "__main__":
             "Only one of: number_of_batches/max_batch_size can be specified")
 
     # logging
-    if args['log_dir'] is not None:
-        log_file_path = create_log_file(args['log_dir'], args['log_filename'])
-        setup_logger(log_file_path)
-    else:
-        setup_logger()
+    set_logging(args['log_dir'], args['log_filename'])
     logger = logging.getLogger(__name__)
 
     for k, v in args.items():

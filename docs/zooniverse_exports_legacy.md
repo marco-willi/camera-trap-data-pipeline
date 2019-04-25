@@ -179,6 +179,8 @@ The code is suppoed to be run manually at only once. Details can be found here:
 |image_datetime_uncertain| flag if image was marked for uncertain datetime (1, '' otherwise) -- derived from 'invalid' column (values 1,2,3)
 |invalid| legacy column referring to timestamp status ('1' = 'Not recoverable', '2'= 'Fix is hard', '3'='Fix is hard but timestamp likely close'),
 |include| legacy flag referring whether to 'include' (='1') the image (='1' only were published)
+|image_was_deleted| dummy flag for consistency with newer data -- is always ''
+|image_no_upload| dummy flag for consistency with newer data -- is always ''
 
 
 Examples:

@@ -6,7 +6,7 @@ import logging
 from panoptes_client import Project, Panoptes
 
 from utils.utils import read_config_file, set_file_permission
-from utils.logger import setup_logger, create_log_file
+from utils.logger import set_logging
 
 
 if __name__ == '__main__':
@@ -32,11 +32,7 @@ if __name__ == '__main__':
     args = vars(parser.parse_args())
 
     # logging
-    if args['log_dir'] is not None:
-        log_file_path = create_log_file(args['log_dir'], args['log_filename'])
-        setup_logger(log_file_path)
-    else:
-        setup_logger()
+    set_logging(args['log_dir'], args['log_filename'])
     logger = logging.getLogger(__name__)
 
     # get Zooniverse passowrd

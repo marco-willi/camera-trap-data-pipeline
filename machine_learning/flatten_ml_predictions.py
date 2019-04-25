@@ -6,7 +6,7 @@ import pandas as pd
 import argparse
 from collections import OrderedDict
 
-from utils.logger import setup_logger, create_log_file
+from utils.logger import set_logging
 from utils.utils import set_file_permission, sort_df_by_capture_id
 from machine_learning.flatten_preds import (
     flatten_ml_empty_preds, flatten_ml_species_preds
@@ -41,11 +41,7 @@ if __name__ == '__main__':
         raise FileNotFoundError("predictions: %s not found" %
                                 args['predictions_empty'])
     # logging
-    if args['log_dir'] is not None:
-        log_file_path = create_log_file(args['log_dir'], args['log_filename'])
-        setup_logger(log_file_path)
-    else:
-        setup_logger()
+    set_logging(args['log_dir'], args['log_filename'])
     logger = logging.getLogger(__name__)
 
     for k, v in args.items():

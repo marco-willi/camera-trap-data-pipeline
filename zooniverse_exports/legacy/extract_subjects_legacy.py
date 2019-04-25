@@ -10,7 +10,7 @@ import logging
 import argparse
 from collections import OrderedDict
 
-from utils.logger import setup_logger, create_log_file
+from utils.logger import set_logging
 from utils.utils import set_file_permission
 from zooniverse_exports.legacy.legacy_extractor import build_img_path
 
@@ -47,11 +47,7 @@ if __name__ == '__main__':
     flags.sort()
 
     # logging
-    if args['log_dir'] is not None:
-        log_file_path = create_log_file(args['log_dir'], args['log_filename'])
-        setup_logger(log_file_path)
-    else:
-        setup_logger()
+    set_logging(args['log_dir'], args['log_filename'])
     logger = logging.getLogger(__name__)
 
     ######################################

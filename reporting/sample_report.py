@@ -6,7 +6,7 @@ import os
 import argparse
 import logging
 
-from utils.logger import setup_logger, create_log_file
+from utils.logger import set_logging
 from config.cfg import cfg
 from utils.utils import (
     set_file_permission, balanced_sample_best_effort, print_nested_dict)
@@ -40,11 +40,7 @@ if __name__ == '__main__':
                                 args['report_csv']))
 
     # logging
-    if args['log_dir'] is not None:
-        log_file_path = create_log_file(args['log_dir'], args['log_filename'])
-        setup_logger(log_file_path)
-    else:
-        setup_logger()
+    set_logging(args['log_dir'], args['log_filename'])
     logger = logging.getLogger(__name__)
 
     for k, v in args.items():
