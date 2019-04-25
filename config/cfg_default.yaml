@@ -108,6 +108,7 @@ pre_processing_flags:
     map_actions_to_flags:
       delete:
         - image_was_deleted
+        - image_no_upload
       invalidate:
         - image_is_invalid
         - image_no_upload
@@ -232,9 +233,7 @@ plurality_aggregation_flags:
 
 upload_flags:
     images_to_remove_from_upload:
-      image_was_deleted:
-        - '1'
-      image_is_invalid:
+      image_no_upload:
         - '1'
 
 ###################################################
@@ -354,6 +353,10 @@ legacy_extractor_flags:
      - eating
      - interacting
      - young_present
+
+###################################################
+# Legacy Subject Extractor
+###################################################
 
 # Subject info to add from the legacy classifications export
 add_subject_info_flags_legacy:

@@ -545,6 +545,13 @@ python3 -m reporting.create_report_stats \
 --output_csv /home/packerc/shared/zooniverse/LilaReports/${SITE}/${SEASON}_report_lila_overview.csv \
 --log_dir /home/packerc/shared/zooniverse/LilaReports/${SITE}/log_files/ \
 --log_filename ${SEASON}_create_report_stats
+
+python3 -m reporting.create_image_inventory \
+--season_captures_csv /home/packerc/shared/season_captures/${SITE}/cleaned/${SEASON}_cleaned.csv \
+--report_path /home/packerc/shared/zooniverse/LilaReports/${SITE}/${SEASON}_report_lila.csv \
+--output_csv /home/packerc/shared/zooniverse/LilaReports/${SITE}/${SEASON}_report_lila_image_inventory.csv \
+--log_dir /home/packerc/shared/zooniverse/LilaReports/${SITE}/log_files/ \
+--log_filename ${SEASON}_create_image_inventory
 }
 
 
