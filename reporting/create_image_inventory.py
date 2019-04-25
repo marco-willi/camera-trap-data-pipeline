@@ -71,11 +71,19 @@ if __name__ == '__main__':
     ######################################
 
     df_report = pd.read_csv(args['report_csv'], index_col=False, dtype=str)
+    logger.info("Read {} records from {}".format(
+        df_report.sahpe[0], args['report_csv']))
+    df_report_deduplicated = df_report.drop_duplicates(subset=['capture_id'])
+    logger.info("Found {} distinct capture ids in {}".format(
+        df_report_deduplicated.shape[0],
+        args['report_csv']
+    ))
 
     ######################################
     # Inner Join on Capture ID
     ######################################
 
+    # get path column
     if 'path' in season_data_df.columns:
         path_col = 'path'
     elif 'image_path_rel' in season_data_df.columns:
@@ -84,14 +92,25 @@ if __name__ == '__main__':
         raise ValueError(
             "season_data_df must have one of 'path' or 'image_path_rel'")
 
+    # get image rank column
+    if 'image_rank_in_capture' in season_data_df.columns:
+        rank_col = 'image_rank_in_capture'
+    elif 'image' in season_data_df.columns:
+        rank_col = 'image'
+    else:
+        raise ValueError(
+            "season_data_df must have one of 'image_rank_in_capture' or 'image' \
+             indicating the order of the image in a capture")
+
     df_images = pd.merge(
-        left=season_data_df[['capture_id', path_col]],
-        right=df_report[['capture_id']],
+        left=season_data_df[['capture_id', rank_col, path_col]],
+        right=df_report_deduplicated[['capture_id']],
         on='capture_id',
         how='inner'
     )
 
-    df_images.columns = ['capture_id', 'image_path_rel']
+    df_images.columns = [
+        'capture_id', 'image_rank_in_capture', 'image_path_rel']
 
     logger.info(
         "Merged 'season_captures_csv' with 'report_csv': {} records".format(
