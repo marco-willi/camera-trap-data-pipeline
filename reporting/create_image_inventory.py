@@ -72,7 +72,7 @@ if __name__ == '__main__':
 
     df_report = pd.read_csv(args['report_csv'], index_col=False, dtype=str)
     logger.info("Read {} records from {}".format(
-        df_report.sahpe[0], args['report_csv']))
+        df_report.shape[0], args['report_csv']))
     df_report_deduplicated = df_report.drop_duplicates(subset=['capture_id'])
     logger.info("Found {} distinct capture ids in {}".format(
         df_report_deduplicated.shape[0],
