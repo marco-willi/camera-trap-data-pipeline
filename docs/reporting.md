@@ -4,6 +4,7 @@ The following codes can be used to:
 
 1. Create reports from Zooniverse aggregations
 2. Create reports from Machine Learning predictions
+3. Create reports for publication on LILA
 
 A report in this context refers to a file (a csv) that contains individual species identifications for the data that was processed throug the entire data pipeline. It does not refer to ecological analyses or analytical products -- it is the basis to create such analyses.
 

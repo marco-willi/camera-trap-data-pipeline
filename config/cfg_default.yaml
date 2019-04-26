@@ -21,6 +21,11 @@ pre_processing_flags:
       output_date_format: '%Y-%m-%d'
       output_datetime_format: '%Y-%m-%d %H:%M:%S'
       output_time_format: '%H:%M:%S'
+      # the default timezone is only relevant for file creation dates
+      # it has no effect on datetime if EXIF data is available,
+      # if EXIF data is not available, the file-creation date is used instead
+      # this must be a 'Pytz' module compatible name
+      default_timezone: Africa/Johannesburg
     #############################
     # EXIF Data Extraction
     #############################

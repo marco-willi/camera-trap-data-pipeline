@@ -128,6 +128,12 @@ python3 -m pre_processing.basic_inventory_checks \
 --n_processes 16
 ```
 
+To calculate correct file-creation dates the timezone can be specififed. Default timezone is: Africa/Johannesburg. This is mainly relevant if no EXIF data is available. In that case the file creation date will be used to determine image datetimes. To replace the timezone choose for example:
+```
+--timezone Africa/Dar_es_Salaam
+```
+See: https://stackoverflow.com/questions/13866926/is-there-a-list-of-pytz-timezones
+
 For processing very large datasets (>200k images) it is recommended to run the following script via job queue.
 
 ```

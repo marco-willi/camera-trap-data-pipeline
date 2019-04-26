@@ -2,6 +2,9 @@ import os
 import logging
 import platform
 from datetime import datetime
+import time
+import pytz
+
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -13,6 +16,18 @@ from utils.utils import set_file_permission
 logger = logging.getLogger(__name__)
 
 plt.switch_backend('agg')
+
+
+def convert_datetime_utc_to_timezone(datetime_ob, target_tz):
+    """ Convert datetime utc to target """
+    datetime_ob = datetime_ob.replace(tzinfo=pytz.UTC)
+    new_tz = pytz.timezone(target_tz)
+    return datetime_ob.astimezone(tz=new_tz)
+
+
+def convert_ctime_to_datetime(ctime):
+    ctime_utc = time.gmtime(ctime)
+    return datetime.fromtimestamp(time.mktime(ctime_utc))
 
 
 def datetime_file_creation(path_to_file):

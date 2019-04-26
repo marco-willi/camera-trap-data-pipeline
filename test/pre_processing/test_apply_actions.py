@@ -30,7 +30,7 @@ class ApplyActionsTests(unittest.TestCase):
                 'site': 'a',
                 'image_no_upload': '1',
                 'image_was_deleted': '',
-                'image_uncertain_datetime': '',
+                'image_datetime_uncertain': '',
                 'image_is_invalid': '',
                 'action_taken': 'mark_no_upload',
                 'action_taken_reason': 'rhino'}
@@ -51,7 +51,7 @@ class ApplyActionsTests(unittest.TestCase):
                 'site': 'a',
                 'image_no_upload': '',
                 'image_was_deleted': '',
-                'image_uncertain_datetime': '',
+                'image_datetime_uncertain': '',
                 'image_is_invalid': '',
                 'datetime': '2000-01-01 00:01:00',
                 'action_taken': 'timechange',
@@ -71,7 +71,7 @@ class ApplyActionsTests(unittest.TestCase):
                 'site': 'a',
                 'image_no_upload': '1',
                 'image_was_deleted': '',
-                'image_uncertain_datetime': '',
+                'image_datetime_uncertain': '',
                 'image_is_invalid': '1',
                 'action_taken': 'invalidate',
                 'action_taken_reason': 'all_black'}
@@ -96,7 +96,7 @@ class ApplyActionsTests(unittest.TestCase):
                 'site': 'a',
                 'image_no_upload': '1',
                 'image_was_deleted': '',
-                'image_uncertain_datetime': '1',
+                'image_datetime_uncertain': '1',
                 'image_is_invalid': '1',
                 'action_taken': 'invalidate#mark_datetime_uncertain',
                 'action_taken_reason': 'all_black#unclear datetime'}
@@ -121,7 +121,7 @@ class ApplyActionsTests(unittest.TestCase):
                 'site': 'a',
                 'image_no_upload': '1',
                 'image_was_deleted': '',
-                'image_uncertain_datetime': '',
+                'image_datetime_uncertain': '',
                 'image_is_invalid': '1',
                 'action_taken': 'invalidate#invalidate',
                 'action_taken_reason': 'all_black#human'}
@@ -144,9 +144,9 @@ class ApplyActionsTests(unittest.TestCase):
                 'image_name': '1.JPG',
                 'image_path': '/d/dummy.txt',
                 'site': 'a',
-                'image_no_upload': '',
+                'image_no_upload': '1',
                 'image_was_deleted': '1',
-                'image_uncertain_datetime': '',
+                'image_datetime_uncertain': '',
                 'image_is_invalid': '',
                 'action_taken': 'delete',
                 'action_taken_reason': 'corrupt'}

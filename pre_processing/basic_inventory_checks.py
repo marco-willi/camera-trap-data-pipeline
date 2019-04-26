@@ -12,7 +12,8 @@ from PIL import Image
 from utils.logger import set_logging
 from pre_processing.utils import (
     datetime_file_creation, image_check_stats, p_pixels_above_threshold,
-    p_pixels_below_threshold, export_inventory_to_csv, read_image_inventory)
+    p_pixels_below_threshold, export_inventory_to_csv, read_image_inventory,
+    convert_ctime_to_datetime, convert_datetime_utc_to_timezone)
 from utils.utils import (
     slice_generator, estimate_remaining_time)
 from config.cfg import cfg
@@ -55,6 +56,7 @@ if __name__ == '__main__':
     parser.add_argument("--inventory", type=str, required=True)
     parser.add_argument("--output_csv", type=str, required=True)
     parser.add_argument("--n_processes", type=int, default=4)
+    parser.add_argument("--timezone", type=str, default=None)
     parser.add_argument(
         "--log_dir", type=str, default=None)
     parser.add_argument(
@@ -83,6 +85,14 @@ if __name__ == '__main__':
 
     for k, v in args.items():
         logger.info("Argument {}: {}".format(k, v))
+
+    # replace default timezone if timezone is specified
+    if args['timezone'] is not None:
+        old_tz = flags['time_formats']['default_timezone']
+        flags['time_formats']['default_timezone'] = args['timezone']
+        logger.info(
+            "Timezone specified -- replacing timezone {} with {}".format(
+                old_tz, args['timezone']))
 
     ######################################
     # Read Image Inventory
@@ -119,9 +129,17 @@ if __name__ == '__main__':
             # get file creation date
             try:
                 img_creation_date = datetime_file_creation(image_path)
-                img_creation_date_str = time.strftime(
-                    flags['time_formats']['output_datetime_format'],
-                    time.gmtime(img_creation_date))
+                img_creation_date_dt = \
+                    convert_ctime_to_datetime(img_creation_date)
+                target_tz = flags['time_formats']['default_timezone']
+                if target_tz != '':
+                    img_creation_date_local = \
+                        convert_datetime_utc_to_timezone(
+                            img_creation_date_dt, target_tz)
+                else:
+                    img_creation_date_local = img_creation_date_dt
+                img_creation_date_str = img_creation_date_local.strftime(
+                    flags['time_formats']['output_datetime_format'])
                 current_data['datetime_file_creation'] = img_creation_date_str
             except Exception:
                 logger.error(
