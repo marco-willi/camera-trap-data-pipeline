@@ -318,7 +318,8 @@ def read_cleaned_season_file_df(path):
 
     for col in required_header_cols:
         if col not in df.columns:
-            print("Column {} not found in cleaned_season_file".format(col))
+            logger.warning(
+                "Column {} not found in cleaned_season_file".format(col))
     # sort df
     try:
         sort_df(df)

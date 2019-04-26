@@ -1,0 +1,28 @@
+#!/bin/bash -l
+#PBS -l walltime=24:00:00,nodes=1:ppn=16
+#PBS -j oe
+#PBS -q lab
+#PBS -N transfer_to_lila
+#PBS -o ${HOME}/job_transfer_to_lila_${PBS_JOBID}.log
+#PBS -e ${HOME}/job_ctransfer_to_lila_${PBS_JOBID}.log
+
+module load rclone
+
+# Example
+# SITE=SER
+# SEASON=S1
+
+SOURCE=/home/packerc/shared/albums/${SITE}/${SEASON}/
+TARGET=lila:snapshot-serengeti/${SITE}/${SEASON}/
+
+echo "SOURCE: ${SOURCE}"
+echo "TARGET: ${TARGET}"
+
+if [ -d "${SOURCE}" ]
+then
+  echo "Starting the transfer..."
+  rclone --transfers=32 --checkers=16 --stats 10s --stats-log-level NOTICE sync $SOURCE $TARGET
+  echo "Transfer finished"
+else
+  echo "Directory ${SOURCE} does not exist"
+fi

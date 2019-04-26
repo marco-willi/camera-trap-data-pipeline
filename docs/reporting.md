@@ -176,6 +176,8 @@ See here: [Machine Learning](../docs/machine_learning.md)
 
 Reports for publication on http://lila.science/datasets
 
+### Create Consensus Report
+
 ```
 python3 -m reporting.create_zooniverse_report \
 --season_captures_csv /home/packerc/shared/season_captures/${SITE}/cleaned/${SEASON}_cleaned.csv \
@@ -191,11 +193,49 @@ python3 -m reporting.create_zooniverse_report \
 --exclude_zooniverse_urls
 ```
 
+Statistics:
+
 ```
-# Create statistics file
 python3 -m reporting.create_report_stats \
 --report_path /home/packerc/shared/zooniverse/LilaReports/${SITE}/${SEASON}_report_lila.csv \
 --output_csv /home/packerc/shared/zooniverse/LilaReports/${SITE}/${SEASON}_report_lila_overview.csv \
 --log_dir /home/packerc/shared/zooniverse/LilaReports/${SITE}/log_files/ \
 --log_filename ${SEASON}_create_report_stats
 ```
+
+### Image Inventory
+
+Create an image inventory containing paths from all images of all captures in the report:
+
+```
+python3 -m reporting.create_image_inventory \
+--season_captures_csv /home/packerc/shared/season_captures/${SITE}/cleaned/${SEASON}_cleaned.csv \
+--report_csv /home/packerc/shared/zooniverse/LilaReports/${SITE}/${SEASON}_report_lila.csv \
+--output_csv /home/packerc/shared/zooniverse/LilaReports/${SITE}/${SEASON}_report_lila_image_inventory.csv \
+--log_dir /home/packerc/shared/zooniverse/LilaReports/${SITE}/log_files/ \
+--log_filename ${SEASON}_create_image_inventory
+```
+
+| Columns   | Description |
+| --------- | ----------- |
+|capture_id | internal identifier of the capture
+|image_rank_in_capture| rank/order of the image in the capture
+|image_path_rel| relative path of the image
+
+### Transfer Images
+
+Note: Pre-requisite is that rclone was configured correctly to access the target disk.
+
+Transfer Images to LILA via qsub:
+
+```
+ssh lab
+cd $HOME/camera-trap-data-pipeline/reporting/jobs
+
+SITE=RUA
+SEASON=RUA_S1
+
+qsub -v SITE=${SITE},SEASON=${SEASON} transfer_to_lila.pbs
+```
+
+This job syncronizes the images. If the job aborts or terminates early simply re-run it and it will pick up where it left off.
