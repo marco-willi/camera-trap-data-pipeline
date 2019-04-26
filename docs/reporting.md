@@ -138,8 +138,27 @@ python3 -m reporting.sample_report \
 --log_filename ${SEASON}_sample_report
 ```
 
+### Image Inventory (Optional)
 
-### Output Fields
+Create an image inventory containing paths for all images of all captures in a report. For example:
+
+```
+python3 -m reporting.create_image_inventory \
+--season_captures_csv /home/packerc/shared/season_captures/${SITE}/cleaned/${SEASON}_cleaned.csv \
+--report_csv /home/packerc/shared/zooniverse/SpeciesReports/${SITE}/${SEASON}_report_consensus.csv \
+--output_csv /home/packerc/shared/zooniverse/SpeciesReports/${SITE}/${SEASON}_report_consensus_image_inventory.csv \
+--log_dir /home/packerc/shared/zooniverse/SpeciesReports/${SITE}/log_files/ \
+--log_filename ${SEASON}_create_image_inventory
+```
+
+| Columns   | Description |
+| --------- | ----------- |
+|capture_id | internal identifier of the capture
+|image_rank_in_capture| rank/order of the image in the capture
+|image_path_rel| relative path of the image
+
+
+### Report Output Fields
 
 
 | Columns   | Description |

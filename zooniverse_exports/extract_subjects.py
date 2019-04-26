@@ -1,19 +1,4 @@
-""" Extract Subjects Data
-    - Zooniverse 'subjects' export
-    - Raw Subject-Data Example:
-    subject_id,project_id,workflow_id,subject_set_id,metadata,locations,classifications_count,retired_at,retirement_reason,created_at,updated_at
-        17510222,5115,4979,18231,"{""#roll"":1,""#site"":""J04"",
-            ""Image 1"":""6562_6082_5649.JPG"",
-            ""Image 2"":""6116_9310_6586.JPG"",
-            ""Image 3"":""4600_9071_9361.JPG"",
-            ""license"":""SnapshotSafari"",""#capture"":6,
-            ""attribution"":""University of Minnesota Lion Center +
-                SnapshotSafari + Singita Grumeti""}",
-            "{""0"":""https://panoptes-uploads.zooniverse.org/production/subject_location/f26d4b0a-81f8-4203-bd90-c85d659a05bb.jpeg"",
-              ""1"":""https://panoptes-uploads.zooniverse.org/production/subject_location/16f9fa0f-95b1-4425-9d27-55878a33f39e.jpeg"",
-              ""2"":""https://panoptes-uploads.zooniverse.org/production/subject_location/7ed39f2d-70b4-4d5e-ae1a-29215832a47e.jpeg""}",
-              17,2018-11-13 08:17:58 UTC,consensus,2018-01-28 02:27:23 UTC,2018-01-28 02:27:23 UTC
-"""
+""" Extract Subjects Data """
 import csv
 import os
 import logging

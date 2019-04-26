@@ -128,11 +128,12 @@ python3 -m pre_processing.basic_inventory_checks \
 --n_processes 16
 ```
 
-To calculate correct file-creation dates the timezone can be specififed. Default timezone is: Africa/Johannesburg. This is mainly relevant if no EXIF data is available. In that case the file creation date will be used to determine image datetimes. To replace the timezone choose for example:
+To calculate correct file-creation dates the timezone can be specified. Default timezone is: 'Africa/Johannesburg'. This is mainly relevant if no EXIF data is available. In that case the file creation date will be used to determine image datetimes. To replace the timezone choose for example:
 ```
 --timezone Africa/Dar_es_Salaam
 ```
 See: https://stackoverflow.com/questions/13866926/is-there-a-list-of-pytz-timezones
+Alternatively, change the default timezone in [config/cfg_default.yaml](../config/cfg_default.yaml).
 
 For processing very large datasets (>200k images) it is recommended to run the following script via job queue.
 
@@ -416,3 +417,24 @@ This code can be run in any case to check if further actions need to be taken if
 |days_to_next_image_taken| days to the next image taken
 |image_check__()| image check flag of check () -- '1' if check failed
 |exif__()| EXIF tag () extracted from the image
+
+
+## Columns of Cleaned Captures (Legacy Files)
+
+There are several seasons that were processed using an older script. These typically contain fewer columns:
+
+| Columns   | Description |
+| --------- | ----------- |
+|capture_id| capture-id
+|season, site, roll, capture| internal ids of the capture
+|image_rank_in_capture| rank/order of image in a capture
+|image_path_rel| relative (to site root) image path after re-naming
+|image_name | image name after re-naming
+|datetime| datetime of image (default Y-m-d H:M:S) -- after any datetime corrections applied
+|datetime_exif| datetime as extrated from EXIF data, typically not available
+|datetime_file_creation| file creation date  (default Y-m-d H:M:S, '' if not available)
+|image_is_invalid| flag if image was invalidated (1, '' otherwise) -- derived from 'invalid' column (values 1,2,3)
+|image_datetime_uncertain| flag if image was marked for uncertain datetime (1, '' otherwise) -- derived from 'invalid' column (values 1,2,3)
+|invalid| legacy column referring to timestamp status ('1' = 'Not recoverable', '2'= 'Fix is hard', '3'='Fix is hard but timestamp likely close')
+|image_was_deleted| dummy flag for consistency with newer data -- is always ''
+|image_no_upload| dummy flag for consistency with newer data -- is always ''
