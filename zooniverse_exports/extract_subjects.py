@@ -102,12 +102,15 @@ if __name__ == '__main__':
             for field in flags['SUBJECT_METADATA_TO_ADD']:
                 try:
                     subject_info_to_add[field] = subject_data_all[field]
-                except:
-                    subject_info_to_add[field] = ''
+                except KeyError:
+                    # dont create empty capture_id field if not available,
+                    # potentially dangeours
+                    if field != '#capture_id':
+                        subject_info_to_add[field] = ''
             for field in flags['SUBJECT_DATA_TO_ADD']:
                 try:
                     subject_info_to_add[field] = subject_data_all[field]
-                except:
+                except KeyError:
                     subject_info_to_add[field] = ''
             subject_info_to_add = extractor.rename_dict_keys(
                 subject_info_to_add, flags['SUBJECT_DATA_NAME_MAPPER'])

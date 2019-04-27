@@ -247,7 +247,9 @@ subject_extractor_flags:
      - '#roll'
      - '#site'
      - '#capture'
+     - '#capture_id'
     SUBJECT_DATA_NAME_MAPPER:
+     '#capture_id': capture_id
      '#capture': capture
      '#roll': roll
      '#season': season

@@ -12,7 +12,7 @@ from pre_processing.generate_actions import generate_actions
 from pre_processing.utils import read_image_inventory
 from pre_processing.update_captures import select_valid_images
 from pre_processing.actions import apply_action
-from pre_processing.create_action_list import _issue_is_resolved
+from utils.utils import create_capture_id
 from config.cfg import cfg_default as cfg
 
 logger = logging.getLogger(__name__)
@@ -98,6 +98,16 @@ class GenerateActionsTests(unittest.TestCase):
             self.captures_updated['APN_S2_A1_R1_IMAG0003.JPG']['action_taken'],
         )
 
+    def testCaptureIdUpdated(self):
+        for k, v in self.captures_updated.items():
+            capture_id_expected = create_capture_id(
+                v['season'], v['site'], v['roll'], v['capture'])
+            self.assertEqual(capture_id_expected, v['capture_id'])
+
+    def testCaptureIdNoGap(self):
+        self.assertEqual(
+            self.captures_updated['APN_S2_A1_R2_IMAG0014.JPG']['capture_id'],
+            'APN_S2#A1#2#4')
 
 if __name__ == '__main__':
     unittest.main()
