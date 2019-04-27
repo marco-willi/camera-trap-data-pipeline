@@ -104,7 +104,7 @@ if __name__ == '__main__':
                     subject_info_to_add[field] = subject_data_all[field]
                 except KeyError:
                     # dont create empty capture_id field if not available,
-                    # potentially dangeours
+                    # potentially dangerous
                     if field != '#capture_id':
                         subject_info_to_add[field] = ''
             for field in flags['SUBJECT_DATA_TO_ADD']:

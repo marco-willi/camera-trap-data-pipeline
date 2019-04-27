@@ -119,6 +119,9 @@ if __name__ == '__main__':
 
     # add capture id if not specified
     if 'capture_id' not in df_aggregated.columns:
+        logger.warning(
+            "capture_id not found in {} - re-creating... ".format(
+             args['aggregated_csv']))
         capture_ids_all = list()
         for _id, row in df_aggregated.iterrows():
             capture_id = '#'.join(

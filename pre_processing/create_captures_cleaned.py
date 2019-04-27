@@ -89,7 +89,8 @@ if __name__ == '__main__':
     if exclude_exif_data:
         output_cols = [x for x in output_cols if not x.startswith('exif__')]
     if exclude_image_check_flags:
-        output_cols = [x for x in output_cols if not x.startswith('image_check__')]
+        output_cols = [
+            x for x in output_cols if not x.startswith('image_check__')]
 
     # select cols
     df = df[output_cols]

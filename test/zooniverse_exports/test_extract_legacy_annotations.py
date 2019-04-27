@@ -4,14 +4,12 @@ import logging
 import csv
 from collections import Counter
 
-from utils.logger import setup_logger
-
-from zooniverse_exports import legacy_extractor
+from zooniverse_exports.legacy import legacy_extractor
 from config.cfg import cfg
 
 flags = cfg['legacy_extractor_flags']
 
-setup_logger()
+
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.ERROR)
 
@@ -35,12 +33,14 @@ class ExtractLegacyClassificationsTests(unittest.TestCase):
                 'SER_S9#C13#R1#S9_C13_R1_IMAG1034.JPG': 'SER_S9#C13#R1#2'}
         stats = Counter()
         user_subject_tracker = dict()
+        subject_to_capture = dict()
         extracted_all = dict()
         for i, cl in enumerate(self.raw_classifications):
             cls_dict = cl
             extracted = legacy_extractor.extract_raw_classification(
                     cls_dict,
                     img_to_capture,
+                    subject_to_capture,
                     flags,
                     stats,
                     user_subject_tracker)
