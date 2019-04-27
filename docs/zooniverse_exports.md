@@ -30,6 +30,47 @@ Download Zooniverse exports. Requires Zooniverse account credentials and
 collaborator status with the project. The project_id can be found in the project builder
 in the top left corner. To create a 'fresh' export it is easiest to go on Zooniverse, to the project page, click on 'Data Exports', and request the appropriate export (see below). After receiving an e-mail confirming the export was completed, execute the following scripts (do not download data via e-mail).
 
+Note: Currently (April 2019) the export contains all historical data from a particular project -- it is only possible to filter by workflow_id.
+
+### Zooniverse Subject Export
+
+To get subject data go to Zooniverse and click 'Request new subject export'. To download the data use:
+```
+# Get Zooniverse Subject Data
+python3 -m zooniverse_exports.get_zooniverse_export \
+--password_file ~/keys/passwords.ini \
+--project_id $PROJECT_ID \
+--output_file /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subjects.csv \
+--export_type subjects \
+--log_dir /home/packerc/shared/zooniverse/Exports/${SITE}/log_files/ \
+--log_filename ${SEASON}_get_subject_export
+```
+
+## Extract Zooniverse Subject Data
+
+The following codes extract subject data from the subject exports that Zooniverse provides. The 'filter_by_season' argument selects only subjects from the specified season.
+
+```
+python3 -m zooniverse_exports.extract_subjects \
+--subject_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subjects.csv \
+--output_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subjects_extracted.csv \
+--filter_by_season ${SEASON} \
+--log_dir /home/packerc/shared/zooniverse/Exports/${SITE}/log_files/ \
+--log_filename ${SEASON}_extract_subjects
+```
+
+The resulting file may have the following column headers:
+
+| Columns   | Description |
+| --------- | ----------- |
+|capture_id, capture,roll,season,site | internal id's of the capture (uploaded to Zooniverse)
+|subject_id | zooniverse unique id of the capture (a subject)
+|zooniverse_created_at| Datetime of when the subject was created/uploaded on/to Zooniverse
+|zooniverse_retired_at| Datetime of when the subject was retired on Zooniverse (empty if not)
+|zooniverse_retirement_reason| Zooniverse system-generated retirement-reason (empty if none / not)
+|zooniverse_url_*| Zooniverse URLs to images of the capture / subject
+
+
 ### Zooniverse Classifications Export
 
 Click on 'Request new classification export' to get the classifications. The structure of a classification is as follows:
@@ -57,21 +98,6 @@ python3 -m zooniverse_exports.get_zooniverse_export \
 --log_dir /home/packerc/shared/zooniverse/Exports/${SITE}/log_files/ \
 --log_filename ${SEASON}_get_classification_export
 ```
-
-### Zooniverse Subject Export
-
-To get subject data go to Zooniverse and click 'Request new subject export'. To download the data use:
-```
-# Get Zooniverse Subject Data
-python3 -m zooniverse_exports.get_zooniverse_export \
---password_file ~/keys/passwords.ini \
---project_id $PROJECT_ID \
---output_file /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subjects.csv \
---export_type subjects \
---log_dir /home/packerc/shared/zooniverse/Exports/${SITE}/log_files/ \
---log_filename ${SEASON}_get_subject_export
-```
-
 
 ## Extract Zooniverse Annotations from Classifications
 
@@ -127,29 +153,18 @@ XYZ,,2018-02-06 17:09:43 UTC,
 4,0,1,0,0,1,1,wildebeest,
 ```
 
-## Extract Zooniverse Subject Data
+## Filter Annotations with Subject Data
 
-The following codes extract subject data from the subject exports that Zooniverse provides.
+To retain only annotations of a specific set of subjects (for example a season) run the following code:
 
 ```
-python3 -m zooniverse_exports.extract_subjects \
---subject_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subjects.csv \
---output_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subjects_extracted.csv \
+python3 -m zooniverse_exports.select_annotations \
+--annotations /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_annotations.csv \
+--subjects /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subjects_extracted.csv \
+--output_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_annotations.csv \
 --log_dir /home/packerc/shared/zooniverse/Exports/${SITE}/log_files/ \
---log_filename ${SEASON}_extract_subjects
+--log_filename ${SEASON}_select_annotations
 ```
-
-The resulting file may have the following column headers:
-
-| Columns   | Description |
-| --------- | ----------- |
-|capture,roll,season,site | internal id's of the capture (uploaded to Zooniverse)
-|subject_id | zooniverse unique id of the capture (a subject)
-|zooniverse_created_at| Datetime of when the subject was created/uploaded on/to Zooniverse
-|zooniverse_retired_at| Datetime of when the subject was retired on Zooniverse (empty if not)
-|zooniverse_retirement_reason| Zooniverse system-generated retirement-reason (empty if none / not)
-|zooniverse_url_*| Zooniverse URLs to images of the capture / subject
-
 
 ## Processing Snapshot Serengeti S1-S10 data (legacy format)
 

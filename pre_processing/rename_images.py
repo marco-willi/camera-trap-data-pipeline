@@ -7,7 +7,10 @@ from pre_processing.utils import (read_image_inventory)
 from utils.logger import set_logging
 
 
-def rename_files(source_paths, dest_paths, logger):
+logger = logging.getLogger(__name__)
+
+
+def rename_files(source_paths, dest_paths):
     """ Rename Files """
     n_total = len(source_paths)
     for i, (src, dst) in enumerate(zip(source_paths, dest_paths)):
@@ -29,14 +32,14 @@ def rename_files(source_paths, dest_paths, logger):
     logger.info("Finished, renamed {:10}/{} files".format(i+1, n_total))
 
 
-def rename_images_in_inventory(inventory, logger):
+def rename_images_in_inventory(inventory):
     """ Rename all images in inventory """
     source_paths = list()
     dest_paths = list()
     for data in inventory.values():
         source_paths.append(data['image_path_original'])
         dest_paths.append(data['image_path'])
-    rename_files(source_paths, dest_paths, logger)
+    rename_files(source_paths, dest_paths)
 
 
 if __name__ == '__main__':
@@ -56,5 +59,5 @@ if __name__ == '__main__':
     inventory = read_image_inventory(args['inventory'])
 
     logger.info("Starting to rename images")
-    rename_images_in_inventory(inventory, logger)
+    rename_images_in_inventory(inventory)
     logger.info("Finished renaming images")

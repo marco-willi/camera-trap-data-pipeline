@@ -26,6 +26,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("--subject_csv", type=str, required=True)
     parser.add_argument("--output_csv", type=str, required=True)
+    parser.add_argument("--filter_by_season", type=str, default='')
     parser.add_argument("--log_dir", type=str, default=None)
     parser.add_argument("--log_filename", type=str, default='extract_subjects')
 
@@ -50,10 +51,15 @@ if __name__ == '__main__':
     # logging flags
     print_nested_dict('', flags)
 
+    if args['filter_by_season'] != '':
+        logger.info("Filter subjects for season equal {}".format(
+            args['filter_by_season']))
+
     # Read Subject CSV
     n_images_per_subject = list()
     subject_info = OrderedDict()
     subject_data_header = set()
+    n_excluded_wrong_season = 0
     with open(args['subject_csv'], "r") as ins:
         csv_reader = csv.reader(ins, delimiter=',', quotechar='"')
         header_subject = next(csv_reader)
@@ -114,7 +120,22 @@ if __name__ == '__main__':
                     subject_info_to_add[field] = ''
             subject_info_to_add = extractor.rename_dict_keys(
                 subject_info_to_add, flags['SUBJECT_DATA_NAME_MAPPER'])
+            # check if season filter is specified
+            if args['filter_by_season'] != '':
+                try:
+                    season = subject_info_to_add['season']
+                    if season != args['filter_by_season']:
+                        n_excluded_wrong_season += 1
+                        continue
+                except KeyError:
+                    logger.warning(
+                        "Specified 'filter_by_season': {} however 'season' \
+                        not found in extracted subject data".format(
+                         args['filter_by_season']))
             subject_info[subject_id] = subject_info_to_add
+
+    logger.info("Excluded {} subjects because of season filter".format(
+        n_excluded_wrong_season))
 
     # Export Data as CSV
     df_out = pd.DataFrame.from_dict(subject_info, orient='index')
