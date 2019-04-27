@@ -156,7 +156,7 @@ pre_processing_flags:
       # specify columns to exclude from the cleaned file, columns not in
       # 'first_columns' and not in 'exclude_columns' will be appended
       # warning: do not exclude important cols like:
-      #  capture_id, season, site, roll, capture, image_rank_in_capture 
+      #  capture_id, season, site, roll, capture, image_rank_in_capture
       exclude_columns:
         - seconds_to_next_image_taken
         - seconds_to_last_image_taken
@@ -164,8 +164,10 @@ pre_processing_flags:
         - days_to_next_image_taken
         - image_rank_in_roll
         - image_name_original
-        - image_path_original
         - image_path_original_rel
+        - image_path_original
+        - date
+        - time
       # flag to generally exclude EXIF data
       exclude_exif_data: True
       # flag to generally exclude image check flags

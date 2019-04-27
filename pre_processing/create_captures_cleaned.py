@@ -45,27 +45,34 @@ if __name__ == '__main__':
     df = pd.read_csv(args['captures'], dtype='str')
     df.fillna('', inplace=True)
 
+    logger.info(
+        "Read {} records from {}".format(df.shape[0], args['captures']))
+
     # get flags
     try:
         first_cols = flags['final_cleaned']['first_columns']
     except KeyError:
         first_cols = []
+        logger.debug("No first columns found in config file")
 
     try:
         exclude_columns = flags['final_cleaned']['exclude_columns']
     except KeyError:
         exclude_columns = []
+        logger.debug("No exclude columns found in config file")
 
     try:
         exclude_exif_data = flags['final_cleaned']['exclude_exif_data']
     except KeyError:
         exclude_exif_data = False
+        logger.debug("No exif exclusion flag found in config file")
 
     try:
         exclude_image_check_flags = \
             flags['final_cleaned']['exclude_image_check_flags']
     except KeyError:
         exclude_image_check_flags = False
+        logger.debug("No image check exclusion flag found in config file")
 
     # determine column order
     all_cols = df.columns
@@ -86,6 +93,8 @@ if __name__ == '__main__':
 
     # select cols
     df = df[output_cols]
+    logger.info(
+        "Found the following columns for export: {}".format(df.columns))
     sort_df(df)
 
     ######################################
@@ -94,5 +103,8 @@ if __name__ == '__main__':
 
     # export
     df.to_csv(args['captures_cleaned'], index=False)
+
+    logger.info("Exported {} records to {}".format(
+        df.shape[0], args['captures_cleaned']))
 
     set_file_permission(args['captures_cleaned'])

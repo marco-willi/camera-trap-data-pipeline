@@ -4,7 +4,7 @@ import argparse
 import logging
 
 from pre_processing.utils import (read_image_inventory)
-from utils.logger import create_log_file, setup_logger
+from utils.logger import set_logging
 
 
 def rename_files(source_paths, dest_paths, logger):
@@ -50,11 +50,7 @@ if __name__ == '__main__':
     args = vars(parser.parse_args())
 
     # logging
-    if args['log_dir'] is not None:
-        log_file_path = create_log_file(args['log_dir'], args['log_filename'])
-        setup_logger(log_file_path)
-    else:
-        setup_logger()
+    set_logging(args['log_dir'], args['log_filename'])
     logger = logging.getLogger(__name__)
 
     inventory = read_image_inventory(args['inventory'])
