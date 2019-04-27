@@ -366,12 +366,7 @@ python3 -m pre_processing.update_captures \
 
 ## Finalize (create cleaned captures) or Iterate (go back to creating action list)
 
-If the previous code showed no further issues in the printed output, the generated file is the finalized cleaned captures file and can be moved like this:
-```
-cp -p /home/packerc/shared/season_captures/${SITE}/captures/${SEASON}_captures_updated.csv /home/packerc/shared/season_captures/${SITE}/cleaned/${SEASON}_cleaned.csv
-```
-
-If there are further issues, we verify this by running the following code:
+To check whether there are further issues run the following code. The code creates a new action list. If the list is empty, there are no further actions to take an we can proceed to the next step and create the cleaned csv. If there are further issues, we go back to the 'Generate Action List' section and proceed from there.
 ```
 python3 -m pre_processing.create_action_list \
 --captures /home/packerc/shared/season_captures/${SITE}/captures/${SEASON}_captures_updated.csv \
@@ -380,9 +375,16 @@ python3 -m pre_processing.create_action_list \
 --log_filename ${SEASON}_create_action_list
 ```
 
-If the produced action list is not empty we can re-iterate the application of actions.
+If the previous code showed no further issues a final cleaned captures file is created:
+```
+python3 -m pre_processing.create_captures_cleaned \
+--captures /home/packerc/shared/season_captures/${SITE}/captures/${SEASON}_captures_updated.csv \
+--captures_cleaned /home/packerc/shared/season_captures/${SITE}/cleaned/${SEASON}_cleaned.csv \
+--log_dir /home/packerc/shared/season_captures/${SITE}/log_files/ \
+--log_filename ${SEASON}_create_captures_cleaned
+```
 
-This code can be run in any case to check if further actions need to be taken if the output of the previous code (update_captures) was not clear.
+
 
 ## Columns of Cleaned Captures (Default)
 
