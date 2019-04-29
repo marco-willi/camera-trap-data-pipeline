@@ -397,41 +397,25 @@ python3 -m pre_processing.create_captures_cleaned \
 |roll | roll identifier (SD card of a camera)
 |capture | capture number (e.g. '1' for the first capture in a specific roll)
 |image_rank_in_capture| (temporal) rank of image in a capture
-|image_rank_in_roll| (temporal) rank of image in a roll
-|action_taken| the action that was applied to the image, separated by '#' if multiple
-|action_taken_reason| the reason for the action that was applied to the image, separated by '#' if multiple
+|image_name | image name after re-naming
+|image_path_rel| relative (from season root) image path after re-naming
+|datetime| datetime of image (default Y-m-d H:M:S) -- after any datetime corrections applied
+|datetime_exif| datetime as extrated from EXIF data (default Y-m-d H:M:S, '' if none)
+|datetime_file_creation| file creation date (default Y-m-d H:M:S)
 |image_is_invalid| flag if image was invalidated (1, '' otherwise)
 |image_was_deleted| flag if image was deleted (1, '' otherwise)
 |image_no_upload| flag if image was marked for no upload (1, '' otherwise)
 |image_datetime_uncertain| flag if image was marked for uncertain datetime (1, '' otherwise)
-|image_name | image name after re-naming
-|image_path_rel| relative (to season root) image path after re-naming
-|image_path | full path of re-named image  
-|image_name_original | original image name
-|image_path_original | full path of original image
-|image_path_original_rel| relative path of original image
-|datetime| datetime of image (default Y-m-d H:M:S) -- after any datetime corrections applied
-|datetime_exif| datetime as extrated from EXIF data (default Y-m-d H:M:S, '' if none)
-|datetime_file_creation| file creation date (default Y-m-d H:M:S)
-|seconds_to_next_image_taken| seconds to the next image taken
-|seconds_to_last_image_taken| seconds to the last/previous image taken
-|days_to_last_image_taken| days to the last/previous image taken
-|days_to_next_image_taken| days to the next image taken
-|image_check__()| image check flag of check () -- '1' if check failed
-|exif__()| EXIF tag () extracted from the image
+|action_taken| the action that was applied to the image, separated by '#' if multiple
+|action_taken_reason| the reason for the action that was applied to the image, separated by '#' if multiple
 
 
 ## Columns of Cleaned Captures (Legacy Files)
 
-There are several seasons that were processed using an older script. These typically contain fewer columns:
+There are several seasons that were processed using an older script. To standardize the files as much as possible the columns are identical, however, some are always ''. A few columns are extra, to preserve historical information. The following columns may be different/affected:
 
 | Columns   | Description |
 | --------- | ----------- |
-|capture_id| capture-id
-|season, site, roll, capture| internal ids of the capture
-|image_rank_in_capture| rank/order of image in a capture
-|image_path_rel| relative (to site root) image path after re-naming
-|image_name | image name after re-naming
 |datetime| datetime of image (default Y-m-d H:M:S) -- after any datetime corrections applied
 |datetime_exif| datetime as extrated from EXIF data, typically not available
 |datetime_file_creation| file creation date  (default Y-m-d H:M:S, '' if not available)
@@ -440,3 +424,5 @@ There are several seasons that were processed using an older script. These typic
 |invalid| legacy column referring to timestamp status ('1' = 'Not recoverable', '2'= 'Fix is hard', '3'='Fix is hard but timestamp likely close')
 |image_was_deleted| dummy flag for consistency with newer data -- is always ''
 |image_no_upload| dummy flag for consistency with newer data -- is always ''
+|action_taken| dummy col for consistency with newer data -- is always ''
+|action_taken_reason| dummy col for consistency with newer data -- is always ''

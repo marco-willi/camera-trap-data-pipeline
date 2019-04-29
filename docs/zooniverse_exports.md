@@ -46,31 +46,6 @@ python3 -m zooniverse_exports.get_zooniverse_export \
 --log_filename ${SEASON}_get_subject_export
 ```
 
-## Extract Zooniverse Subject Data
-
-The following codes extract subject data from the subject exports that Zooniverse provides. The 'filter_by_season' argument selects only subjects from the specified season.
-
-```
-python3 -m zooniverse_exports.extract_subjects \
---subject_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subjects.csv \
---output_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subjects_extracted.csv \
---filter_by_season ${SEASON} \
---log_dir /home/packerc/shared/zooniverse/Exports/${SITE}/log_files/ \
---log_filename ${SEASON}_extract_subjects
-```
-
-The resulting file may have the following column headers:
-
-| Columns   | Description |
-| --------- | ----------- |
-|capture_id, capture,roll,season,site | internal id's of the capture (uploaded to Zooniverse)
-|subject_id | zooniverse unique id of the capture (a subject)
-|zooniverse_created_at| Datetime of when the subject was created/uploaded on/to Zooniverse
-|zooniverse_retired_at| Datetime of when the subject was retired on Zooniverse (empty if not)
-|zooniverse_retirement_reason| Zooniverse system-generated retirement-reason (empty if none / not)
-|zooniverse_url_*| Zooniverse URLs to images of the capture / subject
-
-
 ### Zooniverse Classifications Export
 
 Click on 'Request new classification export' to get the classifications. The structure of a classification is as follows:
@@ -99,6 +74,31 @@ python3 -m zooniverse_exports.get_zooniverse_export \
 --log_filename ${SEASON}_get_classification_export
 ```
 
+## Extract Zooniverse Subject Data
+
+The following codes extract subject data from the subject exports that Zooniverse provides. The 'filter_by_season' argument selects only subjects from the specified season.
+
+```
+python3 -m zooniverse_exports.extract_subjects \
+--subject_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subjects.csv \
+--output_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subjects_extracted.csv \
+--filter_by_season ${SEASON} \
+--log_dir /home/packerc/shared/zooniverse/Exports/${SITE}/log_files/ \
+--log_filename ${SEASON}_extract_subjects
+```
+
+The resulting file may have the following column headers:
+
+| Columns   | Description |
+| --------- | ----------- |
+|capture_id, capture,roll,season,site | internal id's of the capture (uploaded to Zooniverse)
+|subject_id | zooniverse unique id of the capture (a subject)
+|zooniverse_created_at| Datetime of when the subject was created/uploaded on/to Zooniverse
+|zooniverse_retired_at| Datetime of when the subject was retired on Zooniverse (empty if not)
+|zooniverse_retirement_reason| Zooniverse system-generated retirement-reason (empty if none / not)
+|zooniverse_url_*| Zooniverse URLs to images of the capture / subject
+
+
 ## Extract Zooniverse Annotations from Classifications
 
 The following code extracts the relevant fields of a Zooniverse classification csv. It creates a csv file with one line per species identification/annotation. Usually, the workflow_id and the workflow_version are specified to extract only the workflow that was used during the 'live-phase' of the project. If neither workflow_id/workflow_version/worfklow_version_min are specified every workflow is extracted. The workflow_id can be found in the project builder when clicking on the workflow. The workflow_version is at the same place slightly further down (e.g. something like 745.34). Be aware that only the 'major' version number is compared against, e.g., workflow_version '45.23' is identical to '45.56'. It is also possible to specify a minimum 'workflow_version_min' in which case all classifications with the same or higher number are extracted. A summary of all extracted workflows and other stats is printed after the extraction.
@@ -117,7 +117,7 @@ python3 -m zooniverse_exports.extract_annotations \
 --output_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_annotations.csv
 ```
 
-Then investiage the output of the script in the terminal to determine which workflows to use and then re-run the code with the specified workflows:
+Then investigate the output of the script in the terminal to determine which workflows to use and then re-run the code with the specified workflows:
 
 ```
 python3 -m zooniverse_exports.extract_annotations \

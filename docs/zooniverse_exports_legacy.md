@@ -191,7 +191,7 @@ SER_S10#B03#1#1,S10,B03,1,1,2,S10/B03/B03_R1/S10_B03_R1_IMAG0002.JPG,2015-01-16 
 SER_S10#B03#1#2,S10,B03,1,2,1,S10/B03/B03_R1/S10_B03_R1_IMAG0003.JPG,2015-01-16 11:31:46,2015-01-16 11:31:46,,0,1,0,0
 ```
 
-### Add Zooniverse URLs to subjec exports
+### Add Zooniverse URLs to subject exports
 
 The following code appends the Zooniverse Urls of each subject.
 

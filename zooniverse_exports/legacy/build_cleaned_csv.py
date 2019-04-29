@@ -207,7 +207,7 @@ df_merged2.iloc[0]
 
 # some random checks / comments
 
-# # check investiage discrepancies
+# # check investigate discrepancies
 # img = 'S1/E02/E02_R5/S1_E02_R5_PICT0148.JPG'
 # img = 'S4/B12/B12_R2/S4_B12_R2_IMAG0100.JPG'
 # img = 'S5/G07/G07_R4/S5_G07_R4_IMAG0219.JPG'
