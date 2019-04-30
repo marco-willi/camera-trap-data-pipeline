@@ -117,7 +117,13 @@ python3 -m zooniverse_exports.extract_annotations \
 --output_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_annotations.csv
 ```
 
-Then investigate the output of the script in the terminal to determine which workflows to use and then re-run the code with the specified workflows:
+Then investigate the output of the script in the terminal to determine which workflows to use and then re-run the code with the specified workflows. Example output:
+```
+INFO:Workflow id: 9435    Workflow version: 391.3      -- counts: 18578
+INFO:Workflow id: 9435    Workflow version: 391.4      -- counts: 18189
+```
+In that case we would choose 'WORKFLOW_ID'=9435 and 'WORKFLOW_VERSION_MIN'=391.3 since it looks like somebody just made a minor change mid-season causing the version number to change slightly. 
+
 
 ```
 python3 -m zooniverse_exports.extract_annotations \

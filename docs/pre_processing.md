@@ -33,7 +33,7 @@ season_captures/${SITE}/log_files
 ```
 
 
-## Check Import (directory) Structure
+## Check Input Structure
 
 The camera trap images to be imported need to be organized according to the following directory structure:
 
@@ -410,18 +410,19 @@ python3 -m pre_processing.create_captures_cleaned \
 |action_taken_reason| the reason for the action that was applied to the image, separated by '#' if multiple
 
 
-## Columns of Cleaned Captures (Legacy Files)
+## Additional / Altered Columns of Legacy Cleaned Captures Files
 
-There are several seasons that were processed using an older script. To standardize the files as much as possible the columns are identical, however, some are always ''. A few columns are extra, to preserve historical information. The following columns may be different/affected:
+There are several seasons that were processed using older scripts. To standardize the files as much as possible the columns are identical, however, some are always empty. A few columns are extra, to preserve historical information. The following columns may be different/affected:
 
 | Columns   | Description |
 | --------- | ----------- |
-|datetime| datetime of image (default Y-m-d H:M:S) -- after any datetime corrections applied
-|datetime_exif| datetime as extrated from EXIF data, typically not available
+|datetime| datetime of image (default Y-m-d H:M:S) -- often this is derived from the file creation date instead of the EXIF data
+|datetime_exif| datetime as extrated from EXIF data, not always available, sometimes unclear if origin is in fact from the EXIF data
 |datetime_file_creation| file creation date  (default Y-m-d H:M:S, '' if not available)
 |image_is_invalid| flag if image was invalidated (1, '' otherwise) -- derived from 'invalid' column (values 1,2,3)
 |image_datetime_uncertain| flag if image was marked for uncertain datetime (1, '' otherwise) -- derived from 'invalid' column (values 1,2,3)
-|invalid| legacy column referring to timestamp status ('1' = 'Not recoverable', '2'= 'Fix is hard', '3'='Fix is hard but timestamp likely close')
+|invalid| legacy column referring to timestamp status ('0' = no issue, '1' = 'Not recoverable', '2'= 'Fix is hard', '3'='Fix is hard but timestamp likely close')
+|include| flag if image has flag 'invalid' equal '0'
 |image_was_deleted| dummy flag for consistency with newer data -- is always ''
 |image_no_upload| dummy flag for consistency with newer data -- is always ''
 |action_taken| dummy col for consistency with newer data -- is always ''

@@ -382,7 +382,7 @@ if __name__ == '__main__':
             csv_writer.writerow(
                 class_data + answers_ordered)
         logger.info("Wrote {} annotations to {}".format(
-            line_no, args['output_csv']))
+            line_no+1, args['output_csv']))
 
     # change permmissions to read/write for group
     set_file_permission(args['output_csv'])

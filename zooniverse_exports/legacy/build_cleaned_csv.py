@@ -394,7 +394,7 @@ df_captures_without_timestamps = pd.merge(
 df_captures_without_timestamps = df_captures_without_timestamps[df_captures_without_timestamps['datetime_clean_f'].isna()]
 
 df_captures_without_timestamps.shape[0]
-# 10528 captures without timestamps
+# 6 captures without timestamps
 
 # combine
 df_captures_all = df_capture_first_with_datetime.append(df_captures_without_timestamps[['season', 'site', 'roll', 'capture', 'datetime_clean']])
@@ -587,6 +587,11 @@ df_final_cols['image_datetime_uncertain'].loc[i_to_include] = '0'
 # re-create dummy columns
 df_final_cols['image_was_deleted'] = ''
 df_final_cols['image_no_upload'] = ''
+df_final_cols['action_taken'] = ''
+df_final_cols['action_taken_reason'] = ''
+
+# re-create image_name  column
+df_final_cols['image_name'] = [os.path.basename(x) for x in df_final_cols['image_path_rel']]
 
 df_final_cols = pd.merge(
     left=df_final_cols, right=df_captures_all,
@@ -615,13 +620,28 @@ df_final_cols.groupby(['invalid', 'image_datetime_uncertain']).size().to_frame('
 # 'datetime', 'datetime_exif',
 # 'invalid', 'include', 'image_is_invalid', 'image_uncertain_datetime'
 
-order_cols = ['capture_id', 'season', 'site',
- 'roll', 'capture', 'image_rank_in_capture',
- 'image_path_rel', 'datetime', 'datetime_exif', 'datetime_file_creation',
- 'invalid', 'include', 'image_is_invalid', 'image_datetime_uncertain',
- 'image_was_deleted', 'image_no_upload']
+final_cols = [
+ 'capture_id',
+ 'season',
+ 'site',
+ 'roll',
+ 'capture',
+ 'image_rank_in_capture',
+ 'image_name',
+ 'image_path_rel',
+ 'datetime',
+ 'datetime_exif',
+ 'datetime_file_creation',
+ 'image_is_invalid',
+ 'image_datetime_uncertain',
+ 'image_no_upload',
+ 'image_was_deleted',
+ 'action_taken',
+ 'action_taken_reason',
+ 'invalid',
+ 'include']
 
-df_final_cols = df_final_cols[order_cols]
+df_final_cols = df_final_cols[final_cols]
 
 df_final_cols.to_csv(os.path.join(path_output, 'captures_cleaned.csv'), index=False)
 

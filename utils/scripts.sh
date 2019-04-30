@@ -217,6 +217,23 @@ WORKFLOW_VERSION_MIN=531.12
 }
 
 ###################################
+# Kruger
+####################################
+
+set_params_KRU () {
+
+cd $HOME/camera-trap-data-pipeline
+SITE=KRU
+SEASON=KRU_S1
+PROJECT_ID=8565
+WORKFLOW_ID=9435
+WORKFLOW_VERSION_MIN=391.3
+
+}
+
+
+
+###################################
 # Python Prep
 ####################################
 
@@ -233,7 +250,7 @@ git pull
 
 # Loop over all seasons
 LOC=SER
-for LOC in MTZ KAR PLN NIA GON APN GRU SER RUA; do
+for LOC in APN NIA GON; do
   set_params_${LOC}
   extract_zooniverse_data
   aggregate_annotations
@@ -420,23 +437,31 @@ python3 -m zooniverse_uploads.upload_manifest \
 ####################################
 
 extract_zooniverse_data () {
-# Get Zooniverse Classification Data
-python3 -m zooniverse_exports.get_zooniverse_export \
---password_file ~/keys/passwords.ini \
---project_id $PROJECT_ID \
---output_file /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_classifications.csv \
---export_type classifications \
---log_dir /home/packerc/shared/zooniverse/Exports/${SITE}/
-
 # Get Zooniverse Subject Data
 python3 -m zooniverse_exports.get_zooniverse_export \
 --password_file ~/keys/passwords.ini \
 --project_id $PROJECT_ID \
 --output_file /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subjects.csv \
 --export_type subjects \
---log_dir /home/packerc/shared/zooniverse/Exports/${SITE}/
+--log_dir /home/packerc/shared/zooniverse/Exports/${SITE}/log_files/ \
+--log_filename ${SEASON}_get_subject_export
 
-# Extract Annotations from Classifications
+
+python3 -m zooniverse_exports.get_zooniverse_export \
+--password_file ~/keys/passwords.ini \
+--project_id $PROJECT_ID \
+--output_file /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_classifications.csv \
+--export_type classifications \
+--log_dir /home/packerc/shared/zooniverse/Exports/${SITE}/log_files/ \
+--log_filename ${SEASON}_get_classification_export
+
+python3 -m zooniverse_exports.extract_subjects \
+--subject_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subjects.csv \
+--output_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subjects_extracted.csv \
+--filter_by_season ${SEASON} \
+--log_dir /home/packerc/shared/zooniverse/Exports/${SITE}/log_files/ \
+--log_filename ${SEASON}_extract_subjects
+
 python3 -m zooniverse_exports.extract_annotations \
 --classification_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_classifications.csv \
 --output_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_annotations.csv \
@@ -445,12 +470,12 @@ python3 -m zooniverse_exports.extract_annotations \
 --log_dir /home/packerc/shared/zooniverse/Exports/${SITE}/log_files/ \
 --log_filename ${SEASON}_extract_annotations
 
-# Extract Subject Data
-python3 -m zooniverse_exports.extract_subjects \
---subject_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subjects.csv \
---output_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subjects_extracted.csv \
+python3 -m zooniverse_exports.select_annotations \
+--annotations /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_annotations.csv \
+--subjects /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_subjects_extracted.csv \
+--output_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_annotations.csv \
 --log_dir /home/packerc/shared/zooniverse/Exports/${SITE}/log_files/ \
---log_filename ${SEASON}_extract_subjects
+--log_filename ${SEASON}_select_annotations
 }
 
 ###################################
