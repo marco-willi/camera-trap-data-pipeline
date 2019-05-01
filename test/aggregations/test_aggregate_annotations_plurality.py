@@ -2,8 +2,6 @@
 import unittest
 import logging
 
-from utils.logger import setup_logger
-
 from aggregations.aggregate_annotations_plurality import (
     aggregate_subject_annotations)
 from config.cfg import cfg_default as cfg
@@ -12,7 +10,7 @@ from aggregations import aggregator
 
 flags = cfg['plurality_aggregation_flags']
 flags_global = cfg['global_processing_flags']
-setup_logger()
+
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.ERROR)
 
@@ -34,7 +32,7 @@ class AggregateAnnotationsPluralityTests(unittest.TestCase):
         self.question_type_map = aggregator.create_question_type_map(
             self.questions, flags, flags_global)
 
-        self.test_subjects = {
+        self.test_subjects_list = {
             'test_standard': [
                 ['u1', 'cid1', 'zebra', '1', '0'],
                 ['u2', 'cid2', 'zebra', '2', '0'],
@@ -103,13 +101,17 @@ class AggregateAnnotationsPluralityTests(unittest.TestCase):
                 ['u4', 'cid4', 'blank', '', '']]
         }
 
+        # convert to dictionaries
+        self.test_subjects = {
+            k: [{self.required_fields[i]: x for i, x in enumerate(a)} for a in v]
+            for k, v in self.test_subjects_list.items()}
+
     def testStandardAggregation(self):
         actual = aggregate_subject_annotations(
                 self.test_subjects['test_standard'],
                 self.questions,
                 self.question_type_map,
-                self.question_main_id,
-                self.annotation_id_to_name_mapper)
+                self.question_main_id)
 
         actual_consensus = actual['consensus_species'][0]
         actual_agg_info = actual['aggregation_info']
@@ -130,8 +132,7 @@ class AggregateAnnotationsPluralityTests(unittest.TestCase):
                 self.test_subjects['test_multi'],
                 self.questions,
                 self.question_type_map,
-                self.question_main_id,
-                self.annotation_id_to_name_mapper)
+                self.question_main_id)
 
         actual_consensus = {x for x in actual['consensus_species']}
         expected_consensus = {'zebra', 'elephant'}
@@ -153,8 +154,7 @@ class AggregateAnnotationsPluralityTests(unittest.TestCase):
                 self.test_subjects['test_prop_1'],
                 self.questions,
                 self.question_type_map,
-                self.question_main_id,
-                self.annotation_id_to_name_mapper)
+                self.question_main_id)
 
         actual_species_aggs = actual['species_aggregations']
         expected_spcies_aggs = {'zebra': {
@@ -172,8 +172,7 @@ class AggregateAnnotationsPluralityTests(unittest.TestCase):
                 self.test_subjects['test_prop_025'],
                 self.questions,
                 self.question_type_map,
-                self.question_main_id,
-                self.annotation_id_to_name_mapper)
+                self.question_main_id)
 
         actual_species_aggs = actual['species_aggregations']
         expected_spcies_aggs = {'zebra': {
@@ -191,8 +190,7 @@ class AggregateAnnotationsPluralityTests(unittest.TestCase):
                 self.test_subjects['test_not_blank'],
                 self.questions,
                 self.question_type_map,
-                self.question_main_id,
-                self.annotation_id_to_name_mapper)
+                self.question_main_id)
 
         actual_consensus = {x for x in actual['consensus_species']}
 
@@ -203,8 +201,7 @@ class AggregateAnnotationsPluralityTests(unittest.TestCase):
                 self.test_subjects['test_blank'],
                 self.questions,
                 self.question_type_map,
-                self.question_main_id,
-                self.annotation_id_to_name_mapper)
+                self.question_main_id)
 
         actual_consensus = {x for x in actual['consensus_species']}
 
@@ -216,8 +213,7 @@ class AggregateAnnotationsPluralityTests(unittest.TestCase):
                 self.test_subjects['test_count_10'],
                 self.questions,
                 self.question_type_map,
-                self.question_main_id,
-                self.annotation_id_to_name_mapper)
+                self.question_main_id)
 
         actual_species_aggs = actual['species_aggregations']
         expected_spcies_aggs = {'zebra': {
@@ -235,8 +231,7 @@ class AggregateAnnotationsPluralityTests(unittest.TestCase):
                 self.test_subjects['test_tie_zebra'],
                 self.questions,
                 self.question_type_map,
-                self.question_main_id,
-                self.annotation_id_to_name_mapper)
+                self.question_main_id)
 
         actual_consensus = {x for x in actual['consensus_species']}
 
@@ -248,8 +243,7 @@ class AggregateAnnotationsPluralityTests(unittest.TestCase):
                 self.test_subjects['test_tie_eland'],
                 self.questions,
                 self.question_type_map,
-                self.question_main_id,
-                self.annotation_id_to_name_mapper)
+                self.question_main_id)
 
         actual_consensus = {x for x in actual['consensus_species']}
 
@@ -261,8 +255,7 @@ class AggregateAnnotationsPluralityTests(unittest.TestCase):
                 self.test_subjects['test_minority'],
                 self.questions,
                 self.question_type_map,
-                self.question_main_id,
-                self.annotation_id_to_name_mapper)
+                self.question_main_id)
 
         actual_species_aggs = actual['species_aggregations']
         expected_spcies_aggs = {'zebra': {
@@ -287,8 +280,7 @@ class AggregateAnnotationsPluralityTests(unittest.TestCase):
                 self.test_subjects['test_multi2'],
                 self.questions,
                 self.question_type_map,
-                self.question_main_id,
-                self.annotation_id_to_name_mapper)
+                self.question_main_id)
 
         actual_consensus = {x for x in actual['consensus_species']}
         expected_consensus = {'zebra', 'elephant'}
@@ -310,8 +302,7 @@ class AggregateAnnotationsPluralityTests(unittest.TestCase):
                 self.test_subjects['test_blind_user'],
                 self.questions,
                 self.question_type_map,
-                self.question_main_id,
-                self.annotation_id_to_name_mapper)
+                self.question_main_id)
 
         actual_consensus = {x for x in actual['consensus_species']}
         expected_consensus = {'zebra'}

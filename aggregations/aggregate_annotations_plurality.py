@@ -91,16 +91,13 @@ def aggregate_subject_annotations(
         subject_data,
         questions,
         question_type_map,
-        question_main_id,
-        annotation_id_to_name_mapper):
+        question_main_id):
     """ Aggregate subject annotations """
     # initialize Counter objects
     stat_all = defaultdict(OrderedCounter)
     stat_species_only = defaultdict(OrderedCounter)
     # extract and add annotations to stats counters
-    for annotation in subject_data:
-        anno_dict = {annotation_id_to_name_mapper[i]: x for
-                     i, x in enumerate(annotation)}
+    for anno_dict in subject_data:
         for k, v in anno_dict.items():
             stat_all[k].update({v})
         # store species only answers
@@ -135,7 +132,6 @@ def aggregate_subject_annotations(
     # calc stats for all species
     species_stats = aggregator.stats_for_species(
             species_names_by_frequency, subject_data,
-            annotation_id_to_name_mapper,
             species_field=question_main_id
             )
     # define empty capture if more volunteers saw nothing
@@ -240,20 +236,16 @@ if __name__ == '__main__':
     with open(args['annotations'], "r") as ins:
         csv_reader = csv.reader(ins, delimiter=',', quotechar='"')
         header = next(csv_reader)
-        row_name_to_id_mapper = {x: i for i, x in enumerate(header)}
         questions = [x for x in header if x.startswith(question_column_prefix)]
         for line_no, line in enumerate(csv_reader):
             # print status
             if ((line_no % 10000) == 0) and (line_no > 0):
                 print("Imported {:,} annotations".format(line_no))
-            # store data into subject dict
-            subject_id = line[row_name_to_id_mapper['subject_id']]
-            if subject_id not in subject_annotations:
-                subject_annotations[subject_id] = list()
-            subject_annotations[subject_id].append(line)
-
-    annotation_id_to_name_mapper = {
-        v: k for k, v in row_name_to_id_mapper.items()}
+            # convert to dict
+            line_dict = {header[i]: x for i, x in enumerate(line)}
+            if line_dict['subject_id'] not in subject_annotations:
+                subject_annotations[line_dict['subject_id']] = list()
+            subject_annotations[line_dict['subject_id']].append(line_dict)
 
     question_type_map = aggregator.create_question_type_map(
         questions, flags, flags_global)
@@ -271,8 +263,7 @@ if __name__ == '__main__':
                     subject_data,
                     questions,
                     question_type_map,
-                    question_main_id,
-                    annotation_id_to_name_mapper)
+                    question_main_id)
         subject_species_aggregations[subject_id] = record
 
     # Create one record per identification

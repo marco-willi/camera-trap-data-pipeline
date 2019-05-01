@@ -120,6 +120,7 @@ python3 -m reporting.create_ml_report_stats \
 |machine_topprediction_is_empty| whether the model indicates the image is empty 'empty' or not 'not_empty'
 |machine_confidence_is_empty| confidence of the image being empty / blank (0-1)
 |machine_topprediction_(label)| the models top prediction for (label), e.g., '5' for the 'count' label
+|machine_topconfidence_(label)| the models top confidence for (label), e.g., 0.98 for the 'count' label
 |machine_confidence_count_(num) | Confidence of the model of (num) species being present in the image.
 |machine_confidence_(behavior) | Confidence of predicted behavior (0-1)
 |machine_confidence_species_(species)| Confidence of (species) being present in the image (0-1)

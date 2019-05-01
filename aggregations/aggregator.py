@@ -73,27 +73,6 @@ def proportion_affirmative(question_stats):
 
 def stats_for_species(
         species_list, subject_data,
-        row_id_to_name_mapper,
-        species_field):
-    """ Calculate stats for specific species accross all classifications of a
-        Subject
-    """
-    stat_species = dict()
-    for annotation in subject_data:
-        anno_dict = {
-            row_id_to_name_mapper[i]: x
-            for i, x in enumerate(annotation)}
-        species = anno_dict[species_field]
-        if species in species_list:
-            if species not in stat_species:
-                stat_species[species] = defaultdict(Counter)
-            for k, v in anno_dict.items():
-                stat_species[species][k].update({v})
-    return stat_species
-
-
-def stats_for_species_v2(
-        species_list, subject_data,
         species_field):
     """ Calculate stats for specific species accross all classifications of a
         Subject
