@@ -16,15 +16,12 @@ def flatten_ml_empty_preds(preds_empty):
 
 def flatten_ml_species_preds(preds_species, only_top=False):
     """ Flatten Empty and Species preds """
-    if only_top:
-        res = _flatten_ml_toppreds(preds_species)
-        return order_dict(res)
-    else:
-        flat_species_conf = _flatten_ml_confidences(preds_species)
-        flat_species_top = _flatten_ml_toppreds(preds_species)
-        res = flat_species_top
-        res.update(flat_species_conf)
-        return res
+    res = OrderedDict()
+    res.update(_flatten_ml_toppreds(preds_species))
+    res.update(_flatten_ml_topconf(preds_species))
+    if not only_top:
+        res.update(_flatten_ml_confidences(preds_species))
+    return res
 
 
 def _is_binary_label(preds):
@@ -58,10 +55,20 @@ def _flatten_ml_confidences(preds):
 
 def _flatten_ml_toppreds(preds):
     """ Add Prediction Data to Meta-Data """
-    top_preds = preds["predictions_top"]
+    top_preds_label = preds["predictions_top"]
     res = {}
-    for pred_label, pred_value in top_preds.items():
+    for pred_label, pred_value in top_preds_label.items():
         key = 'machine_topprediction_%s' % pred_label
+        res[key] = pred_value
+    return order_dict(res)
+
+
+def _flatten_ml_topconf(preds):
+    """ Add Prediction Data to Meta-Data """
+    top_preds_conf = preds["confidences_top"]
+    res = {}
+    for pred_label, pred_value in top_preds_conf.items():
+        key = 'machine_topconfidence_%s' % pred_label
         res[key] = pred_value
     return order_dict(res)
 

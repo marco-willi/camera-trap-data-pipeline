@@ -5,8 +5,8 @@ The following codes can be used to:
 1. Check File Organization
 2. Check for Duplicate Images
 3. Create Image Inventory
-4. Extract Exif data
-5. Perform basic checks
+4. Perform basic checks
+5. Extract Exif data
 6. Re-name all images
 7. Group images into captures
 8. Inspect potential issues to resolve/waive them
