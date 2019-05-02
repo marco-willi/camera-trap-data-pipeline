@@ -20,6 +20,15 @@ flags = cfg['subject_extractor_flags']
 # args['output_csv'] = '/home/packerc/shared/zooniverse/Exports/MAD/MAD_S1_subjects_extracted.csv'
 
 
+def _guess_season_id_from_file(file_path):
+    """ Guess the season id from filename / path
+        - required for legacy data
+    """
+    file_name = os.path.basename(file_path)
+    season_id = '_'.join(file_name.split('_')[0:2])
+    return season_id
+
+
 if __name__ == '__main__':
 
     # Parse command line arguments
@@ -54,6 +63,16 @@ if __name__ == '__main__':
     if args['filter_by_season'] != '':
         logger.info("Filter subjects for season equal {}".format(
             args['filter_by_season']))
+
+    # Guess season id to subsitute it if not in subject extractions but
+    # requested -- dealing with legacy data
+    try:
+        season_id_guess = _guess_season_id_from_file(args['output_csv'])
+        logger.info("Guessed season id from output_csv: {}".format(
+            season_id_guess))
+    except:
+        season_id_guess = ''
+        logger.info("Failed to guess season id from output_csv")
 
     # Read Subject CSV
     n_images_per_subject = list()
@@ -108,11 +127,16 @@ if __name__ == '__main__':
             for field in flags['SUBJECT_METADATA_TO_ADD']:
                 try:
                     subject_info_to_add[field] = subject_data_all[field]
+                    # subsitute '' season field with guess to deal with legacy
+                    if (field == '#season') and (subject_data_all[field] == ''):
+                        subject_info_to_add[field] = season_id_guess
                 except KeyError:
                     # dont create empty capture_id field if not available,
                     # potentially dangerous
                     if field != '#capture_id':
                         subject_info_to_add[field] = ''
+                    elif field == '#season':
+                        subject_info_to_add[field] = season_id_guess
             for field in flags['SUBJECT_DATA_TO_ADD']:
                 try:
                     subject_info_to_add[field] = subject_data_all[field]
