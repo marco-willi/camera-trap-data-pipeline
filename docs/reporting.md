@@ -196,7 +196,7 @@ See here: [Machine Learning](../docs/machine_learning.md)
 
 Reports for publication on http://lila.science/datasets
 
-### Create Consensus Report
+### Create LILA Report
 
 ```
 python3 -m reporting.create_zooniverse_report \

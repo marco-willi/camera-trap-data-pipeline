@@ -20,7 +20,7 @@ MODEL_CLASS_MAPPING=${MODEL_ROOT_PATH}${MODEL_NAME}/label_mappings.json
 MODEL_PRE_PROCESSING=${MODEL_ROOT_PATH}${MODEL_NAME}/image_processing.json
 
 # Container
-SINGURALIRY_PATH=/home/packerc/shared/programs/camera-trap-classifier
+SINGULARITY_PATH=/home/packerc/shared/programs/camera-trap-classifier
 
 
 # Log Parameters
@@ -34,14 +34,14 @@ echo "MODEL_PATH: $MODEL_PATH"
 echo "MODEL_CLASS_MAPPING: $MODEL_CLASS_MAPPING"
 echo "MODEL_PRE_PROCESSING: $MODEL_PRE_PROCESSING"
 
-echo "SINGURALIRY_PATH: $SINGURALIRY_PATH"
+echo "SINGULARITY_PATH: $SINGULARITY_PATH"
 
 # modules
 module load singularity
 module load python3
 
 # switch to singularity container path
-cd $SINGURALIRY_PATH
+cd $SINGULARITY_PATH
 #singularity pull -F docker://will5448/camera-trap-classifier:latest-cpu
 
 # run the script

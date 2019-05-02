@@ -71,6 +71,7 @@ The 'captures_csv' input is a csv file with one row per image and with (at least
 |path or image_path_rel | Absolute or relative path of the image
 
 Optional columns:
+
 | Column   | Description |
 | --------- | ----------- |
 |invalid| excludes images from the manifest if value is '1' or '2'
