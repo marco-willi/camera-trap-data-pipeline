@@ -165,7 +165,7 @@ if __name__ == '__main__':
     logger.info(
         "Used guessed season_id {} for {} subjects without season id in meta-data".format(
             season_id_guess,
-            n_excluded_wrong_season))
+            n_used_guessed_season_id))
 
     n_used_guessed_season_id
 
