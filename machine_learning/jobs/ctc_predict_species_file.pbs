@@ -17,6 +17,8 @@ MODEL_PATH=${MODEL_ROOT_PATH}${MODEL_NAME}/best_model.hdf5
 MODEL_CLASS_MAPPING=${MODEL_ROOT_PATH}${MODEL_NAME}/label_mappings.json
 MODEL_PRE_PROCESSING=${MODEL_ROOT_PATH}${MODEL_NAME}/image_processing.json
 
+# Container
+SINGURALIRY_PATH=/home/packerc/shared/programs/camera-trap-classifier
 
 # Log Parameters
 echo "TO_PREDICT_PATH: $TO_PREDICT_PATH"
@@ -29,6 +31,8 @@ echo "MODEL_PATH: $MODEL_PATH"
 echo "MODEL_CLASS_MAPPING: $MODEL_CLASS_MAPPING"
 echo "MODEL_PRE_PROCESSING: $MODEL_PRE_PROCESSING"
 
+echo "SINGURALIRY_PATH: $SINGURALIRY_PATH"
+
 
 # modules
 module load singularity
@@ -37,13 +41,12 @@ module load python3
 
 # sleep for 2 minutes to reduce chance of conflict with 'empty' script when it
 # is pulling the following docker container
-sleep 2m
+#sleep 2m
 
 
-# download container and code
-cd $HOME
-singularity pull docker://will5448/camera-trap-classifier:latest-cpu
-
+# switch to singularity container path
+cd $SINGURALIRY_PATH
+#singularity pull -F docker://will5448/camera-trap-classifier:latest-cpu
 
 # run the script
 singularity exec -B /home/packerc/shared:/home/packerc/shared ./camera-trap-classifier-latest-cpu.simg \

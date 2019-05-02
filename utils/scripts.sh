@@ -250,7 +250,7 @@ git pull
 
 # Loop over all seasons
 LOC=SER
-for LOC in APN NIA GON; do
+for LOC in GRU; do
   set_params_${LOC}
   extract_zooniverse_data
   aggregate_annotations
