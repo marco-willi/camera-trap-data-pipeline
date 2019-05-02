@@ -79,6 +79,7 @@ if __name__ == '__main__':
     subject_info = OrderedDict()
     subject_data_header = set()
     n_excluded_wrong_season = 0
+    n_used_guessed_season_id = 0
     with open(args['subject_csv'], "r") as ins:
         csv_reader = csv.reader(ins, delimiter=',', quotechar='"')
         header_subject = next(csv_reader)
@@ -127,16 +128,17 @@ if __name__ == '__main__':
             for field in flags['SUBJECT_METADATA_TO_ADD']:
                 try:
                     subject_info_to_add[field] = subject_data_all[field]
-                    # subsitute '' season field with guess to deal with legacy
-                    if (field == '#season') and (subject_data_all[field] == ''):
-                        subject_info_to_add[field] = season_id_guess
                 except KeyError:
                     # dont create empty capture_id field if not available,
                     # potentially dangerous
-                    if field != '#capture_id':
-                        subject_info_to_add[field] = ''
+                    if field == '#capture_id':
+                        pass
+                    # substitute season id based on guessed id
                     elif field == '#season':
                         subject_info_to_add[field] = season_id_guess
+                        n_used_guessed_season_id += 1
+                    else:
+                        subject_info_to_add[field] = ''
             for field in flags['SUBJECT_DATA_TO_ADD']:
                 try:
                     subject_info_to_add[field] = subject_data_all[field]
@@ -160,6 +162,12 @@ if __name__ == '__main__':
 
     logger.info("Excluded {} subjects because of season filter".format(
         n_excluded_wrong_season))
+    logger.info(
+        "Used guessed season_id {} for {} subjects without season id in meta-data".format(
+            season_id_guess,
+            n_excluded_wrong_season))
+
+    n_used_guessed_season_id
 
     # Export Data as CSV
     df_out = pd.DataFrame.from_dict(subject_info, orient='index')
