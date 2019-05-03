@@ -23,6 +23,9 @@ from utils.utils import (
     file_path_splitter, file_path_generator, set_file_permission)
 
 
+logger = logging.getLogger(__name__)
+
+
 # python3 -m zooniverse_uploads.upload_manifest_v6 \
 # --manifest /home/packerc/shared/zooniverse/Manifests/GRU_TEST/GRU_S1__batch_17__manifest.json \
 # --log_dir /home/packerc/shared/zooniverse/Manifests/GRU_TEST/ \
@@ -67,6 +70,7 @@ def batch_data_storage():
 
 
 def connect_to_panoptes():
+    """ connect to panoptes -- uses global config dict """
     logger.info("Connecting to Panoptes")
     Panoptes.connect(username=config['zooniverse']['username'],
                      password=config['zooniverse']['password'])
@@ -79,25 +83,8 @@ def get_images_list_from_capture_data(capture_data):
     elif isinstance(capture_data['images'], list):
         images = capture_data['images']
     else:
-        logger.warning("no images found for capture_id: {}".format(
-            capture_id))
         images = list()
     return images
-
-
-def get_images_from_capture_data(capture_data, root_path):
-    """ Return a list of images """
-    if isinstance(capture_data['images'], dict):
-        images_to_upload = capture_data['images']['original_images']
-    elif isinstance(capture_data['images'], list):
-        images_to_upload = capture_data['images']
-    else:
-        logger.warning("no images found for capture_id: {}".format(
-            capture_id))
-    if root_path is not None:
-        images_to_upload = [os.path.join(root_path, x)
-                            for x in images_to_upload]
-    return images_to_upload
 
 
 def compress_images(images_to_upload, args):
@@ -136,17 +123,13 @@ def get_subject_set(subject_set_id, subject_set_name):
     return my_set
 
 
-def create_subject_set(my_project, subject_set_name):
-    my_set = uploader.create_subject_set(
-        my_project, subject_set_name)
-    logger.info("Created new subject set with id {}, name {}".format(
-                 my_set.id, my_set.display_name))
-    return my_set
-
-
 def create_subject(capture_id, capture_data, args):
     """ Create a Subject """
     images_to_upload = get_images_list_from_capture_data(capture_data)
+
+    if len(images_to_upload) == 0:
+        logger.warning("no images found for capture_id: {}".format(
+            capture_id))
 
     # add root path if specified
     if args['image_root_path'] is not None:
@@ -354,7 +337,10 @@ if __name__ == "__main__":
         my_set = get_subject_set(
             args['subject_set_id'], args['subject_set_name'])
     else:
-        my_set = create_subject_set(my_project, args['subject_set_name'])
+        my_set = uploader.create_subject_set(
+            my_project, args['subject_set_name'])
+        logger.info("Created new subject set with id {}, name {}".format(
+                     my_set.id, my_set.display_name))
 
     ###################################
     # Create Stats Variables

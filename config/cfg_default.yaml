@@ -7,7 +7,10 @@ global_processing_flags:
     # is to convert to: 'question__<question_on_zooniverse>'
     QUESTION_DELIMITER: __
     QUESTION_PREFIX: question
+    # the name to use for the main/top-level question in a survey task
     QUESTION_MAIN: species
+    # the answer to the main/top-level question that indicates blank/empt images
+    # these are handled differently in certain cases
     QUESTION_MAIN_EMPTY: blank
 
 ###################################################
@@ -17,7 +20,9 @@ global_processing_flags:
 pre_processing_flags:
     # Input / Output Timeformats
     time_formats:
+      # timeformat as stored in EXIF data (should not change)
       exif_input_datetime_format: '%Y:%m:%d %H:%M:%S'
+      # timeformat used in output files (can be changed)
       output_date_format: '%Y-%m-%d'
       output_datetime_format: '%Y-%m-%d %H:%M:%S'
       output_time_format: '%H:%M:%S'
@@ -30,22 +35,26 @@ pre_processing_flags:
     # EXIF Data Extraction
     #############################
     # Order of EXIF timestamp data to consider for the 'datetime'
-    # attribute of the image (first non-empty)
+    # attribute of the image (first non-empty found in the EXIF tags)
     exif_data_timestamps:
      - DateTime
      - DateTimeOriginal
      - EXIF:DateTime
      - EXIF:DateTimeOriginal
+    # EXIF data is grouped -- this specifies which groups to extract
     exif_tag_groups_to_extract:
      - EXIF
      - MakerNotes
      - Composite
+    # exclude specific exif tags: default is to exclude binary data like
+    # thumbnail versions of the image
     exif_tags_to_exclude:
      - EXIF:ThumbnailImage
      - MakerNotes:PreviewImage
     #############################
     # Checks
     #############################
+    # list of image checks -- changing this is not recommend: unclear impact
     image_checks:
      - all_black
      - all_white
@@ -57,21 +66,25 @@ pre_processing_flags:
      - time_too_old
      - captures_with_too_many_images
     image_check_parameters:
-     # Percentage 'percent' of all pixels of an image
-     # that need to be above / blow 'thresh' to fail the check
+     # a 'black' pixel is defined as a pixel whose RGB values are all
+     # below 30 (default), an image is considered 'all_black' if at least
+     # 0.8 (80%) are below that threshold
      all_black:
        percent: 0.8
        thresh: 30
+     # a 'white' pixel is defined as a pixel whose RGB values are all
+     # above 200 (default), an image is considered 'all_white' if at least
+     # 0.8 (80%) are above that threshold
      all_white:
        percent: 0.8
        thresh: 200
-     # captures with more than x images fail check
+     # captures with more than 'max_images' images fail that check
      captures_with_too_many_images:
        max_images: 3
-     # images equal and less than N seconds apart will be grouped into the
-     # same capture (X1, X2, X3, X4 -- if each difference is <= N)
+     # subsequent images <= N seconds apart will be grouped into the
+     # same capture (X1, X2, X3, X4 grouped if each difference is <= N)
      capture_delta_max_seconds: 5
-     # max allowed consequetive days without captures
+     # max allowed consequetive days without captures -- otherwise flagged
      time_lapse_days:
        max_days: 30
      # general time window (years) -- typically specified via parameters
@@ -79,7 +92,7 @@ pre_processing_flags:
        max_year: 9999
      time_too_old:
        min_year: 1970
-    # Group the different checks to define propose automatic checks
+    # Group the different checks to propose automatic check actions
     image_checks_propose_invalidate:
      - all_black
      - all_white
@@ -109,7 +122,8 @@ pre_processing_flags:
       - image_is_invalid
       - image_no_upload
       - image_datetime_uncertain
-    # create a flag for the following actions
+    # associate specific actions with flags that are set to '1' if the
+    # action is taken
     map_actions_to_flags:
       delete:
         - image_was_deleted
@@ -135,6 +149,7 @@ pre_processing_flags:
     #############################
     final_cleaned:
       # order of first columns, any that are found will be exported in this
+      # order
       first_columns:
         - capture_id
         - season
@@ -169,9 +184,9 @@ pre_processing_flags:
         - image_path_original
         - date
         - time
-      # flag to generally exclude EXIF data
+      # flag to generally exclude EXIF data -- default is to exclude EXIF tags
       exclude_exif_data: True
-      # flag to generally exclude image check flags
+      # flag to generally exclude image check flags -- default is to exclude
       exclude_image_check_flags: True
 
 
@@ -181,6 +196,9 @@ pre_processing_flags:
 ###################################################
 
 extractor_flags:
+    # This can be used to map long questions (typically full sentences without
+    # blanks and special characters) to more readable ones
+    # 'choice' is the default question name for the 'survey-task'
     QUESTION_NAME_MAPPER:
       arethereanyyoungpresent: young_present
       choice: species
@@ -189,8 +207,11 @@ extractor_flags:
       howmany: count
       howmanyanimalscanyouseethathavehorns: horns_count
       question: species
+    # questions not to extract
     QUESTIONS_TO_IGNORE:
      - dontcare
+    # general answer mapper -- map any answer from any question to the
+    # specified value
     ANSWER_MAPPER:
       0: '0'
       n: '0'
@@ -198,6 +219,8 @@ extractor_flags:
       1: '1'
       y: '1'
       'yes': '1'
+    # map specific answers to specific questions -- important if different
+    # anwers have the same meaning (e.g. blank)
     ANSWER_TYPE_MAPPER:
       species:
         no animals present: blank
@@ -238,6 +261,7 @@ extractor_flags:
 ###################################################
 
 subject_extractor_flags:
+    # Location data refers to URL data
     SUBJECT_ADD_LOCATION_DATA: true
     SUBJECT_DATA_TO_ADD:
      - retirement_reason
@@ -266,13 +290,18 @@ subject_extractor_flags:
 ###################################################
 
 plurality_aggregation_flags:
+    # To aggregate count data (calculate quantiles) one can define
+    # mappings from strings that don't represent a count value to an integer
+    # that is used instead in the calculation
     COUNTS_TO_ORDINAL_MAPPER:
       '': 0
       '11-50': 11
       '51+': 12
+    # define which questions are actually count questions
     QUESTION_COUNTS:
      - count
      - horns_count
+    # how to aggregate the counts
     COUNT_AGGREGATION_MODES:
       - median
       - min
@@ -283,6 +312,8 @@ plurality_aggregation_flags:
 ###################################################
 
 upload_flags:
+    # remove any images from uploading if the following flags are
+    # set to the specified value(s)
     images_to_remove_from_upload:
       image_no_upload:
         - '1'
@@ -292,6 +323,9 @@ upload_flags:
 ###################################################
 
 report_flags:
+  # remove any images (and thus captures if all images of a
+  # capture are affected) for which any of the flags has any of the specified
+  # values
   images_to_remove_from_report:
     image_was_deleted:
       - '1'
@@ -304,7 +338,8 @@ report_flags:
       - '2'
   identify_humans_for_exclusion:
     - human
-  # group report columns to select them when creating reports
+  # group report columns to select them when creating reports -- this affects
+  # which columns are selected for different options used in the scripts
   capture_cols:
     - capture_id
     - subject_id
@@ -347,6 +382,7 @@ report_flags:
 ###################################################
 # Flags to define the bheavior of the
 # Legacy Classification Extractor
+# (unlikely this needs to be ever changed)
 ###################################################
 
 legacy_extractor_flags:

@@ -6,9 +6,9 @@ This repository contains code to process camera trap images, specifically:
 3. [Upload Data to Zooniverse](docs/zooniverse_uploads.md)
 4. [Download & Extract Data from Zooniverse](docs/zooniverse_exports.md)
 5. [Aggregate Annotations](docs/aggregations.md)
-6. [Merge Data into Reports](docs/reporting.md)
+6. [Create Reports](docs/reporting.md)
 
-The code was developed for the [Snapshot Safari](http://www.snapshotsafari.org) project but is generally usable for camera trap projects. The code allows for organizing and processing camera trap images, classifying images with machine learning models, uploading images to [Zooniverse](https://www.zooniverse.org) for classification by citzien scientists, and allows for aggregating and consolidating data exports from Zooniverse into reports.
+The code was developed for the [Snapshot Safari](http://www.snapshotsafari.org) project but is generally usable for camera trap projects -- pre-requisite is a specific way of organizing image data. The code allows for processing camera trap images, classifying images with machine learning models, uploading images to [Zooniverse](https://www.zooniverse.org) for classification by citzien scientists, and allows for aggregating and consolidating data exports from Zooniverse into reports.
 
 ## Overview
 
@@ -21,10 +21,10 @@ An overview of how the scripts are connected can be found here:
 
 ## Configuration
 
-Default parameters that define the behavior of some codes are defined here: [config/cfg_default.yaml](config/cfg_default.yaml). To use a custom cfg create a 'cfg.yaml' file in [config/](config/) and it will be used instead.
+Default parameters that define the behavior of some codes are defined here: [config/cfg_default.yaml](config/cfg_default.yaml). To use a custom cfg copy the 'cfg_default.yaml' and create a 'cfg.yaml' file in [config/](config/) -- this will override the default cfg file.
 
 These need to be adjusted, for example:
-1. if a new question answer needs to be mapped to 'empty', e.g., 'no animal is here'
+1. if a new question answer needs to be mapped to 'blank', e.g., 'no animal is here'
 2. if a new question needs to be renamed, e.g., 'howmanyanimalswithbighornsdoyousee' to 'big_horns_count'
 3. if different formats / namings are required, e.g., 'answer__' instead of 'question__'
 

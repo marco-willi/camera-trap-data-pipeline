@@ -78,12 +78,21 @@ if __name__ == "__main__":
     with open(args['manifest'], 'r') as f:
         mani = json.load(f)
 
+    logger.info("Imported {} records from {}".format(
+        len(mani.keys()), args['manifest']))
+
     # import predictions
     with open(args['predictions_species'], 'r') as f:
         preds_species = json.load(f)
 
+    logger.info("Imported {} records from {}".format(
+        len(mani.keys()), args['predictions_species']))
+
     with open(args['predictions_empty'], 'r') as f:
         preds_empty = json.load(f)
+
+    logger.info("Imported {} records from {}".format(
+        len(mani.keys()), args['predictions_empty']))
 
     captures_with_preds = 0
     n_total = len(mani.keys())
@@ -96,6 +105,7 @@ if __name__ == "__main__":
         # get predictions empty
         if capture_id in preds_empty:
             flat_empty = flatten_ml_empty_preds(preds_empty[capture_id])
+            # prefix with '#' to hide on Zooniverse
             flat_empty = {'#{}'.format(k): v for k, v in flat_empty.items()}
             meta_data.update(flat_empty)
             data['info']['machine_learning'] = True
@@ -104,6 +114,7 @@ if __name__ == "__main__":
             flat_species = flatten_ml_species_preds(
                 preds_species[capture_id],
                 only_top=(not args['add_all_species_scores']))
+            # prefix with '#' to hide on Zooniverse
             flat_species = {
                 '#{}'.format(k): v for k, v in flat_species.items()}
             meta_data.update(flat_species)

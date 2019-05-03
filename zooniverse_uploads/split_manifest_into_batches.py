@@ -114,5 +114,7 @@ if __name__ == "__main__":
 
         export_dict_to_json_with_newlines(batch_manifest, batch_path)
 
+        logger.info("Finished writing to {}".format(batch_path))
+
         # change permmissions to read/write for group
         set_file_permission(batch_path)

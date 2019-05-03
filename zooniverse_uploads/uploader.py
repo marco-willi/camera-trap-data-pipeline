@@ -2,8 +2,12 @@
 import os
 import hashlib
 import csv
+import logging
 
 from panoptes_client import SubjectSet, Subject
+
+
+logger = logging.getLogger(__name__)
 
 
 def create_subject(project, media_files, metadata):
@@ -23,9 +27,9 @@ def create_subject(project, media_files, metadata):
 
 
 def handle_batch_failure(subjects_to_link):
-    print('Rolling back, attempting to clean up any unlinked subjects.')
+    logger.info('Rolling back, attempting to clean up any unlinked subjects.')
     for subject in subjects_to_link:
-        print('Removing the subject with id: {}'.format(subject.id))
+        logger.info('Removing the subject with id: {}'.format(subject.id))
         subject.delete()
 
 

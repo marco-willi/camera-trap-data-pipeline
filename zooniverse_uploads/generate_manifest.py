@@ -25,7 +25,6 @@ flags_uploads = cfg['upload_flags']
 # args['compressed_image_dir'] = "/home/packerc/shared/zooniverse/ToUpload/RUA_will5448/RUA_S1_Compressed/"
 # args['output_manifest_dir'] = "/home/packerc/shared/zooniverse/Manifests/RUA/"
 # args['manifest_id'] = 'RUA_S1'
-# args['csv_quotechar'] = '"'
 # args['attribution'] = 'University of Minnesota Lion Center + SnapshotSafari + Ruaha Carnivore Project + Tanzania + Ruaha National Park'
 # args['license'] =  'SnapshotSafari + Ruaha Carnivore Project'
 #
@@ -33,7 +32,6 @@ flags_uploads = cfg['upload_flags']
 # args['compressed_image_dir'] = "/home/packerc/shared/zooniverse/ToUpload/GRU/GRU_S1_Compressed/"
 # args['output_manifest_dir'] = "/home/packerc/shared/zooniverse/Manifests/GRU/"
 # args['manifest_id'] = 'RUA_S1'
-# args['csv_quotechar'] = '"'
 # args['attribution'] = 'University of Minnesota Lion Center + Snapshot Safari + Singita Grumeti + Tanzania'
 # args['license'] =  'Snapshot Safari + Singita Grumeti'
 
@@ -55,17 +53,14 @@ if __name__ == "__main__":
               describes the content of the captures_csv.")
     parser.add_argument(
         "--images_root_path", type=str, default='',
-        help="Root path of the column 'path' in the captures_csv. Used to \
+        help="Root path of the column 'path'/'image_path_rel' in the captures_csv. Used to \
         check if images exist on disk.")
     parser.add_argument(
         "--attribution", type=str, required=True,
-        help="Attribution text.")
+        help="Attribution text added to the manifest.")
     parser.add_argument(
         "--license", type=str, required=True,
-        help="license information")
-    parser.add_argument(
-        "--csv_quotechar", type=str, default='"',
-        help="Quotechar used to import the captures_csv")
+        help="license information added to the manifest.")
     parser.add_argument(
         "--log_dir", type=str, default=None)
     parser.add_argument(
@@ -174,6 +169,8 @@ if __name__ == "__main__":
                 (len(manifest.keys()), manifest_path))
 
     export_dict_to_json_with_newlines(manifest, manifest_path)
+
+    logger.info("Finished writing to {}".format(manifest_path))
 
     # change permmissions to read/write for group
     set_file_permission(manifest_path)
