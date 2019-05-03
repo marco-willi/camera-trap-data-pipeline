@@ -152,7 +152,7 @@ pre_processing_flags:
         - image_no_upload
         - image_was_deleted
         - action_taken
-        - action_reason
+        - action_taken_reason
       # specify columns to exclude from the cleaned file, columns not in
       # 'first_columns' and not in 'exclude_columns' will be appended
       # warning: do not exclude important cols like:
@@ -163,6 +163,7 @@ pre_processing_flags:
         - days_to_last_image_taken
         - days_to_next_image_taken
         - image_rank_in_roll
+        - image_path
         - image_name_original
         - image_path_original_rel
         - image_path_original

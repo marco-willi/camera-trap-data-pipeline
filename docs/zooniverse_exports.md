@@ -98,6 +98,7 @@ The resulting file may have the following column headers:
 |zooniverse_retirement_reason| Zooniverse system-generated retirement-reason (empty if none / not)
 |zooniverse_url_*| Zooniverse URLs to images of the capture / subject
 
+Note: The 'season' attribute is guessed for records without that data in the subject export based on the name of the 'output_csv'. This is to deal with legacy data that had no 'season' field.
 
 ## Extract Zooniverse Annotations from Classifications
 
@@ -122,7 +123,7 @@ Then investigate the output of the script in the terminal to determine which wor
 INFO:Workflow id: 9435    Workflow version: 391.3      -- counts: 18578
 INFO:Workflow id: 9435    Workflow version: 391.4      -- counts: 18189
 ```
-In that case we would choose 'WORKFLOW_ID'=9435 and 'WORKFLOW_VERSION_MIN'=391.3 since it looks like somebody just made a minor change mid-season causing the version number to change slightly. 
+In that case we would choose 'WORKFLOW_ID'=9435 and 'WORKFLOW_VERSION_MIN'=391.3 since it looks like somebody just made a minor change mid-season causing the version number to change slightly.
 
 
 ```
