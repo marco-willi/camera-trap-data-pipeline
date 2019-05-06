@@ -120,11 +120,17 @@ python3 -m zooniverse_exports.extract_annotations \
 
 Then investigate the output of the script in the terminal to determine which workflows to use and then re-run the code with the specified workflows. Example output:
 ```
-INFO:Workflow id: 9435    Workflow version: 391.3      -- counts: 18578
-INFO:Workflow id: 9435    Workflow version: 391.4      -- counts: 18189
+INFO:Workflow id: 4655    Workflow version: 4.4        -- counts: 2
+INFO:Workflow id: 4655    Workflow version: 173.7      -- counts: 1
+INFO:Workflow id: 4655    Workflow version: 209.17     -- counts: 2
+INFO:Workflow id: 4655    Workflow version: 226.18     -- counts: 2
+INFO:Workflow id: 4655    Workflow version: 303.22     -- counts: 277
+INFO:Workflow id: 4655    Workflow version: 304.23     -- counts: 1377468
+INFO:Workflow id: 4655    Workflow version: 362.24     -- counts: 405
+INFO:Workflow id: 4655    Workflow version: 363.25     -- counts: 842646
 ```
-In that case we would choose 'WORKFLOW_ID'=9435 and 'WORKFLOW_VERSION_MIN'=391.3 since it looks like somebody just made a minor change mid-season causing the version number to change slightly.
 
+In that case we would choose 'WORKFLOW_ID=4655' and 'WORKFLOW_VERSION_MIN=304.23' since this seems to be the 'real' start of the season with many annotations. Later changes hopefully were only minor.
 
 ```
 python3 -m zooniverse_exports.extract_annotations \

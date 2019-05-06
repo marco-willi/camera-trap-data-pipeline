@@ -97,6 +97,7 @@ python3 -m reporting.create_report_stats \
 --log_filename ${SEASON}_create_report_stats
 ```
 
+Note: Sometimes there are empty fields '' shown in the overview file. This is usually from captures without any aggregations (b/c not upoaded to Zooniverse).
 
 ### Consensus Species Report
 

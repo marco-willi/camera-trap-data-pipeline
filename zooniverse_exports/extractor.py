@@ -277,28 +277,6 @@ def deduplicate_answers(classification_answers, flags):
     return deduplicated
 
 
-# def find_question_answer_pairs(all_records):
-#     """ Analyze annotations to determine question and answer mappings
-#         Output:
-#          {'species': ['vulture', 'zebra', 'nyala', ...],
-#           'young_present': ['yes', 'no'],
-#           }
-#     """
-#     question_answer_pairs = OrderedDict()
-#     for record in all_records:
-#         annos = record['annos']
-#         for anno in annos:
-#             for question, answers in anno.items():
-#                 if question not in question_answer_pairs:
-#                     question_answer_pairs[question] = set()
-#                 if isinstance(answers, str):
-#                     question_answer_pairs[question].add(answers)
-#                 elif isinstance(answers, list):
-#                     for answer in answers:
-#                         question_answer_pairs[question].add(answer)
-#     return OrderedDict([(k, list(v)) for k, v in question_answer_pairs.items()])
-
-
 def find_question_answer_pairs(all_records):
     """ Analyze annotations to determine question and answer mappings
         Output:

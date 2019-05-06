@@ -69,7 +69,8 @@ if __name__ == '__main__':
     df = pd.merge(
         left=df_annotations,
         right=df_subjects,
-        how='inner'
+        how='inner',
+        on='subject_id'
     )
 
     logger.info("{} annotations remaining after join".format(df.shape[0]))
