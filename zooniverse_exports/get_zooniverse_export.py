@@ -53,10 +53,6 @@ if __name__ == '__main__':
         logger.info("Generating new export and wait until it is ready")
         my_project.wait_export(args['export_type'])
 
-    # get info about export
-    export_description = my_project.describe_export(args['export_type'])
-    export_description['meta']['media']['page_size']
-
     export = my_project.get_export(args['export_type'])
 
     # save classifications to csv file
