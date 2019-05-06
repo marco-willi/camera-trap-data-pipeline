@@ -60,7 +60,8 @@ if __name__ == '__main__':
         df_subjects.shape[0], args['subjects']))
 
     df_subjects = df_subjects[['subject_id']]
-    df_subjects.drop_duplicates(subset=['subject_id'], keep='first', inplace=True)
+    df_subjects.drop_duplicates(
+        subset=['subject_id'], keep='first', inplace=True)
 
     ######################################
     # Merge

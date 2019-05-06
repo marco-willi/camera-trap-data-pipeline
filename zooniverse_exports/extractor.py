@@ -7,7 +7,7 @@
 import json
 import copy
 import logging
-from collections import defaultdict, Counter, OrderedDict
+from collections import defaultdict, Counter
 
 logger = logging.getLogger(__name__)
 
