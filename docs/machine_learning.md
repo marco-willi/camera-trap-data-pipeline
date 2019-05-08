@@ -15,6 +15,12 @@ SITE=SER
 SEASON=SER_S1
 ```
 
+Make sure to create the following folders:
+```
+MachineLearning/${SITE}
+MachineLearning/${SITE}/log_files
+```
+
 ## Prepare Input File for Model
 
 Create an input file for a machine learning model to create predictions for.
