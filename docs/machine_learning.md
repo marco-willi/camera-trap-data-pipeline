@@ -19,6 +19,8 @@ Make sure to create the following folders:
 ```
 MachineLearning/${SITE}
 MachineLearning/${SITE}/log_files
+SpeciesReports/${SITE}
+SpeciesReports/${SITE}/log_files
 ```
 
 ## Prepare Input File for Model
