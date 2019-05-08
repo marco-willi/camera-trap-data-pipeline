@@ -63,7 +63,12 @@ To run the 'Species' model execute the following command:
 qsub -v INPUT_FILE=${INPUT_FILE},OUTPUT_FILE=${OUTPUT_FILE_SPECIES},IMAGES_ROOT=${IMAGES_ROOT} ctc_predict_species_file.pbs
 ```
 
-NOTE: The script has a walltime of 24h. This was enough to calculate predictions for 187k captures. Should significantly more predictions be required increase the walltime paramter in the script accordingly.
+NOTE: The script has a walltime of 36h. This was enough to calculate predictions for 187k captures. Should significantly more predictions be required increase the walltime paramter in the script accordingly.
+
+NOTE2: To use the faster GPU servers replace the name of the script in the following way:
+```
+... ctc_predict_species_file_gpu.pbs
+```
 
 ## Flatten ML Predictions (convert JSON to a CSV)
 

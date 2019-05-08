@@ -1,27 +1,24 @@
 #!/bin/bash -l
-#PBS -l walltime=36:00:00,nodes=1:ppn=12
+#PBS -l walltime=06:00:00,nodes=1:ppn=24:gpus=2
 #PBS -j oe
 #PBS -m abe
-#PBS -q small
-#PBS -N predict_empty
-#PBS -o ${HOME}/job_ml_output_pred_empty_${PBS_JOBID}.log
-#PBS -e ${HOME}/job_ml_error_pred_empty_${PBS_JOBID}.log
-
+#PBS -q k40
+#PBS -N predict_species_gpu
+#PBS -o ${HOME}/job_ml_output_pred_species_${PBS_JOBID}.log
+#PBS -e ${HOME}/job_ml_error_pred_species_${PBS_JOBID}.log
 
 # Parameters Static
 TO_PREDICT_PATH=${INPUT_FILE}
 OUTPUT_PATH=${OUTPUT_FILE}
 
-# Model Parameters
-MODEL_ROOT_PATH=/home/packerc/shared/machine_learning/data/models/PANTHERA_SNAPSHOT_SAFARI/empty_or_not/
-MODEL_NAME=ResNet18_448_v1
+MODEL_ROOT_PATH=/home/packerc/shared/machine_learning/data/models/PANTHERA_SNAPSHOT_SAFARI/species/
+MODEL_NAME=Xception_v1
 MODEL_PATH=${MODEL_ROOT_PATH}${MODEL_NAME}/best_model.hdf5
 MODEL_CLASS_MAPPING=${MODEL_ROOT_PATH}${MODEL_NAME}/label_mappings.json
 MODEL_PRE_PROCESSING=${MODEL_ROOT_PATH}${MODEL_NAME}/image_processing.json
 
 # Container
 SINGULARITY_PATH=/home/packerc/shared/programs/camera-trap-classifier
-
 
 # Log Parameters
 echo "TO_PREDICT_PATH: $TO_PREDICT_PATH"
@@ -36,16 +33,23 @@ echo "MODEL_PRE_PROCESSING: $MODEL_PRE_PROCESSING"
 
 echo "SINGULARITY_PATH: $SINGULARITY_PATH"
 
+
 # modules
 module load singularity
 module load python3
 
+
+# sleep for 2 minutes to reduce chance of conflict with 'empty' script when it
+# is pulling the following docker container
+#sleep 2m
+
+
 # switch to singularity container path
 cd $SINGULARITY_PATH
-#singularity pull -F docker://will5448/camera-trap-classifier:latest-cpu
+#singularity pull -F docker://will5448/camera-trap-classifier:latest-gpu
 
 # run the script
-singularity exec -B /home/packerc/shared:/home/packerc/shared ./camera-trap-classifier-latest-cpu.simg \
+singularity exec -B /home/packerc/shared:/home/packerc/shared ./camera-trap-classifier-latest-gpu.simg \
   ctc.predict \
     -csv_path $TO_PREDICT_PATH \
     -csv_id_col capture_id \
