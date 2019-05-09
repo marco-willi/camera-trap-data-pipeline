@@ -139,4 +139,4 @@ python3 -m reporting.create_ml_report_stats \
 |machine_confidence_species_(species)| Confidence of (species) being present in the image (0-1)
 
 
-Note: The report is comprised of two models an 'empty or not' model and a 'species' model. Even if the 'empty or not' model classifies the capture as being empty, the 'species' model has to predict a 'species'. Therefore, always consider the species predictions in conjuntion with the 'empty or not' prediction.
+Note: The report is comprised of two models an 'empty or not' model and a 'species' model. Even if the 'empty or not' model classifies the capture as being empty, the 'species' model has to predict a 'species'. Therefore, always consider the species predictions in conjunction with the 'empty or not' prediction.

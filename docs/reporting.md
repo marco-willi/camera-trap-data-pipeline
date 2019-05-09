@@ -24,6 +24,14 @@ SITE=GRU
 SEASON=GRU_S1
 ```
 
+Make sure to create the following folders:
+```
+SpeciesReports/${SITE}
+SpeciesReports/${SITE}/log_files
+LilaReports/${SITE}
+LilaReports/${SITE}/log_files
+```
+
 ## Create Zooniverse Reports
 
 The next scripts produce reports based on Zooniverse aggregations. The full report (without any modification as listed below) contains one or more records per capture event as defined in the 'cleaned.csv' -- multiple records if multiple species were identified.

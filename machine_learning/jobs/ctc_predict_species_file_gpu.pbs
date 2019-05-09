@@ -1,11 +1,11 @@
 #!/bin/bash -l
-#PBS -l walltime=06:00:00,nodes=1:ppn=24:gpus=2
+#PBS -l walltime=24:00:00,nodes=1:ppn=24:gpus=2
 #PBS -j oe
 #PBS -m abe
 #PBS -q k40
 #PBS -N predict_species_gpu
-#PBS -o ${HOME}/job_ml_output_pred_species_${PBS_JOBID}.log
-#PBS -e ${HOME}/job_ml_error_pred_species_${PBS_JOBID}.log
+#PBS -o ${HOME}/job_ml_output_pred_species_gpu_${PBS_JOBID}.log
+#PBS -e ${HOME}/job_ml_error_pred_species_gpu_${PBS_JOBID}.log
 
 # Parameters Static
 TO_PREDICT_PATH=${INPUT_FILE}
@@ -49,7 +49,7 @@ cd $SINGULARITY_PATH
 #singularity pull -F docker://will5448/camera-trap-classifier:latest-gpu
 
 # run the script
-singularity exec -B /home/packerc/shared:/home/packerc/shared ./camera-trap-classifier-latest-gpu.simg \
+singularity exec --nv -B /home/packerc/shared:/home/packerc/shared ./camera-trap-classifier-latest-gpu.simg \
   ctc.predict \
     -csv_path $TO_PREDICT_PATH \
     -csv_id_col capture_id \

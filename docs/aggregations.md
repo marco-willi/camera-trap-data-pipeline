@@ -30,6 +30,12 @@ SITE=RUA
 SEASON=RUA_S1
 ```
 
+Make sure to create the following folders:
+```
+Aggregations/${SITE}
+Aggregations/${SITE}/log_files
+```
+
 ## Output Fields
 
 The primary key is: subject_id + the main task (question__species).
