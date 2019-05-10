@@ -113,7 +113,7 @@ qsub -I -l walltime=2:00:00,nodes=1:ppn=4,mem=16gb
 
 ### Option 1) Filtering Classifications by Worfklow-ID
 
-Usually, the workflow_id and the workflow_version are specified to extract only the workflow that was used during the 'live-phase' of the project. If neither workflow_id/workflow_version/worfklow_version_min are specified every workflow is extracted. The workflow_id can be found in the project builder when clicking on the workflow. The workflow_version is at the same place slightly further down (e.g. something like 745.34). Be aware that only the 'major' version number is compared against, e.g., workflow_version '45.23' is identical to '45.56'. It is also possible to specify a minimum 'workflow_version_min' in which case all classifications with the same or higher number are extracted. A summary of all extracted workflows and other stats is printed after the extraction.
+Usually, the workflow_id and the workflow_version are specified to extract only the workflow that was used during the 'live-phase' of the project. If neither workflow_id/worfklow_version_min are specified every workflow is extracted. The workflow_id can be found in the project builder when clicking on the workflow. The workflow version is at the same place slightly further down (e.g. something like 745.34). Be aware that only the 'major' version number is compared against, e.g., workflow version '45.23' is identical to '45.56'. To extract specific workflow versions we can specify a minimum version 'workflow_version_min' in which case all classifications with the same or higher number are extracted. A summary of all extracted workflows and other stats is printed after the extraction.
 
 If WORKFLOW_ID / WORKFLOW_VERSION_MIN are unknown run the script like this:
 ```
@@ -154,7 +154,7 @@ python3 -m zooniverse_exports.extract_annotations \
 
 ### Option 2) Filtering Classifications by Date Range
 
-If one knows when the project was set live a start-date can be specified such that no classifications made prior to that date are being extracted. There is also the option to specify an end-date: no classification made past that date will be extracted. It is possible to specify only one of the dates. Note: The dates are compared against UTC time.
+If is is known when the project went live a start-date can be specified such that no classifications made prior to that date are being extracted. There is also the option to specify an end-date: no classification made past that date will be extracted. It is possible to specify only one of the dates. Note: The dates are compared against UTC time.
 
 ```
 EARLIEST_DATE=2000-01-01
