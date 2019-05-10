@@ -33,7 +33,11 @@ class ExtractClassificationsTests(unittest.TestCase):
         stats = Counter()
         user_subject_tracker = dict()
         self.extracted_classifications = list()
-        args = {'workflow_id': '10337', 'workflow_version_min': '383'}
+        args = {
+            'workflow_id': '10337',
+            'workflow_version_min': '383',
+            'no_earlier_than_date': extractor.convert_date_str_to_datetime('2019-01-01'),
+            'no_later_than_date': extractor.convert_date_str_to_datetime('2020-01-01')}
         for i, cl in enumerate(self.raw_classifications):
             extracted = extract_raw_classification(
                     cl,
@@ -74,6 +78,49 @@ class ExtractClassificationsTests(unittest.TestCase):
                 {'workflow_id': '1', 'workflow_version': '2'},
                 workflow_id='2',
                 workflow_version_min='2'))
+
+    def testDateRangeEligibility(self):
+        """ Test If Classification is correctly discared/accepted if
+            datetime range is specified
+        """
+        test_cases = [
+            # Case 1
+            (extractor.convert_date_str_to_datetime("2017-07-24"),
+             extractor.convert_date_str_to_datetime("2017-07-28"),
+             '2017-07-24 14:45:59 UTC',
+             True),
+            # Case 2
+            (extractor.convert_date_str_to_datetime("2017-07-25"),
+             extractor.convert_date_str_to_datetime("2017-07-28"),
+             '2017-07-24 14:45:59 UTC',
+             False),
+            # Case 3
+            (extractor.convert_date_str_to_datetime("2017-07-25"),
+             None,
+             '2017-07-24 14:45:59 UTC',
+             False),
+            # Case 4
+            (extractor.convert_date_str_to_datetime("2017-07-20"),
+             None,
+             '2017-07-24 14:45:59 UTC',
+             True),
+            # Case 5
+            (None,
+             extractor.convert_date_str_to_datetime("2017-07-30"),
+             '2017-07-24 14:45:59 UTC',
+             True),
+            # Case 6
+            (None,
+             extractor.convert_date_str_to_datetime("2017-07-30"),
+             '2017-08-03 14:45:59 UTC',
+             False)
+        ]
+        for test_case in test_cases:
+            self.assertEqual(
+                extractor.is_in_date_range(
+                    {'created_at': test_case[2]},
+                    no_earlier_than_date=test_case[0],
+                    no_later_than_date=test_case[1]), test_case[3])
 
     def testMultiAnswerExtraction(self):
         # multi-answer tasks
@@ -169,6 +216,18 @@ class ExtractClassificationsTests(unittest.TestCase):
         self.assertEqual(
             len([x for x in self.extracted_classifications
                 if x['user_name'] == 'same_user_same_subject']), 1)
+
+        self.assertEqual(
+            len([x for x in self.extracted_classifications
+                if x['user_name'] == 'too_early']), 0)
+
+        self.assertEqual(
+            len([x for x in self.extracted_classifications
+                if x['user_name'] == 'too_late']), 0)
+
+        self.assertEqual(
+            len([x for x in self.extracted_classifications
+                if x['user_name'] == 'invalid_datetime']), 1)
 
     def testExtractAnnotations(self):
         rhino_giraffe = list()

@@ -77,6 +77,14 @@ def extract_raw_classification(
     if not is_eligible_workflow:
         stats.update({'n_not_eligible_workflow'})
         return extracted_annotations
+    # check datetime range is valid
+    is_in_date_range = extractor.is_in_date_range(
+        cls_dict,
+        args['no_earlier_than_date'],
+        args['no_later_than_date'])
+    if not is_in_date_range:
+        stats.update({'n_not_in_date_range'})
+        return extracted_annotations
     # extract classification-level info
     classification_info = {
         x: cls_dict[x] for x in flags['CLASSIFICATION_INFO_TO_ADD']}
@@ -163,16 +171,16 @@ if __name__ == '__main__':
         workflow version number \
         version. Only the major version number is compared, e.g., \
         version 45.12 is identical to 45.45")
+    parser.add_argument(
+        "--no_earlier_than_date", type=str, default=None,
+        help="Extract only classifications that are no earlier than the \
+              specified date -- must be in format YYYY-MM-DD")
+    parser.add_argument(
+        "--no_later_than_date", type=str, default=None,
+        help="Extract only classifications that are no later than the \
+              specified date -- must be in format YYYY-MM-DD")
 
     args = vars(parser.parse_args())
-
-    ######################################
-    # Check Input
-    ######################################
-
-    if not os.path.isfile(args['classification_csv']):
-        raise FileNotFoundError("classification_csv: {} not found".format(
-                                args['classification_csv']))
 
     ######################################
     # Configuration
@@ -187,6 +195,36 @@ if __name__ == '__main__':
 
     # logging flags
     print_nested_dict('', flags)
+
+    ######################################
+    # Check Input
+    ######################################
+
+    if not os.path.isfile(args['classification_csv']):
+        raise FileNotFoundError("classification_csv: {} not found".format(
+                                args['classification_csv']))
+
+    if args['no_later_than_date'] is not None:
+        date = args['no_later_than_date']
+        try:
+            no_later_than_date = \
+              extractor.convert_date_str_to_datetime(date)
+        except:
+            raise ValueError(
+                "'no_later_than_date' must be YYYY-MM-DD, is {}".format(
+                    date))
+        args['no_later_than_date'] = no_later_than_date
+
+    if args['no_earlier_than_date'] is not None:
+        date = args['no_earlier_than_date']
+        try:
+            no_earlier_than_date = \
+              extractor.convert_date_str_to_datetime(date)
+        except:
+            raise ValueError(
+                "'no_earlier_than_date ' must be YYYY-MM-DD, is {}".format(
+                    date))
+        args['no_earlier_than_date'] = no_earlier_than_date
 
     ######################################
     # Read and Process Classifications

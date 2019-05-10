@@ -102,7 +102,7 @@ Note: The 'season' attribute is guessed for records without that data in the sub
 
 ## Extract Zooniverse Annotations from Classifications
 
-The following code extracts the relevant fields of a Zooniverse classification csv. It creates a csv file with one line per species identification/annotation. Usually, the workflow_id and the workflow_version are specified to extract only the workflow that was used during the 'live-phase' of the project. If neither workflow_id/workflow_version/worfklow_version_min are specified every workflow is extracted. The workflow_id can be found in the project builder when clicking on the workflow. The workflow_version is at the same place slightly further down (e.g. something like 745.34). Be aware that only the 'major' version number is compared against, e.g., workflow_version '45.23' is identical to '45.56'. It is also possible to specify a minimum 'workflow_version_min' in which case all classifications with the same or higher number are extracted. A summary of all extracted workflows and other stats is printed after the extraction.
+The following code extracts the relevant fields of a Zooniverse classification csv. It creates a csv file with one line per species identification/annotation.
 
 Use a machine with enough memory - for example:
 
@@ -110,6 +110,10 @@ Use a machine with enough memory - for example:
 ssh lab
 qsub -I -l walltime=2:00:00,nodes=1:ppn=4,mem=16gb
 ```
+
+### Option 1) Filtering Classifications by Worfklow-ID
+
+Usually, the workflow_id and the workflow_version are specified to extract only the workflow that was used during the 'live-phase' of the project. If neither workflow_id/workflow_version/worfklow_version_min are specified every workflow is extracted. The workflow_id can be found in the project builder when clicking on the workflow. The workflow_version is at the same place slightly further down (e.g. something like 745.34). Be aware that only the 'major' version number is compared against, e.g., workflow_version '45.23' is identical to '45.56'. It is also possible to specify a minimum 'workflow_version_min' in which case all classifications with the same or higher number are extracted. A summary of all extracted workflows and other stats is printed after the extraction.
 
 If WORKFLOW_ID / WORKFLOW_VERSION_MIN are unknown run the script like this:
 ```
@@ -133,6 +137,11 @@ INFO:Workflow id: 4655    Workflow version: 363.25     -- counts: 842646
 In that case we would choose 'WORKFLOW_ID=4655' and 'WORKFLOW_VERSION_MIN=304.23' since this seems to be the 'real' start of the season with many annotations. Later changes hopefully were only minor.
 
 ```
+WORKFLOW_ID=4655
+WORKFLOW_VERSION_MIN=304.23
+```
+
+```
 python3 -m zooniverse_exports.extract_annotations \
 --classification_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_classifications.csv \
 --output_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_annotations.csv \
@@ -141,6 +150,62 @@ python3 -m zooniverse_exports.extract_annotations \
 --log_dir /home/packerc/shared/zooniverse/Exports/${SITE}/log_files/ \
 --log_filename ${SEASON}_extract_annotations
 ```
+
+
+### Option 2) Filtering Classifications by Date Range
+
+If one knows when the project was set live a start-date can be specified such that no classifications made prior to that date are being extracted. There is also the option to specify an end-date: no classification made past that date will be extracted. It is possible to specify only one of the dates. Note: The dates are compared against UTC time.
+
+```
+EARLIEST_DATE=2000-01-01
+LAST_DATE=2099-01-01
+```
+
+```
+python3 -m zooniverse_exports.extract_annotations \
+--classification_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_classifications.csv \
+--output_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_annotations.csv \
+--no_earlier_than_date $EARLIEST_DATE \
+--no_later_than_date $LAST_DATE \
+--log_dir /home/packerc/shared/zooniverse/Exports/${SITE}/log_files/ \
+--log_filename ${SEASON}_extract_annotations
+```
+
+### Option 3) No Filtering
+
+No filtering of any classifications.
+
+```
+python3 -m zooniverse_exports.extract_annotations \
+--classification_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_classifications.csv \
+--output_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_annotations.csv \
+--log_dir /home/packerc/shared/zooniverse/Exports/${SITE}/log_files/ \
+--log_filename ${SEASON}_extract_annotations
+```
+
+### Option 4) Combine Filters
+
+Workflow and date range filters can be applied at the same time.
+
+```
+EARLIEST_DATE=2000-01-01
+WORKFLOW_ID=4655
+WORKFLOW_VERSION_MIN=304.23
+```
+
+```
+python3 -m zooniverse_exports.extract_annotations \
+--classification_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_classifications.csv \
+--output_csv /home/packerc/shared/zooniverse/Exports/${SITE}/${SEASON}_annotations.csv \
+--no_earlier_than_date $EARLIEST_DATE \
+--workflow_id $WORKFLOW_ID \
+--workflow_version_min $WORKFLOW_VERSION_MIN \
+--log_dir /home/packerc/shared/zooniverse/Exports/${SITE}/log_files/ \
+--log_filename ${SEASON}_extract_annotations
+```
+
+
+### Output File
 
 
 The resulting file may have the following column headers:

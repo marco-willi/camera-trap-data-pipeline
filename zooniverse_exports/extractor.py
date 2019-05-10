@@ -7,6 +7,7 @@
 import json
 import copy
 import logging
+from datetime import datetime
 from collections import defaultdict, Counter
 
 logger = logging.getLogger(__name__)
@@ -188,6 +189,41 @@ def get_workflow_major_version(workflow_version):
         return workflow_version
 
 
+def _convert_utc_str_to_datetime(date_str):
+    date, time, utc = date_str.split(' ')
+    return datetime.strptime(date, "%Y-%m-%d")
+
+
+def convert_date_str_to_datetime(date):
+    """ Check if date is valid """
+    return datetime.strptime(date, "%Y-%m-%d")
+
+
+def is_in_date_range(
+        cls_dict,
+        no_earlier_than_date=None,
+        no_later_than_date=None):
+    """ Check whether classification was made within the specified dates """
+    if (no_earlier_than_date is None) and (no_later_than_date is None):
+        return True
+    date_str = cls_dict['created_at']
+    try:
+        date = _convert_utc_str_to_datetime(date_str)
+    except:
+        logger.debug(
+            "Failed to extract 'created_at': {} to datetime".format(date_str))
+        return True
+    if no_earlier_than_date is not None:
+        is_not_too_early = (date >= no_earlier_than_date)
+    else:
+        is_not_too_early = True
+    if no_later_than_date is not None:
+        is_not_too_late = (date <= no_later_than_date)
+    else:
+        is_not_too_late = True
+    return (is_not_too_late and is_not_too_early)
+
+
 def is_eligible_workflow(
         cls_dict,
         workflow_id=None,
@@ -362,7 +398,7 @@ def classification_is_valid(cls_dict):
     """ Check all required fields are available """
     required = [
         'user_name', 'subject_ids', 'subject_data', 'annotations',
-        'workflow_id', 'workflow_version']
+        'workflow_id', 'workflow_version', 'created_at']
     if not all([x in cls_dict for x in required]):
         return False
     else:
