@@ -4,6 +4,7 @@ import os
 import time
 import datetime
 import json
+import hashlib
 import random
 import pandas as pd
 from hashlib import md5
@@ -445,3 +446,39 @@ def merge_csvs(base_csv, to_add_csv, key, merge_new_cols_to_right=True):
     df_merged = df_merged[cols_rearranged]
 
     return df_merged
+
+
+def list_pictures(directory, ext=('jpg', 'jpeg', 'bmp', 'png', 'ppm')):
+    """Lists all pictures in a directory, including all subdirectories.
+    # Arguments
+        directory: string, absolute path to the directory
+        ext: tuple of strings or single string, extensions of the pictures
+    # Returns
+        a list of paths
+    """
+    ext = tuple('.%s' % e for e in ((ext,) if isinstance(ext, str) else ext))
+    return [os.path.join(root, f)
+            for root, _, files in os.walk(directory) for f in files
+            if f.lower().endswith(ext)]
+
+
+def chunk_reader(fobj, chunk_size=1024):
+    """Generator that reads a file in chunks of bytes"""
+    while True:
+        chunk = fobj.read(chunk_size)
+        if not chunk:
+            return
+        yield chunk
+
+
+def get_hash(filename, first_chunk_only=False, hash=hashlib.sha1):
+    hashobj = hash()
+    file_object = open(filename, 'rb')
+    if first_chunk_only:
+        hashobj.update(file_object.read(1024))
+    else:
+        for chunk in chunk_reader(file_object):
+            hashobj.update(chunk)
+    hashed = hashobj.digest()
+    file_object.close()
+    return hashed

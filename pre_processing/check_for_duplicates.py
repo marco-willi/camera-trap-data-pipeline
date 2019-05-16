@@ -11,28 +11,7 @@ import argparse
 import logging
 
 from utils.logger import set_logging
-
-
-def chunk_reader(fobj, chunk_size=1024):
-    """Generator that reads a file in chunks of bytes"""
-    while True:
-        chunk = fobj.read(chunk_size)
-        if not chunk:
-            return
-        yield chunk
-
-
-def get_hash(filename, first_chunk_only=False, hash=hashlib.sha1):
-    hashobj = hash()
-    file_object = open(filename, 'rb')
-    if first_chunk_only:
-        hashobj.update(file_object.read(1024))
-    else:
-        for chunk in chunk_reader(file_object):
-            hashobj.update(chunk)
-    hashed = hashobj.digest()
-    file_object.close()
-    return hashed
+from utils.utils import get_hash
 
 
 def check_for_duplicates(paths, hash=hashlib.sha1):
