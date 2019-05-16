@@ -3,10 +3,9 @@
 The following steps are required to upload new data to Zooniverse. The following codes show an example for processing RUA data. These are the steps:
 
 1. Generate Manifest (a file containing all info for the Zooniverse upload)
-2. Create Machine Learning File for Model Input (Optional - create input for machine classifier)
-3. Generate new Predictions (Optional - run a machine classifier)
-4. Split/Batch Manifest (Optional - Zooniverse recommends not to use too large batches at once)
-5. Upload Manifest
+2. Add Machine Learing Predictions (Optional)
+3. Split/Batch Manifest (Optional - Zooniverse recommends not to use too large batches at once)
+4. Upload Manifest
 
 The optional steps can simply be skipped.
 

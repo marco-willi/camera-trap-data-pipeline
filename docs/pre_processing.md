@@ -82,7 +82,7 @@ python3 -m pre_processing.check_for_duplicates \
 ```
 The script will print/log duplicates if any are found but won't alter anything. Note that some corrupt files (such with 0 size) will also be recognized as duplicates.
 
-## Create Image Inventory
+## Create Basic Image Inventory
 
 The following script generates an inventory of all camera trap images.
 
@@ -104,13 +104,13 @@ python3 -m pre_processing.create_image_inventory \
 |image_path_original| full path of image file
 
 
-## Perform Basic Checks
+## Create Image Inventory with Checks
 
-The following script performs some basic checks. It opens each image to verify it's integrity and to perform pixel-based checks. The code is parallelized -- use the following options to make the most of the parallelization (it still takes roughly 1 hour per 60k images).
+The following script performs some checks on the images. It opens each image to verify it's integrity and to perform pixel-based checks. The code is parallelized -- use the following options to make the most of the parallelization (it still takes roughly 1 hour per 60k images).
 
 ```
 ssh lab
-qsub -I -l walltime=2:00:00,nodes=1:ppn=16,mem=16gb
+qsub -I -l walltime=4:00:00,nodes=1:ppn=16,mem=16gb
 module load python3
 cd $HOME/camera-trap-data-pipeline
 git pull
