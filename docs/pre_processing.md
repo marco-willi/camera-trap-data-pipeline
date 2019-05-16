@@ -302,7 +302,18 @@ action_site	| action_roll | action_from_image |	action_to_image	| action_to_take
 6. For each row specify: 'action_to_take' and 'action_to_take_reason'
 7. For 'timechange' in 'action_to_take' specify 'datetime_current' and 'datetime_new'. This will apply the difference (!) between these two dates to all selected images. For example: 'datetime_current'='2000-01-01 00:00:00' and 'datetime_new'=2000-01-01 00:05:00 will shift the time by +5 minutes.
 8. All rows with 'action_to_take' equal 'inspect' must be resolved and replaced with values as specified above.
-8. Upload the modified csv and proceed.
+9. Upload the modified csv and proceed.
+
+### Experimental: Find specific (sensitive) images
+
+Sometimes certain images (e.g. sensitive rhino images) need to be excluded from publication, however, need to be processed along with all the other images. In a scenario where we have identified such images (before the pre-processing) we would copy these to a separate directory but leave the originals in place to process them. We can now find these images again by using the following script to mark them via action_list as 'mark_no_upload'. The script finds any images stored in a directory (with any number of images and sub-directories) and searches for their twins as referenced in the 'captures.csv' file. Note that the following script has not been tested thoroughly and is not yet part of the standard process -- there is currently no standard 'images_to_match_path'.
+
+```
+python3 -m pre_processing.find_images_in_captures \
+--captures /home/packerc/shared/season_captures/${SITE}/captures/${SEASON}_captures.csv \
+--images_to_match_path /home/packerc/shared/... \
+--output_csv /home/packerc/shared/season_captures/${SITE}/captures/${SEASON}_sensitive_images.csv \
+```
 
 
 ## Parse Action Items
