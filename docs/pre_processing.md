@@ -312,7 +312,7 @@ Sometimes certain images (e.g. sensitive rhino images) need to be excluded from 
 python3 -m pre_processing.find_images_in_captures \
 --captures /home/packerc/shared/season_captures/${SITE}/captures/${SEASON}_captures.csv \
 --images_to_match_path /home/packerc/shared/... \
---output_csv /home/packerc/shared/season_captures/${SITE}/captures/${SEASON}_sensitive_images.csv \
+--output_csv /home/packerc/shared/season_captures/${SITE}/captures/${SEASON}_sensitive_images.csv
 ```
 
 
