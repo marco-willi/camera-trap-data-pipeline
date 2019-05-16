@@ -315,7 +315,7 @@ if __name__ == "__main__":
     with open(args['manifest'], 'r') as f:
         mani = json.load(f)
 
-    logger.info("Imported Manfest file {} with {} records".format(
+    logger.info("Imported Manifest file {} with {} records".format(
                 args['manifest'], len(mani.keys())))
 
     # read Zooniverse credentials
