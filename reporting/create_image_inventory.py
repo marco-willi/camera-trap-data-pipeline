@@ -23,6 +23,10 @@ if __name__ == '__main__':
     parser.add_argument("--report_csv", type=str, required=True)
     parser.add_argument("--season_captures_csv", type=str, required=True)
     parser.add_argument("--output_csv", type=str, required=True)
+    parser.add_argument("--add_url", action="store_true")
+    parser.add_argument(
+        "--url_prefix", type="str",
+        default="https://s3.msi.umn.edu/snapshotsafari/")
     parser.add_argument(
         "--log_dir", type=str, default=None)
     parser.add_argument(
@@ -115,6 +119,11 @@ if __name__ == '__main__':
     logger.info(
         "Merged 'season_captures_csv' with 'report_csv': {} records".format(
             df_images.shape[0]))
+
+    # build url
+    if args['add_url']:
+        df_images['url'] = df_images['image_path_rel'].apply(
+            lambda x: '/'.join([args['url_prefix'], x]))
 
     ######################################
     # Export
