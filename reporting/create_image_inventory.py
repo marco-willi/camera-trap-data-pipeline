@@ -25,7 +25,7 @@ if __name__ == '__main__':
     parser.add_argument("--output_csv", type=str, required=True)
     parser.add_argument("--add_url", action="store_true")
     parser.add_argument(
-        "--url_prefix", type="str",
+        "--url_prefix", type=str,
         default="https://s3.msi.umn.edu/snapshotsafari/")
     parser.add_argument(
         "--log_dir", type=str, default=None)
@@ -122,6 +122,8 @@ if __name__ == '__main__':
 
     # build url
     if args['add_url']:
+        logger.info("Adding url column with prefix: {}".format(
+            args['url_prefix']))
         df_images['url'] = df_images['image_path_rel'].apply(
             lambda x: '/'.join([args['url_prefix'], x]))
 
