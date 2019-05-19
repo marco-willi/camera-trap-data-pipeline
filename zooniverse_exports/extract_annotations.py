@@ -57,73 +57,19 @@ logger = logging.getLogger(__name__)
 def extract_raw_classification(
         cls_dict,
         args,
-        stats,
-        user_subject_tracker):
+        stats):
     """ Extract data from raw classifications
         cls_dict: dict of raw classification
         args: dict with configuration
         stats: Counter object to track stats
-        user_subject_tracker: dict to track user and subjects
     """
-
-    # list to store extracted annotations
     extracted_annotations = list()
-
-    # check eligibility of classification
-    is_eligible_workflow = extractor.is_eligible_workflow(
-        cls_dict,
-        args['workflow_id'],
-        args['workflow_version_min'])
-    if not is_eligible_workflow:
-        stats.update({'n_not_eligible_workflow'})
-        return extracted_annotations
-    # check datetime range is valid
-    is_in_date_range = extractor.is_in_date_range(
-        cls_dict,
-        args['no_earlier_than_date'],
-        args['no_later_than_date'])
-    if not is_in_date_range:
-        stats.update({'n_not_in_date_range'})
-        return extracted_annotations
     # extract classification-level info
     classification_info = {
         x: cls_dict[x] for x in flags['CLASSIFICATION_INFO_TO_ADD']}
     # map classification info header
     classification_info = extractor.rename_dict_keys(
         classification_info, flags['CLASSIFICATION_INFO_MAPPER'])
-    # extract Zooniverse subject metadata
-    subject_zooniverse_metadata = json.loads(cls_dict['metadata'])
-    # if subject was flagged as 'seen_before' skip it
-    try:
-        if extractor.subject_already_seen(subject_zooniverse_metadata):
-            if stats['n_seen_before'] < 10:
-                msg = "Removed classification_id: {} due to \
-                       'seen_before' flag".format(
-                     classification_info['classification_id'])
-                logger.debug(textwrap.shorten(msg, width=99))
-            elif stats['n_seen_before'] == 10:
-                logger.debug("Stop printing 'seen_before' msgs..")
-            stats.update({'n_seen_before'})
-            return extracted_annotations
-    except:
-        pass
-    # check if subject was already classified by user
-    # if so, skip it
-    user_name = classification_info['user_name']
-    subject_id = classification_info['subject_id']
-    if user_name not in user_subject_tracker:
-        user_subject_tracker[user_name] = set()
-    if subject_id in user_subject_tracker[user_name]:
-        # generate logging message
-        msg = "Removed classification_id: {} due \
-               to subject_id {} already classified by \
-               user {}".format(
-               classification_info['classification_id'],
-               subject_id, user_name)
-        logger.debug(textwrap.shorten(msg, width=150))
-        stats.update({'n_duplicate_subject_by_same_user'})
-        return extracted_annotations
-    user_subject_tracker[user_name].add(subject_id)
     # get all annotations (list of annotations)
     annotations_list = json.loads(cls_dict['annotations'])
     # get all tasks of an annotation
@@ -147,7 +93,6 @@ def extract_raw_classification(
     for classification_answer in classifications_deduplicated:
         record = {**classification_info, 'annos': classification_answer}
         extracted_annotations.append(record)
-
     return extracted_annotations
 
 
@@ -167,7 +112,7 @@ if __name__ == '__main__':
         help="Extract only classifications from the specified workflow_id")
     parser.add_argument(
         "--workflow_version_min", type=str, default=None,
-        help="Extract only classifications with at least the speciefied \
+        help="Extract only classifications with at least the specified \
         workflow version number \
         version. Only the major version number is compared, e.g., \
         version 45.12 is identical to 45.45")
@@ -227,10 +172,10 @@ if __name__ == '__main__':
         args['no_earlier_than_date'] = no_earlier_than_date
 
     ######################################
-    # Read and Process Classifications
+    # Extract Classifications
     ######################################
 
-    # store all extracted annotations
+    # store all extracted classifications
     all_extracted_classifications = list()
 
     # keep track of statistics
@@ -241,7 +186,7 @@ if __name__ == '__main__':
         header = next(csv_reader)
 
         # keep track of potential duplicates
-        user_subject_tracker = dict()
+        duplicate_tracker = set()
 
         for line_no, line in enumerate(csv_reader):
             # print status
@@ -251,17 +196,47 @@ if __name__ == '__main__':
             # create dictionary from input line
             cls_dict = {header[i]: x for i, x in enumerate(line)}
 
-            # check validity of classification
-            if not extractor.classification_is_valid(cls_dict):
-                logger.warning(
-                    "Classification number {} not valid, data: {}".format(
-                        line_no, cls_dict
-                    ))
-
-            # Extract annotations
             try:
-                extracted_classifications = extract_raw_classification(
-                    cls_dict, args, stats, user_subject_tracker)
+                if not extractor.classification_is_valid(cls_dict):
+                    logger.warning(
+                        "Classification number {} not valid, data: {}".format(
+                            line_no, cls_dict
+                        ))
+
+                if not extractor.is_eligible_workflow(
+                        cls_dict,
+                        args['workflow_id'],
+                        args['workflow_version_min']):
+                    stats.update({'n_not_eligible_workflow'})
+                    continue
+
+                if not extractor.is_in_date_range(
+                        cls_dict,
+                        args['no_earlier_than_date'],
+                        args['no_later_than_date']):
+                    stats.update({'n_not_in_date_range'})
+                    continue
+
+                if extractor.subject_already_seen(cls_dict):
+                    msg = "Removed classification_id: {} due to \
+                           'seen_before' flag".format(
+                         cls_dict['classification_id'])
+                    logger.debug(textwrap.shorten(msg, width=99))
+                    stats.update({'n_seen_before'})
+                    continue
+
+                if extractor.classification_is_duplicate(
+                        cls_dict, duplicate_tracker):
+                    # generate logging message
+                    msg = "Removed classification_id: {} is duplicate".format(
+                           cls_dict['classification_id'])
+                    logger.debug(textwrap.shorten(msg, width=150))
+                    stats.update({'n_duplicate_classifications_removed'})
+                    continue
+
+                extracted_classification = extract_raw_classification(
+                    cls_dict, args, stats)
+
             except Exception:
                 logger.warning(
                     "Failed to extract classification number {}".format(
@@ -274,7 +249,7 @@ if __name__ == '__main__':
                 logger.warning(traceback.format_exc())
                 stats.update({'n_exceptions'})
 
-            all_extracted_classifications += extracted_classifications
+            all_extracted_classifications += extracted_classification
 
     # print statistics
     logger.info("Processed {:,} classifications".format(line_no))
@@ -346,11 +321,6 @@ if __name__ == '__main__':
     for i, (user, count) in enumerate(user_stats.most_common(10)):
         logger.info("Rank {:3} - User: {:20} - Classifications: {}".format(
             i+1, user, count))
-
-    ######################################
-    # Unpack Classifications into
-    # Annotations
-    ######################################
 
     # get all possible answers to the questions
     question_answer_pairs = extractor.find_question_answer_pairs(

@@ -140,3 +140,36 @@ python3 -m reporting.create_ml_report_stats \
 
 
 Note: The report is comprised of two models an 'empty or not' model and a 'species' model. Even if the 'empty or not' model classifies the capture as being empty, the 'species' model has to predict a 'species'. Therefore, always consider the species predictions in conjunction with the 'empty or not' prediction.
+
+
+### Image Inventory (Optional)
+
+Create an image inventory containing paths for all images of all captures in a report. For example:
+
+```
+python3 -m reporting.create_image_inventory \
+--season_captures_csv /home/packerc/shared/season_captures/${SITE}/cleaned/${SEASON}_cleaned.csv \
+--report_csv /home/packerc/shared/zooniverse/SpeciesReports/${SITE}/${SEASON}_report_machine_learning.csv \
+--output_csv /home/packerc/shared/zooniverse/SpeciesReports/${SITE}/${SEASON}_report_machine_learning_image_inventory.csv \
+--log_dir /home/packerc/shared/zooniverse/SpeciesReports/${SITE}/log_files/ \
+--log_filename ${SEASON}_create_image_inventory
+```
+
+| Columns   | Description |
+| --------- | ----------- |
+|capture_id | internal identifier of the capture
+|image_rank_in_capture| rank/order of the image in the capture
+|image_path_rel| relative path of the image
+
+If urls are available, it is possible to add them using the following code:
+
+```
+python3 -m reporting.create_image_inventory \
+--season_captures_csv /home/packerc/shared/season_captures/${SITE}/cleaned/${SEASON}_cleaned.csv \
+--report_csv /home/packerc/shared/zooniverse/SpeciesReports/${SITE}/${SEASON}_report_machine_learning.csv \
+--output_csv /home/packerc/shared/zooniverse/SpeciesReports/${SITE}/${SEASON}_report_machine_learning_image_inventory.csv \
+--add_url \
+--url_prefix https://s3.msi.umn.edu/snapshotsafari/${SITE} \
+--log_dir /home/packerc/shared/zooniverse/SpeciesReports/${SITE}/log_files/ \
+--log_filename ${SEASON}_create_image_inventory
+```

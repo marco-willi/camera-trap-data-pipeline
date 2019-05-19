@@ -398,18 +398,39 @@ def classification_is_valid(cls_dict):
     """ Check all required fields are available """
     required = [
         'user_name', 'subject_ids', 'subject_data', 'annotations',
-        'workflow_id', 'workflow_version', 'created_at']
+        'workflow_id', 'workflow_version', 'created_at',
+        'classification_id']
     if not all([x in cls_dict for x in required]):
         return False
     else:
         return True
 
 
-def subject_already_seen(subject_metadata):
+def subject_already_seen(cls_dict):
     """ Determine if subject was already seen """
-    if 'see_before' in subject_metadata:
-        return subject_metadata['seen_before']
-    elif 'subject_selection_state' in subject_metadata:
-        return subject_metadata['subject_selection_state']['already_seen']
+    meta_data = json.loads(cls_dict['metadata'])
+    if 'see_before' in meta_data:
+        return meta_data['seen_before']
+    elif 'subject_selection_state' in meta_data:
+        try:
+            return meta_data['subject_selection_state']['already_seen']
+        except KeyError:
+            return False
     else:
+        return False
+
+
+def get_classification_unqiue_key(cls_dict):
+    """ Return unique key of classification """
+    return (cls_dict['user_name'],
+            cls_dict['subject_ids'],
+            cls_dict['workflow_id'])
+
+
+def classification_is_duplicate(cls_dict, tracker):
+    unique_key = get_classification_unqiue_key(cls_dict)
+    if unique_key in tracker:
+        return True
+    else:
+        tracker.add(unique_key)
         return False

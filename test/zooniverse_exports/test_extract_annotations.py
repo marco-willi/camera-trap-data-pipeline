@@ -4,15 +4,11 @@ import logging
 import csv
 from collections import Counter
 
-from utils.logger import setup_logger
-
 from zooniverse_exports.extract_annotations import extract_raw_classification
 
 from zooniverse_exports import extractor
 
-setup_logger()
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.ERROR)
 
 
 class ExtractClassificationsTests(unittest.TestCase):
@@ -31,19 +27,35 @@ class ExtractClassificationsTests(unittest.TestCase):
         self.raw_classifications = raw_classifications
 
         stats = Counter()
-        user_subject_tracker = dict()
+        duplicate_tracker = set()
         self.extracted_classifications = list()
         args = {
             'workflow_id': '10337',
             'workflow_version_min': '383',
-            'no_earlier_than_date': extractor.convert_date_str_to_datetime('2019-01-01'),
-            'no_later_than_date': extractor.convert_date_str_to_datetime('2020-01-01')}
+            'no_earlier_than_date': extractor.convert_date_str_to_datetime(
+                '2019-01-01'),
+            'no_later_than_date': extractor.convert_date_str_to_datetime(
+                '2020-01-01')}
         for i, cl in enumerate(self.raw_classifications):
+            if not extractor.is_in_date_range(
+                    cl,
+                    args['no_earlier_than_date'],
+                    args['no_later_than_date']):
+                continue
+            if not extractor.is_eligible_workflow(
+                    cl,
+                    args['workflow_id'],
+                    args['workflow_version_min']):
+                continue
+            if extractor.subject_already_seen(cl):
+                continue
+            if extractor.classification_is_duplicate(
+                    cl, duplicate_tracker):
+                continue
             extracted = extract_raw_classification(
                     cl,
                     args,
-                    stats,
-                    user_subject_tracker)
+                    stats)
             self.extracted_classifications += extracted
 
     def orderListofSingleKeyDicts(self, dict_list):
@@ -228,6 +240,21 @@ class ExtractClassificationsTests(unittest.TestCase):
         self.assertEqual(
             len([x for x in self.extracted_classifications
                 if x['user_name'] == 'invalid_datetime']), 1)
+
+    def testRemoveDuplicateClassifications(self):
+        tracker = set()
+        cls_raw = [
+            {'user_name': 'a', 'subject_ids': '1', 'workflow_id': '1'},
+            {'user_name': 'a', 'subject_ids': '1', 'workflow_id': '1'},
+            {'user_name': 'a', 'subject_ids': '1', 'workflow_id': '2'},
+            {'user_name': 'b', 'subject_ids': '1', 'workflow_id': '1'},
+            {'user_name': 'a', 'subject_ids': '2', 'workflow_id': '1'}
+        ]
+        expected = [False, True, False, False, False]
+        for i, cls_dict in enumerate(cls_raw):
+            self.assertEqual(
+                extractor.classification_is_duplicate(cls_dict, tracker),
+                expected[i])
 
     def testExtractAnnotations(self):
         rhino_giraffe = list()

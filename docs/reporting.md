@@ -166,6 +166,18 @@ python3 -m reporting.create_image_inventory \
 |image_rank_in_capture| rank/order of the image in the capture
 |image_path_rel| relative path of the image
 
+If urls are available, it is possible to add them using the following code:
+
+```
+python3 -m reporting.create_image_inventory \
+--season_captures_csv /home/packerc/shared/season_captures/${SITE}/cleaned/${SEASON}_cleaned.csv \
+--report_csv /home/packerc/shared/zooniverse/SpeciesReports/${SITE}/${SEASON}_report_consensus.csv \
+--output_csv /home/packerc/shared/zooniverse/SpeciesReports/${SITE}/${SEASON}_report_consensus_image_inventory.csv \
+--add_url \
+--url_prefix https://s3.msi.umn.edu/snapshotsafari/${SITE} \
+--log_dir /home/packerc/shared/zooniverse/SpeciesReports/${SITE}/log_files/ \
+--log_filename ${SEASON}_create_image_inventory
+```
 
 ### Report Output Fields
 
