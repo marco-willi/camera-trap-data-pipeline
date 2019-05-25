@@ -1,6 +1,7 @@
 """ Test Extraction of Annotations """
 import unittest
 import logging
+import json
 import csv
 from collections import Counter
 
@@ -35,7 +36,8 @@ class ExtractClassificationsTests(unittest.TestCase):
             'no_earlier_than_date': extractor.convert_date_str_to_datetime(
                 '2019-01-01'),
             'no_later_than_date': extractor.convert_date_str_to_datetime(
-                '2020-01-01')}
+                '2020-01-01'),
+            'include_non_live_classifications': False}
         for i, cl in enumerate(self.raw_classifications):
             if not extractor.is_in_date_range(
                     cl,
@@ -47,6 +49,12 @@ class ExtractClassificationsTests(unittest.TestCase):
                     args['workflow_id'],
                     args['workflow_version_min']):
                 continue
+
+            metadata = json.loads(cl['metadata'])
+            if not extractor.project_is_live(metadata):
+                if not args['include_non_live_classifications']:
+                    continue
+
             if extractor.subject_already_seen(cl):
                 continue
             if extractor.classification_is_duplicate(
@@ -240,6 +248,10 @@ class ExtractClassificationsTests(unittest.TestCase):
         self.assertEqual(
             len([x for x in self.extracted_classifications
                 if x['user_name'] == 'invalid_datetime']), 1)
+
+        self.assertEqual(
+            len([x for x in self.extracted_classifications
+                if x['user_name'] == 'not_live_project']), 0)
 
     def testRemoveDuplicateClassifications(self):
         tracker = set()

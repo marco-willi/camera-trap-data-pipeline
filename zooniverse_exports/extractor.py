@@ -178,6 +178,15 @@ def is_eligible(line, mapper, cond):
     return True
 
 
+def project_is_live(metadata):
+    try:
+        return metadata['live_project']
+    except KeyError:
+        logger.warning(
+            "'live_project' status could not be extracted - returning True")
+        return True
+
+
 def get_workflow_major_version(workflow_version):
     """ Get major version number of a workflow_version
         Input: 743.34

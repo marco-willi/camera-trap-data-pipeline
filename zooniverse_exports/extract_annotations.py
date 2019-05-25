@@ -124,6 +124,11 @@ if __name__ == '__main__':
         "--no_later_than_date", type=str, default=None,
         help="Extract only classifications that are no later than the \
               specified date -- must be in format YYYY-MM-DD")
+    parser.add_argument(
+        "--include_non_live_classifications",
+        action='store_true',
+        help="Wherther to include classifications that were made during \
+              the non-live phase of a project")
 
     args = vars(parser.parse_args())
 
@@ -199,7 +204,7 @@ if __name__ == '__main__':
             try:
                 if not extractor.classification_is_valid(cls_dict):
                     logger.warning(
-                        "Classification number {} not valid, data: {}".format(
+                        "Classification on line {} not valid, data: {}".format(
                             line_no, cls_dict
                         ))
 
@@ -216,6 +221,12 @@ if __name__ == '__main__':
                         args['no_later_than_date']):
                     stats.update({'n_not_in_date_range'})
                     continue
+
+                metadata = json.loads(cls_dict['metadata'])
+                if not extractor.project_is_live(metadata):
+                    if not args['include_non_live_classifications']:
+                        stats.update({'project_is_not_live'})
+                        continue
 
                 if extractor.subject_already_seen(cls_dict):
                     msg = "Removed classification_id: {} due to \

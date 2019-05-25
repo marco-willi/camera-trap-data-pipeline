@@ -205,6 +205,15 @@ python3 -m zooniverse_exports.extract_annotations \
 ```
 
 
+### Other Options
+
+Per default classifications made during the non-live phase of a project are excluded. To include them specify the following parameter.
+
+```
+--include_non_live_classifications
+```
+
+
 ### Output File
 
 
