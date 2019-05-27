@@ -74,9 +74,13 @@ if __name__ == "__main__":
                 subject = Subject.find(subject_id)
                 new_data = subid_dict[subject_id]
                 subject.metadata.update(new_data)
-                subject.save()
-                subjects_updated.append(subject_id)
-                n_updated += 1
+                save_successful = subject.save()
+                if save_successful:
+                    subjects_updated.append(subject_id)
+                    n_updated += 1
+                else:
+                    print("Failed to save subject {}".format(
+                        subject_id), flush=True)
         print("updated {} subjects".format(n_updated), flush=True)
         with open(args['tracker_file'], 'a') as f:
             for line in subjects_updated:
