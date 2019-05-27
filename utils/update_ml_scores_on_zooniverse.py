@@ -58,9 +58,6 @@ if __name__ == "__main__":
     config = read_config_file('~/keys/passwords.ini')
     Panoptes.connect(username=config['zooniverse']['username'],
                      password=config['zooniverse']['password'])
-    my_project = Project(args['project_id'])
-    my_set = SubjectSet().find(args['subject_set_id'])
-
     n_updated = 0
     print("Starting to update subjects", flush=True)
 
