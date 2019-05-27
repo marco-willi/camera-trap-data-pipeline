@@ -74,6 +74,7 @@ if __name__ == "__main__":
     # my_set = SubjectSet().find(args['subject_set_id'])
 
     n_updated = 0
+    n_already_updated = 0
     print("Starting to update subjects", flush=True)
 
     n_to_update = len(subjects_to_update)
@@ -133,6 +134,7 @@ if __name__ == "__main__":
                 if len(meta_to_update.keys()) == 0:
                     subjects_updated.append(subject_id)
                     n_updated += 1
+                    n_already_updated += 1
                     continue
                 else:
                     subject.save()
@@ -146,6 +148,8 @@ if __name__ == "__main__":
                 print("Failed to save subject {}".format(
                     subject.id), flush=True)
         print("updated {} subjects".format(n_updated), flush=True)
+        print("Found {} already updated subjects".format(
+            n_already_updated), flush=True)
         with open(args['tracker_file'], 'a') as f:
             for line in subjects_updated:
                 f.write(line + '\n')
