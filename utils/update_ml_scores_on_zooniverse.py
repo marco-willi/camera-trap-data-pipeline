@@ -19,7 +19,7 @@ from utils.utils import read_config_file, slice_generator
 # args['manifest_path'] = '/home/packerc/shared/zooniverse/Manifests/RUA/RUA_S1__batch_2__manifest_uploaded.json'
 # args['tracker_file'] = '/home/packerc/will5448/data/misc/RUA_S1_update_ml_tracker.txt'
 # args['verify_upload'] = True
-
+# #
 # SITE=RUA
 # SEASON=RUA_S1
 # python3 -m utils.update_ml_scores_on_zooniverse \
@@ -78,27 +78,28 @@ if __name__ == "__main__":
 
     for i_start, i_end in slices:
         subjects_updated = list()
-        for subject_id in subjects_to_update[i_start:i_end]:
-            subject = Subject.find(subject_id)
-            new_data = subid_dict[subject_id]
-            if new_data.items() <= subject.metadata.items():
-                print("Already updated subject {}".format(subject_id), flush=True)
-                subjects_updated.append(subject_id)
-                n_updated += 1
-                continue
-            subject.metadata.update(new_data)
-            subject.save()
-            if args['verify_upload']:
-                subject_updated = Subject.find(subject_id)
-                if new_data.items() <= subject_updated.metadata.items():
+        subject_objects = list()
+        with Subject.async_saves():
+            for subject_id in subjects_to_update[i_start:i_end]:
+                subject = Subject.find(subject_id)
+                new_data = subid_dict[subject_id]
+                if new_data.items() <= subject.metadata.items():
+                    print("Already updated subject {}".format(
+                        subject_id), flush=True)
                     subjects_updated.append(subject_id)
                     n_updated += 1
-                else:
-                    print("Failed to save subject {}".format(
-                        subject_id), flush=True)
-            else:
-                subjects_updated.append(subject_id)
+                    continue
+                subject.metadata.update(new_data)
+                subject.save()
+                subject_objects.append(subject)
+        # verify save status
+        for subject in subject_objects:
+            if subject.async_save_result:
+                subjects_updated.append(subject.id)
                 n_updated += 1
+            else:
+                print("Failed to save subject {}".format(
+                    subject.id), flush=True)
         print("updated {} subjects".format(n_updated), flush=True)
         with open(args['tracker_file'], 'a') as f:
             for line in subjects_updated:
@@ -106,6 +107,40 @@ if __name__ == "__main__":
         print("Updated tracker file at {}".format(
             args['tracker_file']), flush=True)
     print("Finished updating subjects", flush=True)
+
+
+
+
+    # for i_start, i_end in slices:
+    #     subjects_updated = list()
+    #     for subject_id in subjects_to_update[i_start:i_end]:
+    #         subject = Subject.find(subject_id)
+    #         new_data = subid_dict[subject_id]
+    #         if new_data.items() <= subject.metadata.items():
+    #             print("Already updated subject {}".format(subject_id), flush=True)
+    #             subjects_updated.append(subject_id)
+    #             n_updated += 1
+    #             continue
+    #         subject.metadata.update(new_data)
+    #         subject.save()
+    #         if args['verify_upload']:
+    #             subject_updated = Subject.find(subject_id)
+    #             if new_data.items() <= subject_updated.metadata.items():
+    #                 subjects_updated.append(subject_id)
+    #                 n_updated += 1
+    #             else:
+    #                 print("Failed to save subject {}".format(
+    #                     subject_id), flush=True)
+    #         else:
+    #             subjects_updated.append(subject_id)
+    #             n_updated += 1
+    #     print("updated {} subjects".format(n_updated), flush=True)
+    #     with open(args['tracker_file'], 'a') as f:
+    #         for line in subjects_updated:
+    #             f.write(line + '\n')
+    #     print("Updated tracker file at {}".format(
+    #         args['tracker_file']), flush=True)
+    # print("Finished updating subjects", flush=True)
 
 
 
