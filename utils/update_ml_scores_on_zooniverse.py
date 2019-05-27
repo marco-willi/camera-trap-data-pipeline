@@ -5,7 +5,7 @@ import os
 from collections import OrderedDict
 import argparse
 
-from panoptes_client import Project, Panoptes, SubjectSet, Subject
+from panoptes_client import Panoptes, Subject
 
 from utils.utils import read_config_file, slice_generator
 
@@ -15,12 +15,17 @@ from utils.utils import read_config_file, slice_generator
 # manifest_path = '/home/packerc/shared/zooniverse/Manifests/RUA/RUA_S1__batch_2__manifest_uploaded.json'
 # tracker_file = '/home/packerc/will5448/data/misc/rua_update_tracker2.txt'
 
+# SITE=RUA
+# SEASON=RUA_S1
+# python3 -m utils.update_ml_scores_on_zooniverse \
+# --manifest_path /home/packerc/shared/zooniverse/Manifests/${SITE}/${SEASON}__batch_2__manifest_uploaded.json \
+# --tracker_file /home/packerc/will5448/data/misc/${SEASON}_update_ml_tracker.txt
+
+
 if __name__ == "__main__":
 
     # Parse command line arguments
     parser = argparse.ArgumentParser()
-    parser.add_argument("--project_id", type=str, required=True)
-    parser.add_argument("--subject_set_id", type=str, required=True)
     parser.add_argument("--manifest_path", type=str, required=True)
     parser.add_argument("--tracker_file", type=str, required=True)
 
