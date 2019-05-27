@@ -75,6 +75,7 @@ if __name__ == "__main__":
     Panoptes.connect(username=config['zooniverse']['username'],
                      password=config['zooniverse']['password'])
     n_updated = 0
+    n_already_updated = 0
     print("Starting to update subjects", flush=True)
 
     n_to_update = len(subjects_to_update)
@@ -88,10 +89,9 @@ if __name__ == "__main__":
                 subject = Subject.find(subject_id)
                 new_data = subid_dict[subject_id]
                 if new_data.items() <= subject.metadata.items():
-                    print("Already updated subject {}".format(
-                        subject_id), flush=True)
                     subjects_updated.append(subject_id)
                     n_updated += 1
+                    n_already_updated += 1
                     continue
                 subject.metadata.update(new_data)
                 subject.save()
@@ -105,6 +105,8 @@ if __name__ == "__main__":
                 print("Failed to save subject {}".format(
                     subject.id), flush=True)
         print("updated {} subjects".format(n_updated), flush=True)
+        print("Found {} already updated subjects".format(
+            n_already_updated), flush=True)
         with open(args['tracker_file'], 'a') as f:
             for line in subjects_updated:
                 f.write(line + '\n')
