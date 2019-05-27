@@ -25,7 +25,12 @@ from utils.utils import read_config_file, slice_generator
 # python3 -m utils.update_ml_scores_on_zooniverse \
 # --manifest_path /home/packerc/shared/zooniverse/Manifests/${SITE}/${SEASON}__batch_2__manifest_uploaded.json \
 # --tracker_file /home/packerc/will5448/data/misc/${SEASON}_update_ml_tracker.txt
-# --verify_upload
+
+# SITE=GRU
+# SEASON=GRU_S1
+# python3 -m utils.update_ml_scores_on_zooniverse \
+# --manifest_path /home/packerc/shared/zooniverse/Manifests/${SITE}/${SEASON}__batch_2__manifest_uploaded.json \
+# --tracker_file /home/packerc/will5448/data/misc/${SEASON}_update_ml_tracker.txt
 
 
 if __name__ == "__main__":
@@ -34,7 +39,6 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--manifest_path", type=str, required=True)
     parser.add_argument("--tracker_file", type=str, required=True)
-    parser.add_argument("--verify_upload", action='store_true')
 
     args = vars(parser.parse_args())
 

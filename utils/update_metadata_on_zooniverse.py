@@ -75,12 +75,13 @@ if __name__ == "__main__":
 
     n_updated = 0
     print("Starting to update subjects", flush=True)
-    subjects_updated = list()
 
     n_to_update = len(subjects_to_update)
     slices = slice_generator(n_to_update, n_to_update // 100)
 
     for i_start, i_end in slices:
+        subjects_updated = list()
+        subject_objects = list()
         with Subject.async_saves():
             for subject_id in subjects_to_update[i_start:i_end]:
                 subject = Subject.find(subject_id)
@@ -127,17 +128,27 @@ if __name__ == "__main__":
                     print("Updating To:", flush=True)
                     print(subject.metadata, flush=True)
                     print("=====================================", flush=True)
-                if not args['dry_run']:
-                    if len(meta_to_update.keys()) > 0:
-                        subject.save()
-                subjects_updated.append(subject_id)
+                if args['dry_run']:
+                    continue
+                if len(meta_to_update.keys()) == 0:
+                    subjects_updated.append(subject_id)
+                    n_updated += 1
+                    continue
+                else:
+                    subject.save()
+                    subject_objects.append(subject)
+        # verify save status
+        for subject in subject_objects:
+            if subject.async_save_result:
+                subjects_updated.append(subject.id)
                 n_updated += 1
+            else:
+                print("Failed to save subject {}".format(
+                    subject.id), flush=True)
         print("updated {} subjects".format(n_updated), flush=True)
         with open(args['tracker_file'], 'a') as f:
             for line in subjects_updated:
                 f.write(line + '\n')
         print("Updated tracker file at {}".format(
             args['tracker_file']), flush=True)
-        subjects_updated = list()
-
     print("Finished updating subjects", flush=True)
