@@ -48,11 +48,6 @@ if __name__ == "__main__":
     for k, v in mani.items():
         _id = v['info']['subject_id']
         meta_data = v["upload_metadata"]
-        # if 'capture_id' in meta_data:
-        #     meta_data['capture_id_anonymized'] = meta_data.pop('capture_id')
-        # if not '#capture_id' in
-        #     meta_data['capture_id_anonymized'] = meta_data['capture_id']
-        #     meta_data['capture_id']
         subid_dict[_id] = meta_data
 
     # subjects to update
@@ -68,12 +63,12 @@ if __name__ == "__main__":
 
     n_updated = 0
     print("Starting to update subjects", flush=True)
-    subjects_updated = list()
 
     n_to_update = len(subjects_to_update)
     slices = slice_generator(n_to_update, n_to_update // 100)
 
     for i_start, i_end in slices:
+        subjects_updated = list()
         with Subject.async_saves():
             for subject_id in subjects_to_update[i_start:i_end]:
                 subject = Subject.find(subject_id)
@@ -88,6 +83,4 @@ if __name__ == "__main__":
                 f.write(line + '\n')
         print("Updated tracker file at {}".format(
             args['tracker_file']), flush=True)
-        subjects_updated = list()
-
     print("Finished updating subjects", flush=True)

@@ -22,7 +22,7 @@ from zooniverse_uploads import uploader
 # args['season_id_to_add'] = 'NIA_S1'
 # args['dry_run'] = True
 
-
+#
 # SITE=NIA
 # SEASON=NIA_S1
 # python3 -m utils.update_metadata_on_zooniverse \
@@ -100,9 +100,9 @@ if __name__ == "__main__":
                     capture = subject.metadata['#capture']
                     capture_id = '{season}#{site}#{roll}#{capture}'.format(
                         **{'season': season,
-                         'site': site,
-                         'roll': roll,
-                         'capture': capture})
+                           'site': site,
+                           'roll': roll,
+                           'capture': capture})
                     meta_to_update['#capture_id'] = capture_id
                 # add capture_id_anonymized
                 if not 'capture_id_anonymized' in subject.metadata:
