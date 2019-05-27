@@ -81,6 +81,11 @@ if __name__ == "__main__":
         for subject_id in subjects_to_update[i_start:i_end]:
             subject = Subject.find(subject_id)
             new_data = subid_dict[subject_id]
+            if new_data.items() <= subject.metadata.items():
+                print("Already updated subject {}".format(subject_id), flush=True)
+                subjects_updated.append(subject_id)
+                n_updated += 1
+                continue
             subject.metadata.update(new_data)
             subject.save()
             if args['verify_upload']:
