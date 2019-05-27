@@ -15,11 +15,17 @@ from utils.utils import read_config_file, slice_generator
 # manifest_path = '/home/packerc/shared/zooniverse/Manifests/RUA/RUA_S1__batch_2__manifest_uploaded.json'
 # tracker_file = '/home/packerc/will5448/data/misc/rua_update_tracker2.txt'
 
+# args = dict()
+# args['manifest_path'] = '/home/packerc/shared/zooniverse/Manifests/RUA/RUA_S1__batch_2__manifest_uploaded.json'
+# args['tracker_file'] = '/home/packerc/will5448/data/misc/RUA_S1_update_ml_tracker.txt'
+# args['verify_upload'] = True
+
 # SITE=RUA
 # SEASON=RUA_S1
 # python3 -m utils.update_ml_scores_on_zooniverse \
 # --manifest_path /home/packerc/shared/zooniverse/Manifests/${SITE}/${SEASON}__batch_2__manifest_uploaded.json \
 # --tracker_file /home/packerc/will5448/data/misc/${SEASON}_update_ml_tracker.txt
+# --verify_upload
 
 
 if __name__ == "__main__":
@@ -28,6 +34,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--manifest_path", type=str, required=True)
     parser.add_argument("--tracker_file", type=str, required=True)
+    parser.add_argument("--verify_upload", action='store_true')
 
     args = vars(parser.parse_args())
 
@@ -53,7 +60,7 @@ if __name__ == "__main__":
     for k, v in mani.items():
         _id = v['info']['subject_id']
         meta_data = v["upload_metadata"]
-        subid_dict[_id] = meta_data
+        subid_dict[_id] = {k: v for k, v in meta_data.items() if k.startswith('#machine')}
 
     # subjects to update
     subjects_to_update = list(subid_dict.keys() - subjects_uploaded.keys())
@@ -71,18 +78,22 @@ if __name__ == "__main__":
 
     for i_start, i_end in slices:
         subjects_updated = list()
-        with Subject.async_saves():
-            for subject_id in subjects_to_update[i_start:i_end]:
-                subject = Subject.find(subject_id)
-                new_data = subid_dict[subject_id]
-                subject.metadata.update(new_data)
-                save_successful = subject.save()
-                if save_successful:
+        for subject_id in subjects_to_update[i_start:i_end]:
+            subject = Subject.find(subject_id)
+            new_data = subid_dict[subject_id]
+            subject.metadata.update(new_data)
+            subject.save()
+            if args['verify_upload']:
+                subject_updated = Subject.find(subject_id)
+                if new_data.items() <= subject_updated.metadata.items():
                     subjects_updated.append(subject_id)
                     n_updated += 1
                 else:
                     print("Failed to save subject {}".format(
                         subject_id), flush=True)
+            else:
+                subjects_updated.append(subject_id)
+                n_updated += 1
         print("updated {} subjects".format(n_updated), flush=True)
         with open(args['tracker_file'], 'a') as f:
             for line in subjects_updated:
@@ -90,3 +101,27 @@ if __name__ == "__main__":
         print("Updated tracker file at {}".format(
             args['tracker_file']), flush=True)
     print("Finished updating subjects", flush=True)
+
+
+
+
+    # for i_start, i_end in slices:
+    #     subjects_updated = list()
+    #     with Subject.async_saves():
+    #         for subject_id in subjects_to_update[i_start:i_end]:
+    #             subject = Subject.find(subject_id)
+    #             new_data = subid_dict[subject_id]
+    #             subject.metadata.update(new_data)
+    #             subject.save()
+    #             subjects_updated.append(subject_id)
+    #             n_updated += 1
+    #             else:
+    #                 print("Failed to save subject {}".format(
+    #                     subject_id), flush=True)
+    #     print("updated {} subjects".format(n_updated), flush=True)
+    #     with open(args['tracker_file'], 'a') as f:
+    #         for line in subjects_updated:
+    #             f.write(line + '\n')
+    #     print("Updated tracker file at {}".format(
+    #         args['tracker_file']), flush=True)
+    # print("Finished updating subjects", flush=True)
