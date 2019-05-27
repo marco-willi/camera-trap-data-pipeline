@@ -7,7 +7,7 @@ import argparse
 
 from panoptes_client import Panoptes, Subject
 
-from utils.utils import read_config_file, slice_generator
+from utils.utils import read_config_file, slice_generator, current_time_str
 
 
 # project_id = '5155'
@@ -110,7 +110,8 @@ if __name__ == "__main__":
         with open(args['tracker_file'], 'a') as f:
             for line in subjects_updated:
                 f.write(line + '\n')
-        print("Updated tracker file at {}".format(
+        print("{} - Updated tracker file at {}".format(
+            current_time_str(),
             args['tracker_file']), flush=True)
     print("Finished updating subjects", flush=True)
 
