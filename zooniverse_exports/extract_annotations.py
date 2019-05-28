@@ -226,7 +226,7 @@ if __name__ == '__main__':
                 metadata = json.loads(cls_dict['metadata'])
                 if not extractor.project_is_live(metadata):
                     if not args['include_non_live_classifications']:
-                        stats.update({'project_is_not_live'})
+                        stats.update({'n_project_is_not_live'})
                         continue
 
                 if args['filter_by_season'] != '':
