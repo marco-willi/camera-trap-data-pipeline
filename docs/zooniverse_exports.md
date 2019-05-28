@@ -85,7 +85,7 @@ The resulting file may have the following column headers:
 
 ## Extract Zooniverse Annotations from Classifications
 
-The following code extracts the relevant fields of a Zooniverse classification export. It creates a csv file with one line per species identification/annotation. There are several options to select classifications for extractions. Per default only classifications made during the 'live' phase of a project are extracted (this can be overriden).
+The following code extracts the relevant fields of a Zooniverse classification export. It creates a csv file with one line per species identification/annotation. There are several options to select classifications for extractions. Per default only classifications made during the 'live' phase of a project are extracted (this can be overriden). Use only one of the following options to do the extraction.
 
 Use a machine with enough memory - for example:
 
@@ -96,7 +96,7 @@ qsub -I -l walltime=2:00:00,nodes=1:ppn=4,mem=16gb
 
 ### Option 1) Filter Classifications by Season-ID (Default)
 
-The following script extracts all classifications of a given season, including all workflows and workflow versions. Note that later scripts (i.e. aggregation scripts) may not work if there are multiple workflows. This requires that the 'season' information was added to the subject's metadata. Inspect the number of classifications that were filtered by 'filter_by_season' for plausibility.
+The following script extracts all classifications of a given season, including all workflows and workflow versions. Note that later scripts (i.e. aggregation scripts) may not work if there are multiple workflows. This option requires that the 'season' information was added to the subject's metadata (is default). Inspect the number of classifications that were filtered by 'filter_by_season' for plausibility.
 
 ```
 python3 -m zooniverse_exports.extract_annotations \
@@ -223,19 +223,15 @@ The resulting file may have the following column headers:
 |subject_id | zooniverse unique id of the capture (a subject)
 |workflow_id,workflow_version | workflow info
 |classification_id | classification_id (multiple annotations possible)
-|question__count, question__eating | question answers
-|question__interacting | question answers
-|question__lyingdown, question__moving | question answers
-|question__standing  | question answers
-|question__young_present,question__species | question answers
-|question__antlers_visible  | question answers
-
+|question__(qustion_name)| answer to question (question_name)
 
 One record may look like:
+
 ```
-XYZ,,2018-02-06 17:09:43 UTC,
-17530583,4979,275.13,88921948,consensus,2018-11-21T19:16:34.362Z,
-4,0,1,0,0,1,1,wildebeest,
+user_name,user_id,created_at,subject_id,workflow_id,workflow_version,classification_id,ques
+tion__species,question__count,question__standing,question__resting,question__moving,questio
+n__eating,question__interacting,question__young_present,question__horns_visible
+XYZ,1717856,2018-02-02 06:43:14 UTC,17579137,4986,248.3,88366520,zebra,2,1,0,0,0,0,0,
 ```
 
 ## Filter Annotations with Subject Data (Optional)
