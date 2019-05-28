@@ -178,6 +178,16 @@ def is_eligible(line, mapper, cond):
     return True
 
 
+def get_season_from_subject_data(subject_data, subject_id):
+    try:
+        data = subject_data[subject_id]
+        return data['#season']
+    except KeyError:
+        logger.warning(
+            "'#season' field could not be extracted for subject_id: {}- returning '' as season".format(subject_id))
+        return ''
+
+
 def project_is_live(metadata):
     try:
         return metadata['live_project']

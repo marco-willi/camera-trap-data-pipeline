@@ -3,7 +3,7 @@ import csv
 import os
 import logging
 import argparse
-from collections import OrderedDict
+from collections import OrderedDict, Counter
 
 import pandas as pd
 
@@ -18,15 +18,6 @@ flags = cfg['subject_extractor_flags']
 # args = dict()
 # args['subject_csv'] = '/home/packerc/shared/zooniverse/Exports/MAD/MAD_S1_subjects.csv'
 # args['output_csv'] = '/home/packerc/shared/zooniverse/Exports/MAD/MAD_S1_subjects_extracted.csv'
-
-
-def _guess_season_id_from_file(file_path):
-    """ Guess the season id from filename / path
-        - required for legacy data
-    """
-    file_name = os.path.basename(file_path)
-    season_id = '_'.join(file_name.split('_')[0:2])
-    return season_id
 
 
 if __name__ == '__main__':
@@ -64,31 +55,22 @@ if __name__ == '__main__':
         logger.info("Filter subjects for season equal {}".format(
             args['filter_by_season']))
 
-    # Guess season id to subsitute it if not in subject extractions but
-    # requested -- dealing with legacy data
-    try:
-        season_id_guess = _guess_season_id_from_file(args['output_csv'])
-        logger.info("Guessed season id from output_csv: {}".format(
-            season_id_guess))
-    except:
-        season_id_guess = ''
-        logger.info("Failed to guess season id from output_csv")
-
     # Read Subject CSV
     n_images_per_subject = list()
     subject_info = OrderedDict()
     subject_data_header = set()
+    stats_missing_data = Counter()
     n_excluded_wrong_season = 0
-    n_used_guessed_season_id = 0
+    n_subjects_with_missing_season_id = 0
     with open(args['subject_csv'], "r") as ins:
         csv_reader = csv.reader(ins, delimiter=',', quotechar='"')
         header_subject = next(csv_reader)
-        row_name_to_id_mapper_sub = {x: i for i, x in enumerate(header_subject)}
+        column_mapper = {x: i for i, x in enumerate(header_subject)}
         for line_no, line in enumerate(csv_reader):
-            subject_id = line[row_name_to_id_mapper_sub['subject_id']]
+            subject_id = line[column_mapper['subject_id']]
             # Extract Location / URL Data
             locations_dict = extractor.extract_key_from_json(
-                line, 'locations', row_name_to_id_mapper_sub)
+                line, 'locations', column_mapper)
             # append 'url' to key-names: 0->url0
             location_keys = list(locations_dict.keys())
             location_keys.sort()
@@ -97,13 +79,13 @@ if __name__ == '__main__':
                     locations_dict.pop('{}'.format(i))
             # extract metadata
             metadata_dict = extractor.extract_key_from_json(
-                line, 'metadata', row_name_to_id_mapper_sub)
+                line, 'metadata', column_mapper)
             # get other information
-            retired_at = line[row_name_to_id_mapper_sub['retired_at']]
-            retirement_reason = line[row_name_to_id_mapper_sub['retirement_reason']]
+            retired_at = line[column_mapper['retired_at']]
+            retirement_reason = line[column_mapper['retirement_reason']]
             # handle legacy case when 'created_at' was not in Zooniverse exports
             try:
-                created_at = line[row_name_to_id_mapper_sub['created_at']]
+                created_at = line[column_mapper['created_at']]
             except:
                 created_at = ''
             # collect all subject data
@@ -129,20 +111,17 @@ if __name__ == '__main__':
                 try:
                     subject_info_to_add[field] = subject_data_all[field]
                 except KeyError:
+                    stats_missing_data.update({field})
                     # dont create empty capture_id field if not available,
                     # potentially dangerous
                     if field == '#capture_id':
-                        pass
-                    # substitute season id based on guessed id
-                    elif field == '#season':
-                        subject_info_to_add[field] = season_id_guess
-                        n_used_guessed_season_id += 1
-                    else:
-                        subject_info_to_add[field] = ''
+                        continue
+                    subject_info_to_add[field] = ''
             for field in flags['SUBJECT_DATA_TO_ADD']:
                 try:
                     subject_info_to_add[field] = subject_data_all[field]
                 except KeyError:
+                    stats_missing_data.update({field})
                     subject_info_to_add[field] = ''
             subject_info_to_add = extractor.rename_dict_keys(
                 subject_info_to_add, flags['SUBJECT_DATA_NAME_MAPPER'])
@@ -162,12 +141,10 @@ if __name__ == '__main__':
 
     logger.info("Excluded {} subjects because of season filter".format(
         n_excluded_wrong_season))
-    logger.info(
-        "Used guessed season_id {} for {} subjects without season id in meta-data".format(
-            season_id_guess,
-            n_used_guessed_season_id))
 
-    n_used_guessed_season_id
+    for field, counts in stats_missing_data.items():
+        logger.info(
+            "Found {} subjects without {} info".format(counts, field))
 
     # Export Data as CSV
     df_out = pd.DataFrame.from_dict(subject_info, orient='index')

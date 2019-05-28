@@ -37,7 +37,8 @@ class ExtractClassificationsTests(unittest.TestCase):
                 '2019-01-01'),
             'no_later_than_date': extractor.convert_date_str_to_datetime(
                 '2020-01-01'),
-            'include_non_live_classifications': False}
+            'include_non_live_classifications': False,
+            'filter_by_season': 'MAD_S1'}
         for i, cl in enumerate(self.raw_classifications):
             if not extractor.is_in_date_range(
                     cl,
@@ -53,6 +54,13 @@ class ExtractClassificationsTests(unittest.TestCase):
             metadata = json.loads(cl['metadata'])
             if not extractor.project_is_live(metadata):
                 if not args['include_non_live_classifications']:
+                    continue
+
+            if args['filter_by_season'] != '':
+                subject_data = json.loads(cl['subject_data'])
+                season_id = extractor.get_season_from_subject_data(
+                    subject_data, cl['subject_ids'])
+                if season_id != args['filter_by_season']:
                     continue
 
             if extractor.subject_already_seen(cl):
@@ -252,6 +260,14 @@ class ExtractClassificationsTests(unittest.TestCase):
         self.assertEqual(
             len([x for x in self.extracted_classifications
                 if x['user_name'] == 'not_live_project']), 0)
+
+        self.assertEqual(
+            len([x for x in self.extracted_classifications
+                if x['user_name'] == 'wrong_season']), 0)
+
+        self.assertEqual(
+            len([x for x in self.extracted_classifications
+                if x['user_name'] == 'no_season']), 0)
 
     def testRemoveDuplicateClassifications(self):
         tracker = set()

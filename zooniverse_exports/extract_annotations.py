@@ -107,6 +107,7 @@ if __name__ == '__main__':
     parser.add_argument(
         "--log_filename", type=str,
         default='extract_annotations')
+    parser.add_argument("--filter_by_season", type=str, default='')
     parser.add_argument(
         "--workflow_id", type=str, default=None,
         help="Extract only classifications from the specified workflow_id")
@@ -226,6 +227,14 @@ if __name__ == '__main__':
                 if not extractor.project_is_live(metadata):
                     if not args['include_non_live_classifications']:
                         stats.update({'project_is_not_live'})
+                        continue
+
+                if args['filter_by_season'] != '':
+                    subject_data = json.loads(cls_dict['subject_data'])
+                    season_id = extractor.get_season_from_subject_data(
+                        subject_data, cls_dict['subject_ids'])
+                    if season_id != args['filter_by_season']:
+                        stats.update({'n_season_does_not_match'})
                         continue
 
                 if extractor.subject_already_seen(cls_dict):
