@@ -60,6 +60,7 @@ if __name__ == '__main__':
     subject_info = OrderedDict()
     subject_data_header = set()
     stats_missing_data = Counter()
+    stats_retirement_reason = Counter()
     n_excluded_wrong_season = 0
     n_subjects_with_missing_season_id = 0
     with open(args['subject_csv'], "r") as ins:
@@ -83,6 +84,7 @@ if __name__ == '__main__':
             # get other information
             retired_at = line[column_mapper['retired_at']]
             retirement_reason = line[column_mapper['retirement_reason']]
+            stats_retirement_reason.update({retirement_reason})
             # handle legacy case when 'created_at' was not in Zooniverse exports
             try:
                 created_at = line[column_mapper['created_at']]
@@ -145,6 +147,12 @@ if __name__ == '__main__':
     for field, counts in stats_missing_data.items():
         logger.info(
             "Found {} subjects without {} info".format(counts, field))
+
+    total = sum([x for x in stats_retirement_reason.values()])
+    for ret_reason, count in stats_retirement_reason.most_common():
+        logger.info(
+            "Retirement Reason: {:20} -- counts: {:10} / {} ({:.2f} %)".format(
+             ret_reason, count, total, 100*count/total))
 
     # Export Data as CSV
     df_out = pd.DataFrame.from_dict(subject_info, orient='index')
