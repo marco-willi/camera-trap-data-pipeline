@@ -211,8 +211,8 @@ def update_time_checks(image_data, flags):
         if float(image_data['days_to_next_image_taken']) > max_days:
             time_checks['image_check__time_lapse'] = 1
     # check for too_old / too new
-    date_format = flags['time_formats']['output_date_format']
-    date_obj = datetime.strptime(image_data['date'], date_format)
+    date_format = flags['time_formats']['output_datetime_format']
+    date_obj = datetime.strptime(image_data['datetime'], date_format)
     year_num = int(date_obj.strftime('%Y'))
     if 'image_check__time_too_old' in time_checks:
         min_year = \
